@@ -170,7 +170,9 @@ namespace Furcadia.IO
 				}
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG: HKCU\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+#endif
                 }
                 finally
                 {
@@ -192,7 +194,9 @@ namespace Furcadia.IO
 				}
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG: HKLM\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+#endif
                 }
                 finally
                 {
@@ -214,7 +218,9 @@ namespace Furcadia.IO
 				}
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG: HKCU\\{0} \n\r{1}", RegPathx32, e.Message));
+#endif
                 }
                 finally
                 {
@@ -234,7 +240,9 @@ namespace Furcadia.IO
                 }
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG::Programs:: HKLM\\{0} , {1}",RegPathx32, e.Message));
+#endif
                 }
                 finally
                 {
@@ -256,7 +264,9 @@ namespace Furcadia.IO
                 }
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG::Programs:: HKCU\\{0} , {1}", RegPathx32, e.Message));
+#endif
                 }
                 finally
                 {
@@ -301,14 +311,19 @@ namespace Furcadia.IO
 						return _installpath; // Path found
 					}
 				}
-				catch{}
+				catch (Exception e)
+                {
+#if DEBUG
+                    Console.WriteLine(string.Format("DEBUG::mono:: HKCU\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+#endif
+                }
                 finally
                 {
                     regkey.Dispose();
                 }
 
-                // Mono Current User with x64 CPU Check
-				regkey = Registry.CurrentUser;
+                // Mono Local Machine with x64 CPU Check
+				regkey = Registry.LocalMachine;
 				try
 				{
 					regkey = regkey.OpenSubKey(GetRegistryPath() + "Programs", false);
@@ -322,15 +337,16 @@ namespace Furcadia.IO
 				}
                 catch (Exception e)
                 {
-                    Console.WriteLine(string.Format("DEBUG: HKCU\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+#if DEBUG
+                    Console.WriteLine(string.Format("DEBUG: HKLM\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+#endif
                 }
                 finally
                 {
                     regkey.Dispose();
                 }
 
-                // Mono Local Machine Hive with x64 CPU Check
-                regkey = Registry.LocalMachine;
+				regkey = Registry.LocalMachine;
                 try
                 {
                     regkey = regkey.OpenSubKey(RegPathx32 + "Programs", false);
@@ -344,24 +360,10 @@ namespace Furcadia.IO
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(string.Format("DEBUG: HKLM\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+#if DEBUG
+                    Console.WriteLine(string.Format("DEBUG: HKLM\\{0} \n\r{1}", RegPathx32, e.Message));
+#endif
                 }
-                finally
-                {
-                    regkey.Close();
-                }
-				regkey = Registry.LocalMachine;
-				try
-				{
-					regkey = regkey.OpenSubKey(RegPathx32  + "Programs", false);
-					path = regkey.GetValue("path").ToString();
-					regkey.Close();
-					if (System.IO.Directory.Exists(path))
-					{
-						_installpath = path;
-						return _installpath; // Path found
-					}
-				}catch{}
                 finally
                 {
                     regkey.Close();
@@ -408,7 +410,9 @@ namespace Furcadia.IO
 				}
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG::Patched:: HKCU\\{0} , {1}", GetRegistryPath(), e.Message));
+#endif
                 }
                 finally
                 {
@@ -430,7 +434,9 @@ namespace Furcadia.IO
                 }
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG::Patched:: HKCU\\{0} , {1}", GetRegistryPath(), e.Message));
+#endif
                 }
                 finally
                 {
@@ -450,7 +456,9 @@ namespace Furcadia.IO
                 }
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG::Patched:: HKLM\\{0} , {1}", RegPathx32, e.Message));
+#endif
                 }
                 finally
                 {
@@ -470,7 +478,9 @@ namespace Furcadia.IO
 				}
                 catch (Exception e)
                 {
+#if DEBUG
                     Console.WriteLine(string.Format("DEBUG::Patched:: HKCU\\{0} , {1}", RegPathx32, e.Message));
+#endif
                 }
                 finally
                 {
@@ -519,23 +529,35 @@ namespace Furcadia.IO
                         return _defaultpatchpath; // Path found
                     }
                 }
-                catch { }
+                catch (Exception e)
+                {
+#if DEBUG
+                    Console.WriteLine(string.Format("DEBUG:mono:Patched:: HKCU\\{0} , {1}", GetRegistryPath(), e.Message));
+#endif
+                }
                 finally
                 {
                     regkey.Dispose();
                 }
+
 				regkey = Registry.LocalMachine;
-				try
-				{
-					regkey = regkey.OpenSubKey( RegPathx32 + "Patches", false);
-					path = regkey.GetValue("default").ToString();
-					regkey.Close();
-					if (System.IO.Directory.Exists(path))
-					{
-						_defaultpatchpath = path;
-						return _defaultpatchpath; // Path found
-					}
-				}catch{}
+                try
+                {
+                    regkey = regkey.OpenSubKey(RegPathx32 + "Patches", false);
+                    path = regkey.GetValue("default").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _defaultpatchpath = path;
+                        return _defaultpatchpath; // Path found
+                    }
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    Console.WriteLine(string.Format("DEBUG:mono:Patched:: HKLM\\{0} , {1}", RegPathx32, e.Message));
+#endif
+                }
                 finally
                 {
                     regkey.Dispose();
@@ -552,7 +574,12 @@ namespace Furcadia.IO
 						return _defaultpatchpath; // Path found
 						}
 					}
-				catch {}
+                catch (Exception e)
+                {
+#if DEBUG
+                    Console.WriteLine(string.Format("DEBUG:mono:Patched:: HKCU\\{0} , {1}", RegPathx32, e.Message));
+#endif
+                }
                 finally
                 {
                     regkey.Dispose();
