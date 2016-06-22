@@ -7,6 +7,19 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  *  (June 1, 2016) Gerolkae, Added possible missing Registry Paths for X86/x64 Windows and Mono Support. Wine Support also contains these corrections
  */
+
+/*
+ * Theory Check all known default paths
+ * check localdir.ini
+ * then Check Each Registry Hives for active CPU type
+ * Then Check each Hive For default 32bit path (Non wow6432node)
+ * then Check Wine Varants (C++ Win32 client)
+ * then Check Mono Versions for beforementioned (C# Client)
+ * then check Default Drive folder Paths
+ * If all Fail... Throw FurcadiaNotInstalled Excempt
+ * Clients Should check for this error and then ask the user where to manually locate Furc
+ */
+ 
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +39,7 @@ namespace Furcadia.IO
 		
 		private string RegPathx64 = @"SOFTWARE\Wow6432Node\Dragon's Eye Productions\Furcadia\";
 		private string RegPathx32 = @"SOFTWARE\Dragon's Eye Productions\Furcadia\";
-			
+        			
 #region Constructors
 		/// <summary>
         /// Defines the base path for the Furcadia Directory
@@ -139,6 +152,8 @@ namespace Furcadia.IO
 			if (Environment.OSVersion.Platform == PlatformID.Win32Windows ||
 				Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{
+
+                // Current User Hive with x64 CPU Check
 				RegistryKey regkey = Registry.CurrentUser;
 				try
 				{
@@ -151,8 +166,17 @@ namespace Furcadia.IO
 						return _installpath; // Path found
 					}
 				}
-				catch{}
-				regkey = Registry.LocalMachine;
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG: HKCU\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
+
+                // Local Machine Hive with x64 CPU Check
+                regkey = Registry.LocalMachine;
 				try
 				{
 					regkey = regkey.OpenSubKey(GetRegistryPath() + "Programs", false);
@@ -164,7 +188,16 @@ namespace Furcadia.IO
 						return _installpath; // Path found
 					}
 				}
-				catch{}
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG: HKLM\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
+
+                // Current User Hive with x64 CPU Check Failed
 				regkey = Registry.CurrentUser;
 				try
 				{
@@ -177,20 +210,57 @@ namespace Furcadia.IO
 						return _installpath; // Path found
 					}
 				}
-				catch{}
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG: HKCU\\{0} \n\r{1}", RegPathx32, e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
 				regkey = Registry.LocalMachine;
-				try
-				{
-					regkey = regkey.OpenSubKey(RegPathx32  + "Programs", false);
-					path = regkey.GetValue("path").ToString();
-					regkey.Close();
-					if (System.IO.Directory.Exists(path))
-					{
-						_installpath = path;
-						return _installpath; // Path found
-					}
-				}
-				catch{}
+                try
+                {
+                    regkey = regkey.OpenSubKey(RegPathx32 + "Programs", false);
+                    path = regkey.GetValue("Path").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _installpath = path;
+                        return _installpath; // Path found
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG::Programs:: HKLM\\{0} , {1}",RegPathx32, e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
+
+                // Current User Hive with x64 CPU Check Failed
+                regkey = Registry.CurrentUser;
+                try
+                {
+                    regkey = regkey.OpenSubKey(RegPathx32 + "Programs", false);
+                    path = regkey.GetValue("Path").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _installpath = path;
+                        return _installpath; // Path found
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG::Programs:: HKCU\\{0} , {1}", RegPathx32, e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
+
 				// Making a guess from the FurcadiaDefaultPath property.
 				path = Path.Combine(ProgramFilesX86(), "Furcadia");
 			}
@@ -216,6 +286,7 @@ namespace Furcadia.IO
 			Type t = Type.GetType ("Mono.Runtime");
        		if (t != null)
        		{
+                // Current Users Hive with x64 CPU Check
        			RegistryKey regkey = Registry.CurrentUser;
 				try
 				{
@@ -229,6 +300,12 @@ namespace Furcadia.IO
 					}
 				}
 				catch{}
+                finally
+                {
+                    regkey.Close();
+                }
+
+                // Mono Current User with x64 CPU Check
 				regkey = Registry.CurrentUser;
 				try
 				{
@@ -241,19 +318,36 @@ namespace Furcadia.IO
 						return _installpath; // Path found
 					}
 				}
-				catch{}
-				regkey = Registry.LocalMachine;
-				try
-				{
-					regkey = regkey.OpenSubKey(RegPathx32 + "Programs", false);
-					path = regkey.GetValue("path").ToString();
-					regkey.Close();
-					if (System.IO.Directory.Exists(path))
-					{
-						_installpath = path;
-						return _installpath; // Path found
-					}
-				}catch{}
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG: HKCU\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
+
+                // Mono Local Machine Hive with x64 CPU Check
+                regkey = Registry.LocalMachine;
+                try
+                {
+                    regkey = regkey.OpenSubKey(RegPathx32 + "Programs", false);
+                    path = regkey.GetValue("path").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _installpath = path;
+                        return _installpath; // Path found
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG: HKLM\\{0} \n\r{1}", GetRegistryPath(), e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
 				regkey = Registry.LocalMachine;
 				try
 				{
@@ -266,6 +360,10 @@ namespace Furcadia.IO
 						return _installpath; // Path found
 					}
 				}catch{}
+                finally
+                {
+                    regkey.Close();
+                }
       			// All options were exhausted - assume Furcadia not installed.
 				if (System.IO.Directory.Exists(path))
 				{
@@ -293,6 +391,7 @@ namespace Furcadia.IO
 			if (Environment.OSVersion.Platform == PlatformID.Win32Windows ||
 				Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{
+                // Current Hive with x64 CPU Check
 				RegistryKey regkey = Registry.CurrentUser;
 				try
 				{
@@ -305,19 +404,56 @@ namespace Furcadia.IO
 						return _defaultpatchpath; // Path found
 					}
 				}
-				catch{}
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG::Patched:: HKCU\\{0} , {1}", GetRegistryPath(), e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
+
+                // Local Machine Hive with x64 CPU Check
+                regkey = Registry.LocalMachine;
+                try
+                {
+                    regkey = regkey.OpenSubKey(GetRegistryPath() + "Patches", false);
+                    path = regkey.GetValue("default").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _defaultpatchpath = path;
+                        return _defaultpatchpath; // Path found
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG::Patched:: HKCU\\{0} , {1}", GetRegistryPath(), e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
 				regkey = Registry.LocalMachine;
-				try
-				{
-					regkey = regkey.OpenSubKey(RegPathx32 + "Patches", false);
-					path = regkey.GetValue("default").ToString();
-					regkey.Close();
-					if (System.IO.Directory.Exists(path))
-					{
-						_defaultpatchpath = path;
-						return _defaultpatchpath; // Path found
-					}
-				}catch{}
+                try
+                {
+                    regkey = regkey.OpenSubKey(RegPathx32 + "Patches", false);
+                    path = regkey.GetValue("default").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _defaultpatchpath = path;
+                        return _defaultpatchpath; // Path found
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG::Patched:: HKLM\\{0} , {1}", RegPathx32, e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
 				regkey = Registry.CurrentUser;
 				try
 				{
@@ -330,7 +466,14 @@ namespace Furcadia.IO
 						return _defaultpatchpath; // Path found
 					}
 				}
-				catch {}
+                catch (Exception e)
+                {
+                    Console.WriteLine(string.Format("DEBUG::Patched:: HKCU\\{0} , {1}", RegPathx32, e.Message));
+                }
+                finally
+                {
+                    regkey.Close();
+                }
 
 				// Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
 				path = GetInstallPath();
@@ -341,7 +484,7 @@ namespace Furcadia.IO
 			}
 			else
 			{
-			// Search Wine paths if Wine is uesed
+			// Search Wine paths if Wine is used
 			//TODO: Check c# Client
 				path = RegistryExplorerForWine.ReadSubKey("HKEY_LOCAL_MACHINE\\" + GetRegistryPath() + "Patches", "default");
 				if (path == null)
