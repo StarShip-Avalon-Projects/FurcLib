@@ -50,10 +50,12 @@ namespace Furcadia.IO
         }
 			/// <summary>
         /// Defines the base path for the Furcadia Directory
+        /// Throws FurcadiaNotFound exception if furcadia.exe cannot be found in specified path
         /// </summary>
         /// <param name="path"></param>
         public  Paths(string path)
         {
+            if (!File.Exists(Path.Combine( path , "Furcadia.exe"))) throw new FurcadiaNotFoundException("Furcadia Framework cannot find the fucadia installation, Please supply a valid path");
             _installpath = path;
         }
 #endregion
@@ -172,7 +174,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
                 // Local Machine Hive with x64 CPU Check
@@ -194,7 +196,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
                 // Current User Hive with x64 CPU Check Failed
@@ -216,7 +218,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 				regkey = Registry.LocalMachine;
                 try
@@ -236,7 +238,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
                 // Current User Hive with x64 CPU Check Failed
@@ -258,7 +260,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
 				// Making a guess from the FurcadiaDefaultPath property.
@@ -302,7 +304,7 @@ namespace Furcadia.IO
 				catch{}
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
                 // Mono Current User with x64 CPU Check
@@ -324,7 +326,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
                 // Mono Local Machine Hive with x64 CPU Check
@@ -452,7 +454,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 				regkey = Registry.CurrentUser;
 				try
@@ -472,7 +474,7 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    regkey.Dispose();
                 }
 
 				// Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
@@ -506,18 +508,22 @@ namespace Furcadia.IO
        		if (t != null)
        		{
 				RegistryKey regkey = Registry.CurrentUser;
-				try
-				{
-					regkey = regkey.OpenSubKey(GetRegistryPath() + "Patches", false);
-					path = regkey.GetValue("default").ToString();
-					regkey.Close();
-					if (System.IO.Directory.Exists(path))
-					{
-						_defaultpatchpath = path;
-						return _defaultpatchpath; // Path found
-					}
-				}
-				catch{}
+                try
+                {
+                    regkey = regkey.OpenSubKey(GetRegistryPath() + "Patches", false);
+                    path = regkey.GetValue("default").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                    {
+                        _defaultpatchpath = path;
+                        return _defaultpatchpath; // Path found
+                    }
+                }
+                catch { }
+                finally
+                {
+                    regkey.Dispose();
+                }
 				regkey = Registry.LocalMachine;
 				try
 				{
@@ -530,6 +536,10 @@ namespace Furcadia.IO
 						return _defaultpatchpath; // Path found
 					}
 				}catch{}
+                finally
+                {
+                    regkey.Dispose();
+                }
 				regkey = Registry.CurrentUser;
 				try
 				{
@@ -543,6 +553,10 @@ namespace Furcadia.IO
 						}
 					}
 				catch {}
+                finally
+                {
+                    regkey.Dispose();
+                }
 				if (System.IO.Directory.Exists(path))
 				{
 					_defaultpatchpath = path;

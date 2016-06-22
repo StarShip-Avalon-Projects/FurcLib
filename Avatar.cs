@@ -10,6 +10,9 @@ namespace Furcadia
 {
    public class Avatar
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public struct Frame
         {
             public int Spec;
@@ -46,6 +49,9 @@ namespace Furcadia
         };
 
         private static DataTable dt = null;
+        /// <summary>
+        /// Primes the table.
+        /// </summary>
         public static void PrimeTable()
         {
             try
@@ -78,6 +84,11 @@ namespace Furcadia
             }
         }
 
+        /// <summary>
+        /// Specs the number.
+        /// </summary>
+        /// <param name="Frame">The frame.</param>
+        /// <returns></returns>
         public static Frame SpecNum(int Frame)
         {
             Frame _Frame = new Frame();
