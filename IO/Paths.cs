@@ -186,7 +186,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if(! (regkey == null))
+                        regkey.Dispose();
                 }
 
                 // Local Machine Hive with x64 CPU Check
@@ -210,7 +211,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 
                 // Current User Hive with x64 CPU Check Failed
@@ -234,7 +236,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 				regkey = Registry.LocalMachine;
                 try
@@ -256,7 +259,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 
                 // Current User Hive with x64 CPU Check Failed
@@ -280,7 +284,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 
 				// Making a guess from the FurcadiaDefaultPath property.
@@ -426,7 +431,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 
                 // Local Machine Hive with x64 CPU Check
@@ -450,7 +456,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Close();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 				regkey = Registry.LocalMachine;
                 try
@@ -472,7 +479,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 				regkey = Registry.CurrentUser;
 				try
@@ -494,7 +502,8 @@ namespace Furcadia.IO
                 }
                 finally
                 {
-                    regkey.Dispose();
+                    if (!(regkey == null))
+                        regkey.Dispose();
                 }
 
 				// Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
