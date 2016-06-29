@@ -116,7 +116,7 @@ namespace Furcadia.IO
 		/// </returns>
 		public  string ProgramFilesX86()
 		{
-#if Net40 == True
+#if Net40 == true
             if (OSBitness.Is64BitOperatingSystem())
 #else
             if (Environment.Is64BitOperatingSystem)
@@ -136,7 +136,7 @@ namespace Furcadia.IO
 		/// </returns>
 		public  string GetRegistryPath()
 		{
-#if Net40 == True
+#if Net40 == true
             if (OSBitness.Is64BitOperatingSystem())
 #else
             if (Environment.Is64BitOperatingSystem)
@@ -627,7 +627,7 @@ namespace Furcadia.IO
             else _localsettingspath = GetLocaldirPath() + "settings/";
             if (String.IsNullOrEmpty(GetLocaldirPath()))
 				_localsettingspath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-												  "Dragon's Eye Productions/Furcadia");
+												  "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia");
 			return _localsettingspath;
 		}
 
@@ -642,7 +642,7 @@ namespace Furcadia.IO
 			else _cachepath = GetLocaldirPath();
 			if (String.IsNullOrEmpty(_cachepath))
 				_cachepath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-										  "Dragon's Eye Productions/Furcadia");
+                                          "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia");
 			return _cachepath;
 		}
 
@@ -657,7 +657,7 @@ namespace Furcadia.IO
             else _dynavpath = GetLocaldirPath();
             if (String.IsNullOrEmpty(_dynavpath))
                 _dynavpath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-										  "Dragon's Eye Productions/Furcadia/Dynamic Avatars");
+										  "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia" + Path.DirectorySeparatorChar + "Dynamic Avatars");
             return _dynavpath;
 		}
 
@@ -698,7 +698,7 @@ namespace Furcadia.IO
 
 
         #region "MSPL Code"
-#if Net40 == True
+#if Net40 == true
         // Source: http://1code.codeplex.com/SourceControl/changeset/view/39074#842775
         //**************************************************************************\
         //        * Portions of this source are subject to the Microsoft Public License.

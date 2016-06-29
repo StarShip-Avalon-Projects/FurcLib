@@ -130,7 +130,7 @@ namespace Furcadia.Net
 
 
 		#region Constructors
-        public Paths FurcPath;
+        public Paths FurcPath = new Paths();
 		public NetProxy()
 		{
             FurcPath = new Paths();
@@ -370,11 +370,11 @@ namespace Furcadia.Net
 
 				}
 								string proxyIni = "localhost " + _lport.ToString();
-               //FurcPath = new Paths(_procpath);
+               FurcPath = new Paths(_procpath);
 				/// UAC Perms Needed to Create proxy.ini
 				/// Win 7 Change your UAC Level or add file create Permissions to [%program files%/furcadia]
 				/// Maybe Do this at install
-				string fIni = FurcPath.GetInstallPath() + "proxy.ini" ;
+				string fIni = Path.Combine(FurcPath.GetInstallPath(), "proxy.ini") ;
 				/// Check proxy.ini if it exoists then use it
 				/// 
 				/// otherwise use settings.ini to avoid UAC issues on %Program Files%
@@ -596,8 +596,8 @@ namespace Furcadia.Net
 private object lck = new object();
 		private void GetClientData (IAsyncResult ar)
 		{
-          lock (lck)
-                {
+        //  lock (lck)
+         //       {
             try
             {
                 if (client.Connected == false)
@@ -657,7 +657,7 @@ private object lck = new object();
 				client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
 			}
 
-                }
+               // }
         }
 		private void GetServerData (IAsyncResult ar)
 		{

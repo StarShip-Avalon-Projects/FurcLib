@@ -18,7 +18,7 @@ namespace Furcadia.IO
             try
             {
                 
-                    SettingFile = File.ReadAllLines(path + file);
+                    SettingFile = File.ReadAllLines(Path.Combine(path, file));
                     return SettingFile;
                 
                 
@@ -36,12 +36,12 @@ namespace Furcadia.IO
 
             try
             {
-                File.WriteAllLines(path + file, SettingFile, Encoding.UTF8);
+                File.WriteAllLines(Path.Combine(path, file), SettingFile, Encoding.UTF8);
             }
             catch (Exception e)
             {
 
-                throw new Exception("++ ERROR: Couldn't Load " + file + " to change.");
+                throw new Exception("++ ERROR: Couldn't Load " + file + " to change.", e);
             }
 
         }
