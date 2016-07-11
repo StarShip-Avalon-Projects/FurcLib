@@ -117,9 +117,9 @@ namespace Furcadia.Net
                 get
                 {
                     if (!string.IsNullOrEmpty(_Name))
-                        return Regex.Replace(_Name.ToLower(), "[^a-z0-9\0x0020_.;&]+", "");
+                        return Regex.Replace(_Name.ToLower(), "[^a-z0-9\0x0020_.;&|]+", "");
                     else
-                        return "";
+                        return null;
                 }
             }
 
