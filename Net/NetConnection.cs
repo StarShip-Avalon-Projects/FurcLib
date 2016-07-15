@@ -80,7 +80,7 @@ namespace Furcadia.Net
 		public NetConnection()
 		{
             FurcPath = new Paths();
-            string SetPath = FurcPath.GetLocalSettingsPath();
+            string SetPath = Paths.GetLocalSettingsPath();
             string SetFile = "/settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
@@ -193,8 +193,8 @@ namespace Furcadia.Net
 			}
 			catch (Exception e) 
             {
-                if (Error != null) Error(e, this, "SendServer");
-                if (ServerDisConnected != null) ServerDisConnected();
+                Error?.Invoke(e, this, "SendServer");
+                ServerDisConnected?.Invoke();
             }
 		}
 
@@ -222,7 +222,7 @@ namespace Furcadia.Net
 				
 				
 			}
-			catch (Exception e) { if (Error != null) Error(e,this, "Kill()"); }
+			catch (Exception e) { Error?.Invoke(e, this, "Kill()"); }
 		}
 
 		//Implement IDisposable.
@@ -256,13 +256,9 @@ namespace Furcadia.Net
 				
 				server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
 
-				if (Connected != null)
-				{
-					Connected();
-									
-				}
-			}
-			catch (Exception e) { if (Error != null) Error(e,this, "AsyncListener()");}
+                Connected?.Invoke();
+            }
+			catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
 		}
 
 
@@ -288,8 +284,7 @@ private object lck = new object();
                    
                         if (read == 0)
                         {
-                            if (ServerDisConnected != null) { ServerDisConnected(); }
-                            return;
+                            ServerDisConnected?.Invoke(); return;
                         }
                         //If we have left over data add it to this server build
                         if (!string.IsNullOrEmpty(_ServerLeftOvers) && _ServerLeftOvers.Length > 0)
@@ -311,25 +306,24 @@ private object lck = new object();
 
                         for (int i = 0; i < lines.Count; i++)
                         {
-                            if ( ServerData != null)
-                                ServerData(lines[i]);
+                            ServerData?.Invoke(lines[i]);
                         }
                     }
                 }
 			
 			catch (Exception e) 
 			{
-			   // if (IsServerConnected == true) ServerDisConnected();
-				if (Error != null) Error(e, this, "GetServerData()");
-                if (ServerDisConnected != null) ServerDisConnected();
-                return;
+                    // if (IsServerConnected == true) ServerDisConnected();
+                    Error?.Invoke(e, this, "GetServerData()");
+                        ServerDisConnected?.Invoke();
+                    return;
 			} //else throw e;
 			// Detect if client disconnected
             if (IsServerConnected && serverBuild.Length < 1 || IsServerConnected == false)
             {
-                if (ServerDisConnected != null) ServerDisConnected();
+                    ServerDisConnected?.Invoke();
 
-            }
+                }
                
 			if (IsServerConnected && serverBuild.Length > 0)
 				server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);

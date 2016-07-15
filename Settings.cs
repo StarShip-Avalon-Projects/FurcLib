@@ -22,7 +22,7 @@ namespace Furcadia
     /// <summary>
     /// A simple way to load settings whether from ini or xml.
     /// </summary>
-    public class Settings
+    public static class Settings
     {
         /// setting path
         /// setting file
@@ -31,7 +31,7 @@ namespace Furcadia
 
         private static Paths FurcPath = new Paths();
         //static Paths FurcPath = new Paths();
-        static string sPath = FurcPath.GetLocalSettingsPath();
+        static string sPath = Paths.GetLocalSettingsPath();
         static string sFile = "settings.ini";
 
         static string[] Keys = new string[8] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs" };
