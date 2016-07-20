@@ -418,7 +418,10 @@ namespace Furcadia.Net
                 throw e;
 
             }
-            catch (Exception e) { if (Error != null) Error(e, this, "Connect()"); else throw e; }
+            catch (Exception e) {
+                if (Error != null)
+                    Error(e, this, "Connect()"); else throw e;
+            }
         }
 
 
@@ -434,7 +437,10 @@ namespace Furcadia.Net
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)
                     client.GetStream().Write(System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message), 0, System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message).Length);
             }
-            catch (Exception e) { Error?.Invoke(e, this, "SendClient()"); }
+            catch (Exception e) {
+                if (Error != null)
+                    Error?.Invoke(e, this, "SendClient()");
+            }
 
         }
 
@@ -453,7 +459,8 @@ namespace Furcadia.Net
             }
             catch (Exception e)
             {
-                Error?.Invoke(e, this, "SendServer");
+                if (Error != null)
+                    Error?.Invoke(e, this, "SendServer");
                 ServerDisConnected?.Invoke();
             }
         }
@@ -480,7 +487,10 @@ namespace Furcadia.Net
                     client.Close();
                 }
             }
-            catch (Exception e) { Error?.Invoke(e, this, "CloseClient()"); }
+            catch (Exception e) {
+                if (Error != null)
+                    Error?.Invoke(e, this, "CloseClient()");
+            }
 
         }
 
@@ -522,7 +532,10 @@ namespace Furcadia.Net
 
 
             }
-            catch (Exception e) { Error?.Invoke(e, this, "Kill()"); }
+            catch (Exception e) {
+                if (Error != null)
+                    Error?.Invoke(e, this, "Kill()");
+            }
         }
 
         //Implement IDisposable.
@@ -592,7 +605,8 @@ namespace Furcadia.Net
             }
             catch (Exception e)
             {
-                Error?.Invoke(e, this, "AsyncListener()");
+                if (Error != null)
+                    Error?.Invoke(e, this, "AsyncListener()");
             }
         }
 
@@ -727,7 +741,8 @@ namespace Furcadia.Net
 
             catch (Exception e)
             {
-                Error?.Invoke(e, this, "GetServerData()");
+                if (Error != null)
+                    Error?.Invoke(e, this, "GetServerData()");
                 return;
             } //else throw e;
               // Detect if client disconnected
