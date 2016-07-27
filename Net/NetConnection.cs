@@ -80,7 +80,7 @@ namespace Furcadia.Net
 		public NetConnection()
 		{
             FurcPath = new Paths();
-            string SetPath = Paths.GetLocalSettingsPath();
+            string SetPath = FurcPath.GetLocalSettingsPath();
             string SetFile = "/settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));

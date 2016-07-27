@@ -51,7 +51,8 @@ namespace Furcadia.IO
         /// <param name="path"></param>
         public Paths(string path)
         {
-            if (!File.Exists(Path.Combine(path, "Furcadia.exe"))) throw new FurcadiaNotFoundException("Furcadia Framework cannot find the fucadia installation, Please supply a valid path");
+            if (path == "")
+                _installpath = null;
             _installpath = path;
         }
         #endregion
@@ -65,7 +66,7 @@ namespace Furcadia.IO
         /// <returns>
         /// A <see cref="System.String"/> containing the location of Furcadia Characters folder in "My Documents".
         /// </returns>
-        public static string GetFurcadiaCharactersPath()
+        public string GetFurcadiaCharactersPath()
         {
             if (!string.IsNullOrEmpty(_FurcadiaCharactersPath)) return _FurcadiaCharactersPath;
             string path = Path.Combine(GetFurcadiaDocPath(), "Furcadia Characters");
@@ -87,7 +88,7 @@ namespace Furcadia.IO
         /// <returns>
         /// A <see cref="System.String"/> containing the location of Furcadia folder in "My Documents".
         /// </returns>
-        public static string GetFurcadiaDocPath()
+        public string GetFurcadiaDocPath()
         {
             if (!string.IsNullOrEmpty(_FurcadiaDocpath)) return _FurcadiaDocpath;
             string path = GetLocaldirPath();
@@ -127,7 +128,7 @@ namespace Furcadia.IO
         /// <returns>
         /// A path to the Furcadia registry folder or NullReferenceException.
         /// </returns>
-        public static string GetRegistryPath()
+        public string GetRegistryPath()
         {
             if (Environment.Is64BitOperatingSystem)
             {
@@ -142,7 +143,7 @@ namespace Furcadia.IO
         /// system.
         /// </summary>
         /// <returns>Path to the Furcadia program folder or null if not found/not installed.</returns>
-        public static string GetInstallPath()
+        public string GetInstallPath()
         {
             //If path already found return it.
             if (!string.IsNullOrEmpty(_installpath)) return _installpath;
@@ -156,78 +157,93 @@ namespace Furcadia.IO
                 // Current User Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
-                        if (regkeyPath != null)
-                        {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                    try
+                    {
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
-                        }
-                    Hive.Close();
+                    }
+                    catch { } //Ditch the Exceptions
+
+
                 }
 
                 // Local Machine Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.LocalMachine)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
-                        if (regkeyPath != null)
-                        {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                    try
+                    {
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
-                        }
-                    Hive.Close();
+                    }
+                    catch { } //Ditch the Exceptions
                 }
 
 
-                // Current User Hive with x64 CPU Check Failed
+                // Current User Hive with x86 CPU Check Failed
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
+                    try
                     {
-                        if (regkeyPath != null)
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
                         {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
                         }
-                        Hive.Close();
                     }
+                    catch { } //Ditch the Exceptions
                 }
 
 
                 using (RegistryKey Hive = Registry.LocalMachine)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
+                    try
                     {
-                        if (regkeyPath != null)
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
                         {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
                         }
-                        Hive.Close();
                     }
+                    catch { } //Ditch the Exceptions
                 }
 
                 // Making a guess from the FurcadiaDefaultPath property.
                 path = Path.Combine(ProgramFilesX86(), "Furcadia");
+                if (Directory.Exists(path))
+                {
+                    _installpath = path;
+                    return _installpath; // Path found
+                }
             }
             // Scanning registry for a path (NON-WINDOWS ONLY)
             else
@@ -254,55 +270,63 @@ namespace Furcadia.IO
                 // Current User Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
-                        if (regkeyPath != null)
-                        {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                    try
+                    {
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
-                        }
-                    Hive.Close();
+                    }
+                    catch { } //Ditch the Exceptions
                 }
 
                 // Local Machine Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.LocalMachine)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
-                        if (regkeyPath != null)
-                        {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                    try
+                    {
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
-                        }
-                    Hive.Close();
+                    }
+                    catch { } //Ditch the Exceptions
                 }
 
 
                 // Current User Hive with x64 CPU Check Failed
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
+                    try
                     {
-                        if (regkeyPath != null)
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
                         {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
+
                         }
-                        Hive.Close();
                     }
+                    catch { } //Ditch the Exceptions
                 }
 
 
@@ -310,17 +334,20 @@ namespace Furcadia.IO
                 {
                     using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
                     {
-                        if (regkeyPath != null)
+                        try
                         {
-                            path = regkeyPath.GetValue("path").ToString();
-                            regkeyPath.Close();
-                            if (Directory.Exists(path))
+                            if (regkeyPath != null)
                             {
-                                _installpath = path;
-                                return _installpath; // Path found
+                                path = regkeyPath.GetValue("path").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _installpath = path;
+                                    return _installpath; // Path found
+                                }
                             }
                         }
-                        Hive.Close();
+
+                        catch { } //Ditch the Exceptions
                     }
                 }
                 // All options were exhausted - assume Furcadia not installed.
@@ -353,17 +380,22 @@ namespace Furcadia.IO
                 // Current Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                    try
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            if (regkey != null)
+                            {
+                                path = regkey.GetValue("default").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _defaultpatchpath = path;
+                                    return _defaultpatchpath; // Path found
+                                }
+                            }
                         }
                     }
-                    Hive.Close();
+                    catch { }//Ditch the Exceptions
                 }
 
 
@@ -371,50 +403,65 @@ namespace Furcadia.IO
                 // Local Machine Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.LocalMachine)
                 {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                    try
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            if (regkey != null)
+                            {
+                                path = regkey.GetValue("default").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _defaultpatchpath = path;
+                                    return _defaultpatchpath; // Path found
+                                }
+                            }
                         }
                     }
-                    Hive.Close();
+                    catch { }//Ditch the Exceptions
                 }
                 using (RegistryKey Hive = Registry.LocalMachine)
                 {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
+                    try
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            if (regkey != null)
+                            {
+                                path = regkey.GetValue("default").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _defaultpatchpath = path;
+                                    return _defaultpatchpath; // Path found
+                                }
+                            }
                         }
                     }
-                    Hive.Close();
+                    catch { } //Ditch the Exceptions
                 }
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
+                    try
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            if (regkey != null)
+                            {
+                                path = regkey.GetValue("default").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _defaultpatchpath = path;
+                                    return _defaultpatchpath; // Path found
+                                }
+                            }
                         }
                     }
-                    Hive.Close();
+                    catch { } //Ditch the Exceptions
                 }
 
                 // Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
                 path = GetInstallPath();
-                if (path == string.Empty)
+                if (string.IsNullOrEmpty(path))
                     path = Path.Combine(ProgramFilesX86(), "Furcadia");
 
                 path = Path.Combine(path, "/patches/default");
@@ -445,69 +492,93 @@ namespace Furcadia.IO
                 // Current Hive with x64 CPU Check
                 using (RegistryKey Hive = Registry.CurrentUser)
                 {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                    try
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+
+                            if (regkey != null)
+                            {
+                                path = regkey.GetValue("default").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _defaultpatchpath = path;
+                                    return _defaultpatchpath; // Path found
+                                }
+                            }
                         }
                     }
-                    Hive.Close();
+                    catch { } //Ditch the Exceptions
+
                 }
+            }
 
 
 
-                // Local Machine Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.LocalMachine)
+            // Local Machine Hive with x64 CPU Check
+            using (RegistryKey Hive = Registry.LocalMachine)
+            {
+                try
                 {
                     using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        if (regkey != null)
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            path = regkey.GetValue("default").ToString();
+                            if (Directory.Exists(path))
+                            {
+                                _defaultpatchpath = path;
+                                return _defaultpatchpath; // Path found
+                            }
                         }
                     }
-                    Hive.Close();
                 }
-                using (RegistryKey Hive = Registry.LocalMachine)
+                catch { } //Ditch the Exceptions
+            }
+            using (RegistryKey Hive = Registry.LocalMachine)
+            {
+                try
                 {
                     using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+                        if (regkey != null)
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            path = regkey.GetValue("default").ToString();
+                            if (Directory.Exists(path))
+                            {
+                                _defaultpatchpath = path;
+                                return _defaultpatchpath; // Path found
+                            }
                         }
                     }
-                    Hive.Close();
                 }
-                using (RegistryKey Hive = Registry.CurrentUser)
+                catch { } //Ditch the Exceptions
+            }
+            using (RegistryKey Hive = Registry.CurrentUser)
+            {
+                try
                 {
                     using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
                     {
-                        path = regkey.GetValue("default").ToString();
-                        regkey.Close();
-                        if (Directory.Exists(path))
+
+                        if (regkey != null)
                         {
-                            _defaultpatchpath = path;
-                            return _defaultpatchpath; // Path found
+                            path = regkey.GetValue("default").ToString();
+                            if (Directory.Exists(path))
+                            {
+                                _defaultpatchpath = path;
+                                return _defaultpatchpath; // Path found
+                            }
                         }
+
                     }
-                    Hive.Close();
+                    if (Directory.Exists(path))
+                    {
+                        _defaultpatchpath = path;
+                        return _defaultpatchpath; // Path found
+                    }
                 }
-                if (Directory.Exists(path))
-                {
-                    _defaultpatchpath = path;
-                    return _defaultpatchpath; // Path found
-                }
+                catch { } //Ditch the Exceptions
             }
             #endregion
 
@@ -521,17 +592,22 @@ namespace Furcadia.IO
         /// Get the path to the Local Settings directory for Furcadia.
         /// </summary>
         /// <returns>Furcadia local settings directory.</returns>
-        public static string GetLocalSettingsPath()
+        public string GetLocalSettingsPath()
         {
             if (!string.IsNullOrEmpty(_localsettingspath)) return _localsettingspath;
-            else _localsettingspath = GetLocaldirPath() + "settings/";
+            else
+            {
+                string p = GetLocaldirPath();
+                if (!string.IsNullOrEmpty(p))
+                    _localsettingspath = Path.Combine(p, "settings");
+            }
             if (string.IsNullOrEmpty(GetLocaldirPath()))
                 _localsettingspath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                                                   "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia");
             return _localsettingspath;
         }
 
-        private string _cachepath;
+        private static string _cachepath;
         /// <summary>
         /// Get the All Users Application Data path for Furcadia.
         /// </summary>
@@ -567,7 +643,7 @@ namespace Furcadia.IO
         /// on the current machine.
         /// </summary>
         /// <returns>Path to the data folder from localdir.ini or null if not found.</returns>
-        public static string GetLocaldirPath()
+        public string GetLocaldirPath()
         {
             if (!string.IsNullOrEmpty(_localdirpath)) return _localdirpath;
             string path;
@@ -579,7 +655,7 @@ namespace Furcadia.IO
 
             // Try to locate localdir.ini
             string ini_path = string.Format("{0}/localdir.ini", install_path);
-            if (!System.IO.File.Exists(ini_path))
+            if (!File.Exists(ini_path))
                 return null; // localdir.ini not found - regular path structure applies.
 
             // Read localdir.ini for remote path and verify it.

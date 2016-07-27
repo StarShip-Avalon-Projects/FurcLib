@@ -31,7 +31,7 @@ namespace Furcadia
 
         private static Paths FurcPath = new Paths();
         //static Paths FurcPath = new Paths();
-        static string sPath = Paths.GetLocalSettingsPath();
+        static string sPath = FurcPath.GetLocalSettingsPath();
         static string sFile = "settings.ini";
 
         static string[] Keys = new string[8] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs" };

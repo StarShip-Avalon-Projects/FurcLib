@@ -134,7 +134,7 @@ namespace Furcadia.Net
         public NetProxy()
         {
             FurcPath = new Paths();
-            string SetPath = Paths.GetLocalSettingsPath();
+            string SetPath = FurcPath.GetLocalSettingsPath();
             string SetFile = "/settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
@@ -383,16 +383,16 @@ namespace Furcadia.Net
                 /// UAC Perms Needed to Create proxy.ini
                 /// Win 7 Change your UAC Level or add file create Permissions to [%program files%/furcadia]
                 /// Maybe Do this at install
-                string fIni = Path.Combine(Paths.GetInstallPath(), "proxy.ini");
+                string fIni = Path.Combine(FurcPath.GetInstallPath(), "proxy.ini");
                 /// Check proxy.ini if it exoists then use it
                 /// 
                 /// otherwise use settings.ini to avoid UAC issues on %Program Files%
                 if (File.Exists(proxyIni))
                     File.Delete(proxyIni);
                 UseProxyIni = false;
-                BackupSettings = Settings.InitializeFurcadiaSettings(Paths.GetLocalSettingsPath());
+                BackupSettings = Settings.InitializeFurcadiaSettings(FurcPath.GetLocalSettingsPath());
                 //Run         
-                if (string.IsNullOrEmpty(ProcessPath)) ProcessPath = Paths.GetInstallPath();
+                if (string.IsNullOrEmpty(ProcessPath)) ProcessPath = FurcPath.GetInstallPath();
                 //check ProcessPath is not a directory
                 if (!Directory.Exists(ProcessPath)) throw new NetProxyException("Process path not found.");
                 if (!File.Exists(Path.Combine(ProcessPath, Process))) throw new NetProxyException("Client executable '" + Process + "' not found.");
@@ -590,8 +590,8 @@ namespace Furcadia.Net
                     /// Delete proxy.ini or restore settings.ini
                     if (UseProxyIni)
                     {
-                        if (File.Exists(Paths.GetInstallPath() + "proxy.ini"))
-                            File.Delete(Paths.GetInstallPath() + "proxy.ini");
+                        if (File.Exists(FurcPath.GetInstallPath() + "proxy.ini"))
+                            File.Delete(FurcPath.GetInstallPath() + "proxy.ini");
                     }
                     /// reset settings.ini
                     /// 10second delay timer
