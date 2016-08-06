@@ -155,45 +155,47 @@ namespace Furcadia.IO
             {
 
                 // Current User Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.CurrentUser)
+                if (Environment.Is64BitOperatingSystem)
                 {
-                    try
+                    using (RegistryKey Hive = Registry.CurrentUser)
                     {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
+                        try
+                        {
+                            using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                                if (regkeyPath != null)
                                 {
-                                    _installpath = path;
-                                    return _installpath; // Path found
+                                    path = regkeyPath.GetValue("path").ToString();
+                                    if (Directory.Exists(path))
+                                    {
+                                        _installpath = path;
+                                        return _installpath; // Path found
+                                    }
                                 }
-                            }
+                        }
+                        catch { } //Ditch the Exceptions
+
+
                     }
-                    catch { } //Ditch the Exceptions
 
-
-                }
-
-                // Local Machine Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    try
+                    // Local Machine Hive with x64 CPU Check
+                    using (RegistryKey Hive = Registry.LocalMachine)
                     {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
+                        try
+                        {
+                            using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                                if (regkeyPath != null)
                                 {
-                                    _installpath = path;
-                                    return _installpath; // Path found
+                                    path = regkeyPath.GetValue("path").ToString();
+                                    if (Directory.Exists(path))
+                                    {
+                                        _installpath = path;
+                                        return _installpath; // Path found
+                                    }
                                 }
-                            }
+                        }
+                        catch { } //Ditch the Exceptions
                     }
-                    catch { } //Ditch the Exceptions
                 }
-
 
                 // Current User Hive with x86 CPU Check Failed
                 using (RegistryKey Hive = Registry.CurrentUser)
