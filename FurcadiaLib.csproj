@@ -115,6 +115,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyFileVersion.cs" />
     <Compile Include="Avatar.cs" />
     <Compile Include="Badges.cs" />
     <Compile Include="Base220.cs" />

@@ -73,7 +73,7 @@ namespace Furcadia
 
                 }
             }
-            catch (Exception ex)
+            catch 
             {
 
             }

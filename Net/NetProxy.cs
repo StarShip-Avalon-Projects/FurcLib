@@ -367,7 +367,7 @@ namespace Furcadia.Net
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
-                        catch (SocketException Ex)
+                        catch 
                         {
                             _lport++;
                             listen = new TcpListener(IPAddress.Any, _lport);
@@ -671,7 +671,7 @@ namespace Furcadia.Net
 
             catch
             {// We don't care if there's an exception here.. We're Disconnecting any way
-                if (client.Connected == true) ClientDisConnected();
+                if (client.Connected == true) ClientDisConnected?.Invoke();
                 return;
             } // else throw e;
             if (IsClientConnected && clientBuild.Length < 1 || IsClientConnected == false)

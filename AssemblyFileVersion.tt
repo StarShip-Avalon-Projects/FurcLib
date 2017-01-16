@@ -37,5 +37,5 @@
 // 
 using System.Reflection;
 
-[assembly: AssemblyVersion("1.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
-[assembly: AssemblyFileVersion("1.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
+[assembly: AssemblyVersion("2.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
+[assembly: AssemblyFileVersion("2.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]

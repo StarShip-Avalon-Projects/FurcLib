@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Data;
+
 namespace Furcadia.Net
 {
     /// <summary>
     /// Current Dream information
     /// </summary>
-    public class DREAM
+    public struct DREAM
     {
          /// <summary>
         /// Dream List
@@ -82,7 +83,7 @@ namespace Furcadia.Net
             private int _Species;
             private int _Special;
             private int _DSSpecies;
-            private uint _Position;
+            //private uint _Position;
             private uint _Shape;
             private int _Flag;
             private uint _AFK;
