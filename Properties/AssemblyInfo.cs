@@ -11,7 +11,6 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TS-Projects")]
 [assembly: AssemblyProduct("FurcadiaFramework")]
-[assembly: AssemblyCopyright("Copyright ©  2013-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

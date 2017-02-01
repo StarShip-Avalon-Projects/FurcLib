@@ -6,6 +6,8 @@
 	DateTime time = DateTime.Now;
 	string format = "MMdd";
 	string CurrentDate = time.ToString(format);
+	string YearFormat = "Y";
+	string CurrentYear = time.ToString(YearFormat);
     try
     {
         //If we cannot find the file, the revision number is set to zero,
@@ -39,3 +41,4 @@ using System.Reflection;
 
 [assembly: AssemblyVersion("2.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
 [assembly: AssemblyFileVersion("2.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
+[assembly: AssemblyCopyright("Copyright © 2012 - <#= CurrentYear #>")]
