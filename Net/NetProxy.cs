@@ -44,7 +44,7 @@ namespace Furcadia.Net
         /// <summary>
         /// 
         /// </summary>
-        public delegate void ErrorEventHandler(Exception e, Object o, String n);
+        public delegate void ErrorEventHandler(Exception e, object o, string n);
         //public delegate void ErrorEventHandler(Exception e);
         /// <summary>
         ///This is triggered when the 
@@ -93,9 +93,7 @@ namespace Furcadia.Net
         /// </summary>
         public event ErrorEventHandler Error;
 
-
-
-        #endregion
+                #endregion
 
         #region Private Declarations
         /// <summary>
