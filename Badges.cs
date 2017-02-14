@@ -1,23 +1,20 @@
 ﻿/* Author: Gerolkae
- * 
+ *
  * Uses: Displaying proper badge in Look responce  and whisper
  * Logging text equivelant "[Group-Level]" IE: [Bugge-Elder]
- * 
+ *
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using System.Data;
+using System.IO;
 using System.Reflection;
 
 namespace Furcadia
 {
     public class Badges
     {
-        enum Group
+        private enum Group
         {
             none,
             Guardian = 1,
@@ -33,9 +30,9 @@ namespace Furcadia
             DEP,
             Irregular,
             Eventer
-            
         };
-        enum Level
+
+        private enum Level
         {
             none,
             Trainee = 1,
@@ -46,7 +43,9 @@ namespace Furcadia
             Associate,
             Creator
         };
+
         private static DataTable dt = null;
+
         public static void PrimeTable()
         {
             try
@@ -70,16 +69,14 @@ namespace Furcadia
                         row.ItemArray = fields;
                         dt.Rows.Add(row);
                     }
-
                 }
             }
-            catch 
+            catch
             {
-
             }
         }
 
-       public static int GetGroup(string tag)
+        public static int GetGroup(string tag)
         {
             int result = 0;
             if (tag == "")
@@ -97,10 +94,10 @@ namespace Furcadia
                     }
                     else
                         return result;
-                    
             }
             return result;
         }
+
         public static int GetLevel(string tag)
         {
             int result = 0;
@@ -119,7 +116,6 @@ namespace Furcadia
                     }
                     else
                         return result;
-
             }
             return result;
         }
@@ -140,7 +136,7 @@ namespace Furcadia
             {
                 object test = dt.Rows[i]["Hash"];
                 if (Convert.IsDBNull(test) == false)
-                    if (tag == (string) test)
+                    if (tag == (string)test)
                     {
                         int lvl = 0;
                         int grp = 0;
@@ -151,11 +147,8 @@ namespace Furcadia
                         result = "[" + g.ToString() + "-" + l.ToString() + "]";
                         return result;
                     }
-
-
             }
             return result;
         }
-
     }
 }

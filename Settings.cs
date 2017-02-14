@@ -4,21 +4,16 @@
  * (Unknown) Gerolkae, Switched proxy.ini to settings.ini firewall settings to support Vista+
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to wirk with a Supplied path
 */
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Collections;
-using System.Xml.Serialization;
-using Furcadia.Net;
 
 using Furcadia.IO;
+using Furcadia.Net;
+using System;
+using System.Collections;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace Furcadia
 {
-
-
-
     /// <summary>
     /// A simple way to load settings whether from ini or xml.
     /// </summary>
@@ -27,50 +22,48 @@ namespace Furcadia
         /// setting path
         /// setting file
         /// setting fields
-        /// 
+        ///
 
         private static Paths FurcPath = new Paths();
+
         //static Paths FurcPath = new Paths();
-        static string sPath = FurcPath.GetLocalSettingsPath();
-        static string sFile = "settings.ini";
+        private static string sPath = FurcPath.GetLocalSettingsPath();
 
-        static string[] Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
-        static string[] values = new string[9] { "Yes", "localhost", NetProxy._lport.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no"  };
+        private static string sFile = "settings.ini";
 
-          /// Load and Store settings.ini with backup
+        private static string[] Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
+        private static string[] values = new string[9] { "Yes", "localhost", NetProxy._lport.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
+
+        /// Load and Store settings.ini with backup
         public static string[] InitializeFurcadiaSettings(string path = null)
         {
-            
-           string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
-           string[] Backup = FurcIni.LoadFurcadiaSettings(sPath, sFile);
-           for (int Key = 0; Key < Keys.Length; Key++)
-           {
-               FurcIni.SetUserSetting(Keys[Key], values[Key], FurcSettings);
-           }
+            string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
+            string[] Backup = FurcIni.LoadFurcadiaSettings(sPath, sFile);
+            for (int Key = 0; Key < Keys.Length; Key++)
+            {
+                FurcIni.SetUserSetting(Keys[Key], values[Key], FurcSettings);
+            }
             /// Save settings.ini?
             FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
-           return Backup;
+            return Backup;
         }
-
 
         /// restore from backup settings.ini
 
         public static void RestoreFurcadiaSettings(string[] BackupSettings)
         {
-
             /// Get the New Changes by Furcadia Suite
             string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
 
             for (int Key = 0; Key < Keys.Length; Key++)
             {
-                /// Capture Back up Fields 
+                /// Capture Back up Fields
                 string Value = FurcIni.GetUserSetting(Keys[Key], BackupSettings);
                 /// Use Backup for Settings
-                 FurcIni.SetUserSetting(Keys[Key], Value, FurcSettings);
+                FurcIni.SetUserSetting(Keys[Key], Value, FurcSettings);
             }
             /// Save settings.ini
-             FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
-           
+            FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
         }
 
         /// <summary>
@@ -111,15 +104,12 @@ namespace Furcadia
                 foreach (string line in lines)
                 {
                     //get key/value!
-                    string[] key_value = line.Split(new char[]{'='},2);
+                    string[] key_value = line.Split(new char[] { '=' }, 2);
                     if (key_value.Length == 2) ret.Add(key_value[0], key_value[1]);
                 }
                 return ret;
             }
             else { throw new FileNotFoundException(file); }
         }
-
-
-        }
     }
-
+}

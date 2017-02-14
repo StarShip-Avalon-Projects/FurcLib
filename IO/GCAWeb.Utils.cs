@@ -1,36 +1,33 @@
 ﻿using System;
-using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
 namespace Furcadia.IO
 {
-
     /// <summary>
-    
+
     ///http://www.codeproject.com/KB/files/UserFileAccessRights.aspx
 
-    /// Configuring a Web site through a Web interface can be tricky. 
-    /// If one is to read and write various files, it is useful to know 
+    /// Configuring a Web site through a Web interface can be tricky.
+    /// If one is to read and write various files, it is useful to know
     /// in advance if you have the authority to do so.
-    /// 
-    /// This class contains a simple answer to a 
-    /// potentially complicated question 
+    ///
+    /// This class contains a simple answer to a
+    /// potentially complicated question
     /// "Can I read this file or can I write to this file?"
-    /// 
-    /// Using the "rule of least privilege", 
-    /// one must check not only is access granted but 
+    ///
+    /// Using the "rule of least privilege",
+    /// one must check not only is access granted but
     /// is it denied at any point including a possibly recursive check of groups.
-    /// 
+    ///
     /// For this simple check, a look at the user and immediate groups are only checked.
-    /// 
+    ///
     /// This class could be expanded to identify if the applicable allow/deny rule
     /// was explicit or inherited
-    /// 
+    ///
     /// </summary>
     public class UserFileAccessRights
     {
-
         private string _path;
         private System.Security.Principal.WindowsIdentity _principal;
 
@@ -82,44 +79,102 @@ namespace Furcadia.IO
         private bool _allowWriteData = false;
         private bool _allowWriteExtendedAttributes = false;
 
-        public bool canAppendData() { return !_denyAppendData && _allowAppendData; }
+        public bool canAppendData()
+        {
+            return !_denyAppendData && _allowAppendData;
+        }
+
         public bool canChangePermissions()
         { return !_denyChangePermissions && _allowChangePermissions; }
+
         public bool canCreateDirectories()
         { return !_denyCreateDirectories && _allowCreateDirectories; }
-        public bool canCreateFiles() { return !_denyCreateFiles && _allowCreateFiles; }
-        public bool canDelete() { return !_denyDelete && _allowDelete; }
+
+        public bool canCreateFiles()
+        {
+            return !_denyCreateFiles && _allowCreateFiles;
+        }
+
+        public bool canDelete()
+        {
+            return !_denyDelete && _allowDelete;
+        }
+
         public bool canDeleteSubdirectoriesAndFiles()
         {
             return !_denyDeleteSubdirectoriesAndFiles &&
               _allowDeleteSubdirectoriesAndFiles;
         }
-        public bool canExecuteFile() { return !_denyExecuteFile && _allowExecuteFile; }
-        public bool canFullControl() { return !_denyFullControl && _allowFullControl; }
+
+        public bool canExecuteFile()
+        {
+            return !_denyExecuteFile && _allowExecuteFile;
+        }
+
+        public bool canFullControl()
+        {
+            return !_denyFullControl && _allowFullControl;
+        }
+
         public bool canListDirectory()
         { return !_denyListDirectory && _allowListDirectory; }
-        public bool canModify() { return !_denyModify && _allowModify; }
-        public bool canRead() { return !_denyRead && _allowRead; }
+
+        public bool canModify()
+        {
+            return !_denyModify && _allowModify;
+        }
+
+        public bool canRead()
+        {
+            return !_denyRead && _allowRead;
+        }
+
         public bool canReadAndExecute()
         { return !_denyReadAndExecute && _allowReadAndExecute; }
+
         public bool canReadAttributes()
         { return !_denyReadAttributes && _allowReadAttributes; }
-        public bool canReadData() { return !_denyReadData && _allowReadData; }
+
+        public bool canReadData()
+        {
+            return !_denyReadData && _allowReadData;
+        }
+
         public bool canReadExtendedAttributes()
         {
             return !_denyReadExtendedAttributes &&
               _allowReadExtendedAttributes;
         }
+
         public bool canReadPermissions()
         { return !_denyReadPermissions && _allowReadPermissions; }
-        public bool canSynchronize() { return !_denySynchronize && _allowSynchronize; }
+
+        public bool canSynchronize()
+        {
+            return !_denySynchronize && _allowSynchronize;
+        }
+
         public bool canTakeOwnership()
         { return !_denyTakeOwnership && _allowTakeOwnership; }
-        public bool canTraverse() { return !_denyTraverse && _allowTraverse; }
-        public bool canWrite() { return !_denyWrite && _allowWrite; }
+
+        public bool canTraverse()
+        {
+            return !_denyTraverse && _allowTraverse;
+        }
+
+        public bool canWrite()
+        {
+            return !_denyWrite && _allowWrite;
+        }
+
         public bool canWriteAttributes()
         { return !_denyWriteAttributes && _allowWriteAttributes; }
-        public bool canWriteData() { return !_denyWriteData && _allowWriteData; }
+
+        public bool canWriteData()
+        {
+            return !_denyWriteData && _allowWriteData;
+        }
+
         public bool canWriteExtendedAttributes()
         {
             return !_denyWriteExtendedAttributes &&
@@ -134,6 +189,7 @@ namespace Furcadia.IO
         {
             return _principal;
         }
+
         /// <summary>
         /// Simple accessor
         /// </summary>
@@ -148,11 +204,11 @@ namespace Furcadia.IO
         /// </summary>
         /// <param name="path"></param>
         public UserFileAccessRights(string path) :
-            this(path, System.Security.Principal.WindowsIdentity.GetCurrent()) { }
-
+            this(path, System.Security.Principal.WindowsIdentity.GetCurrent())
+        { }
 
         /// <summary>
-        /// Supply the path to the file or directory and a user or group. 
+        /// Supply the path to the file or directory and a user or group.
         /// Access checks are done
         /// during instantiation to ensure we always have a valid object
         /// </summary>
@@ -402,7 +458,7 @@ namespace Furcadia.IO
 
         /// <summary>
         /// Simply displays all allowed rights
-        /// 
+        ///
         /// Useful if say you want to test for write access and find
         /// it is false;
         /// <xmp>
@@ -420,9 +476,9 @@ namespace Furcadia.IO
         ///         lblLogMsg.Text = rights.ToString()
         ///     }
         /// }
-        /// 
+        ///
         /// </xmp>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public override String ToString()

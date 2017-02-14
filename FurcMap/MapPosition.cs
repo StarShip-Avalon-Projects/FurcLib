@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Furcadia.FurcMap
 {
+    [CLSCompliant(true)]
     public class MapPosition
     {
-        public ushort floornumber, objectnumber, wallnumber, regionnumber, effectnumber;
+        public int floorNumber, objectNumber, wallNumber, regionNumber, effectNumber;
         public int x, y;
 
         public MapPosition(int x, int y)
@@ -20,11 +18,11 @@ namespace Furcadia.FurcMap
         {
             this.x = x;
             this.y = y;
-            this.floornumber = map.getFloorAt(x, y);
-            this.objectnumber = map.getObjectAt(x, y);
-            this.wallnumber = map.getWallAt(x, y);
-            this.regionnumber = map.getRegionAt(x, y);
-            this.effectnumber = map.getEffectAt(x, y);
+            this.floorNumber = map.getFloorAt(x, y);
+            this.objectNumber = map.getObjectAt(x, y);
+            this.wallNumber = map.getWallAt(x, y);
+            this.regionNumber = map.getRegionAt(x, y);
+            this.effectNumber = map.getEffectAt(x, y);
         }
     }
 }

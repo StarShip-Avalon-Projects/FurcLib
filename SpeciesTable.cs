@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Security.Permissions;
+﻿using System.Data;
 using System.IO;
-using System.Data;
+using System.Reflection;
 
 namespace Furcadia
 {
-    class SpeciesTable
+    internal class SpeciesTable
     {
         private static DataTable dt = null;
+
         public static void PrimeTable()
         {
             try
@@ -38,14 +34,12 @@ namespace Furcadia
                         row.ItemArray = fields;
                         dt.Rows.Add(row);
                     }
-                
-      }}    
-            catch 
-            {
-            
+                }
             }
-      }
-
+            catch
+            {
+            }
+        }
 
         //Convert Species to number
         public static int SpecNum(int species, int special)
@@ -54,12 +48,11 @@ namespace Furcadia
             if (dt == null)
                 PrimeTable();
 
-           
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 int Special = 0;
-               int.TryParse(dt.Rows[i]["Special"].ToString(), out Special);
-              if (Special == special)
+                int.TryParse(dt.Rows[i]["Special"].ToString(), out Special);
+                if (Special == special)
                 {
                     switch (Special)
                     {
@@ -130,18 +123,16 @@ namespace Furcadia
                         case 9:
                             result = species + 1;
                             break;
+
                         default:
-                            int.TryParse(dt.Rows[i]["DS"].ToString(), out result); 
+                            int.TryParse(dt.Rows[i]["DS"].ToString(), out result);
                             break;
                     }
                     break;
                 }
-
-
             }
 
-            
-                return result;
+            return result;
         }
 
         public static int WingsNum(int species, int special)
@@ -159,10 +150,7 @@ namespace Furcadia
                     int.TryParse(dt.Rows[i]["Wings"].ToString(), out result);
                     break;
                 }
-
-
             }
-
 
             return result;
         }
@@ -176,12 +164,5 @@ namespace Furcadia
 
         //    return "";
         //}
-
-
-
-
     }
-
-
-
 }

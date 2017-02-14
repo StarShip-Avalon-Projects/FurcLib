@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Furcadia.FurcMap
+﻿namespace Furcadia.FurcMap
 {
-   public class MapTile
+    public class MapTile
     {
-        public ushort floorNumber, objectNumber, wallNENumber, wallNWNumber, regionNumber, effectNumber;
+        public int floorNumber, objectNumber, wallNENumber, wallNWNumber, regionNumber, effectNumber;
         public int x, y;
 
         public MapTile(int x, int y)

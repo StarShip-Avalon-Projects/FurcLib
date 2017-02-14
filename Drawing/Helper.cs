@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Furcadia.Drawing.Graphics;
+using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
-using System.Drawing.Imaging;
 
 namespace Furcadia.Drawing
 {
@@ -31,12 +27,9 @@ namespace Furcadia.Drawing
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-            public static int CharToDescTag(char c)
+        public static int CharToDescTag(char c)
         {
             return (int)(c - 33);
         }
     }
-
-    
-
 }

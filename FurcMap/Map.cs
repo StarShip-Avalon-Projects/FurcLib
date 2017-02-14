@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Text;
 
 namespace Furcadia.FurcMap
 {
-   public class Map
+    public class Map
     {
         private List<String> headerLines = new List<String>();
         private Dictionary<String, String> mapData = new Dictionary<String, String>();
@@ -145,12 +144,10 @@ namespace Furcadia.FurcMap
             set { this.rating = value; }
         }
 
-
-        #endregion
+        #endregion Public Variables
 
         internal Map()
         {
-
         }
 
         /// <summary>
@@ -281,7 +278,6 @@ namespace Furcadia.FurcMap
                 effects[i] = matrix[i + (this.bytesLayerCount * 4)];
             }
 
-
             return true;
         }
 
@@ -348,7 +344,6 @@ namespace Furcadia.FurcMap
                 read = br.Read(buffer, 0, buffer.Length);
                 for (int i = 0; i < read; i++)
                     mapMatrix.Add(buffer[i]);
-
             } while (read > 0);
 
             br.Close();
@@ -370,11 +365,11 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>The floor number</returns>
-        public ushort getFloorAt(int x, int y)
+        public int getFloorAt(int x, int y)
         {
             int pos = getPosFrom(x, y);
 
-            return (ushort)floors[pos];
+            return (int)floors[pos];
         }
 
         /// <summary>
@@ -383,7 +378,7 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="floorNumber"></param>
-        public void setFloorAt(int x, int y, ushort floorNumber)
+        public void setFloorAt(int x, int y, int floorNumber)
         {
             int pos = getPosFrom(x, y);
 
@@ -396,11 +391,11 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>The object number</returns>
-        public ushort getObjectAt(int x, int y)
+        public int getObjectAt(int x, int y)
         {
             int pos = getPosFrom(x, y);
 
-            return (ushort)objects[pos];
+            return (int)objects[pos];
         }
 
         /// <summary>
@@ -409,7 +404,7 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="floorNumber"></param>
-        public void setObjectAt(int x, int y, ushort objectNumber)
+        public void setObjectAt(int x, int y, int objectNumber)
         {
             int pos = getPosFrom(x, y);
 
@@ -422,11 +417,11 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>The wall number</returns>
-        public ushort getWallAt(int x, int y)
+        public int getWallAt(int x, int y)
         {
             int pos = (this.height * x + y);
 
-            return (ushort)walls[pos];
+            return (int)walls[pos];
         }
 
         /// <summary>
@@ -435,7 +430,7 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="floorNumber"></param>
-        public void setWallAt(int x, int y, ushort wallNumber)
+        public void setWallAt(int x, int y, int wallNumber)
         {
             int pos = (this.height * x + y);
 
@@ -448,11 +443,11 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>The region number</returns>
-        public ushort getRegionAt(int x, int y)
+        public int getRegionAt(int x, int y)
         {
             int pos = getPosFrom(x, y);
 
-            return (ushort)regions[pos];
+            return (int)regions[pos];
         }
 
         /// <summary>
@@ -461,7 +456,7 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="floorNumber"></param>
-        public void setRegionAt(int x, int y, ushort regionNumber)
+        public void setRegionAt(int x, int y, int regionNumber)
         {
             int pos = getPosFrom(x, y);
 
@@ -474,11 +469,11 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>The effect number</returns>
-        public ushort getEffectAt(int x, int y)
+        public int getEffectAt(int x, int y)
         {
             int pos = getPosFrom(x, y);
 
-            return (ushort)effects[pos];
+            return (int)effects[pos];
         }
 
         /// <summary>
@@ -487,7 +482,7 @@ namespace Furcadia.FurcMap
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="floorNumber"></param>
-        public void setEffectAt(int x, int y, ushort effectNumber)
+        public void setEffectAt(int x, int y, int effectNumber)
         {
             int pos = getPosFrom(x, y);
 
@@ -577,5 +572,4 @@ namespace Furcadia.FurcMap
         public const String AdultOnly = "Adults Only";
         public const String AOClean = "AOClean";
     }
-
 }

@@ -1,16 +1,14 @@
 /*Log Header
  *Format: (date,Version) AuthorName, Changes (i.e lines, or function listings).
  * (Oct 27,2009,0.1) Squizzle, Initial Developer.
- * 
+ *
 */
+
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Timers;
+using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace Furcadia.Net
@@ -37,22 +35,24 @@ namespace Furcadia.Net
         /// <summary>
         /// Total online Furre count retrieved from a online check request
         /// </summary>
-        public int TotalFurresOnline {
+        public int TotalFurresOnline
+        {
             get { return _totalOnline; }
             set { _totalOnline = value; }
         }
 
-        public int NumberOfDreamsOnMainMaps {
+        public int NumberOfDreamsOnMainMaps
+        {
             get { return _num_dreams_mainmaps; }
         }
-        
+
         /// <summary>
         /// Called when a online check request sends a response.  First argument is a list of players online.
         /// </summary>
         public event PounceResponse Response;
 
         /// <summary>
-        /// A http web request 
+        /// A http web request
         /// </summary>
         /// <param name="url">Url (i.e http://on.furcadia.com) or if you have a custom online check server use that instead</param>
         /// <param name="shortN_friends">Friends (shortname) (i.e emeraldflame instead of Emerald|Flame)</param>
@@ -82,23 +82,23 @@ namespace Furcadia.Net
             return true;
         }
 
-        internal void Request (string url)
+        internal void Request(string url)
         {
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(((url.EndsWith("/")) ? url : url + "/") ); // /?" + requestString
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(((url.EndsWith("/")) ? url : url + "/")); // /?" + requestString
             request.Method = "POST";
-            request.ContentType ="application/x-www-form-urlencoded";
+            request.ContentType = "application/x-www-form-urlencoded";
 
             try
             {
-               request.BeginGetRequestStream(new AsyncCallback(BuffRespCallback), request);
-               allDone.WaitOne();
+                request.BeginGetRequestStream(new AsyncCallback(BuffRespCallback), request);
+                allDone.WaitOne();
             }
             catch
             {
                 this._responseBody = "No Server Response";
             }
         }
+
         internal void BuffRespCallback(IAsyncResult ar)
         {
             HttpWebRequest request = (HttpWebRequest)ar.AsyncState;
@@ -115,7 +115,6 @@ namespace Furcadia.Net
             postStream.Close();
             try
             {
-                
                 request.BeginGetResponse(new AsyncCallback(RespCallback), request);
             }
             catch
@@ -123,6 +122,7 @@ namespace Furcadia.Net
                 this._responseBody = "No Server Response";
             }
         }
+
         internal void RespCallback(IAsyncResult ar)
         {
             try
@@ -194,24 +194,25 @@ namespace Furcadia.Net
             {
             }
         }
-        
+
         /// <summary>
-        /// Connects to the online check server and sends a online check request 
+        /// Connects to the online check server and sends a online check request
         /// </summary>
         public void Connect()
         {
-            if (string.IsNullOrEmpty(_url) == false && Uri.IsWellFormedUriString(_url,UriKind.RelativeOrAbsolute))this.Request(_url);
+            if (string.IsNullOrEmpty(_url) == false && Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute)) this.Request(_url);
         }
-        
+
         /// <summary>
         /// Connects asynchronously to the online check server and sends a request without affecting the executing thread.
         /// </summary>
-        public void ConnectAsync(){
-            if (string.IsNullOrEmpty(_url) == false && 
-                Uri.IsWellFormedUriString(_url,UriKind.RelativeOrAbsolute))
+        public void ConnectAsync()
+        {
+            if (string.IsNullOrEmpty(_url) == false &&
+                Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute))
             {
                 ThreadPool.QueueUserWorkItem(
-                    new WaitCallback(delegate{this.Request(_url);}));
+                    new WaitCallback(delegate { this.Request(_url); }));
             }
         }
 
@@ -230,9 +231,11 @@ namespace Furcadia.Net
         public bool AddFriend(string name)
         {
             name = name.ToLower();
-            name = name.Replace(" ","");
-            if (IsValidAlphaNumeric (name)) {
-                if (_friends.Contains(name)==false){
+            name = name.Replace(" ", "");
+            if (IsValidAlphaNumeric(name))
+            {
+                if (_friends.Contains(name) == false)
+                {
                     _friends.Add(name);
                     return true;
                 }
@@ -243,7 +246,8 @@ namespace Furcadia.Net
 
         public bool RemoveFriend(string name)
         {
-            if (_friends.Contains(name)){
+            if (_friends.Contains(name))
+            {
                 _friends.Remove(name);
                 return true;
             }
@@ -261,11 +265,11 @@ namespace Furcadia.Net
         /// <returns>True: All friends names are fine.  False otherwise.</returns>
         public bool CheckFriendNames()
         {
-            for (int i = 0; i <= _friends.Count - 1;i++ )
+            for (int i = 0; i <= _friends.Count - 1; i++)
                 if (!IsValidAlphaNumeric(_friends[i])) return false;
             return true;
         }
-        
+
         /// <summary>
         /// Checks a friend's name to make sure it is a valid alpha numeric (a-z0-9).
         /// </summary>
@@ -276,7 +280,8 @@ namespace Furcadia.Net
             if (id != -1)
             {
                 return IsValidAlphaNumeric(_friends[id]);
-            }else {return false;}
+            }
+            else { return false; }
         }
 
         public void Kill()
