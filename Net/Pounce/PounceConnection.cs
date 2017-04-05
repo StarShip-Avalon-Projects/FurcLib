@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading;
 using static Furcadia.Util;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Pounce
 {
     /// <summary>
     /// Base class for handling the Pounce Server Connections
@@ -42,8 +42,7 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        [CLSCompliant(false)]
-        public List<string> _friends = new List<string>(), _dreams = new List<string>();
+        internal List<string> _friends = new List<string>(), _dreams = new List<string>(), _channels = new List<string>();
 
         #endregion Public Fields
 
@@ -95,6 +94,7 @@ namespace Furcadia.Net
         /// </summary>
         public PounceConnection()
         {
+            // TODO: Load Online.ini (uses Players List as default
         }
 
         #endregion Public Constructors
