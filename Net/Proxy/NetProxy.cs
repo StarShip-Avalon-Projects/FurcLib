@@ -1,7 +1,7 @@
 ﻿using Furcadia.Net.Utils;
 using System;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Proxy
 {
     /// <summary>
     /// Generic Proxy handler for any derived Proxy.

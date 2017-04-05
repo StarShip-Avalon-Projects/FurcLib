@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Proxy
 {
     /// <summary>
     /// Base Furcadia Session Class

@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Furcadia.Net.Pounce
+﻿namespace Furcadia.Net.Pounce
 {
-    class PounceClient
+    /// <summary>
+    /// Generic Class to use the Pounce server
+    /// </summary>
+    public class PounceClient : PounceConnection
     {
+        #region Public Constructors
+
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        public PounceClient()
+        {
+        }
+
+        #endregion Public Constructors
     }
 }
