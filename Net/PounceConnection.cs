@@ -13,16 +13,14 @@ using System.Threading;
 
 namespace Furcadia.Net
 {
-    /// <summary>
-    /// Legacy Pounce
-    /// </summary>
+    [Obsolete("Use Net.Pounce Classes instead", false)]
     public class PounceConnection
     {
-        #region Public Fields
+        #region Internal Fields
 
-        public List<string> _friends = new List<string>(), _dreams = new List<string>();
+        internal List<string> _friends = new List<string>(), _dreams = new List<string>();
 
-        #endregion Public Fields
+        #endregion Internal Fields
 
         #region Private Fields
 

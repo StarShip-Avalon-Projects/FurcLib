@@ -51,7 +51,18 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// NetProxy Constructor with defaults
         /// </summary>
-        public NetProxy()
+        public NetProxy() : base()
+        {
+            ServerParser = new Net.Utils.ParseServer(ref Dream, ref Player);
+            ServQue = new ServerQue();
+            ServQue.OnServerSendMessage += OnServerSent;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="port">
+        /// </param>
+        public NetProxy(int port) : base(port)
         {
             ServerParser = new Net.Utils.ParseServer(ref Dream, ref Player);
             ServQue = new ServerQue();
