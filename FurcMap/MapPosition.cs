@@ -5,14 +5,8 @@ namespace Furcadia.FurcMap
     [CLSCompliant(true)]
     public class MapPosition
     {
-        #region Public Fields
-
         public int floorNumber, objectNumber, wallNumber, regionNumber, effectNumber;
         public int x, y;
-
-        #endregion Public Fields
-
-        #region Public Constructors
 
         public MapPosition(int x, int y)
         {
@@ -30,7 +24,5 @@ namespace Furcadia.FurcMap
             this.regionNumber = map.getRegionAt(x, y);
             this.effectNumber = map.getEffectAt(x, y);
         }
-
-        #endregion Public Constructors
     }
 }

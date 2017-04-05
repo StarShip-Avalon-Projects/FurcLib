@@ -13,15 +13,9 @@ namespace Furcadia.Net
     /// </summary>
     public class FURREList : ICollection, IDisposable, IEnumerator<FURRE>
     {
-        #region Protected Internal Fields
-
         /// <summary>
         /// </summary>
         protected internal List<FURRE> fList;
-
-        #endregion Protected Internal Fields
-
-        #region Public Constructors
 
         /// <summary>
         /// </summary>
@@ -29,10 +23,6 @@ namespace Furcadia.Net
         {
             fList = new List<FURRE>();
         }
-
-        #endregion Public Constructors
-
-        #region Public Properties
 
         /// <summary>
         /// </summary>
@@ -47,6 +37,14 @@ namespace Furcadia.Net
         /// <summary>
         /// </summary>
         public FURRE Current
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        object IEnumerator.Current
         {
             get
             {
@@ -74,18 +72,6 @@ namespace Furcadia.Net
             }
         }
 
-        object IEnumerator.Current
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        #endregion Public Properties
-
-        #region Public Indexers
-
         /// <summary>
         /// </summary>
         /// <param name="index">
@@ -99,18 +85,6 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        [CLSCompliant(false)]
-        public FURRE this[
-            uint index
-        ]
-        { get { return fList[(int)index]; } set { fList[(int)index] = value; } }
-
-        /// <summary>
-        /// </summary>
         /// <param name="Furre">
         /// </param>
         /// <returns>
@@ -119,10 +93,6 @@ namespace Furcadia.Net
     FURRE Furre
 ]
         { get { return fList[fList.IndexOf(Furre)]; } set { fList[fList.IndexOf(Furre)] = value; } }
-
-        #endregion Public Indexers
-
-        #region Public Methods
 
         /// <summary>
         /// </summary>
@@ -157,18 +127,6 @@ namespace Furcadia.Net
         /// <returns>
         /// </returns>
         public bool Contains(int FurreID)
-        {
-            return fList.Contains(new Net.FURRE(FurreID));
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="FurreID">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        [CLSCompliant(false)]
-        public bool Contains(uint FurreID)
         {
             return fList.Contains(new Net.FURRE(FurreID));
         }
@@ -225,11 +183,21 @@ namespace Furcadia.Net
             fList.Remove(new Net.FURRE(FurreID));
         }
 
-        #endregion Public Methods
-
         #region IDisposable Support
 
         private bool disposedValue = false; // To detect redundant calls
+
+        // This code added to correctly implement the disposable pattern.
+        void IDisposable.Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above. GC.SuppressFinalize(this);
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free
+        //       unmanaged resources. ~FURREList() { // Do not change this code. Put cleanup code in
+        // Dispose(bool disposing) above. Dispose(false); }
 
         /// <summary>
         /// </summary>
@@ -240,22 +208,11 @@ namespace Furcadia.Net
             throw new NotImplementedException();
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free
-        //       unmanaged resources. ~FURREList() { // Do not change this code. Put cleanup code in
-        // Dispose(bool disposing) above. Dispose(false); }
         /// <summary>
         /// </summary>
         public void Reset()
         {
             throw new NotImplementedException();
-        }
-
-        // This code added to correctly implement the disposable pattern.
-        void IDisposable.Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above. GC.SuppressFinalize(this);
         }
 
         /// <summary>

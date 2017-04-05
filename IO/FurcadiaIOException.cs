@@ -17,8 +17,6 @@ namespace Furcadia.IO
     /// </summary>
     public class FurcadiaIOException : Exception, ISerializable
     {
-        #region Public Constructors
-
         public FurcadiaIOException()
         {
         }
@@ -31,15 +29,9 @@ namespace Furcadia.IO
         {
         }
 
-        #endregion Public Constructors
-
-        #region Protected Constructors
-
         // This constructor is needed for serialization.
         protected FurcadiaIOException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
-
-        #endregion Protected Constructors
     }
 }

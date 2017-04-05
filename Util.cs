@@ -11,7 +11,7 @@ namespace Furcadia
     /// <summary>
     /// Utility class with helper functions.
     /// </summary>
-    public static class Util
+    public class Util
     {
         #region Public Methods
 

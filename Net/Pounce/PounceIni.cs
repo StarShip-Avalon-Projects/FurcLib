@@ -1,6 +1,12 @@
-﻿namespace Furcadia.Net.Pounce
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Furcadia.Net.Pounce
 {
-    internal class PounceIni
+    class PounceIni
     {
     }
 }

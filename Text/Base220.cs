@@ -4,7 +4,7 @@
  * P.S: jk above...
 */
 
-using Furcadia.Net.Utils;
+using Furcadia.Net;
 using System;
 using System.Text;
 
@@ -26,25 +26,15 @@ namespace Furcadia.Text
 
         #region Public Constructors
 
-        /// <summary>
-        /// </summary>
         public Base220() : this(0)
         {
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="n">
-        /// </param>
         public Base220(int n)
         {
             Value = n;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="s">
-        /// </param>
         public Base220(string s)
         {
             FromString(s);
@@ -144,12 +134,6 @@ namespace Furcadia.Text
 
         #region Public Methods
 
-        /// <summary>
-        /// </summary>
-        /// <param name="b220str">
-        /// </param>
-        /// <returns>
-        /// </returns>
         public static int ConvertFromBase220(string b220str)
         {
             int num = 0;
@@ -222,7 +206,7 @@ namespace Furcadia.Text
         {
             // System.Text.Encoding.GetEncoding(EncoderPage).GetBytes
 
-            return System.Text.Encoding.GetEncoding(Utilities.GetEncoding).GetBytes(ToString(nDigits));
+            return System.Text.Encoding.GetEncoding(BaseProxy.EncoderPage).GetBytes(ToString(nDigits));
         }
 
         public override string ToString()

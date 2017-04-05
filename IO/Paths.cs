@@ -38,12 +38,8 @@ namespace Furcadia.IO
     /// </summary>
     public class Paths
     {
-        #region Private Fields
-
         private const string RegPathx32 = @"SOFTWARE\Dragon's Eye Productions\Furcadia\";
         private const string RegPathx64 = @"SOFTWARE\Wow6432Node\Dragon's Eye Productions\Furcadia\";
-
-        #endregion Private Fields
 
         #region Constructors
 

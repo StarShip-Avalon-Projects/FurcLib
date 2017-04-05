@@ -1,7 +1,7 @@
 ﻿using Furcadia.Net.Utils;
 using System;
 
-namespace Furcadia.Net.Proxy
+namespace Furcadia.Net
 {
     /// <summary>
     /// Generic Proxy handler for any derived Proxy.
@@ -51,18 +51,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// NetProxy Constructor with defaults
         /// </summary>
-        public NetProxy() : base()
-        {
-            ServerParser = new Net.Utils.ParseServer(ref Dream, ref Player);
-            ServQue = new ServerQue();
-            ServQue.OnServerSendMessage += OnServerSent;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="port">
-        /// </param>
-        public NetProxy(int port) : base(port)
+        public NetProxy()
         {
             ServerParser = new Net.Utils.ParseServer(ref Dream, ref Player);
             ServQue = new ServerQue();

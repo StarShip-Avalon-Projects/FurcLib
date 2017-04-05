@@ -84,28 +84,6 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// </summary>
-        /// <param name="FurreID">
-        /// Furre ID
-        /// </param>
-        [CLSCompliant(false)]
-        public FURRE(uint FurreID)
-        {
-            _ID = (int)FurreID;
-            _ColorType = '\0';
-            _Color = "#";
-            Location = new FurrePosition();
-            LastPosition = new FurrePosition();
-            // -1 means these haven't been set yet
-            _Species = -1;
-            _Gender = -1;
-            _Special = -1;
-            _DSSpecies = -1;
-            _LastStat = -1;
-            _Wings = -1;
-        }
-
-        /// <summary>
         /// Furre Constructor with Name
         /// </summary>
         /// <param name="Name">

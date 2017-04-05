@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Furcadia.Net.Proxy
+namespace Furcadia.Net
 {
     /// <summary>
     /// Base Furcadia Session Class
@@ -23,19 +23,8 @@ namespace Furcadia.Net.Proxy
 
         #region Protected Fields
 
-        /// <summary>
-        /// Associate/Beekin Badges
-        /// </summary>
         protected Queue<string> BadgeTag = new Queue<string>(10);
-
-        /// <summary>
-        /// Look data
-        /// </summary>
         protected Queue<string> LookQue = new Queue<string>(10);
-
-        /// <summary>
-        /// SpeciTags
-        /// </summary>
         protected Queue<string> SpeciesTag = new Queue<string>(10);
 
         #endregion Protected Fields
@@ -43,26 +32,10 @@ namespace Furcadia.Net.Proxy
         #region Public Constructors
 
         /// <summary>
-        /// Default Construction
         /// </summary>
-        public ProxySession() : base()
+        public ProxySession()
         {
-            FurcReconnect = new ProxyReconnect();
-            FurcReconnect.OnStartProxyConnect += Connect;
-            FurcReconnect.OnConnectTimeOut += ConnectionTimedOut;
-            FurcReconnect.OnAttemptsExceded += AttemptsExceded;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="port">
-        /// </param>
-        public ProxySession(int port) : base(port)
-        {
-            FurcReconnect = new ProxyReconnect();
-            FurcReconnect.OnStartProxyConnect += Connect;
-            FurcReconnect.OnConnectTimeOut += ConnectionTimedOut;
-            FurcReconnect.OnAttemptsExceded += AttemptsExceded;
+            NewFurcReconnect();
         }
 
         #endregion Public Constructors
@@ -85,6 +58,17 @@ namespace Furcadia.Net.Proxy
         public override void Connect()
         {
             FurcReconnect.Start();
+        }
+
+        /// <summary>
+        /// </summary>
+        public void NewFurcReconnect()
+        {
+            //Reconnection System
+            FurcReconnect = new ProxyReconnect();
+            FurcReconnect.OnStartProxyConnect += Connect;
+            FurcReconnect.OnConnectTimeOut += ConnectionTimedOut;
+            FurcReconnect.OnAttemptsExceded += AttemptsExceded;
         }
 
         /// <summary>

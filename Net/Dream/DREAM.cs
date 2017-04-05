@@ -6,7 +6,7 @@ namespace Furcadia.Net
     /// Current Dream information
     /// </summary>
     [CLSCompliant(true)]
-    public class DREAM
+    public class DREAM : IDisposable
     {
         #region Public Fields
 
@@ -22,7 +22,7 @@ namespace Furcadia.Net
         /// As of V31, Color code has changed.
         /// </para>
         /// </summary>
-        public FURREList FurreList = new FURREList();
+        public FURREList FurreList;
 
         #endregion Public Fields
 
@@ -31,16 +31,28 @@ namespace Furcadia.Net
         /// <summary>
         /// private variables
         /// </summary>
-        private static string _Name, _Title, _Lines, _Rating, _URL, _Owner;
+        private string _Name, _Title, _Lines, _Rating, _URL, _Owner;
 
         #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// List of Furres in the dream.
+        /// </summary>
+        public DREAM()
+        {
+            FurreList = new FURREList();
+        }
+
+        #endregion Public Constructors
 
         #region Public Properties
 
         /// <summary>
         /// Number of DS Lines
         /// </summary>
-        public static string Lines
+        public string Lines
         {
             get { return _Lines; }
             set { _Lines = value; }
@@ -49,7 +61,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Name of the dream
         /// </summary>
-        public static string Name
+        public string Name
         {
             get { return _Name; }
             set { _Name = value; }
@@ -58,7 +70,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Dreams uploader character
         /// </summary>
-        public static string Owner
+        public string Owner
         {
             get { return _Owner; }
             set { _Owner = value; }
@@ -67,7 +79,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Furcadia Dream rating
         /// </summary>
-        public static string Rating
+        public string Rating
         {
             get { return _Rating; }
             set { _Rating = value; }
@@ -76,7 +88,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Dream title
         /// </summary>
-        public static string Title
+        public string Title
         {
             get { return _Title; }
             set { _Title = value; }
@@ -88,12 +100,46 @@ namespace Furcadia.Net
         /// IE: 'fdl furc://DreamOwner:DreamTitle/EntryCode#
         /// </para>
         /// </summary>
-        public static string URL
+        public string URL
         {
             get { return _URL; }
             set { _URL = value; }
         }
 
         #endregion Public Properties
+
+        #region IDisposable Support
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        // This code added to correctly implement the disposable pattern.
+        void IDisposable.Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above. GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free
+        //       unmanaged resources. ~DREAM() { // Do not change this code. Put cleanup code in
+        // Dispose(bool disposing) above. Dispose(false); }
+
+        #endregion IDisposable Support
     }
 }

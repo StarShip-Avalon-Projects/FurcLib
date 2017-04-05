@@ -1,6 +1,12 @@
-﻿namespace Furcadia.Security
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Furcadia.Security
 {
-    internal class SSL
+    class SSL
     {
     }
 }

@@ -7,13 +7,28 @@ namespace Furcadia
 {
     public class Avatar
     {
-        #region Private Fields
+        /// <summary>
+        ///
+        /// </summary>
+        public struct Frame
+        {
+            public int Spec;
+            public int dir;
+            public int pose;
+            public int gender;
+            public int DS_Number;
+            public int Wings;
 
-        private static DataTable dt = null;
-
-        #endregion Private Fields
-
-        #region Private Enums
+            public void Clear()
+            {
+                Spec = -1;
+                dir = -1;
+                pose = -1;
+                gender = -1;
+                DS_Number = -1;
+                Wings = -1;
+            }
+        }
 
         private enum av_DIR
         {
@@ -32,9 +47,7 @@ namespace Furcadia
             AVPOSE_LIE,
         };
 
-        #endregion Private Enums
-
-        #region Public Methods
+        private static DataTable dt = null;
 
         /// <summary>
         /// Primes the table.
@@ -72,11 +85,8 @@ namespace Furcadia
         /// <summary>
         /// Specs the number.
         /// </summary>
-        /// <param name="Frame">
-        /// The frame.
-        /// </param>
-        /// <returns>
-        /// </returns>
+        /// <param name="Frame">The frame.</param>
+        /// <returns></returns>
         public static Frame SpecNum(int Frame)
         {
             Frame _Frame = new Frame();
@@ -206,42 +216,6 @@ namespace Furcadia
             _Frame.Clear();
             return _Frame;
         }
-
-        #endregion Public Methods
-
-        #region Public Structs
-
-        /// <summary>
-        /// </summary>
-        public struct Frame
-        {
-            #region Public Fields
-
-            public int dir;
-            public int DS_Number;
-            public int gender;
-            public int pose;
-            public int Spec;
-            public int Wings;
-
-            #endregion Public Fields
-
-            #region Public Methods
-
-            public void Clear()
-            {
-                Spec = -1;
-                dir = -1;
-                pose = -1;
-                gender = -1;
-                DS_Number = -1;
-                Wings = -1;
-            }
-
-            #endregion Public Methods
-        }
-
-        #endregion Public Structs
 
         //end class
     }
