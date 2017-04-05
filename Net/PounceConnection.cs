@@ -13,22 +13,83 @@ using System.Threading;
 
 namespace Furcadia.Net
 {
+    [Obsolete("Use Net.Pounce Classes instead", false)]
     public class PounceConnection
     {
-        public delegate void PounceResponse(string[] friends, string[] dreams);
+        #region Internal Fields
 
-        private HttpWebRequest request;
+        internal List<string> _friends = new List<string>(), _dreams = new List<string>();
+
+        #endregion Internal Fields
+
+        #region Private Fields
+
         private static ManualResetEvent allDone = new ManualResetEvent(false);
-        private string _url;
-        private string _responseBody;
-        private int _statusCode;
+
         private int _num_dreams_mainmaps;
-        public List<string> _friends = new List<string>(), _dreams = new List<string>();
+
+        private string _responseBody;
+
+        private int _statusCode;
+
         private int _totalOnline;
 
+        private string _url;
+
+        private HttpWebRequest request;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
         /// <summary>
-        /// When a response from the server is recieved this property will contain
-        /// the raw HTTP string.
+        /// A http web request
+        /// </summary>
+        /// <param name="url">
+        /// Url (i.e http://on.furcadia.com) or if you have a custom online check server use that instead
+        /// </param>
+        /// <param name="shortN_friends">
+        /// Friends (shortname) (i.e emeraldflame instead of Emerald|Flame)
+        /// </param>
+        public PounceConnection(string url, params string[] shortN_friends)
+        {
+            _url = url;
+            //Make sure we have some friends..  no loners here, amirite?
+            if (shortN_friends != null && shortN_friends.Length > 0)
+            {
+                foreach (string friend in shortN_friends)
+                {
+                    AddFriend(friend);
+                }
+            }
+        }
+
+        #endregion Public Constructors
+
+        #region Public Delegates
+
+        public delegate void PounceResponse(string[] friends, string[] dreams);
+
+        #endregion Public Delegates
+
+        #region Public Events
+
+        /// <summary>
+        /// Called when a online check request sends a response. First argument is a list of players online.
+        /// </summary>
+        public event PounceResponse Response;
+
+        #endregion Public Events
+
+        #region Public Properties
+
+        public int NumberOfDreamsOnMainMaps
+        {
+            get { return _num_dreams_mainmaps; }
+        }
+
+        /// <summary>
+        /// When a response from the server is recieved this property will contain the raw HTTP string.
         /// </summary>
         public string RawResponse { get { return _responseBody; } }
 
@@ -41,31 +102,132 @@ namespace Furcadia.Net
             set { _totalOnline = value; }
         }
 
-        public int NumberOfDreamsOnMainMaps
+        #endregion Public Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// Adds a friend to a list of friends. Throws a Exception on non alphanumeric string.
+        /// </summary>
+        /// <param name="name">
+        /// A <see cref="System.String"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.Boolean"/>. True if successfully added friend name. False if name
+        /// already added.
+        /// </returns>
+        public bool AddFriend(string name)
         {
-            get { return _num_dreams_mainmaps; }
+            name = name.ToLower();
+            name = name.Replace(" ", "");
+            if (IsValidAlphaNumeric(name))
+            {
+                if (_friends.Contains(name) == false)
+                {
+                    _friends.Add(name);
+                    return true;
+                }
+            }
+            else throw new Exception(name + " is not valid alphanumeric (a-z0-9).");
+            return false;
         }
 
         /// <summary>
-        /// Called when a online check request sends a response.  First argument is a list of players online.
+        /// Checks a friend's name to make sure it is a valid alpha numeric (a-z0-9).
         /// </summary>
-        public event PounceResponse Response;
+        /// <returns>
+        /// True: Friend name is fine. False otherwise.
+        /// </returns>
+        public bool CheckFriendName(string shortNFriend)
+        {
+            int id = _friends.IndexOf(shortNFriend);
+            if (id != -1)
+            {
+                return IsValidAlphaNumeric(_friends[id]);
+            }
+            else { return false; }
+        }
 
         /// <summary>
-        /// A http web request
+        /// Iterates through friend's names to make sure they are valid alpha numeric (a-z0-9).
         /// </summary>
-        /// <param name="url">Url (i.e http://on.furcadia.com) or if you have a custom online check server use that instead</param>
-        /// <param name="shortN_friends">Friends (shortname) (i.e emeraldflame instead of Emerald|Flame)</param>
-        public PounceConnection(string url, params string[] shortN_friends)
+        /// <returns>
+        /// True: All friends names are fine. False otherwise.
+        /// </returns>
+        public bool CheckFriendNames()
         {
-            _url = url;
-            //Make sure we have some friends..  no loners here, amirite?
-            if (shortN_friends != null && shortN_friends.Length > 0)
+            for (int i = 0; i <= _friends.Count - 1; i++)
+                if (!IsValidAlphaNumeric(_friends[i])) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Connects to the online check server and sends a online check request
+        /// </summary>
+        public void Connect()
+        {
+            if (string.IsNullOrEmpty(_url) == false && Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute)) this.Request(_url);
+        }
+
+        /// <summary>
+        /// Connects asynchronously to the online check server and sends a request without affecting
+        /// the executing thread.
+        /// </summary>
+        public void ConnectAsync()
+        {
+            if (string.IsNullOrEmpty(_url) == false &&
+                Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute))
             {
-                foreach (string friend in shortN_friends)
-                {
-                    AddFriend(friend);
-                }
+                ThreadPool.QueueUserWorkItem(
+                    new WaitCallback(delegate { this.Request(_url); }));
+            }
+        }
+
+        public void Kill()
+        {
+            if (request != null) { request.Abort(); }
+        }
+
+        public bool RemoveFriend(string name)
+        {
+            if (_friends.Contains(name))
+            {
+                _friends.Remove(name);
+                return true;
+            }
+            return false;
+        }
+
+        public void RemoveFriends()
+        {
+            _friends.Clear();
+        }
+
+        #endregion Public Methods
+
+        #region Internal Methods
+
+        internal void BuffRespCallback(IAsyncResult ar)
+        {
+            HttpWebRequest request = (HttpWebRequest)ar.AsyncState;
+            Stream postStream = request.EndGetRequestStream(ar);
+            string requestString = string.Empty;
+            foreach (string friend in _friends)
+                requestString += "u[]=" + friend + "&"; //u[]=jack&u[]=jill&u[]=hill
+            foreach (string dream in _dreams)
+                requestString += "d[]=" + dream.Substring(6) + "&";
+            byte[] byteArray = Encoding.UTF8.GetBytes(requestString);
+            //request.ContentLength = requestString.Length;
+            // Write to the request stream.
+            postStream.Write(byteArray, 0, requestString.Length);
+            postStream.Close();
+            try
+            {
+                request.BeginGetResponse(new AsyncCallback(RespCallback), request);
+            }
+            catch
+            {
+                this._responseBody = "No Server Response";
             }
         }
 
@@ -92,30 +254,6 @@ namespace Furcadia.Net
             {
                 request.BeginGetRequestStream(new AsyncCallback(BuffRespCallback), request);
                 allDone.WaitOne();
-            }
-            catch
-            {
-                this._responseBody = "No Server Response";
-            }
-        }
-
-        internal void BuffRespCallback(IAsyncResult ar)
-        {
-            HttpWebRequest request = (HttpWebRequest)ar.AsyncState;
-            Stream postStream = request.EndGetRequestStream(ar);
-            string requestString = string.Empty;
-            foreach (string friend in _friends)
-                requestString += "u[]=" + friend + "&"; //u[]=jack&u[]=jill&u[]=hill
-            foreach (string dream in _dreams)
-                requestString += "d[]=" + dream.Substring(6) + "&";
-            byte[] byteArray = Encoding.UTF8.GetBytes(requestString);
-            //request.ContentLength = requestString.Length;
-            // Write to the request stream.
-            postStream.Write(byteArray, 0, requestString.Length);
-            postStream.Close();
-            try
-            {
-                request.BeginGetResponse(new AsyncCallback(RespCallback), request);
             }
             catch
             {
@@ -195,98 +333,6 @@ namespace Furcadia.Net
             }
         }
 
-        /// <summary>
-        /// Connects to the online check server and sends a online check request
-        /// </summary>
-        public void Connect()
-        {
-            if (string.IsNullOrEmpty(_url) == false && Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute)) this.Request(_url);
-        }
-
-        /// <summary>
-        /// Connects asynchronously to the online check server and sends a request without affecting the executing thread.
-        /// </summary>
-        public void ConnectAsync()
-        {
-            if (string.IsNullOrEmpty(_url) == false &&
-                Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute))
-            {
-                ThreadPool.QueueUserWorkItem(
-                    new WaitCallback(delegate { this.Request(_url); }));
-            }
-        }
-
-        /// <summary>
-        /// Adds a friend to a list of friends.
-        /// Throws a Exception on non alphanumeric string.
-        /// </summary>
-        /// <param name="name">
-        /// A <see cref="System.String"/>
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.Boolean"/>.
-        /// True if successfully added friend name.
-        /// False if name already added.
-        /// </returns>
-        public bool AddFriend(string name)
-        {
-            name = name.ToLower();
-            name = name.Replace(" ", "");
-            if (IsValidAlphaNumeric(name))
-            {
-                if (_friends.Contains(name) == false)
-                {
-                    _friends.Add(name);
-                    return true;
-                }
-            }
-            else throw new Exception(name + " is not valid alphanumeric (a-z0-9).");
-            return false;
-        }
-
-        public bool RemoveFriend(string name)
-        {
-            if (_friends.Contains(name))
-            {
-                _friends.Remove(name);
-                return true;
-            }
-            return false;
-        }
-
-        public void RemoveFriends()
-        {
-            _friends.Clear();
-        }
-
-        /// <summary>
-        /// Iterates through friend's names to make sure they are valid alpha numeric (a-z0-9).
-        /// </summary>
-        /// <returns>True: All friends names are fine.  False otherwise.</returns>
-        public bool CheckFriendNames()
-        {
-            for (int i = 0; i <= _friends.Count - 1; i++)
-                if (!IsValidAlphaNumeric(_friends[i])) return false;
-            return true;
-        }
-
-        /// <summary>
-        /// Checks a friend's name to make sure it is a valid alpha numeric (a-z0-9).
-        /// </summary>
-        /// <returns>True: Friend name is fine.  False otherwise.</returns>
-        public bool CheckFriendName(string shortNFriend)
-        {
-            int id = _friends.IndexOf(shortNFriend);
-            if (id != -1)
-            {
-                return IsValidAlphaNumeric(_friends[id]);
-            }
-            else { return false; }
-        }
-
-        public void Kill()
-        {
-            if (request != null) { request.Abort(); }
-        }
+        #endregion Internal Methods
     }
 }

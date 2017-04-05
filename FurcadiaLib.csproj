@@ -95,18 +95,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>..\packages\Mono.Cecil.0.9.6.1\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -122,59 +110,75 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyFileVersion.cs" />
+    <Compile Include="AssemblyFileVersion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyFileVersion.tt</DependentUpon>
+    </Compile>
     <Compile Include="Avatar.cs" />
     <Compile Include="Badges.cs" />
-    <Compile Include="Base220.cs" />
-    <Compile Include="Base95.cs" />
+    <Compile Include="LegacyAttribute.cs" />
+    <Compile Include="Net\Account\AccountInfo.cs" />
+    <Compile Include="Net\Account\CharacterInfo.cs" />
+    <Compile Include="Net\DirectConnection\NetConnection.cs" />
+    <Compile Include="Net\NetProxy.cs" />
+    <Compile Include="Net\PounceConnection.cs" />
+    <Compile Include="Net\Pounce\PounceClient.cs" />
+    <Compile Include="Net\Pounce\PounceIni.cs" />
+    <Compile Include="Security\SSL.cs" />
+    <Compile Include="Security\SslCert.cs" />
+    <Compile Include="Text\Base220.cs" />
+    <Compile Include="Text\Base95.cs" />
     <Compile Include="Drawing\FurrePosition.cs" />
     <Compile Include="Drawing\ViewArea.cs" />
-    <Compile Include="EventArgs\NetServerArgs.cs" />
+    <Compile Include="Net\Utils\NetServerArgs.cs" />
     <Compile Include="FurcMap\Map.cs" />
     <Compile Include="FurcMap\MapPosition.cs" />
     <Compile Include="FurcMap\MapTile.cs" />
     <Compile Include="IO\FurcadiaIOException.cs" />
     <Compile Include="IO\FurcadiaNotFoundException.cs" />
-    <Compile Include="IO\ParseClient.cs" />
-    <Compile Include="IO\ParseServer.cs" />
-    <Compile Include="IO\ServerQue.cs" />
+    <Compile Include="Net\Utils\ParseClient.cs" />
+    <Compile Include="Net\Utils\ParseServer.cs" />
+    <Compile Include="Net\Utils\ProxyReconnect.cs" />
+    <Compile Include="Net\Utils\ServerQue.cs" />
     <Compile Include="IO\SubSystem\PhoenixSpeakParser.cs" />
     <Compile Include="Net\Dream\DREAM.cs" />
     <Compile Include="Net\Dream\FURRE.cs" />
     <Compile Include="Net\Dream\FURREList.cs" />
-    <Compile Include="Net\NetClient.cs" />
-    <Compile Include="Net\NetConnection.cs" />
-    <Compile Include="Net\NetProxyException.cs" />
-    <Compile Include="Net\NetServer.cs" />
-    <Compile Include="Net\ProxySession.cs" />
+    <Compile Include="Net\DirectConnection\NetClient.cs" />
+    <Compile Include="Net\DirectConnection\ClientBase.cs" />
+    <Compile Include="Net\Proxy\NetProxyException.cs" />
+    <Compile Include="Net\Proxy\NetProxy.cs" />
+    <Compile Include="Net\Proxy\ProxySession.cs" />
+    <Compile Include="Net\Utils\Utilities.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SpeciesTable.cs" />
-    <Compile Include="IO\GCAWeb.Utils.cs" />
     <Compile Include="Drawing\Graphics.cs" />
     <Compile Include="Drawing\Helper.cs" />
-    <Compile Include="IO\FurcIni.cs" />
-    <Compile Include="IO\IniParser.cs" />
+    <Compile Include="Text\ColorString.cs" />
+    <Compile Include="Text\FurcIni.cs" />
+    <Compile Include="Text\IniParser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\RegistryExplorer.cs" />
     <Compile Include="Net\Dream\BotFurre.cs" />
     <Compile Include="Net\INetMessage.cs" />
-    <Compile Include="Net\Movement.cs" />
-    <Compile Include="Net\NetProxy.cs" />
+    <Compile Include="Net\Utils\Movement.cs" />
+    <Compile Include="Net\Proxy\BaseProxy.cs" />
     <Compile Include="Net\NetMessage.cs" />
-    <Compile Include="Net\PounceConnection.cs" />
+    <Compile Include="Net\Pounce\PounceConnection.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Settings.cs" />
+    <Compile Include="Text\Settings.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Character.cs" />
+    <Compile Include="Text\Character.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -201,7 +205,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="AssemblyFileVersion.tt" />
+    <DesignData Include="AssemblyFileVersion.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyFileVersion.cs</LastGenOutput>
+    </DesignData>
     <Content Include="Changes.txt" />
     <Content Include="ToDo.txt" />
   </ItemGroup>
@@ -216,6 +223,7 @@
     <Resource Include="Resources\DefaultMapData.txt">
       <LogicalName>DefaultMapData</LogicalName>
     </Resource>
+    <None Include="README.md" />
     <None Include="Resources\furc.pal" />
     <EmbeddedResource Include="Resources\SpeciesTable.csv" />
     <EmbeddedResource Include="Resources\badges.csv" />
@@ -223,8 +231,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
@@ -249,6 +258,10 @@
       <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.MonthAndDayStamp" />
     </VisualStudio>
   </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>

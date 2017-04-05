@@ -4,6 +4,7 @@
  *
 */
 
+using Furcadia.Net.Utils;
 using System.Text;
 
 namespace Furcadia.Net
@@ -13,12 +14,22 @@ namespace Furcadia.Net
     /// </summary>
     public class NetMessage : INetMessage
     {
+        #region Private Fields
+
         private StringBuilder _data;
+
+        #endregion Private Fields
+
+        #region Public Constructors
 
         public NetMessage()
         {
             _data = new StringBuilder();
         }
+
+        #endregion Public Constructors
+
+        #region Public Methods
 
         public string GetString()
         {
@@ -32,7 +43,9 @@ namespace Furcadia.Net
 
         public void Write(byte[] data)
         {
-            _data.Append(Encoding.GetEncoding(NetProxy.EncoderPage).GetString(data));
+            _data.Append(Encoding.GetEncoding(Utilities.GetEncoding).GetString(data));
         }
+
+        #endregion Public Methods
     }
 }

@@ -1,21 +1,7 @@
-# Furcadia Framework For 3rd Party Programs
+# Furcadia Framework For Third Party Programs (FF3PP)
+This is the Core library for Third Party Developers to create any kind of Application
 
-A Swiss Army Knife for Furcadia Software and Services.
-"It's so easy a caveman can do it!"
+## Disclaimer
+Furcadia Framework and it's Documentation is not supported by Furcadia, Dragon's Eye Production or Catnip Studios. This poroject is developed and maintained indepentaly by and for the Furcadia Community
 
-Features:
-Furcadia File Formats
-* Fox Format
 
-Default File Paths
-
-Networking:
-Pounce Connection
-NetProxy
-NetConnection
-
-Utilities
-Base70/Base220 Conversions
-Furcadia Settings
-Furre Structure
-Furre Species Lookups
