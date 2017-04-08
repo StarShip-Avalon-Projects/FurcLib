@@ -21,6 +21,9 @@ namespace Furcadia.Net.Pounce
     /// <summary>
     /// Base class for handling the Pounce Server Connections
     /// </summary>
+    /// <remarks>
+    /// Pounce server returns a list on online objects (Furres,Dreams,Channels?)
+    /// </remarks>
     public class PounceConnection : IDisposable
     {
         #region Public Properties
@@ -95,9 +98,9 @@ namespace Furcadia.Net.Pounce
         private string _responseBody;
 
         /// <summary>
-        /// Default URL "http://on.furcadia.com/q
+        /// Default URL "http://on.furcadia.com/q/
         /// </summary>
-        private string _url = string.Format("http://{0}/q", Utilities.PounceServerHost);
+        private string _url = string.Format("http://{0}/q/", Utilities.PounceServerHost);
 
         #endregion Private Fields
 
@@ -135,6 +138,7 @@ namespace Furcadia.Net.Pounce
         /// </summary>
         public PounceConnection()
         {
+            _url = string.Format("http://{0}/q/", Utilities.PounceServerHost);
             // TODO: Load Online.ini (uses Players List as default
         }
 

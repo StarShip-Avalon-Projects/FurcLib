@@ -20,7 +20,9 @@ namespace Furcadia.Net.Utils
         #region Public Methods
 
         /// <summary>
-        /// Checks TCP port and scans for an available TCP port on the host system
+        /// Checks TCP port and scans for an available TCP port on the host
+        /// system <paraa>
+        /// TODO: Find an Available Port? </paraa>
         /// </summary>
         /// <param name="port">
         /// ref TCP Port
@@ -30,10 +32,11 @@ namespace Furcadia.Net.Utils
         /// </returns>
         public bool PortOpen(ref int port)
         {
-            // Evaluate current system tcp connections. This is the same information provided by the
-            // netstat command line application, just in .Net strongly-typed object form. We will
-            // look through the list, and if our port we would like to use in our TcpClient is
-            // occupied, we will set isAvailable to false.
+            // Evaluate current system tcp connections. This is the same
+            // information provided by the netstat command line application,
+            // just in .Net strongly-typed object form. We will look through
+            // the list, and if our port we would like to use in our
+            // TcpClient is occupied, we will set isAvailable to false.
             IPGlobalProperties ipGlobalProperties__1 = IPGlobalProperties.GetIPGlobalProperties();
             TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties__1.GetActiveTcpConnections();
 
@@ -94,7 +97,8 @@ namespace Furcadia.Net.Utils
         #region Public Properties
 
         /// <summary>
-        /// Gets or sets the Furcadia server host (i.e lightbringer.furcadia.com). (Furcadia v31c)
+        /// Gets or sets the Furcadia server host (i.e
+        /// lightbringer.furcadia.com). (Furcadia v31c)
         /// </summary>
         public static string GameServerHost
         {
@@ -120,7 +124,8 @@ namespace Furcadia.Net.Utils
         public static int GetEncoding { get { return EncoderPage; } }
 
         /// <summary>
-        /// Gets or sets the Furcadia Pounce Server host (IE on.furcadia.com). (Furcadia v31c)
+        /// Gets or sets the Furcadia Pounce Server host (IE
+        /// on.furcadia.com). (Furcadia v31c)
         /// </summary>
         public static string PounceServerHost
         {
