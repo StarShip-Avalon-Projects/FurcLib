@@ -19,7 +19,26 @@
 *.opensdf
 *.sdf
 
-bin/
 obj/
 build/
 /SRC
+.vs/
+**/bin/*
+/Plugins/AngelCat
+/Plugins/SoundWave
+/FastColoredTextBox
+
+# Ignore NuGet Packages
+*.nupkg
+# Ignore the packages folder
+**/packages/*
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/packages/repositories.config
+/Net40/Debug
+/Net40/Release
+/Net40
+/Monkey Speak Extended/Help
+/ps errors.txt
+/Z.txt
