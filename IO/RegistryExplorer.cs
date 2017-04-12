@@ -57,20 +57,22 @@ namespace Furcadia.IO
 
         internal static string parseRegFile(FileStream file, string key)
         {
-            StreamReader reader = new StreamReader(file);
-            List<string> lines = new List<string>();
-            string _l = null;
-            while ((_l = reader.ReadLine()) != null)
+            using (StreamReader reader = new StreamReader(file))
             {
-                lines.Add(_l);
-            }
-            for (int i = 1; i <= lines.Count - 1; i++)
-            {
-                if (lines[i].Length > 4 && lines[i].Contains(key))
+                List<string> lines = new List<string>();
+                string _l = null;
+                while ((_l = reader.ReadLine()) != null)
                 {
-                    string line = lines[i].Substring(1, lines[i].Length - 1);
-                    line = line.Replace("\"", "").Replace(@"\\", "/");
-                    return line;
+                    lines.Add(_l);
+                }
+                for (int i = 1; i <= lines.Count - 1; i++)
+                {
+                    if (lines[i].Length > 4 && lines[i].Contains(key))
+                    {
+                        string line = lines[i].Substring(1, lines[i].Length - 1);
+                        line = line.Replace("\"", "").Replace(@"\\", "/");
+                        return line;
+                    }
                 }
             }
             return null;
@@ -84,8 +86,11 @@ namespace Furcadia.IO
             {
                 try
                 {
-                    fs = File.Open(filePath, fileMode, fileAccess, fileShare);
-                    break;
+                    if (File.Exists(filePath))
+                    {
+                        fs = File.Open(filePath, fileMode, fileAccess, fileShare);
+                        return fs;
+                    }
                 }
                 catch (IOException ioEx)
                 {
@@ -93,7 +98,7 @@ namespace Furcadia.IO
                     if (attempts > maximumAttempts)
                     {
                         fs = null;
-                        break;
+                        return null;
                     }
                     else
                     {

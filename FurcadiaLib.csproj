@@ -122,7 +122,6 @@
     <Compile Include="Net\Account\CharacterInfo.cs" />
     <Compile Include="Net\DirectConnection\NetConnection.cs" />
     <Compile Include="Net\NetProxy.cs" />
-    <Compile Include="Net\PounceConnection.cs" />
     <Compile Include="Net\Pounce\PounceClient.cs" />
     <Compile Include="Net\Pounce\PounceIni.cs" />
     <Compile Include="Security\SSL.cs" />
@@ -131,7 +130,7 @@
     <Compile Include="Text\Base95.cs" />
     <Compile Include="Drawing\FurrePosition.cs" />
     <Compile Include="Drawing\ViewArea.cs" />
-    <Compile Include="Net\Utils\NetServerArgs.cs" />
+    <Compile Include="Net\NetEventArgs.cs" />
     <Compile Include="FurcMap\Map.cs" />
     <Compile Include="FurcMap\MapPosition.cs" />
     <Compile Include="FurcMap\MapTile.cs" />
@@ -148,8 +147,6 @@
     <Compile Include="Net\DirectConnection\NetClient.cs" />
     <Compile Include="Net\DirectConnection\ClientBase.cs" />
     <Compile Include="Net\Proxy\NetProxyException.cs" />
-    <Compile Include="Net\Proxy\NetProxy.cs" />
-    <Compile Include="Net\Proxy\ProxySession.cs" />
     <Compile Include="Net\Utils\Utilities.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -167,7 +164,6 @@
     <Compile Include="Net\Dream\BotFurre.cs" />
     <Compile Include="Net\INetMessage.cs" />
     <Compile Include="Net\Utils\Movement.cs" />
-    <Compile Include="Net\Proxy\BaseProxy.cs" />
     <Compile Include="Net\NetMessage.cs" />
     <Compile Include="Net\Pounce\PounceConnection.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -209,7 +205,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyFileVersion.cs</LastGenOutput>
     </DesignData>
-    <Content Include="Changes.txt" />
     <Content Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>

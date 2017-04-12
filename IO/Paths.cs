@@ -1,25 +1,3 @@
-/****NOTICE: DO NOT REMOVE
- * Credits go to Artex for helping me fix Path issues and
- * contributing his code.
- ****NOTICE: DO NOT REMOVE.*
-*Log Header
- *Format: (date,Version) AuthorName, Changes.
- * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
- *  (June 1, 2016) Gerolkae, Added possible missing Registry Paths for X86/x64 Windows and Mono Support. Wine Support also contains these corrections
- */
-
-/*
- * Theory Check all known default paths
- * check localdir.ini
- * then Check Each Registry Hives for active CPU type
- * Then Check each Hive For default 32bit path (Non wow6432node)
- * then Check Wine Varants (C++ Win32 client)
- * then Check Mono Versions for beforementioned (C# Client)
- * then check Default Drive folder Paths
- * If all Fail... Throw FurcadiaNotInstalled Excempt
- * Clients Should check for this error and then ask the user where to manually locate Furc
- */
-
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -35,12 +13,30 @@ namespace Furcadia.IO
     ///<para>Format: (date,Version) AuthorName, Changes.</para>
     ///<para> (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path</para>
     ///<para>  (June 1, 2016) Gerolkae, Added possible missing Registry Paths for x86/x64 Windows and Mono Support. Wine Support also contains these corrections.</para>
+    ///<remarks>
+    ///  Theory check all known default paths
+    ///<para> check localdir.ini</para>
+    ///<para>  then check each registry hives for active CPU type</para><
+    ///<para>  Then check each give for default 32bit path(Non wow6432node)</para>
+    ///<para>  then check Wine variants(C++ Win32 client)</para>
+    ///<para>  then check Mono Versions for before mentioned(C#? Client)</para>
+    ///<para>  then check default drive folder paths</para>
+    ///<para>  If all Fail... Throw <see cref="FurcadiaNotInstalled"/> exempt</para>
+    ///<para>  Clients Should check for this error and then ask the user where to manually locate Furccadia</para>
+    ///</remarks>
     /// </summary>
     public class Paths
     {
         #region Private Fields
 
+        /// <summary>
+        /// Registry path for x86 systems ///
+        /// </summary>
         private const string RegPathx32 = @"SOFTWARE\Dragon's Eye Productions\Furcadia\";
+
+        /// <summary>
+        /// Registry path for x64 Systems
+        /// </summary>
         private const string RegPathx64 = @"SOFTWARE\Wow6432Node\Dragon's Eye Productions\Furcadia\";
 
         #endregion Private Fields
@@ -56,10 +52,12 @@ namespace Furcadia.IO
         }
 
         /// <summary>
-        /// Defines the base path for the Furcadia Directory Throws FurcadiaNotFound exception if
-        /// furcadia.exe cannot be found in specified path
+        /// Defines the base path for the Furcadia Directory Throws
+        /// FurcadiaNotFound exception if furcadia.exe cannot be found in
+        /// specified path
         /// </summary>
         /// <param name="path">
+        /// the selected filepath for the Furcadia Installation.
         /// </param>
         public Paths(string path)
         {
@@ -81,12 +79,14 @@ namespace Furcadia.IO
 
         private static string _localsettingspath;
 
+        private static string DSC_AppData;
         private string _defaultpatchpath;
 
         private string _dynavpath;
 
         /// <summary>
-        /// Determines the registry path by platform. (x32/x64) Thanks to Ioka for this one.
+        /// Determines the registry path by platform. (x32/x64) Thanks to
+        /// Ioka for this one.
         /// </summary>
         /// <returns>
         /// A path to the Furcadia registry folder or NullReferenceException.
@@ -112,7 +112,8 @@ namespace Furcadia.IO
             else _cachepath = GetLocaldirPath();
             if (string.IsNullOrEmpty(_cachepath))
                 _cachepath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                                          "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia");
+                                          "Dragon's Eye Productions",
+                                          "Furcadia");
             return _cachepath;
         }
 
@@ -212,12 +213,13 @@ namespace Furcadia.IO
                     catch { } //Ditch the Exceptions
                 }
 
-                // Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
+                // Making a guess from the FurcadiaPath or
+                // FurcadiaDefaultPath property.
                 path = GetInstallPath();
                 if (string.IsNullOrEmpty(path))
                     path = Path.Combine(ProgramFilesX86(), "Furcadia");
 
-                path = Path.Combine(path, "/patches/default");
+                path = Path.Combine(path, "patches", "default");
             }
             else
             {
@@ -347,7 +349,9 @@ namespace Furcadia.IO
             else _dynavpath = GetLocaldirPath();
             if (string.IsNullOrEmpty(_dynavpath))
                 _dynavpath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                                          "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia" + Path.DirectorySeparatorChar + "Dynamic Avatars");
+                                          "Dragon's Eye Productions",
+                                           "Furcadia",
+                                           "Dynamic Avatars");
             return _dynavpath;
         }
 
@@ -355,8 +359,8 @@ namespace Furcadia.IO
         /// Gets the location of the Furcadia Character Files
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String"/> containing the location of Furcadia Characters folder in
-        /// "My Documents".
+        /// A <see cref="System.String"/> containing the location of
+        /// Furcadia Characters folder in "My Documents".
         /// </returns>
         public string GetFurcadiaCharactersPath()
         {
@@ -376,7 +380,8 @@ namespace Furcadia.IO
         /// Gets the location of the Furcadia folder located in "My Documents"
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String"/> containing the location of Furcadia folder in "My Documents".
+        /// A <see cref="System.String"/> containing the location of
+        /// Furcadia folder in "My Documents".
         /// </returns>
         public string GetFurcadiaDocPath()
         {
@@ -615,7 +620,8 @@ namespace Furcadia.IO
         }
 
         /// <summary>
-        /// Find the current localdir path where data files would be stored on the current machine.
+        /// Find the current localdir path where data files would be stored
+        /// on the current machine.
         /// </summary>
         /// <returns>
         /// Path to the data folder from localdir.ini or null if not found.
@@ -652,7 +658,7 @@ namespace Furcadia.IO
         }
 
         /// <summary>
-        /// Get the path to the Local Settings directory for Furcadia.
+        /// Get the path to the Local settings directory for Furcadia.
         /// </summary>
         /// <returns>
         /// Furcadia local settings directory.
@@ -668,15 +674,16 @@ namespace Furcadia.IO
             }
             if (string.IsNullOrEmpty(GetLocaldirPath()))
                 _localsettingspath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Dragon's Eye Productions" + Path.DirectorySeparatorChar + "Furcadia");
+                    "Dragon's Eye Productions", "Furcadia");
             return _localsettingspath;
         }
 
         /// <summary>
-        /// Determines the registry path by platform. (x32/x64) Thanks to Ioka for this one.
+        /// Determines the registry path by platform. (x32/x64) Thanks to
+        /// Ioka for this one.
         /// </summary>
         /// <returns>
-        /// A path to the Furcadia registry folder or NullReferenceException.
+        /// A path to the Furcadia registry folder.
         /// </returns>
         public string GetRegistryPath()
         {

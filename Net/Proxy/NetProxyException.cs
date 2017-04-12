@@ -10,10 +10,8 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Furcadia.Net.Proxy
+namespace Furcadia.Net
 {
-    public delegate void ServerDisConnectedHandler();
-
     /// <summary>
     /// Desctiption of NetProxyException.
     /// </summary>

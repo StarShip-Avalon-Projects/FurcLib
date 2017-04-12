@@ -2,6 +2,7 @@
 
 namespace Furcadia
 {
+    [Obsolete("Furcadia Legacy feature", false)]
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
     internal class LegacyAttribute : Attribute
     {

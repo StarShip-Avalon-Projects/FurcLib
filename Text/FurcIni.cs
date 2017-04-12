@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 namespace Furcadia.Text
 {
     /// <summary>
-    /// Furcadia configuration class to backup/set Proxy/firewall settings and restore them after we
-    /// have connected to the game server.
+    /// Furcadia configuration class to backup/set Proxy/firewall settings
+    /// and restore them after we have connected to the game server.
     /// <para>
     /// Author Gerolkae
     /// </para>
@@ -68,9 +68,9 @@ namespace Furcadia.Text
                 SettingFile = File.ReadAllLines(Path.Combine(path, file));
                 return SettingFile;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("++ ERROR: Couldn't Load " + file + " to change.");
+                throw new Exception("++ ERROR: Couldn't Load " + file + " to change.", ex);
             }
         }
 

@@ -22,7 +22,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Checks TCP port and scans for an available TCP port on the host
         /// system <paraa>
-        /// TODO: Find an Available Port? </paraa>
+        /// TODO: Find an Available Port?</paraa>
         /// </summary>
         /// <param name="port">
         /// ref TCP Port
@@ -30,7 +30,7 @@ namespace Furcadia.Net.Utils
         /// <returns>
         /// True when a port is found available
         /// </returns>
-        public bool PortOpen(ref int port)
+        public static bool PortOpen(ref int port)
         {
             // Evaluate current system tcp connections. This is the same
             // information provided by the netstat command line application,
@@ -58,6 +58,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Default Constructor
         /// </summary>
+        [Legacy]
         public Utilities()
         {
         }

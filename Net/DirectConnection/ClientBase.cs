@@ -51,7 +51,8 @@ namespace Furcadia.Net.DirectConnection
         public event ErrorEventHandler Error;
 
         /// <summary>
-        /// This is triggered when the Server sends data to the client. Doesn't expect a return value.
+        /// This is triggered when the Server sends data to the client.
+        /// Doesn't expect a return value.
         /// </summary>
         public event DataEventHandler2 ServerData;
 
@@ -109,7 +110,7 @@ namespace Furcadia.Net.DirectConnection
         {
             FurcPath = new Paths();
             string SetPath = FurcPath.GetLocalSettingsPath();
-            string SetFile = "/settings.ini";
+            string SetFile = "settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
             try

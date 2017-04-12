@@ -18,13 +18,33 @@ namespace Furcadia.Net.Pounce
         /// <summary>
         /// Default Constructor
         /// <para>
-        /// Pounce server updates on a 30 second cron-job
+        /// Pounce server updates on a 30 second cron-job and returns a list
+        /// of Furres Currently on-line
         /// </para>
         /// </summary>
         public PounceClient() : base("http://on.furcadia.com/q/", null, null)
         {
             PounceTimer = new Timer(smPounceSend, this,
                 TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+        }
+
+        /// <summary>
+        /// Set up the default Pounce Client and Friends List and Dream List
+        /// <para>
+        /// Pounce server updates on a 30 second cron-job and returns a list
+        /// of Furres Currently on-line
+        /// </para>
+        /// </summary>
+        /// <param name="FurreList">
+        /// Furre List as string array
+        /// </param>
+        /// <param name="DreamList">
+        /// dream list as s string array
+        /// </param>
+        public PounceClient(string[] FurreList, string[] DreamList) : base("http://on.furcadia.com/q/", FurreList, DreamList)
+        {
+            PounceTimer = new Timer(smPounceSend, this,
+    TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
         }
 
         #endregion Public Constructors

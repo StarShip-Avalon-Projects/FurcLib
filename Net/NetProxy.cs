@@ -7,11 +7,11 @@
  */
 
 using Furcadia.IO;
-using Furcadia.Net.Proxy;
 using Furcadia.Net.Utils;
 using Furcadia.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 //using System.ComponentModel;
@@ -20,13 +20,40 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Timers;
 
-/// using System.Timers.Timer;
-
 namespace Furcadia.Net
 {
-    [Obsolete("Use Net.Proxy Classes instead", false)]
+    // [Obsolete("Use Net.Proxy Classes instead", false)]
+    /// <summary>
+    /// Furcadia base proxy connect between Client and Server. This is a low
+    /// level class that handles the raw connections and furcadia
+    /// proxy/firewall settings.
+    /// <para>
+    /// We don't have TLS/SSL handling here, so therefore, Furcadia Settings
+    /// for this are disabled
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
     public class NetProxy
     {
+        #region Private Fields
+
+        private Process proc;
+
+        #endregion Private Fields
+
+        #region Public Properties
+
+        /// <summary>
+        /// Furcadia Client Process
+        /// </summary>
+        public Process ClientProcess
+        {
+            get { return proc; }
+        }
+
+        #endregion Public Properties
+
         #region Event Handling
 
         /// <summary>
@@ -51,7 +78,8 @@ namespace Furcadia.Net
         public event DataEventHandler ClientData;
 
         /// <summary>
-        /// This is triggered when the Client sends data to the server. Expects a return value.
+        /// This is triggered when the Client sends data to the server.
+        /// Expects a return value.
         /// </summary>
         public event DataEventHandler2 ClientData2;
 
@@ -61,7 +89,8 @@ namespace Furcadia.Net
         public event ActionDelegate ClientDisConnected;
 
         /// <summary>
-        /// This is triggered when the user has exited/logoff Furcadia and the Furcadia client is closed.
+        /// This is triggered when the user has exited/logoff Furcadia and
+        /// the Furcadia client is closed.
         /// </summary>
         public event ActionDelegate ClientExited;
 
@@ -71,9 +100,8 @@ namespace Furcadia.Net
         /// </summary>
         public event ActionDelegate Connected;
 
-        /// <summary>
-        /// This is triggered when a handled Exception is thrown.
-        /// </summary>
+        /// <summary> This is triggered when a handled Exception is thrown.
+        /// <para </summary>
         public event ErrorEventHandler Error;
 
         /// <summary>
@@ -82,12 +110,14 @@ namespace Furcadia.Net
         public event ActionDelegate FurcSettingsRestored;
 
         /// <summary>
-        /// This is triggered when the Server sends data to the client. Expects a return Value
+        /// This is triggered when the Server sends data to the client.
+        /// Expects a return Value
         /// </summary>
         public event DataEventHandler ServerData;
 
         /// <summary>
-        /// This is triggered when the Server sends data to the client. Doesn't expect a return value.
+        /// This is triggered when the Server sends data to the client.
+        /// Doesn't expect a return value.
         /// </summary>
         public event DataEventHandler2 ServerData2;
 
@@ -113,13 +143,20 @@ namespace Furcadia.Net
         /// </summary>
         private static int BUFFER_CAP = 2048;
 
+        /// <summary>
+        /// </summary>
         private static int ENCODE_PAGE = 1252;
+
         private static System.Timers.Timer NewsTimer;
         private IPEndPoint _endpoint;
         private string _proc = "Furcadia.exe", _procpath, _procCMD = "-pick";
         private int _procID;
         private string _ServerLeftOvers;
-        private bool CConnected = false;
+
+        /// <summary>
+        /// </summary>
+        private bool CConnected;
+
         private TcpClient client = new TcpClient();
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
         private string clientBuild, serverBuild;
@@ -127,6 +164,8 @@ namespace Furcadia.Net
         private TcpClient server;
 
         #endregion Private Declarations
+
+
 
         #region Private Fields
 
@@ -139,13 +178,17 @@ namespace Furcadia.Net
 
         #region Constructors
 
+        /// <summary>
+        /// </summary>
         public Paths FurcPath;
 
+        /// <summary>
+        /// </summary>
         public NetProxy()
         {
             FurcPath = new Paths();
             string SetPath = FurcPath.GetLocalSettingsPath();
-            string SetFile = "/settings.ini";
+            string SetFile = "settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
             try
@@ -155,6 +198,10 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="port">
+        /// </param>
         public NetProxy(int port)
         {
             FurcPath = new Paths();
@@ -165,6 +212,12 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="port">
+        /// </param>
+        /// <param name="lport">
+        /// </param>
         public NetProxy(int port, int lport)
         {
             FurcPath = new Paths();
@@ -176,6 +229,12 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="host">
+        /// </param>
+        /// <param name="port">
+        /// </param>
         public NetProxy(string host, int port)
         {
             FurcPath = new Paths();
@@ -186,6 +245,14 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="host">
+        /// </param>
+        /// <param name="port">
+        /// </param>
+        /// <param name="lport">
+        /// </param>
         public NetProxy(string host, int port, int lport)
         {
             FurcPath = new Paths();
@@ -197,6 +264,12 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="ip">
+        /// </param>
+        /// <param name="port">
+        /// </param>
         public NetProxy(IPAddress ip, int port)
         {
             FurcPath = new Paths();
@@ -207,6 +280,14 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="ip">
+        /// </param>
+        /// <param name="port">
+        /// </param>
+        /// <param name="lport">
+        /// </param>
         public NetProxy(IPAddress ip, int port, int lport)
         {
             FurcPath = new Paths();
@@ -218,6 +299,12 @@ namespace Furcadia.Net
             catch { }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="endpoint">
+        /// </param>
+        /// <param name="lport">
+        /// </param>
         public NetProxy(IPEndPoint endpoint, int lport)
         {
             FurcPath = new Paths();
@@ -233,6 +320,9 @@ namespace Furcadia.Net
 
         #region Properties
 
+        /// <summary>
+        /// Check the connection Status of the Furcadia Client
+        /// </summary>
         public bool IsClientConnected
         {
             get
@@ -245,7 +335,7 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Proxy is connected, or not.
+        /// Check our connection status to the game server
         /// </summary>
         public bool IsServerConnected
         {
@@ -259,7 +349,8 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Process to start. (default: Furcadia.exe)
+        /// the application file name to connect to the game server.
+        /// (Default Furcadia.exe)
         /// </summary>
         public string Process
         {
@@ -268,7 +359,8 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Command to pass (default: -pick)
+        /// Process command line Arguments (Former Default "-pick" used to
+        /// bring up the Charcter select window for the Character ini file)
         /// </summary>
         public string ProcessCMD
         {
@@ -314,6 +406,8 @@ namespace Furcadia.Net
 
         #region Public Static Properties
 
+        /// <summary>
+        /// </summary>
         public static int BufferCapacity
         {
             get
@@ -322,6 +416,8 @@ namespace Furcadia.Net
             }
         }
 
+        /// <summary>
+        /// </summary>
         public static int EncoderPage
         {
             get
@@ -404,12 +500,14 @@ namespace Furcadia.Net
                 }
                 string proxyIni = "localhost " + _lport.ToString();
                 //FurcPath = new Paths(_procpath);
-                /// UAC Perms Needed to Create proxy.ini Win 7 Change your UAC Level or add file
-                /// create Permissions to [%program files%/furcadia] Maybe Do this at install
-                string fIni = FurcPath.GetInstallPath() + "proxy.ini";
+                /// UAC Perms Needed to Create proxy.ini Win 7 Change your
+                /// UAC Level or add file create Permissions to [%program
+                /// files%/furcadia] Maybe Do this at install
+                string fIni = Path.Combine(FurcPath.GetInstallPath(), "proxy.ini");
                 /// Check proxy.ini if it exoists then use it
                 ///
-                /// otherwise use settings.ini to avoid UAC issues on %Program Files%
+                /// otherwise use settings.ini to avoid UAC issues on
+                /// %Program Files%
                 if (File.Exists(proxyIni))
                     File.Delete(proxyIni);
                 UseProxyIni = false;
@@ -419,7 +517,7 @@ namespace Furcadia.Net
                 //check ProcessPath is not a directory
                 if (!Directory.Exists(_procpath)) throw new NetProxyException("Process path not found.");
                 if (!File.Exists(Path.Combine(_procpath, Process))) throw new NetProxyException("Client executable '" + Process + "' not found.");
-                System.Diagnostics.Process proc = new System.Diagnostics.Process(); //= System.Diagnostics.Process.Start(Process,ProcessCMD );
+                proc = new System.Diagnostics.Process(); //= System.Diagnostics.Process.Start(Process,ProcessCMD );
                 proc.EnableRaisingEvents = true;
                 proc.StartInfo.FileName = Process;
                 proc.StartInfo.Arguments = ProcessCMD;
@@ -492,18 +590,10 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="message"></param>
-        public virtual void SendClient(INetMessage message)
-        {
-            SendClient(message.GetString());
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        public virtual void SendClient(string message)
+        /// <param name="message">
+        /// </param>
+        public virtual void SendToClient(string message)
         {
             if (!message.EndsWith("\n"))
                 message += '\n';
@@ -516,21 +606,30 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="message"></param>
-        public virtual void SendServer(INetMessage message)
+        /// <param name="message">
+        /// </param>
+        public virtual void SendToClient(INetMessage message)
         {
-            SendServer(message.GetString());
+            SendToClient(message.GetString());
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="message"></param>
-        public virtual void SendServer(string message)
+        /// <param name="message">
+        /// </param>
+        public virtual void SendToServer(INetMessage message)
         {
-            if(!message.EndsWith("\n"))
+            SendToServer(message.GetString());
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        public virtual void SendToServer(string message)
+        {
+            if (!message.EndsWith("\n"))
                 message += '\n';
             try
             {
@@ -558,9 +657,9 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="disposing"></param>
+        /// <param name="disposing">
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -577,10 +676,11 @@ namespace Furcadia.Net
         #region Private Methods
 
         private object lck = new object();
+
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="ar"></param>
+        /// <param name="ar">
+        /// </param>
         private void AsyncListener(IAsyncResult ar)
         {
             try
@@ -609,8 +709,8 @@ namespace Furcadia.Net
                     /// Delete proxy.ini or restore settings.ini
                     if (UseProxyIni)
                     {
-                        if (File.Exists(FurcPath.GetInstallPath() + "proxy.ini"))
-                            File.Delete(FurcPath.GetInstallPath() + "proxy.ini");
+                        if (File.Exists(Path.Combine(FurcPath.GetInstallPath(), "proxy.ini")))
+                            File.Delete(Path.Combine(FurcPath.GetInstallPath(), "proxy.ini"));
                     }
                     /// reset settings.ini 10second delay timer
                     NewsTimer = new System.Timers.Timer();
@@ -624,9 +724,9 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="ar"></param>
+        /// <param name="ar">
+        /// </param>
         private void GetClientData(IAsyncResult ar)
         {
             lock (lck)
@@ -659,9 +759,10 @@ namespace Furcadia.Net
                     for (int i = 0; i < lines.Count; i++)
                     {
                         ClientData2(lines[i]);
-                        // we want ServerConnected and Check for null data Application may
-                        // intentionally return ClientData = null to Avoid "Throat Tired" Syndrome.
-                        // Let Application handle packet routing.
+                        // we want ServerConnected and Check for null data
+                        // Application may intentionally return ClientData =
+                        // null to Avoid "Throat Tired" Syndrome. Let
+                        // Application handle packet routing.
                         if (IsServerConnected == true && ClientData != null)
                         {
                             INetMessage msg = new NetMessage();
@@ -671,7 +772,7 @@ namespace Furcadia.Net
                             //The '\n' separates the server/client protocols
                             if (msg.GetString().EndsWith("\n") == false) msg.Write("\n");
                             //Send it on it's way...
-                            SendServer(msg);
+                            SendToServer(msg);
                         }
                     }
                 }
@@ -737,7 +838,7 @@ namespace Furcadia.Net
                                 {
                                     NetMessage msg = new NetMessage();
                                     msg.Write(ServerData(lines[i]) + '\n');
-                                    SendClient(msg);
+                                    SendToClient(msg);
                                 }
                             }
                         }

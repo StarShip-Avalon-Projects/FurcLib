@@ -1,64 +1,6 @@
 ﻿namespace Furcadia.Net.Utils
 {
     /// <summary>
-    /// Server to Client Instruction set. (Furcadia v31c)
-    /// <para>
-    /// This is the set that FF3PP understands and uses.
-    /// </para>
-    /// <para>
-    /// these can change with each Furcadia update.
-    /// </para>
-    /// </summary>
-    public enum ServerInstructionType
-    {
-        /// <summary>
-        /// Unknown Instruction,
-        /// <para>
-        /// Needs further research
-        /// </para>
-        /// </summary>
-        Unknown = -1,
-
-        /// <summary>
-        /// Spawns a new Furre in the dream
-        /// </summary>
-        /// <remarks>
-        /// Prefix "&gt;"
-        /// <para>
-        /// </para>
-        /// </remarks>
-        SpawnAvatar,
-
-        /// <summary>
-        /// </summary>
-        RemoveAvatar,
-
-        /// <summary>
-        /// </summary>
-        AnimatedMoveAvatar,
-
-        /// <summary>
-        /// </summary>
-        MoveAvatar,
-
-        /// <summary>
-        /// Display formated Text.
-        /// <para>
-        /// Mostly Furcadia Markup but other stuff too
-        /// </para>
-        /// </summary>
-        /// <remarks>
-        /// Prefix "("
-        /// <para>
-        /// This instruction displays the specific text in the user's chat-box. The data may be
-        /// formatted with HTML-equivalent and Furcadia-specific tags, as well as emoticons (stuff
-        /// like "#SA").
-        /// </para>
-        /// </remarks>
-        DisplayText
-    }
-
-    /// <summary>
     /// Parsing Server Data with Events
     /// </summary>
     public class ParseServer
@@ -171,8 +113,8 @@
         /// <summary>
         /// Parse the raw data coming from the Game Server
         /// <para>
-        /// if the Data is a <see cref="ServerInstructionType.DisplayText"/> instruction, send the
-        /// data to <see cref="ParseServerChannel"/>
+        /// if the Data is a <see cref="ServerInstructionType.DisplayText"/>
+        /// instruction, send the data to <see cref="ParseServerChannel"/>
         /// </para>
         /// </summary>
         /// <param name="data">
