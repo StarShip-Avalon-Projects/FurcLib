@@ -5,6 +5,9 @@ namespace Furcadia.Net
     /// <summary>
     /// Connection Status
     /// </summary>
+    /// <remarks>
+    /// Credit to Artex for his open source projects use this method
+    /// </remarks>
     public enum ConnectionPhase
     {
         /// <summary>
@@ -69,7 +72,8 @@ namespace Furcadia.Net
         Unknown = -1,
 
         /// <summary>
-        /// Spawns a new Furre in the dream
+        /// Spawns a new Furre in the dream furre list because they have
+        /// joing the Dream we're in
         /// </summary>
         /// <remarks>
         /// Prefix "&gt;"
@@ -79,14 +83,18 @@ namespace Furcadia.Net
         SpawnAvatar,
 
         /// <summary>
+        /// Remove the Avatar from the Dream Furre list because they have
+        /// left the dream
         /// </summary>
         RemoveAvatar,
 
         /// <summary>
+        /// Move and animate the Active Furre to the next location
         /// </summary>
         AnimatedMoveAvatar,
 
         /// <summary>
+        /// Move the current active furre to the next locatiomn
         /// </summary>
         MoveAvatar,
 
@@ -115,7 +123,7 @@ namespace Furcadia.Net
         #region Public Constructors
 
         /// <summary>
-        /// Default Constructor
+        /// Default Constructor <see cref="ConnectionPhase.error"/>
         /// </summary>
         public NetClientEventArgs()
         {
@@ -155,20 +163,20 @@ namespace Furcadia.Net
     }
 
     /// <summary>
-    /// Server Status Event Arguments
+    /// Game Server Status Event Arguments
     /// </summary>
     public class NetServerEventArgs : EventArgs
     {
         #region Public Constructors
 
         /// <summary>
-        /// Constructor
+        /// Game Server Status Event Arguments
         /// </summary>
         /// <param name="phase">
-        /// Server Connection Phase
+        /// Server <see cref="ConnectionPhase"/>
         /// </param>
         /// <param name="Instruction">
-        /// Current Server to Client Instruction Type
+        /// Game <see cref="ServerInstructionType"/> to client
         /// </param>
         public NetServerEventArgs(ConnectionPhase phase, ServerInstructionType Instruction)
         {
@@ -178,6 +186,9 @@ namespace Furcadia.Net
 
         /// <summary>
         /// default Constructor
+        /// <para>
+        /// <see cref="ConnectionPhase.error"/> and <see cref="ServerInstructionType.Unknown"/>
+        /// </para>
         /// </summary>
         public NetServerEventArgs()
         {
@@ -222,7 +233,7 @@ namespace Furcadia.Net
         #region Public Properties
 
         /// <summary>
-        /// Server to Client instructions
+        /// Server to Client Instruction Type
         /// </summary>
         public ServerInstructionType ServerInstruction
         {
@@ -235,6 +246,8 @@ namespace Furcadia.Net
         #region Public Constructors
 
         /// <summary>
+        /// Default Constructor <see cref="ServerInstructionType.Unknown"/>
+        /// because we don't know wich one it is yet
         /// </summary>
         public ParseServerArgs()
         {
@@ -242,7 +255,11 @@ namespace Furcadia.Net
         }
 
         /// <summary>
+        /// Constructor setting the current Server to Client Instruction type
         /// </summary>
+        /// <param name="ServerInstruction">
+        /// Current Execuring <see cref="ServerInstructionType"/>
+        /// </param>
         public ParseServerArgs(ServerInstructionType ServerInstruction)
         {
             serverinstruction = ServerInstruction;

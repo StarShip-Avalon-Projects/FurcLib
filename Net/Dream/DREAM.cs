@@ -11,12 +11,14 @@ namespace Furcadia.Net
         #region Public Fields
 
         /// <summary>
-        /// Dream List Furcadia requires Clients to handle thier own Dream Lists See
+        /// Dream List Furcadia requires Clients to handle thier own Dream
+        /// Lists See
         /// <para>
         /// http://dev.furcadia.com/docs New Movement for Spawn and Remove packets
         /// </para>
         /// <para>
-        /// **Spawn is out dated. New information requires a 4byte for AFK flag at the end
+        /// **Spawn is out dated. New information requires a 4byte for AFK
+        ///   flag at the end
         /// </para>
         /// <para>
         /// As of V31, Color code has changed.
@@ -115,11 +117,18 @@ namespace Furcadia.Net
         // This code added to correctly implement the disposable pattern.
         void IDisposable.Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            // Do not change this code. Put cleanup code in Dispose(bool
+            // disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above. GC.SuppressFinalize(this);
+            // TODO: uncomment the following line if the finalizer is
+            //       overridden above. GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Implements Idisposable
+        /// </summary>
+        /// <param name="disposing">
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -129,16 +138,18 @@ namespace Furcadia.Net
                     // TODO: dispose managed state (managed objects).
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: free unmanaged resources (unmanaged objects) and
+                //       override a finalizer below.
                 // TODO: set large fields to null.
 
                 disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free
-        //       unmanaged resources. ~DREAM() { // Do not change this code. Put cleanup code in
-        // Dispose(bool disposing) above. Dispose(false); }
+        // TODO: override a finalizer only if Dispose(bool disposing) above
+        //       has code to free unmanaged resources. ~DREAM() { // Do not
+        //       change this code. Put cleanup code in Dispose(bool
+        // disposing) above. Dispose(false); }
 
         #endregion IDisposable Support
     }

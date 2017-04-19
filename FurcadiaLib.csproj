@@ -124,8 +124,12 @@
     <Compile Include="Net\NetProxy.cs" />
     <Compile Include="Net\Options\ClientOptions.cs" />
     <Compile Include="Net\Options\ProxyOptions.cs" />
+    <Compile Include="Net\Options\ProxySessionOptions.cs" />
+    <Compile Include="Net\Options\ServerOptions.cs" />
     <Compile Include="Net\Pounce\PounceClient.cs" />
     <Compile Include="Net\Pounce\PounceIni.cs" />
+    <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
+    <Compile Include="Net\Proxy\FurcadiaSession.cs" />
     <Compile Include="Security\SSL.cs" />
     <Compile Include="Security\SslCert.cs" />
     <Compile Include="Text\Base220.cs" />
@@ -163,7 +167,6 @@
     <Compile Include="Text\IniParser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\RegistryExplorer.cs" />
-    <Compile Include="Net\Dream\BotFurre.cs" />
     <Compile Include="Net\INetMessage.cs" />
     <Compile Include="Net\Utils\Movement.cs" />
     <Compile Include="Net\NetMessage.cs" />

@@ -172,6 +172,12 @@ namespace Furcadia.Text
 
         #region Public Methods
 
+        /// <summary>
+        /// </summary>
+        /// <param name="b220str">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static int ConvertFromBase220(string b220str)
         {
             int num = 0;

@@ -21,7 +21,7 @@ namespace Furcadia.IO
     ///<para>  then check Wine variants(C++ Win32 client)</para>
     ///<para>  then check Mono Versions for before mentioned(C#? Client)</para>
     ///<para>  then check default drive folder paths</para>
-    ///<para>  If all Fail... Throw <see cref="FurcadiaNotInstalled"/> exempt</para>
+    ///<para>  If all Fail... Throw <see cref="FurcadiaNotInstalled"/> exception</para>
     ///<para>  Clients Should check for this error and then ask the user where to manually locate Furccadia</para>
     ///</remarks>
     /// </summary>
@@ -38,6 +38,22 @@ namespace Furcadia.IO
         /// Registry path for x64 Systems
         /// </summary>
         private const string RegPathx64 = @"SOFTWARE\Wow6432Node\Dragon's Eye Productions\Furcadia\";
+
+        private static string _cachepath;
+        private static string _FurcadiaCharactersPath = null;
+
+        private static string _FurcadiaDocpath;
+
+        private static string _installpath;
+
+        private static string _localdirpath;
+
+        private static string _localsettingspath;
+
+        private static string DSC_AppData;
+        private string _defaultpatchpath;
+
+        private string _dynavpath;
 
         #endregion Private Fields
 
@@ -61,28 +77,12 @@ namespace Furcadia.IO
         /// </param>
         public Paths(string path)
         {
-            if (path == "")
-                _installpath = null;
             _installpath = path;
         }
 
         #endregion Constructors
 
-        private static string _cachepath;
-        private static string _FurcadiaCharactersPath = null;
-
-        private static string _FurcadiaDocpath;
-
-        private static string _installpath;
-
-        private static string _localdirpath;
-
-        private static string _localsettingspath;
-
-        private static string DSC_AppData;
-        private string _defaultpatchpath;
-
-        private string _dynavpath;
+        #region Public Methods
 
         /// <summary>
         /// Determines the registry path by platform. (x32/x64) Thanks to
@@ -373,7 +373,7 @@ namespace Furcadia.IO
                 _FurcadiaCharactersPath = path;
                 return _FurcadiaCharactersPath;
             }
-            throw new FurcadiaNotFoundException("Furcadia Characters path not found.\n" + path);
+            throw new FurcadiaNotFoundException("Furcadia Characters path not found.");
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace Furcadia.IO
                 _FurcadiaDocpath = path;
                 return _FurcadiaDocpath;
             }
-            throw new FurcadiaNotFoundException("Furcadia documents path not found.\n" + path);
+            throw new FurcadiaNotFoundException("Furcadia documents path not found.");
         }
 
         /// <summary>
@@ -614,7 +614,7 @@ namespace Furcadia.IO
                     return _installpath; // Path found
                 }
             }
-            throw new FurcadiaNotFoundException("Furcadia Install path not found." + "\n" + path);
+            throw new FurcadiaNotFoundException("Furcadia Install path not found.");
 
             #endregion "Mono Runtime"
         }
@@ -646,7 +646,7 @@ namespace Furcadia.IO
             {
                 path = sr.ReadLine();
                 if (!string.IsNullOrEmpty(path))
-                    path.Trim();
+                    path = path.Trim();
                 sr.Close();
             }
             if (string.IsNullOrEmpty(path))
@@ -693,5 +693,7 @@ namespace Furcadia.IO
             }
             return RegPathx32;
         }
+
+        #endregion Public Methods
     }
 }

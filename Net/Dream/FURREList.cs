@@ -7,11 +7,11 @@ namespace Furcadia.Net
     /// <summary>
     /// Furre List information for a Furcadia Dream
     /// <para>
-    /// This class acts like an enhanced List(of &gt;T&lt;) because you can Select a Furre by Item as
-    /// well as index
+    /// This class acts like an enhanced List(of &gt;T&lt;) because you can
+    /// Select a Furre by Item as well as index
     /// </para>
     /// </summary>
-    public class FURREList : ICollection, IDisposable, IEnumerator<FURRE>
+    public class FURREList : List<FURRE>, ICollection, IDisposable, IEnumerator<FURRE>
     {
         #region Protected Internal Fields
 
@@ -36,16 +36,6 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return ((ICollection)fList).Count;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
         public FURRE Current
         {
             get
@@ -53,6 +43,8 @@ namespace Furcadia.Net
                 throw new NotImplementedException();
             }
         }
+
+        public bool IsReadOnly => throw new NotImplementedException();
 
         /// <summary>
         /// </summary>
@@ -83,32 +75,6 @@ namespace Furcadia.Net
         }
 
         #endregion Public Properties
-
-        #region Public Indexers
-
-        /// <summary>
-        /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public FURRE this[
-            int index
-        ]
-        { get { return fList[index]; } set { fList[index] = value; } }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Furre">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public FURRE this[
-    FURRE Furre
-]
-        { get { return fList[fList.IndexOf(Furre)]; } set { fList[fList.IndexOf(Furre)] = value; } }
-
-        #endregion Public Indexers
 
         #region Public Methods
 
@@ -216,9 +182,10 @@ namespace Furcadia.Net
             throw new NotImplementedException();
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free
-        //       unmanaged resources. ~FURREList() { // Do not change this code. Put cleanup code in
-        // Dispose(bool disposing) above. Dispose(false); }
+        // TODO: override a finalizer only if Dispose(bool disposing) above
+        //       has code to free unmanaged resources. ~FURREList() { // Do
+        //       not change this code. Put cleanup code in Dispose(bool
+        // disposing) above. Dispose(false); }
         /// <summary>
         /// </summary>
         public void Reset()
@@ -229,9 +196,11 @@ namespace Furcadia.Net
         // This code added to correctly implement the disposable pattern.
         void IDisposable.Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            // Do not change this code. Put cleanup code in Dispose(bool
+            // disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above. GC.SuppressFinalize(this);
+            // TODO: uncomment the following line if the finalizer is
+            //       overridden above. GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -247,7 +216,8 @@ namespace Furcadia.Net
                     // TODO: dispose managed state (managed objects).
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: free unmanaged resources (unmanaged objects) and
+                //       override a finalizer below.
                 // TODO: set large fields to null.
 
                 disposedValue = true;
