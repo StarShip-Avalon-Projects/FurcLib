@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Furcadia.Text;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,13 +12,13 @@ namespace Furcadia.Net
     /// Select a Furre by Item as well as index
     /// </para>
     /// </summary>
-    public class FURREList : List<FURRE>, ICollection, IDisposable, IEnumerator<FURRE>
+    public class FURREList : IList<FURRE>, ICollection, IDisposable
     {
         #region Protected Internal Fields
 
         /// <summary>
         /// </summary>
-        protected internal List<FURRE> fList;
+        protected internal IList<FURRE> fList;
 
         #endregion Protected Internal Fields
 
@@ -33,18 +34,6 @@ namespace Furcadia.Net
         #endregion Public Constructors
 
         #region Public Properties
-
-        /// <summary>
-        /// </summary>
-        public FURRE Current
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool IsReadOnly => throw new NotImplementedException();
 
         /// <summary>
         /// </summary>
@@ -66,13 +55,22 @@ namespace Furcadia.Net
             }
         }
 
-        object IEnumerator.Current
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        /// <summary>
+        /// Number of Avatars in the Dream
+        /// </summary>
+        public int Count => fList.Count;
+
+        /// <summary>
+        /// </summary>
+        public bool IsReadOnly => fList.IsReadOnly;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="index">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public FURRE this[int index] { get => fList[index]; set => fList[index] = value; }
 
         #endregion Public Properties
 
@@ -82,19 +80,9 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="Furre">
         /// </param>
-        public void add(FURRE Furre)
+        public void Add(FURRE Furre)
         {
             fList.Add(Furre);
-        }
-
-        /// <summary>
-        /// add a range of Furres to the list
-        /// </summary>
-        /// <param name="range">
-        /// </param>
-        public void AddRange(IEnumerable<FURRE> range)
-        {
-            fList.AddRange(range);
         }
 
         /// <summary>
@@ -139,11 +127,66 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
+        /// <param name="sname">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public FURRE GerFurreByName(string sname)
+        {
+            foreach (FURRE Character in fList)
+            {
+                if (Character.ShortName == Util.FurcadiaShortName(sname))
+                {
+                    return Character;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// </summary>
         /// <returns>
         /// </returns>
         public IEnumerator GetEnumerator()
         {
             return ((ICollection)fList).GetEnumerator();
+        }
+
+        /// <summary>
+        /// Get's a Furre from the Dream List bu it's ID
+        /// </summary>
+        /// <param name="FurreID">
+        /// Base220 4 byte string representing the Furre ID
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public FURRE GetFurreByID(string FurreID)
+        {
+            foreach (FURRE furre in fList)
+            {
+                if (furre.ID == Base220.ConvertFromBase220(FurreID))
+                    return furre;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// get a furre from the furrelist by its integer idd
+        /// </summary>
+        /// <param name="FurreID">
+        /// Furre ID as integer
+        /// </param>
+        /// <returns>
+        /// Furre
+        /// </returns>
+        public FURRE GetFurreByID(int FurreID)
+        {
+            foreach (FURRE furre in fList)
+            {
+                if (furre.ID == FurreID)
+                    return furre;
+            }
+            return null;
         }
 
         /// <summary>
@@ -162,9 +205,13 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="FurreID">
         /// </param>
-        public void Remove(int FurreID)
+        public void Remove(string FurreID)
         {
-            fList.Remove(new Net.FURRE(FurreID));
+            foreach (FURRE furre in fList)
+            {
+                if (furre.ID == Base220.ConvertFromBase220(FurreID))
+                    fList.Remove(furre);
+            }
         }
 
         #endregion Public Methods
@@ -175,22 +222,52 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        /// <returns>
-        /// </returns>
-        public bool MoveNext()
+        /// <param name="array">
+        /// </param>
+        /// <param name="arrayIndex">
+        /// </param>
+        public void CopyTo(FURRE[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            fList.CopyTo(array, arrayIndex);
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above
-        //       has code to free unmanaged resources. ~FURREList() { // Do
-        //       not change this code. Put cleanup code in Dispose(bool
-        // disposing) above. Dispose(false); }
         /// <summary>
         /// </summary>
-        public void Reset()
+        /// <param name="index">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        public void Insert(int index, FURRE item)
         {
-            throw new NotImplementedException();
+            fList.Insert(index, item);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public bool Remove(FURRE item)
+        {
+            foreach (FURRE furre in fList)
+            {
+                if (furre.ID == item.ID)
+                {
+                    fList.Remove(furre);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="index">
+        /// </param>
+        public void RemoveAt(int index)
+        {
+            fList.RemoveAt(index);
         }
 
         // This code added to correctly implement the disposable pattern.
@@ -201,6 +278,11 @@ namespace Furcadia.Net
             Dispose(true);
             // TODO: uncomment the following line if the finalizer is
             //       overridden above. GC.SuppressFinalize(this);
+        }
+
+        IEnumerator<FURRE> IEnumerable<FURRE>.GetEnumerator()
+        {
+            return fList.GetEnumerator();
         }
 
         /// <summary>

@@ -522,7 +522,7 @@ namespace Furcadia.Net
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
-                        catch (SocketException Ex)
+                        catch (SocketException)
                         {
                             _lport++;
                             listen = new TcpListener(IPAddress.Any, _lport);

@@ -130,6 +130,10 @@
     <Compile Include="Net\Pounce\PounceIni.cs" />
     <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
     <Compile Include="Net\Proxy\FurcadiaSession.cs" />
+    <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />
+    <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
+    <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />
+    <Compile Include="Net\Utils\ServerParser\UpdateColorString.cs" />
     <Compile Include="Security\SSL.cs" />
     <Compile Include="Security\SslCert.cs" />
     <Compile Include="Text\Base220.cs" />
@@ -162,13 +166,13 @@
     <Compile Include="SpeciesTable.cs" />
     <Compile Include="Drawing\Graphics.cs" />
     <Compile Include="Drawing\Helper.cs" />
-    <Compile Include="Text\ColorString.cs" />
+    <Compile Include="Movement\ColorString.cs" />
     <Compile Include="Text\FurcIni.cs" />
     <Compile Include="Text\IniParser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\RegistryExplorer.cs" />
     <Compile Include="Net\INetMessage.cs" />
-    <Compile Include="Net\Utils\Movement.cs" />
+    <Compile Include="Movement\CharacterFlags.cs" />
     <Compile Include="Net\NetMessage.cs" />
     <Compile Include="Net\Pounce\PounceConnection.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -177,7 +181,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Text\Settings.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="Movement\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Text\Character.cs" />
   </ItemGroup>
