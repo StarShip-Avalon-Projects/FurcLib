@@ -7,9 +7,6 @@ namespace Furcadia.Net
     /// </summary>
     /// <remarks>
     /// Credit to Artex for his open source projects use this method
-    /// <para>
-    /// Reference http://dev.furcadia.com/docs/027_movement.html
-    /// </para>
     /// </remarks>
     [CLSCompliant(true)]
     public enum ConnectionPhase
@@ -78,19 +75,17 @@ namespace Furcadia.Net
         /// <summary>
         /// Spawns a new Furre in the dream furre list because they have
         /// joing the Dream we're in
-        /// <para>
-        /// '&lt;' + user id + x + y + shape number + name + color code +
-        /// flag + linefeed
-        /// </para>
         /// </summary>
+        /// <remarks>
+        /// Prefix "&gt;"
+        /// <para>
+        /// </para>
+        /// </remarks>
         SpawnAvatar,
 
         /// <summary>
         /// Remove the Avatar from the Dream Furre list because they have
         /// left the dream
-        /// <para>
-        /// ')' + user id + linefeed
-        /// </para>
         /// </summary>
         RemoveAvatar,
 
@@ -118,15 +113,7 @@ namespace Furcadia.Net
         /// Furcadia-specific tags, as well as emoticons (stuff like "#SA").
         /// </para>
         /// </remarks>
-        DisplayText,
-
-        /// <summary>
-        /// Update the Triggering Furre ColorCode
-        /// <para>
-        /// 'B' + user id + shape + color code + linefeed
-        /// </para>
-        /// </summary>
-        UpdateColorString
+        DisplayText
     }
 
     /// <summary>
@@ -273,7 +260,7 @@ namespace Furcadia.Net
         public ParseServerArgs()
         {
             serverinstruction = ServerInstructionType.Unknown;
-            serverConnectedPhase = ConnectionPhase.error;
+            ServerConnectedPhase = ConnectionPhase.error;
         }
 
         /// <summary>
@@ -287,7 +274,7 @@ namespace Furcadia.Net
         public ParseServerArgs(ServerInstructionType ServerInstruction, ConnectionPhase phase)
         {
             serverinstruction = ServerInstruction;
-            serverConnectedPhase = phase;
+            ServerConnectedPhase = phase;
         }
 
         #endregion Public Constructors

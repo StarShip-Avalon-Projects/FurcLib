@@ -244,6 +244,15 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
+        /// <returns>
+        /// </returns>
+        public bool MoveNext()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="item">
         /// </param>
         /// <returns>
@@ -270,6 +279,13 @@ namespace Furcadia.Net
             fList.RemoveAt(index);
         }
 
+        /// <summary>
+        /// </summary>
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+
         // This code added to correctly implement the disposable pattern.
         void IDisposable.Dispose()
         {
@@ -282,7 +298,7 @@ namespace Furcadia.Net
 
         IEnumerator<FURRE> IEnumerable<FURRE>.GetEnumerator()
         {
-            return fList.GetEnumerator();
+            throw new NotImplementedException();
         }
 
         /// <summary>

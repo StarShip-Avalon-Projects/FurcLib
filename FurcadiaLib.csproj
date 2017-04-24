@@ -131,9 +131,7 @@
     <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
     <Compile Include="Net\Proxy\FurcadiaSession.cs" />
     <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />
-    <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
-    <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />
-    <Compile Include="Net\Utils\ServerParser\UpdateColorString.cs" />
+    <Compile Include="Net\Utils\ServerParser\SpawnFurre.cs" />
     <Compile Include="Security\SSL.cs" />
     <Compile Include="Security\SslCert.cs" />
     <Compile Include="Text\Base220.cs" />

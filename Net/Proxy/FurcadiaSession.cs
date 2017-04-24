@@ -70,6 +70,9 @@ namespace Furcadia.Net
         private bool newData = false;
         private FURRE player;
 
+        //Property?
+        private bool procExit;
+
         /// <summary>
         /// Manage out Auto reconnects
         /// </summary>
@@ -340,6 +343,8 @@ namespace Furcadia.Net
 
         #endregion Dice Rolles
 
+        public bool ProcExit { get => procExit; set => procExit = value; }
+
         /// <summary>
         /// Curent server connection phase
         /// </summary>
@@ -401,6 +406,24 @@ namespace Furcadia.Net
             return player.ShortName == FurcadiaShortName(botName);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="sname">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public FURRE NameToFurre(string sname)
+        {
+            foreach (FURRE Character in Dream.FurreList)
+            {
+                if (Character.ShortName == Furcadia.Util.FurcadiaShortName(sname))
+                {
+                    return Character;
+                }
+            }
+            return null;
+        }
+
         #endregion "Public Methods"
 
         /// <summary>
@@ -432,6 +455,7 @@ namespace Furcadia.Net
             {
                 data = data.Remove(0, 1);
 
+                string SpecTag = "";
                 Channel = Regex.Match(data, ChannelNameFilter).Groups[1].Value;
                 string Color = Regex.Match(data, EntryFilter).Groups[1].Value;
                 string User = "";
@@ -546,7 +570,7 @@ namespace Furcadia.Net
                     //7:      additional(Message)
                     //8:      Final(result)
 
-                    player = Dream.FurreList.GerFurreByName(DiceMatch.Groups[3].Value);
+                    player = NameToFurre(DiceMatch.Groups[3].Value);
                     player.Message = DiceMatch.Groups[7].Value;
                     double.TryParse(DiceMatch.Groups[4].Value, out diceSides);
                     double.TryParse(DiceMatch.Groups[3].Value, out diceCount);
@@ -554,6 +578,9 @@ namespace Furcadia.Net
                     DiceModifyer = 0.0;
                     double.TryParse(DiceMatch.Groups[5].Value, out diceModifyer);
                     double.TryParse(DiceMatch.Groups[8].Value, out diceResult);
+
+                    SendToClient("(" + data);
+                    return;
                 }
                 else if (Channel == "@dragonspeak" || Channel == "@emit" || Color == "emit")
                 {
@@ -1082,7 +1109,7 @@ namespace Furcadia.Net
             //Spawn Avatar
             else if (data.StartsWith("<") & serverconnectphase == ConnectionPhase.Connected)
             {
-                var FurreSpawn = new SpawnAvatar(data);
+                var FurreSpawn = new SpawnFurre(data);
                 player = FurreSpawn.player;
 
                 if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) & !Dream.FurreList.Contains(player))
@@ -1090,7 +1117,7 @@ namespace Furcadia.Net
                     Dream.FurreList.Add(player);
                 }
                 else
-                    player = Dream.FurreList.GetFurreByID(Player.ID);
+                    Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
 
                 if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_SET_VISIBLE))
                 {
@@ -1116,10 +1143,16 @@ namespace Furcadia.Net
             //Remove Furre
             else if (data.StartsWith(")") & serverconnectphase == ConnectionPhase.Connected)
             {
-                RemoveAvatar RemoveFurre = new RemoveAvatar(data);
-                Dream.FurreList.Remove(RemoveFurre.AvatarID);
-                ProcessServerInstruction?.Invoke(RemoveFurre,
-                        new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
+                int remID = ConvertFromBase220(data.Substring(1, 4));
+                // remove departure from List
+                if (Dream.FurreList.Contains(remID) == true)
+                {
+                    player = Dream.FurreList[remID];
+                    Dream.FurreList.Remove(remID);
+                }
+
+                SendToClient(data);
+                return;
             }
             //Animated Move
             else if (data.StartsWith("/") & serverconnectphase == ConnectionPhase.Connected)
@@ -1174,7 +1207,7 @@ namespace Furcadia.Net
             //Update ColorString
             else if (data.StartsWith("B") & serverconnectphase == ConnectionPhase.Connected & InDream)
             {
-                //fuid 4 b220 bytes
+                //fuid size 4 b220 bytes
                 player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
                 UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
 
