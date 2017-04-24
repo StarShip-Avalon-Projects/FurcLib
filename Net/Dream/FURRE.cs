@@ -1,5 +1,5 @@
 ﻿using Furcadia.Drawing;
-using Furcadia.Text;
+using Furcadia.Movement;
 using System;
 using static Furcadia.Util;
 
@@ -14,35 +14,46 @@ namespace Furcadia.Net
 
         private int _AFK;
         private string _badge;
-        private string _Color;
-        private char _ColorType;
+
+        /// <summary>
+        /// v31c Colorcodes
+        /// </summary>
+        private ColorString _Color;
+
         private string _Desc;
-        private int _DSSpecies;
-        private int _Flag;
+
         private uint _FloorObjectCurrent;
         private uint _FloorObjectOld;
-        private int _Gender;
+
         private int _group;
         private int _ID;
         private int _LastStat;
         private int _level;
         private string _Message;
-        private string _Name;
-        private int _option;
-        private int _option1;
+        private string _name;
+
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
-        private int _Shape;
-        private int _Special;
-        private int _Species;
+
         private string _tag;
         private bool _Visible;
         private bool _WasVisible;
-        private int _Wings;
+
         private FurrePosition Location;
         private FurrePosition SourceLocation;
 
         #endregion Private Fields
+
+        private int shape;
+
+        /// <summary>
+        /// Avatar Shape, (it's Look)
+        /// </summary>
+        public int Shape
+        {
+            get { return shape; }
+            set { shape = value; }
+        }
 
         #region Public Constructors
 
@@ -50,17 +61,10 @@ namespace Furcadia.Net
         /// </summary>
         public FURRE()
         {
-            _ColorType = '\0';
-            _Color = "#";
+            _Color = new ColorString();
             Location = new FurrePosition();
             LastPosition = new FurrePosition();
-            // -1 means these haven't been set yet
-            _Species = -1;
-            _Gender = -1;
-            _Special = -1;
-            _DSSpecies = -1;
             _LastStat = -1;
-            _Wings = -1;
         }
 
         /// <summary>
@@ -70,17 +74,11 @@ namespace Furcadia.Net
         public FURRE(int FurreID)
         {
             _ID = FurreID;
-            _ColorType = '\0';
-            _Color = "#";
+
+            _Color = new ColorString();
             Location = new FurrePosition();
             LastPosition = new FurrePosition();
-            // -1 means these haven't been set yet
-            _Species = -1;
-            _Gender = -1;
-            _Special = -1;
-            _DSSpecies = -1;
             _LastStat = -1;
-            _Wings = -1;
         }
 
         /// <summary>
@@ -90,18 +88,10 @@ namespace Furcadia.Net
         /// </param>
         public FURRE(string Name)
         {
-            _Name = Name;
-            _ColorType = '\0';
-            _Color = "#";
+            _Color = new ColorString();
             Location = new FurrePosition();
             LastPosition = new FurrePosition();
-            // -1 means these haven't been set yet
-            _Species = -1;
-            _Gender = -1;
-            _Special = -1;
-            _DSSpecies = -1;
             _LastStat = -1;
-            _Wings = -1;
         }
 
         #endregion Public Constructors
@@ -132,10 +122,9 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Furcadia Color Code
+        /// Furcadia Color Code (v31c)
         /// </summary>
-        [Obsolete("Outdated as Furcadia v31 strings are now prefixed with \"w\" and contain two extra bytes for the new fox v5+` layers")]
-        public string Color
+        public ColorString Color
         {
             //TODO: Move section to a Costume Sub Class
             // Furcadia now supports Costumes through Online FurEd
@@ -143,27 +132,7 @@ namespace Furcadia.Net
             set
             {
                 _Color = value;
-
-                // Color Tag expanded 2 bytes
-                if (_Color.Length == 14)
-                {
-                    _Species = Base220.ConvertFromBase220(_Color.Substring(12, 1));
-                    _Gender = Base220.ConvertFromBase220(_Color.Substring(11, 1));
-                    _Special = Base220.ConvertFromBase220(_Color.Substring(13, 1));
-
-                    _DSSpecies = SpeciesTable.SpecNum(_Species, _Special);
-                    _Wings = SpeciesTable.WingsNum(_Species, _Special);
-                    _LastStat = 0;
-                }
             }
-        }
-
-        /// <summary>
-        /// </summary>
-        public char ColorType
-        {
-            get { return _ColorType; }
-            set { _ColorType = value; }
         }
 
         /// <summary>
@@ -173,21 +142,6 @@ namespace Furcadia.Net
         {
             get { return _Desc; }
             set { _Desc = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int DSSpecies
-        {
-            get { return _DSSpecies; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Flag
-        {
-            get { return _Flag; }
-            set { _Flag = value; }
         }
 
         /// <summary>
@@ -210,23 +164,6 @@ namespace Furcadia.Net
         {
             get { return _FloorObjectOld; }
             set { _FloorObjectOld = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public Avatar.Frame FrameInfo
-        {
-            get
-            {
-                return Avatar.SpecNum(_Shape);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Gender
-        {
-            get { return _Gender; }
         }
 
         /// <summary>
@@ -282,24 +219,8 @@ namespace Furcadia.Net
         /// </summary>
         public string Name
         {
-            get { return _Name; }
-            set { _Name = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Option
-        {
-            get { return _option; }
-            set { _option = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Option1
-        {
-            get { return _option1; }
-            set { _option1 = value; }
+            get { return _name; }
+            set { _name = value; }
         }
 
         /// <summary>
@@ -340,25 +261,13 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// </summary>
-        public int Shape
-        {
-            get { return _Shape; }
-            set
-            {
-                _LastStat = 1;
-                _Shape = value;
-            }
-        }
-
-        /// <summary>
         /// Furcadia Shortname format for Furre Name
         /// </summary>
         public string ShortName
         {
             get
             {
-                return FurcadiaShortName(_Name);
+                return FurcadiaShortName(_name);
             }
         }
 
@@ -390,28 +299,6 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        public int Special
-        {
-            get { return _Special; }
-            set { _Special = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Species
-        {
-            get { return _Species; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public string Tag
-        {
-            get { return _tag; }
-        }
-
-        /// <summary>
-        /// </summary>
         public bool Visible
         {
             get { return _Visible; }
@@ -427,13 +314,6 @@ namespace Furcadia.Net
         public bool WasVisible
         {
             get { return _WasVisible; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Wings
-        {
-            get { return _Wings; }
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
 ﻿using Furcadia.Drawing;
+using Furcadia.Movement;
+using Furcadia.Net.Utils.ServerParser;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -15,7 +17,7 @@ using System.Text.RegularExpressions;
 
 using System.Threading;
 using static Furcadia.Drawing.VisibleArea;
-using static Furcadia.Net.Utils.Movement;
+using static Furcadia.Movement.CharacterFlags;
 using static Furcadia.Text.Base220;
 using static Furcadia.Util;
 
@@ -40,23 +42,53 @@ namespace Furcadia.Net
     /// </summary>
     public class FurcadiaSession : NetProxy, IDisposable
     {
-        #region "Private Fields"
+        #region Private Fields
+
+        private string banishName = "";
+        private List<string> banishString = new List<string>();
+
+        /// <summary>
+        /// Furre Name we connected with
+        /// </summary>
+        private string botName;
+
+        private int botUID;
+        private string channel;
+        private object ChannelLock = new object();
+        private bool clientClose = false;
+        private ConnectionPhase clientconnectionphase;
+        private object clientlock = new object();
+        private int DataReceived = 0;
+        private bool disposed = false;
+        private DREAM dream;
+        private string errorMsg = "";
+        private short errorNum = 0;
+        private bool hasShare;
+        private bool inDream = false;
+        private bool Look;
+        private Queue<string> LookQue = new Queue<string>();
+        private bool newData = false;
+        private FURRE player;
+
+        //Property?
+        private bool procExit;
 
         /// <summary>
         /// Manage out Auto reconnects
         /// </summary>
-
         private Utils.ProxyReconnect ReconnectionManager;
+
         /// <summary>
         /// Balance thhe out going load to server
         /// <para>
         /// Throat Tired Syndrome and No Endurance Control
         /// </para>
         /// </summary>
-
         private Utils.ServerQue ServerBalancer;
 
-        #endregion "Private Fields"
+        private Queue<string> SpeciesTag = new Queue<string>();
+
+        #endregion Private Fields
 
         #region "RegEx filters"
 
@@ -158,6 +190,16 @@ namespace Furcadia.Net
         public delegate void ProcessClientData(string Message, EventArgs Arg);
 
         /// <summary>
+        /// Send Server to Client Instruction object to Subclassed for handlings
+        /// </summary>
+        /// <param name="InstructionObject">
+        /// Server Instruction Object
+        /// </param>
+        /// <param name="Args">
+        /// </param>
+        public delegate void ProcessInstruction(BaseServerInstruction InstructionObject, ParseServerArgs Args);
+
+        /// <summary>
         /// Process Display Text and Channels
         /// </summary>
         public event DataHandler ProcessServerChannelData;
@@ -167,18 +209,67 @@ namespace Furcadia.Net
         /// </summary>
         public event DataHandler ProcessServerData;
 
+        /// <summary>
+        /// </summary>
+        public event ProcessInstruction ProcessServerInstruction;
+
         #endregion "Client/Server Fata Handling"
 
         #endregion "Public Events"
 
+        #region Public Properties
+
+        #region Server Queue Manager
+
         /// <summary>
-        /// Client Connection Status
+        /// ServerQueue Throat Tired Mode
         /// </summary>
+        /// <returns>
+        /// State <see cref="Furcadia.Net.Utils.ServerQue.ThroatTired"/>
+        /// </returns>
+        public bool ThroatTired
+        {
+            get { return ServerBalancer.ThroatTired; }
+            set { ServerBalancer.ThroatTired = value; }
+        }
 
-        #region Private Fields
+        /// <summary>
+        /// Server Queue NoEndurance modew
+        /// </summary>
+        internal bool NoEndurance
+        {
+            get { return ServerBalancer.NoEndurance; }
+            set { ServerBalancer.NoEndurance = value; }
+        }
 
-        private object ChannelLock = new object();
-        private ConnectionPhase clientconnectionphase;
+        #endregion Server Queue Manager
+
+        private ConnectionPhase serverconnectphase;
+
+        /// <summary>
+        /// Beekin Badge
+        /// </summary>
+        public Queue<string> BadgeTag { get; set; }
+
+        /// <summary>
+        /// Current Name for Banish Operations
+        /// <para>
+        /// We mirror Furcadia's Banish system for effciency
+        /// </para>
+        /// </summary>
+        public string BanishName { get => banishName; set => banishName = value; }
+
+        /// <summary>
+        /// </summary>
+        public List<string> BanishString { get => banishString; set => banishString = value; }
+
+        /// <summary>
+        /// </summary>
+        public string Channel { get => channel; set => channel = value; }
+
+        /// <summary>
+        /// </summary>
+        public bool ClientClose { get => clientClose; set => clientClose = value; }
 
         /// <summary>
         /// Current Connection Phase
@@ -187,16 +278,6 @@ namespace Furcadia.Net
         {
             get { return clientconnectionphase; }
         }
-
-        #endregion Private Fields
-
-        /// <summary>
-        /// Server connection status
-        /// </summary>
-
-        #region "Public Properties"
-
-        private ConnectionPhase serverconnectphase;
 
         /// <summary>
         /// Client Connection status
@@ -208,6 +289,61 @@ namespace Furcadia.Net
         {
             get { return clientconnectionphase; }
         }
+
+        /// <summary>
+        /// </summary>
+        public int ConnectedCharacterFurcadiaID
+        { get => botUID; set => botUID = value; }
+
+        /// <summary>
+        /// Our Connected Character name
+        /// </summary>
+        public string ConnectedCharacterName { get => botName; set => botName = value; }
+
+        /// <summary>
+        /// Current Dream Information with Furre List
+        /// </summary>
+        public DREAM Dream
+        {
+            get { return dream; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string ErrorMsg { get => errorMsg; set => errorMsg = value; }
+
+        /// <summary>
+        /// </summary>
+        public short ErrorNum { get => errorNum; set => errorNum = value; }
+
+        /// <summary>
+        /// We have Dream Share or We are Dream owner
+        /// </summary>
+        public bool HasShare { get { return hasShare; } }
+
+        /// <summary>
+        /// </summary>
+        public bool InDream { get => inDream; set => inDream = value; }
+
+        /// <summary>
+        /// Current Triggering player
+        /// </summary>
+        public FURRE Player
+        {
+            get { return player; }
+        }
+
+        #region Dice Rolles
+
+        public string DiceCompnentMatch { get => diceCompnentMatch; set => diceCompnentMatch = value; }
+        public double DiceCount { get => diceCount; set => diceCount = value; }
+        public double DiceModifyer { get => diceModifyer; set => diceModifyer = value; }
+        public double DiceResult { get => diceResult; set => diceResult = value; }
+        public double DiceSides { get => diceSides; set => diceSides = value; }
+
+        #endregion Dice Rolles
+
+        public bool ProcExit { get => procExit; set => procExit = value; }
 
         /// <summary>
         /// Curent server connection phase
@@ -228,17 +364,9 @@ namespace Furcadia.Net
             get { return serverconnectphase; }
         }
 
-        #endregion "Public Properties"
+        #endregion Public Properties
 
-        private object clientlock = new object();
-
-        private int DataReceived = 0;
-
-        private bool disposed = false;
-
-        private bool Look;
-
-        private bool newData = false;
+        #region Public Methods
 
         /// <summary>
         /// implementation of Dispose pattern callable by consumers.
@@ -262,29 +390,7 @@ namespace Furcadia.Net
             return Convert.ToInt32(enumVal);
         }
 
-        #region "Public Fields"
-
-        private string banishName = "";
-        private List<string> banishString = new List<string>();
-        //Monkey Speak Bot specific Variables
-
-        private string botName;
-        //Bot specific Settings for Silver
-
-        private string channel;
-        private bool clientClose = false;
-        private string errorMsg = "";
-        private short errorNum = 0;
-        private bool hasShare;
-        //Property?
-
-        private bool inDream = false;
-        private bool procExit;
-        //Silver Monkey Specific Feature
-
-        #endregion "Public Fields"
-
-        // Public Bot As FURRE
+        #endregion Public Methods
 
         #region "Public Methods"
 
@@ -308,17 +414,14 @@ namespace Furcadia.Net
         /// </returns>
         public FURRE NameToFurre(string sname)
         {
-            FURRE p = new FURRE();
-            p.Name = sname;
-
             foreach (FURRE Character in Dream.FurreList)
             {
                 if (Character.ShortName == Furcadia.Util.FurcadiaShortName(sname))
                 {
-                    p = Character;
+                    return Character;
                 }
             }
-            return p;
+            return null;
         }
 
         #endregion "Public Methods"
@@ -332,6 +435,19 @@ namespace Furcadia.Net
         /// <param name="Handled">
         /// Is this data already handled?
         /// </param>
+        /// <remarks>
+        /// This is derived content from the Furcadia Dev Docs and Furcadia
+        /// Technical Resources
+        /// <para>
+        /// Update 23 Avatar Moement http://dev.furcadia.com/docs/023_new_movement.pdf
+        /// </para>
+        /// <para>
+        /// Update 27 Movement http://dev.furcadia.com/docs/027_movement.html
+        /// </para>
+        /// <para>
+        /// FTR http://ftr.icerealm.org/ref-instructions/
+        /// </para>
+        /// </remarks>
         public void ParseServerChannel(ref string data, bool Handled)
         {
             //TODO: needs to move and refactored to ServerParser Class
@@ -521,7 +637,7 @@ namespace Furcadia.Net
                     Text = t.Match(data).Groups[2].Value;
                     if (SpeciesTag.Count > 0)
                     {
-                        player.Color = SpeciesTag.Dequeue();
+                        //player.Color = SpeciesTag.Dequeue();
                         if (Dream.FurreList.Contains(player))
                             Dream.FurreList[player.ID] = player;
                     }
@@ -543,7 +659,7 @@ namespace Furcadia.Net
 
                         if (SpeciesTag.Count > 0)
                         {
-                            player.Color = SpeciesTag.Dequeue();
+                            //player.Color = SpeciesTag.Dequeue();
                             if (Dream.FurreList.Contains(player))
                                 Dream.FurreList[player.ID] = player;
                         }
@@ -565,20 +681,8 @@ namespace Furcadia.Net
                     player = NameToFurre(DescName);
                     if (LookQue.Count > 0)
                     {
+                        player.Color = new ColorString(LookQue.Dequeue());
                         string colorcode = LookQue.Peek();
-                        if (colorcode.StartsWith("t"))
-                        {
-                            colorcode = colorcode.Substring(0, 14);
-                        }
-                        else if (colorcode.StartsWith("u"))
-                        {
-                        }
-                        else if (colorcode.StartsWith("v"))
-                        {
-                            //RGB Values
-                        }
-                        player.Color = LookQue.Dequeue();
-                        ;
                     }
                     if (BadgeTag.Count > 0)
                     {
@@ -716,7 +820,7 @@ namespace Furcadia.Net
                     // ''EMOTE
                     if (SpeciesTag.Count > 0)
                     {
-                        player.Color = SpeciesTag.Dequeue();
+                        player.Color = new ColorString(SpeciesTag.Dequeue());
                     }
                     Regex usr = new Regex(NameFilter);
                     System.Text.RegularExpressions.Match n = usr.Match(Text);
@@ -865,19 +969,6 @@ namespace Furcadia.Net
                     ProcessServerChannelData?.Invoke(data, new NetServerEventArgs());
                     SendToClient("(" + data);
                     return;
-
-                    //if (MainSettings.PSShowMainWindow)
-                    //{
-                    //    //Dim args As New Furcadia.Net.Utils.NetServerArgs
-                    //    //args.ConnectionPhase.
-                    //    //args.Channel = "PhoenixSpeak"
-                    //    //args.Text = data
-                    //    //args.Handled = True
-                    //    //RaiseEvent ServerChannelProcessed(data, args)
-                    //}
-                    //if (MainSettings.PSShowClient)
-                    //{
-                    //}
                 }
                 else if (data.StartsWith("(You enter the dream of"))
                 {
@@ -892,7 +983,6 @@ namespace Furcadia.Net
                     SendToClient("(" + data);
                     return;
                 }
-                // SendClient("(" + data ) Exit Sub
             }
         }
 
@@ -906,6 +996,20 @@ namespace Furcadia.Net
         /// </param>
         /// <param name="Handled">
         /// </param>
+        /// ///
+        /// <remarks>
+        /// This is derived content from the Furcadia Dev Docs and Furcadia
+        /// Technical Resources
+        /// <para>
+        /// Update 23 Avatar Moement http://dev.furcadia.com/docs/023_new_movement.pdf
+        /// </para>
+        /// <para>
+        /// Update 27 Movement http://dev.furcadia.com/docs/027_movement.html
+        /// </para>
+        /// <para>
+        /// FTR http://ftr.icerealm.org/ref-instructions/
+        /// </para>
+        /// </remarks>
         public virtual void ParseServerData(string data, bool Handled)
         {
             ServerInstructionType MyServerInstruction = ServerInstructionType.Unknown;
@@ -927,8 +1031,8 @@ namespace Furcadia.Net
 
                 SendToClient(data);
                 return;
-                // Species Tags
             }
+            // Species Tags
             else if (data.StartsWith("]-"))
             {
                 if (data.StartsWith("]-#A"))
@@ -943,9 +1047,9 @@ namespace Furcadia.Net
                 SendToClient(data);
                 return;
                 //DS Variables
-
-                //Popup Dialogs!
             }
+
+            //Popup Dialogs!
             else if (data.StartsWith("]#"))
             {
                 //]#<idstring> <style 0-17> <message that might have spaces in>
@@ -963,6 +1067,7 @@ namespace Furcadia.Net
                 return;
                 //]s(.+)1 (.*?) (.*?) 0
             }
+            // SSL/TLS `starttls
             else if (data.StartsWith("]s"))
             {
                 Regex t = new Regex("\\]s(.+)1 (.*?) (.*?) 0", RegexOptions.IgnoreCase);
@@ -970,8 +1075,8 @@ namespace Furcadia.Net
 
                 SendToClient(data);
                 return;
-                //Look response
             }
+            //Look response
             else if (data.StartsWith("]f") & serverconnectphase == ConnectionPhase.Connected & InDream == true)
             {
                 short length = 14;
@@ -992,7 +1097,7 @@ namespace Furcadia.Net
 
                     player = NameToFurre(data.Remove(0, length + 2));
                     // If player.ID = 0 Then Exit Sub
-                    player.Color = data.Substring(2, length);
+                    player.Color = new ColorString(data.Substring(2, length));
                     if (IsBot(ref player))
                         Look = false;
                     if (Dream.FurreList.Contains(player))
@@ -1000,61 +1105,21 @@ namespace Furcadia.Net
                 }
                 SendToClient(data);
                 return;
-                //Spawn Avatar
             }
+            //Spawn Avatar
             else if (data.StartsWith("<") & serverconnectphase == ConnectionPhase.Connected)
             {
-                if (data.Length < 29)
-                    return;
-                // Debug.Print(data)
-                player = new FURRE(ConvertFromBase220(data.Substring(1, 4)));
+                var FurreSpawn = new SpawnFurre(data);
+                player = FurreSpawn.player;
 
-                if (Dream.FurreList.Contains(player))
+                if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) & !Dream.FurreList.Contains(player))
                 {
-                    player = Dream.FurreList[player.ID];
+                    Dream.FurreList.Add(player);
                 }
-                player.Position = new Furcadia.Drawing.FurrePosition(ConvertFromBase220(data.Substring(5, 2)) * 2, ConvertFromBase220(data.Substring(7, 2)));
-                player.Shape = ConvertFromBase220(data.Substring(9, 2));
+                else
+                    Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
 
-                int NameLength = ConvertFromBase220(data.Substring(11, 1));
-                this.player.Name = data.Substring(12, NameLength).Replace("|", " ");
-
-                int ColTypePos = 12 + NameLength;
-                this.player.ColorType = Convert.ToChar(data.Substring(ColTypePos, 1));
-                uint ColorSize = 10;
-                //If player.ColorType <> "t" Then
-                //    ColorSize = 30
-                //End If
-                int sColorPos = ColTypePos + 1;
-
-                player.Color = data.Substring(sColorPos, Convert.ToInt32(ColorSize));
-
-                int FlagPos = data.Length - 6;
-                player.Flag = Convert.ToInt32(ConvertFromBase220(data.Substring(FlagPos, 1)));
-                int AFK_Pos = data.Length - 5;
-                string AFKStr = data.Substring(AFK_Pos, 4);
-                player.AFK = ConvertFromBase220(data.Substring(AFK_Pos, 4));
-                int FlagCheck = Flags.CHAR_FLAG_NEW_AVATAR - player.Flag;
-
-                if (player.Flag == 4 | !Dream.FurreList.Contains(player))
-                {
-                    Dream.FurreList.@add(player);
-                    // If InDream Then RaiseEvent UpDateDreamList(player.Name)
-                    if (player.Flag == 2)
-                    {
-                        FURRE Bot = NameToFurre(botName);
-                        ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
-                        if (VisableRectangle.X <= this.player.Position.y & VisableRectangle.Y <= this.player.Position.y & VisableRectangle.height >= this.player.Position.y & VisableRectangle.length >= this.player.Position.x)
-                        {
-                            player.Visible = true;
-                        }
-                        else
-                        {
-                            player.Visible = false;
-                        }
-                    }
-                }
-                else if (player.Flag == 2)
+                if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_SET_VISIBLE))
                 {
                     FURRE Bot = NameToFurre(botName);
                     ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
@@ -1069,22 +1134,13 @@ namespace Furcadia.Net
                         player.Visible = false;
                     }
                 }
-                else if (player.Flag == 1)
-                {
-                }
-                else if (player.Flag == 0)
-                {
-                }
-                if (Dream.FurreList.Contains(player))
-                {
-                    Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
-                }
-
-                SendToClient(data);
-                return;
-                //Remove Furre
-                //And loggingIn = False
+                //if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))
+                //{
+                //}
+                ProcessServerInstruction?.Invoke(FurreSpawn,
+                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
             }
+            //Remove Furre
             else if (data.StartsWith(")") & serverconnectphase == ConnectionPhase.Connected)
             {
                 int remID = ConvertFromBase220(data.Substring(1, 4));
@@ -1097,9 +1153,8 @@ namespace Furcadia.Net
 
                 SendToClient(data);
                 return;
-                //Animated Move
-                //And loggingIn = False
             }
+            //Animated Move
             else if (data.StartsWith("/") & serverconnectphase == ConnectionPhase.Connected)
             {
                 player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
@@ -1123,9 +1178,8 @@ namespace Furcadia.Net
 
                 SendToClient(data);
                 return;
-                // Move Avatar
-                //And loggingIn = False
             }
+            // Move Avatar
             else if (data.StartsWith("A") & serverconnectphase == ConnectionPhase.Connected)
             {
                 player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
@@ -1149,25 +1203,18 @@ namespace Furcadia.Net
 
                 SendToClient(data);
                 return;
-                // Update Color Code
-                //And loggingIn = False
             }
+            //Update ColorString
             else if (data.StartsWith("B") & serverconnectphase == ConnectionPhase.Connected & InDream)
             {
-                player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
-                player.Shape = ConvertFromBase220(data.Substring(5, 2));
-                uint ColTypePos = 7;
-                player.ColorType = Convert.ToChar(data.Substring(Convert.ToInt32(ColTypePos), 1));
-                uint ColorSize = 10;
+                //fuid size 4 b220 bytes
+                player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
+                UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
 
-                uint sColorPos = Convert.ToUInt32(ColTypePos + 1);
-                player.Color = data.Substring(Convert.ToInt32(sColorPos), Convert.ToInt32(ColorSize));
-
-                SendToClient(data);
-                return;
-                //Hide Avatar
-                //And loggingIn = False
+                ProcessServerInstruction?.Invoke(ColorStringUpdate,
+                        new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
             }
+            //Hide Avatar
             else if (data.StartsWith("C") != false & serverconnectphase == ConnectionPhase.Connected)
             {
                 player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
@@ -1183,10 +1230,10 @@ namespace Furcadia.Net
                 SendToClient(data);
                 return;
                 //Display Disconnection Dialog
-#if DEBUG
             }
             else if (data.StartsWith("["))
             {
+#if DEBUG
                 Console.WriteLine("Disconnection Dialog:" + data);
 #endif
                 InDream = false;
@@ -1227,11 +1274,10 @@ namespace Furcadia.Net
                 ConnectedCharacterFurcadiaID = int.Parse(data.Substring(2, data.Length - botName.Length - 3));
                 SendToClient(data);
                 return;
-
-#if DEBUG
             }
             else if (data.StartsWith("]c"))
             {
+#if DEBUG
                 Console.WriteLine(data);
 #endif
                 SendToClient(data);
@@ -1517,13 +1563,6 @@ namespace Furcadia.Net
 
         #region "Constructors"
 
-        private int botUID;
-        private DREAM dream;
-        private Queue<string> LookQue = new Queue<string>();
-        private FURRE player;
-
-        private Queue<string> SpeciesTag = new Queue<string>();
-
         /// <summary>
         /// </summary>
         public FurcadiaSession() : base()
@@ -1561,7 +1600,7 @@ namespace Furcadia.Net
         /// <summary>
         /// </summary>
         /// <param name="options">
-        /// Procy Options
+        /// Proxy Options
         /// </param>
         public FurcadiaSession(Options.ProxySessionOptions options) : base(options)
         {
@@ -1572,110 +1611,6 @@ namespace Furcadia.Net
 
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectAttempts, options.ReconnectTimeOutDelay);
         }
-
-        /// <summary>
-        /// Beekin Badge
-        /// </summary>
-        public Queue<string> BadgeTag { get; set; }
-
-        /// <summary>
-        /// Current Name for Banish Operations
-        /// <para>
-        /// We mirror Furcadia's Banish system for effciency
-        /// </para>
-        /// </summary>
-        public string BanishName { get => banishName; set => banishName = value; }
-
-        /// <summary>
-        /// </summary>
-        public List<string> BanishString { get => banishString; set => banishString = value; }
-
-        /// <summary>
-        /// </summary>
-        public string Channel { get => channel; set => channel = value; }
-
-        /// <summary>
-        /// </summary>
-        public bool ClientClose { get => clientClose; set => clientClose = value; }
-
-        /// <summary>
-        /// </summary>
-        public int ConnectedCharacterFurcadiaID
-        { get => botUID; set => botUID = value; }
-
-        /// <summary>
-        /// Our Connected Character name
-        /// </summary>
-        public string ConnectedCharacterName { get => botName; set => botName = value; }
-
-        /// <summary>
-        /// Current Dream Information with Furre List
-        /// </summary>
-        public DREAM Dream
-        {
-            get { return dream; }
-        }
-
-        /// <summary>
-        /// </summary>
-        public string ErrorMsg { get => errorMsg; set => errorMsg = value; }
-
-        /// <summary>
-        /// </summary>
-        public short ErrorNum { get => errorNum; set => errorNum = value; }
-
-        /// <summary>
-        /// </summary>
-        public bool HasShare { get => hasShare; }
-
-        /// <summary>
-        /// </summary>
-        public bool InDream { get => inDream; set => inDream = value; }
-
-        /// <summary>
-        /// Current Triggering player
-        /// </summary>
-        public FURRE Player
-        {
-            get { return player; }
-        }
-
-        #region Dice Rolles
-
-        public string DiceCompnentMatch { get => diceCompnentMatch; set => diceCompnentMatch = value; }
-        public double DiceCount { get => diceCount; set => diceCount = value; }
-        public double DiceModifyer { get => diceModifyer; set => diceModifyer = value; }
-        public double DiceResult { get => diceResult; set => diceResult = value; }
-        public double DiceSides { get => diceSides; set => diceSides = value; }
-
-        #endregion Dice Rolles
-
-        public bool ProcExit { get => procExit; set => procExit = value; }
-
-        #region Server Queue Manager
-
-        /// <summary>
-        /// ServerQueue Throat Tired Mode
-        /// </summary>
-        /// <returns>
-        /// State <see cref="Furcadia.Net.Utils.ServerQue.ThroatTired"/>
-        /// </returns>
-        public bool ThroatTired
-        {
-            get { return ServerBalancer.ThroatTired; }
-            set { ServerBalancer.ThroatTired = value; }
-        }
-
-        /// <summary>
-        /// Server Queue NoEndurance modew
-        /// </summary>
-        internal bool NoEndurance
-        {
-            get { return ServerBalancer.NoEndurance; }
-            set { ServerBalancer.NoEndurance = value; }
-        }
-
-        #endregion Server Queue Manager
 
         #endregion "Constructors"
 

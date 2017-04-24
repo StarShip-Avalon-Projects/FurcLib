@@ -8,6 +8,7 @@ namespace Furcadia.Net
     /// <remarks>
     /// Credit to Artex for his open source projects use this method
     /// </remarks>
+    [CLSCompliant(true)]
     public enum ConnectionPhase
     {
         /// <summary>
@@ -226,6 +227,7 @@ namespace Furcadia.Net
     {
         #region Private Fields
 
+        private ConnectionPhase serverConnectedPhase;
         private ServerInstructionType serverinstruction;
 
         #endregion Private Fields
@@ -233,12 +235,18 @@ namespace Furcadia.Net
         #region Public Properties
 
         /// <summary>
+        /// </summary>
+        public ConnectionPhase ServerConnectedPhase
+        {
+            get { return serverConnectedPhase; }
+        }
+
+        /// <summary>
         /// Server to Client Instruction Type
         /// </summary>
         public ServerInstructionType ServerInstruction
         {
             get { return serverinstruction; }
-            set { serverinstruction = value; }
         }
 
         #endregion Public Properties
@@ -252,6 +260,7 @@ namespace Furcadia.Net
         public ParseServerArgs()
         {
             serverinstruction = ServerInstructionType.Unknown;
+            ServerConnectedPhase = ConnectionPhase.error;
         }
 
         /// <summary>
@@ -260,9 +269,12 @@ namespace Furcadia.Net
         /// <param name="ServerInstruction">
         /// Current Execuring <see cref="ServerInstructionType"/>
         /// </param>
-        public ParseServerArgs(ServerInstructionType ServerInstruction)
+        /// <param name="phase">
+        /// </param>
+        public ParseServerArgs(ServerInstructionType ServerInstruction, ConnectionPhase phase)
         {
             serverinstruction = ServerInstruction;
+            ServerConnectedPhase = phase;
         }
 
         #endregion Public Constructors

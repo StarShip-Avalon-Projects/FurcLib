@@ -1,9 +1,3 @@
-/* Author: Artex (aka, 1337)
- * Base95 Format.
- * Uses: I have no idea.  Enjoy!
- * P.S: jk above...
-*/
-
 using Furcadia.Net.Utils;
 using System;
 using System.Text;
@@ -11,7 +5,17 @@ using System.Text;
 namespace Furcadia.Text
 {
     /// <summary>
+    /// Furcadia Base220 Encoding
+    /// <para>
+    /// Author: Artex (aka, 1337)
+    /// </para>
+    /// <para>
+    /// Modified by: Gerolkae
+    /// </para>
     /// </summary>
+    /// <remarks>
+    /// Reference http://dev.furcadia.com/docs/base220.pdf
+    /// </remarks>
     public class Base220 : IComparable<int>, IEquatable<int>
     {
         #region Private Fields
@@ -21,8 +25,6 @@ namespace Furcadia.Text
         private int Value;
 
         #endregion Private Fields
-
-        /*** Constructor ***/
 
         #region Public Constructors
 
@@ -121,46 +123,118 @@ namespace Furcadia.Text
 
         #region Other Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base220 operator -(Base220 n1, Base220 n2)
         {
             return new Base220(n1.Value - n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator !=(Base220 n1, Base220 n2)
         {
             return !(n1 == n2);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base220 operator %(Base220 n1, Base220 n2)
         {
             return new Base220(n1.Value % n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base220 operator *(Base220 n1, Base220 n2)
         {
             return new Base220(n1.Value * n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base220 operator /(Base220 n1, Base220 n2)
         {
             return new Base220(n1.Value / n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base220 operator +(Base220 n1, Base220 n2)
         {
             return new Base220(n1.Value + n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator <(Base220 n1, Base220 n2)
         {
             return n1.Value < n2.Value;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator ==(Base220 n1, Base220 n2)
         {
             return n1.Equals(n2);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator >(Base220 n1, Base220 n2)
         {
             return n1.Value > n2.Value;
@@ -171,6 +245,27 @@ namespace Furcadia.Text
         /*** Static Functions ***/
 
         #region Public Methods
+
+        /// <summary>
+        /// Process Base220 Strings.
+        /// <para>
+        /// these are string Prefixed with a Base220 character representing
+        /// the Lengeth of the string
+        /// </para>
+        /// </summary>
+        /// <param name="b220str">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <remarks>
+        /// Reference Base 220 Strings http://dev.furcadia.com/docs/base220.pdf
+        /// </remarks>
+        public static int Base220StringLengeth(ref string b220str)
+        {
+            int Length = ConvertFromBase220(b220str[0].ToString());
+            b220str = b220str.Substring(1, Length);
+            return Length;
+        }
 
         /// <summary>
         /// </summary>
@@ -235,8 +330,6 @@ namespace Furcadia.Text
 
             return b220str.ToString();
         }
-
-        /*** Methods ***/
 
         /// <summary>
         /// </summary>
