@@ -9,12 +9,23 @@ using System.Text;
 
 namespace Furcadia.Text
 {
+    /// <summary>
+    /// </summary>
     public class Base95 : IComparable<uint>, IEquatable<uint>
     {
         #region Public Fields
 
+        /// <summary>
+        /// </summary>
         public const byte BASE = 95;
+
+        /// <summary>
+        /// </summary>
         public const byte CHAR_OFFSET = (byte)' ';
+
+        /// <summary>
+        /// </summary>
+        [CLSCompliant(false)]
         public uint Value;
 
         #endregion Public Fields
@@ -23,15 +34,26 @@ namespace Furcadia.Text
 
         #region Public Constructors
 
+        /// <summary>
+        /// </summary>
         public Base95() : this(0)
         {
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n">
+        /// </param>
+        [CLSCompliant(false)]
         public Base95(uint n)
         {
             Value = n;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="s">
+        /// </param>
         public Base95(string s)
         {
             FromString(s);
@@ -41,36 +63,71 @@ namespace Furcadia.Text
 
         #region Conversion Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="b95n">
+        /// </param>
+        [CLSCompliant(false)]
         public static explicit operator ushort(Base95 b95n)
         {
             return (ushort)b95n.Value;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n">
+        /// </param>
+        [CLSCompliant(false)]
         public static implicit operator Base95(uint n)
         {
             return new Base95(n);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n">
+        /// </param>
+        [CLSCompliant(false)]
         public static implicit operator Base95(ushort n)
         {
             return new Base95(n);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="s">
+        /// </param>
+        [CLSCompliant(false)]
         public static implicit operator Base95(string s)
         {
             return new Base95(s);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="b95n">
+        /// </param>
+        [CLSCompliant(false)]
         public static implicit operator byte[] (Base95 b95n)
         {
             return b95n.ToByteArray();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="b95n">
+        /// </param>
+        [CLSCompliant(false)]
         public static implicit operator string(Base95 b95n)
         {
             return b95n.ToString();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="b95n">
+        /// </param>
+        [CLSCompliant(false)]
         public static implicit operator uint(Base95 b95n)
         {
             return b95n.Value;
@@ -80,46 +137,121 @@ namespace Furcadia.Text
 
         #region Other Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public static Base95 operator -(Base95 n1, Base95 n2)
         {
             return new Base95(n1.Value - n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public static bool operator !=(Base95 n1, Base95 n2)
         {
             return !(n1 == n2);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public static Base95 operator %(Base95 n1, Base95 n2)
         {
             return new Base95(n1.Value % n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base95 operator *(Base95 n1, Base95 n2)
         {
             return new Base95(n1.Value * n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base95 operator /(Base95 n1, Base95 n2)
         {
             return new Base95(n1.Value / n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Base95 operator +(Base95 n1, Base95 n2)
         {
             return new Base95(n1.Value + n2.Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator <(Base95 n1, Base95 n2)
         {
             return n1.Value < n2.Value;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator ==(Base95 n1, Base95 n2)
         {
             return n1.Equals(n2);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="n1">
+        /// </param>
+        /// <param name="n2">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool operator >(Base95 n1, Base95 n2)
         {
             return n1.Value > n2.Value;
@@ -131,6 +263,13 @@ namespace Furcadia.Text
 
         #region Public Methods
 
+        /// <summary>
+        /// </summary>
+        /// <param name="b95str">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public static uint ConvertFromBase95(string b95str)
         {
             uint num = 0;
@@ -146,11 +285,27 @@ namespace Furcadia.Text
             return num;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="num">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public static string ConvertToBase95(uint num)
         {
             return ConvertToBase95(num, 0);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="num">
+        /// </param>
+        /// <param name="nDigits">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public static string ConvertToBase95(uint num, int nDigits)
         {
             StringBuilder b95str = new StringBuilder("");
@@ -177,6 +332,12 @@ namespace Furcadia.Text
 
         /*** Methods ***/
 
+        /// <summary>
+        /// </summary>
+        /// <param name="obj">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public override bool Equals(object obj)
         {
             if (!(obj is Base95))
@@ -184,32 +345,64 @@ namespace Furcadia.Text
             return this.Value == ((Base95)obj).Value;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="s">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public uint FromString(string s)
         {
             return Value = ConvertFromBase95(s);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
+
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
 
         public byte[] ToByteArray()
         {
             return ToByteArray(0);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="nDigits">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public byte[] ToByteArray(int nDigits)
         {
             System.Text.ASCIIEncoding enc = new ASCIIEncoding();
             return enc.GetBytes(ToString(nDigits));
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override string ToString()
         {
             return ConvertToBase95(Value);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="nDigits">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public string ToString(int nDigits)
         {
             return ConvertToBase95(Value, nDigits);
@@ -219,11 +412,25 @@ namespace Furcadia.Text
 
         #region Interface Implementation
 
+        /// <summary>
+        /// </summary>
+        /// <param name="other">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public int CompareTo(uint other)
         {
             return Value.CompareTo(other);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="other">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        [CLSCompliant(false)]
         public bool Equals(uint other)
         {
             return Value.Equals(other);

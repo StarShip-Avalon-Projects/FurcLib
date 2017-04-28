@@ -1,6 +1,8 @@
 ﻿namespace Furcadia.Net.Pounce
 {
-    internal class PounceIni
+    /// <summary>
+    /// </summary>
+    public class PounceIni
     {
     }
 }

@@ -28,10 +28,11 @@
         /// </para>
         /// </summary>
         /// <remarks>
-        /// This intellectual property is owned and controlled by DEP/CS as per their Third Party
-        /// Nondisclosure Agreement (NDA). This cannot be redistributed with out their consent. Every
-        /// Measure to protect this key is required, this include Obfuscation/Encryption. Clear Text
-        /// form is Prohibited.
+        /// This intellectual property is owned and controlled by DEP/CS as
+        /// per their Third Party Nondisclosure Agreement (NDA). This cannot
+        /// be redistributed with out their consent. Every Measure to
+        /// protect this key is required, this include
+        /// Obfuscation/Encryption. Clear Text form is Prohibited.
         /// </remarks>
         public string ApiKey { get; set; }
 

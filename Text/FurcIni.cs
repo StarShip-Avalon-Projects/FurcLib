@@ -61,7 +61,7 @@ namespace Furcadia.Text
         /// </returns>
         public static String[] LoadFurcadiaSettings(string path, string file)
         {
-            /// long FileIn, WiDx;
+            // long FileIn, WiDx;
             string[] SettingFile;
             try
             {

@@ -7,8 +7,8 @@
         //Reference http://pastebin.com/QbnjwjNc
         public static ViewArea getTargetRectFromCenterCoord(int X, int Y)
         {
-            // Set the size of the rectangle drawn around the player. The +1 is the tile the player
-            // is on.
+            // Set the size of the rectangle drawn around the player. The +1
+            // is the tile the player is on.
             ViewArea rec = null;
             //Dim tilesWide As UInt32 = extraTilesLeft + 7 + 1 + 7 + extraTilesRight
             //Dim tilesHigh As UInt32 = extraTilesTop + 8 + 1 + 8 + extraTilesBottom

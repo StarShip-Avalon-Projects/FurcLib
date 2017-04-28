@@ -39,6 +39,7 @@ namespace Furcadia.Text
         { get { return logins; } set { logins = value; } }
 
         /// <summary>
+        /// character name
         /// </summary>
         public string Name
         { get; set; }

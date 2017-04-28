@@ -15,13 +15,13 @@ using System.Text.RegularExpressions;
 
 //Furre Update events?
 
-using System.Threading;
 using static Furcadia.Drawing.VisibleArea;
 using static Furcadia.Movement.CharacterFlags;
 using static Furcadia.Text.Base220;
+using static Furcadia.Text.FurcadiaMarkup;
 using static Furcadia.Util;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Proxy
 {
     /// <summary>
     /// This Instance handles the current Furcadia Session.
@@ -40,7 +40,7 @@ namespace Furcadia.Net
     /// Part3: This Class Links loosley to the GUI
     /// </para>
     /// </summary>
-    public class FurcadiaSession : NetProxy, IDisposable
+    public class ProxySession : NetProxy, IDisposable
     {
         #region Private Fields
 
@@ -58,7 +58,7 @@ namespace Furcadia.Net
         private bool clientClose = false;
         private ConnectionPhase clientconnectionphase;
         private object clientlock = new object();
-        private int DataReceived = 0;
+        private object DataReceived = new object();
         private bool disposed = false;
         private DREAM dream;
         private string errorMsg = "";
@@ -67,11 +67,8 @@ namespace Furcadia.Net
         private bool inDream = false;
         private bool Look;
         private Queue<string> LookQue = new Queue<string>();
-        private bool newData = false;
+        private Options.ProxySessionOptions options;
         private FURRE player;
-
-        //Property?
-        private bool procExit;
 
         /// <summary>
         /// Manage out Auto reconnects
@@ -89,42 +86,6 @@ namespace Furcadia.Net
         private Queue<string> SpeciesTag = new Queue<string>();
 
         #endregion Private Fields
-
-        #region "RegEx filters"
-
-        /// <summary>
-        /// </summary>
-        public const string ChannelNameFilter = "<channel name='(.*?)' />";
-
-        /// <summary>
-        /// </summary>
-        public const string CookieToMeREGEX = "<name shortname='(.*?)'>(.*?)</name> just gave you";
-
-        /// <summary>
-        /// </summary>
-        public const string DescFilter = "<desc shortname='([^']*)' />(.*)";
-
-        /// <summary>
-        /// </summary>
-        public const string DiceFilter = "^<font color='roll'><img src='fsh://system.fsh:101' alt='@roll' /><channel name='@roll' /> <name shortname='([^ ]+)'>([^ ]+)</name> rolls (\\d+)d(\\d+)((-|\\+)\\d+)? ?(.*) & gets (\\d+)\\.</font>$";
-
-        /// <summary>
-        /// </summary>
-        public const string EntryFilter = "^<font color='([^']*?)'>(.*?)</font>$";
-
-        /// <summary>
-        /// </summary>
-        public const string Iconfilter = "<img src='fsh://system.fsh:([^']*)'(.*?)/>";
-
-        /// <summary>
-        /// </summary>
-        public const string NameFilter = "<name shortname='([^']*)' ?(.*?)?>([\\x21-\\x3B\\=\\x3F-\\x7E]+)</name>";
-
-        /// <summary>
-        /// </summary>
-        public const string YouSayFilter = "You ([\\x21-\\x3B\\=\\x3F-\\x7E]+), \"([^']*)\"";
-
-        #endregion "RegEx filters"
 
         #region "Public Events"
 
@@ -181,13 +142,12 @@ namespace Furcadia.Net
         public delegate void DataHandler(string Message, EventArgs e);
 
         /// <summary>
-        /// OProcess the Data sent to the Furcadia Client
         /// </summary>
-        /// <param name="Message">
+        /// <param name="InstructionObject">
         /// </param>
-        /// <param name="Arg">
+        /// <param name="Args">
         /// </param>
-        public delegate void ProcessClientData(string Message, EventArgs Arg);
+        public delegate void ProcessChannel(ChannelObject InstructionObject, ParseServerArgs Args);
 
         /// <summary>
         /// Send Server to Client Instruction object to Subclassed for handlings
@@ -202,12 +162,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Process Display Text and Channels
         /// </summary>
-        public event DataHandler ProcessServerChannelData;
-
-        /// <summary>
-        /// Process the Data coming from the Game server
-        /// </summary>
-        public event DataHandler ProcessServerData;
+        public event ProcessChannel ProcessServerChannelData;
 
         /// <summary>
         /// </summary>
@@ -257,19 +212,19 @@ namespace Furcadia.Net
         /// We mirror Furcadia's Banish system for effciency
         /// </para>
         /// </summary>
-        public string BanishName { get => banishName; set => banishName = value; }
+        public string BanishName { get { return banishName; } set { banishName = value; } }
 
         /// <summary>
         /// </summary>
-        public List<string> BanishString { get => banishString; set => banishString = value; }
+        public List<string> BanishString { get { return banishString; } set { banishString = value; } }
 
         /// <summary>
         /// </summary>
-        public string Channel { get => channel; set => channel = value; }
+        public string Channel { get { return channel; } set { channel = value; } }
 
         /// <summary>
         /// </summary>
-        public bool ClientClose { get => clientClose; set => clientClose = value; }
+        public bool ClientClose { get { return clientClose; } set { clientClose = value; } }
 
         /// <summary>
         /// Current Connection Phase
@@ -293,12 +248,15 @@ namespace Furcadia.Net
         /// <summary>
         /// </summary>
         public int ConnectedCharacterFurcadiaID
-        { get => botUID; set => botUID = value; }
+        {
+            get { return botUID; }
+            set { botUID = value; }
+        }
 
         /// <summary>
         /// Our Connected Character name
         /// </summary>
-        public string ConnectedCharacterName { get => botName; set => botName = value; }
+        public string ConnectedCharacterName { get { return botName; } set { botName = value; } }
 
         /// <summary>
         /// Current Dream Information with Furre List
@@ -310,11 +268,11 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        public string ErrorMsg { get => errorMsg; set => errorMsg = value; }
+        public string ErrorMsg { get { return errorMsg; } set { errorMsg = value; } }
 
         /// <summary>
         /// </summary>
-        public short ErrorNum { get => errorNum; set => errorNum = value; }
+        public short ErrorNum { get { return errorNum; } set { errorNum = value; } }
 
         /// <summary>
         /// We have Dream Share or We are Dream owner
@@ -323,7 +281,7 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        public bool InDream { get => inDream; set => inDream = value; }
+        public bool InDream { get { return inDream; } set { inDream = value; } }
 
         /// <summary>
         /// Current Triggering player
@@ -332,18 +290,6 @@ namespace Furcadia.Net
         {
             get { return player; }
         }
-
-        #region Dice Rolles
-
-        public string DiceCompnentMatch { get => diceCompnentMatch; set => diceCompnentMatch = value; }
-        public double DiceCount { get => diceCount; set => diceCount = value; }
-        public double DiceModifyer { get => diceModifyer; set => diceModifyer = value; }
-        public double DiceResult { get => diceResult; set => diceResult = value; }
-        public double DiceSides { get => diceSides; set => diceSides = value; }
-
-        #endregion Dice Rolles
-
-        public bool ProcExit { get => procExit; set => procExit = value; }
 
         /// <summary>
         /// Curent server connection phase
@@ -390,10 +336,6 @@ namespace Furcadia.Net
             return Convert.ToInt32(enumVal);
         }
 
-        #endregion Public Methods
-
-        #region "Public Methods"
-
         /// <summary>
         /// Are we the Current triggering furre?
         /// </summary>
@@ -406,25 +348,7 @@ namespace Furcadia.Net
             return player.ShortName == FurcadiaShortName(botName);
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="sname">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public FURRE NameToFurre(string sname)
-        {
-            foreach (FURRE Character in Dream.FurreList)
-            {
-                if (Character.ShortName == Furcadia.Util.FurcadiaShortName(sname))
-                {
-                    return Character;
-                }
-            }
-            return null;
-        }
-
-        #endregion "Public Methods"
+        #endregion Public Methods
 
         /// <summary>
         /// Parse Channel Data
@@ -455,8 +379,6 @@ namespace Furcadia.Net
             {
                 data = data.Remove(0, 1);
 
-                string SpecTag = "";
-                Channel = Regex.Match(data, ChannelNameFilter).Groups[1].Value;
                 string Color = Regex.Match(data, EntryFilter).Groups[1].Value;
                 string User = "";
                 string Desc = "";
@@ -465,8 +387,7 @@ namespace Furcadia.Net
                 {
                     Text = Regex.Match(data, EntryFilter).Groups[2].Value;
                     User = Regex.Match(data, NameFilter).Groups[3].Value;
-                    if (!string.IsNullOrEmpty(User))
-                        player = NameToFurre(User);
+                    // if (!string.IsNullOrEmpty(User)) player = NameToFurre(User);
                     player.Message = "";
                     Desc = Regex.Match(data, DescFilter).Groups[2].Value;
                     Regex mm = new Regex(Iconfilter);
@@ -480,21 +401,12 @@ namespace Furcadia.Net
                     User = player.Name;
                     Text = player.Message;
                 }
-                DiceSides = 0;
-                DiceCount = 0;
-                DiceCompnentMatch = "";
-                DiceModifyer = 0;
-                DiceResult = 0;
 
                 ErrorMsg = "";
                 ErrorNum = 0;
 
                 if (Channel == "@news" | Channel == "@spice")
                 {
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "success")
                 {
@@ -551,41 +463,12 @@ namespace Furcadia.Net
                         //(0:96) When the Bot sees "Your cookies are ready."
                         Regex CookiesReady = new Regex(string.Format("{0}", "Your cookies are ready.  http://furcadia.com/cookies/ for more info!"));
                     }
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Channel == "@roll")
                 {
-                    Regex DiceREGEX = new Regex(DiceFilter, RegexOptions.IgnoreCase);
-                    System.Text.RegularExpressions.Match DiceMatch = DiceREGEX.Match(data);
-
-                    //Matches, in order:
-                    //1:      shortname()
-                    //2:      full(name)
-                    //3:      dice(count)
-                    //4:      sides()
-                    //5: +/-#
-                    //6: +/-  (component match)
-                    //7:      additional(Message)
-                    //8:      Final(result)
-
-                    player = NameToFurre(DiceMatch.Groups[3].Value);
-                    player.Message = DiceMatch.Groups[7].Value;
-                    double.TryParse(DiceMatch.Groups[4].Value, out diceSides);
-                    double.TryParse(DiceMatch.Groups[3].Value, out diceCount);
-                    DiceCompnentMatch = DiceMatch.Groups[6].Value;
-                    DiceModifyer = 0.0;
-                    double.TryParse(DiceMatch.Groups[5].Value, out diceModifyer);
-                    double.TryParse(DiceMatch.Groups[8].Value, out diceResult);
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Channel == "@dragonspeak" || Channel == "@emit" || Color == "emit")
                 {
-                    SendToClient("(" + data);
-                    return;
                     //'BCast (Advertisments, Announcments)
                 }
                 else if (Color == "bcast")
@@ -600,21 +483,18 @@ namespace Furcadia.Net
 
                             AdRegEx = "\\[(.*?)\\] (.*?)</font>";
                             string adMessage = Regex.Match(data, AdRegEx).Groups[2].Value;
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
 
                             break;
 
                         case "@bcast":
 
                             u = Regex.Match(data, "<channel name='@(.*?)' />(.*?)</font>").Groups[2].Value;
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
 
                             break;
 
                         case "@announcements":
 
                             u = Regex.Match(data, "<channel name='@(.*?)' />(.*?)</font>").Groups[2].Value;
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
 
                             break;
 
@@ -626,8 +506,6 @@ namespace Furcadia.Net
                             break;
                     }
 
-                    SendToClient("(" + data);
-                    return;
                     //'SAY
                 }
                 else if (Color == "myspeech")
@@ -643,9 +521,6 @@ namespace Furcadia.Net
                     }
 
                     player.Message = Text;
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (!string.IsNullOrEmpty(User) & string.IsNullOrEmpty(Channel) & string.IsNullOrEmpty(Color) & Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
@@ -664,9 +539,6 @@ namespace Furcadia.Net
                                 Dream.FurreList[player.ID] = player;
                         }
                         Channel = "say";
-
-                        SendToClient("(" + data);
-                        return;
                     }
                     else
                     {
@@ -678,7 +550,7 @@ namespace Furcadia.Net
                 {
                     string DescName = Regex.Match(data, DescFilter).Groups[1].Value;
 
-                    player = NameToFurre(DescName);
+                    // player = NameToFurre(DescName);
                     if (LookQue.Count > 0)
                     {
                         player.Color = new ColorString(LookQue.Dequeue());
@@ -697,12 +569,8 @@ namespace Furcadia.Net
                         Dream.FurreList[player.ID] = player;
 
                     //sndDisplay)
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
 
                     Look = false;
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "shout")
                 {
@@ -715,9 +583,6 @@ namespace Furcadia.Net
                     {
                         player.Message = Text;
                     }
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "query")
                 {
@@ -728,40 +593,30 @@ namespace Furcadia.Net
                         case "summon":
                             //'JOIN
 
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
-
                             break;
 
                         case "join":
                             //'SUMMON
-
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
 
                             break;
 
                         case "follow":
                             //'LEAD
 
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
-
                             break;
 
                         case "lead":
                             //'FOLLOW
 
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
                             //If Not IsBot(player) Then
 
                             break;
 
                         case "cuddle":
 
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
-
                             break;
 
                         default:
-                            ProcessServerData?.Invoke(data, new NetServerEventArgs());
 
                             break;
                     }
@@ -776,7 +631,7 @@ namespace Furcadia.Net
                     //'WHISPER
                     string WhisperFrom = Regex.Match(data, "whispers, \"(.*?)\" to you").Groups[1].Value;
                     string WhisperTo = Regex.Match(data, "You whisper \"(.*?)\" to").Groups[1].Value;
-                    string WhisperDir = Regex.Match(data, string.Format("<name shortname='(.*?)' src='whisper-(.*?)'>")).Groups[2].Value;
+                    string WhisperDir = Regex.Match(data, string.Format(RegExName)).Groups[2].Value;
                     if (WhisperDir == "from")
                     {
                         //player = NameToFurre(User, True)
@@ -793,16 +648,11 @@ namespace Furcadia.Net
                         if (Dream.FurreList.Contains(player))
                             Dream.FurreList[player.ID] = player;
                     }
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "warning")
                 {
                     ErrorMsg = Text;
                     ErrorNum = 1;
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "trade")
                 {
@@ -811,9 +661,6 @@ namespace Furcadia.Net
                     if (!string.IsNullOrEmpty(User))
                         Text = " " + User + Text.Replace(TextStr, "");
                     player.Message = Text;
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "emote")
                 {
@@ -826,15 +673,12 @@ namespace Furcadia.Net
                     System.Text.RegularExpressions.Match n = usr.Match(Text);
                     Text = usr.Replace(Text, "");
 
-                    player = NameToFurre(n.Groups[3].Value);
+                    // player = NameToFurre(n.Groups[3].Value);
 
                     player.Message = Text;
                     if (Dream.FurreList.Contains(player))
                         Dream.FurreList[player.ID] = player;
                     bool test = IsBot(ref player);
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "channel")
                 {
@@ -849,8 +693,6 @@ namespace Furcadia.Net
                     ss = r.Match(Text);
                     if (ss.Success)
                         Text = Text.Replace(ss.Groups[0].Value, "");
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-                    SendToClient("(" + data);
                 }
                 else if (Color == "notify")
                 {
@@ -884,9 +726,6 @@ namespace Furcadia.Net
                             }
                         }
                     }
-
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (Color == "error")
                 {
@@ -919,17 +758,10 @@ namespace Furcadia.Net
                     else if (Text == "You do not have any cookies to give away right now!")
                     {
                     }
-
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (data.StartsWith("Communication"))
                 {
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-                    ProcExit = false;
                     Disconnect();
-                    //LogSaveTmr.Enabled = False
                 }
                 else if (Channel == "@cookie")
                 {
@@ -960,37 +792,22 @@ namespace Furcadia.Net
                     //args.Text = data
                     //args.Handled = True
                     //RaiseEvent ServerChannelProcessed(data, args)
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (data.StartsWith("PS"))
                 {
                     Color = "PhoenixSpeak";
-                    ProcessServerChannelData?.Invoke(data, new NetServerEventArgs());
-                    SendToClient("(" + data);
-                    return;
                 }
                 else if (data.StartsWith("(You enter the dream of"))
                 {
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-                    SendToClient("(" + data);
-                    return;
                 }
                 else
                 {
-                    ProcessServerData?.Invoke(data, new NetServerEventArgs());
-
-                    SendToClient("(" + data);
-                    return;
                 }
             }
         }
 
         /// <summary>
         /// Parse Server Data
-        /// <para>
-        /// TODO: Move this functionality to <see cref="Furcadia.Net.Utils.ParseServer"/>
-        /// </para>
         /// </summary>
         /// <param name="data">
         /// </param>
@@ -1012,323 +829,316 @@ namespace Furcadia.Net
         /// </remarks>
         public virtual void ParseServerData(string data, bool Handled)
         {
-            ServerInstructionType MyServerInstruction = ServerInstructionType.Unknown;
-            // page = engine.LoadFromString(cBot.MS_Script)
-            if (data == "Dragonroar")
+            switch (serverconnectphase)
             {
-                // Login Sucessful
-                SendToClient(data);
-                return;
-
-                //Logs into Furcadia
-            }
-            else if (data == "&&&&&&&&&&&&&")
-            {
-                //We've connected to Furcadia
-                //Stop the reconnection manager
-                serverconnectphase = ConnectionPhase.Connected;
-                ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, MyServerInstruction));
-
-                SendToClient(data);
-                return;
-            }
-            // Species Tags
-            else if (data.StartsWith("]-"))
-            {
-                if (data.StartsWith("]-#A"))
-                {
-                    SpeciesTag.Enqueue(data.Substring(4));
-                }
-                else if (data.StartsWith("]-#B"))
-                {
-                    BadgeTag.Enqueue(data.Substring(2));
-                }
-
-                SendToClient(data);
-                return;
-                //DS Variables
-            }
-
-            //Popup Dialogs!
-            else if (data.StartsWith("]#"))
-            {
-                //]#<idstring> <style 0-17> <message that might have spaces in>
-                Regex repqq = new Regex("^\\]#(.*?) (\\d+) (.*?)$");
-                Match m = repqq.Match(data);
-                Rep r = default(Rep);
-                r.ID = m.Groups[1].Value;
-                int num = 0;
-                int.TryParse(m.Groups[2].Value, out num);
-                r.Type = num;
-                Repq.Enqueue(r);
-                player.Message = m.Groups[3].Value;
-
-                SendToClient(data);
-                return;
-                //]s(.+)1 (.*?) (.*?) 0
-            }
-            // SSL/TLS `starttls
-            else if (data.StartsWith("]s"))
-            {
-                Regex t = new Regex("\\]s(.+)1 (.*?) (.*?) 0", RegexOptions.IgnoreCase);
-                System.Text.RegularExpressions.Match m = t.Match(data);
-
-                SendToClient(data);
-                return;
-            }
-            //Look response
-            else if (data.StartsWith("]f") & serverconnectphase == ConnectionPhase.Connected & InDream == true)
-            {
-                short length = 14;
-                if (Look)
-                {
-                    LookQue.Enqueue(data.Substring(2));
-                }
-                else
-                {
-                    if (data.Substring(2, 1) != "t")
+                case ConnectionPhase.MOTD:
+                    // SSL/TLS `starttls
+                    if (data.StartsWith("]s"))
                     {
-                        length = 30;
+                        Regex t = new Regex("\\]s(.+)1 (.*?) (.*?) 0", RegexOptions.IgnoreCase);
+                        System.Text.RegularExpressions.Match m = t.Match(data);
                     }
-                    else
+                    if (data == "Dragonroar")
                     {
-                        length = 14;
+                        // Login Sucessful
+                        serverconnectphase = ConnectionPhase.Auth;
+                        ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                        // Standalone / account Send(String.Format("connect
+                        // {0} {1}\n", sUsername, sPassword));
+
+                        //vasecodegamma ?
                     }
+                    break;
 
-                    player = NameToFurre(data.Remove(0, length + 2));
-                    // If player.ID = 0 Then Exit Sub
-                    player.Color = new ColorString(data.Substring(2, length));
-                    if (IsBot(ref player))
-                        Look = false;
-                    if (Dream.FurreList.Contains(player))
-                        Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
-                }
-                SendToClient(data);
-                return;
-            }
-            //Spawn Avatar
-            else if (data.StartsWith("<") & serverconnectphase == ConnectionPhase.Connected)
-            {
-                var FurreSpawn = new SpawnFurre(data);
-                player = FurreSpawn.player;
-
-                if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) & !Dream.FurreList.Contains(player))
-                {
-                    Dream.FurreList.Add(player);
-                }
-                else
-                    Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
-
-                if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_SET_VISIBLE))
-                {
-                    FURRE Bot = NameToFurre(botName);
-                    ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
-                    if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
-                        player.Position.y & VisableRectangle.height >=
-                        player.Position.y & VisableRectangle.length >= player.Position.x)
+                case ConnectionPhase.Auth:
+                    if (data.StartsWith("]#"))
                     {
-                        player.Visible = true;
+                        //char[] sep = { ' ' };
+                        //string[] tokens = data.Split(sep, 3);
+                        //sErrorMessage = tokens[2];
                     }
-                    else
+                    else if (data.StartsWith("]]"))
                     {
+                        //Disconnect();
+                        //bIsRunning = false;
+                    }
+                    else if (data == "&&&&&&&&&&&&&")
+                    {
+                        //We've connected to Furcadia
+                        //Stop the reconnection manager
+
+                        serverconnectphase = ConnectionPhase.Connected;
+
+                        //ProcessServerInstruction?.Invoke(FurreSpawn,
+                        //        new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+
+                        ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                    }
+                    break;
+
+                case ConnectionPhase.Connected:
+
+                    if (data.StartsWith("]f") & InDream == true)
+                    {
+                        short length = 14;
+                        if (Look)
+                        {
+                            LookQue.Enqueue(data.Substring(2));
+                        }
+                        else
+                        {
+                            if (data.Substring(2, 1) != "t")
+                            {
+                                length = 30;
+                            }
+                            else
+                            {
+                                length = 14;
+                            }
+
+                            // player = NameToFurre(data.Remove(0, length +
+                            // 2)); If player.ID = 0 Then Exit Sub
+                            player.Color = new ColorString(data.Substring(2, length));
+                            if (IsBot(ref player))
+                                Look = false;
+                            if (Dream.FurreList.Contains(player))
+                                Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
+                        }
+                    }
+                    //Spawn Avatar
+                    else if (data.StartsWith("<"))
+                    {
+                        var FurreSpawn = new SpawnAvatar(data);
+                        player = FurreSpawn.player;
+
+                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) & !Dream.FurreList.Contains(player))
+                        {
+                            Dream.FurreList.Add(player);
+                        }
+                        else
+                            player = Dream.FurreList.GetFurreByID(Player.ID);
+
+                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_SET_VISIBLE))
+                        {
+                            // FURRE Bot = NameToFurre(botName);
+                            //ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
+                            //if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
+                            //    player.Position.y & VisableRectangle.height >=
+                            //    player.Position.y & VisableRectangle.length >= player.Position.x)
+                            //{
+                            //    player.Visible = true;
+                            //}
+                            //else
+                            //{
+                            //    player.Visible = false;
+                            //}
+                        }
+                        //if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))
+                        //{
+                        //}
+                        ProcessServerInstruction?.Invoke(FurreSpawn,
+                            new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                    }
+                    //Remove Furre
+                    else if (data.StartsWith(")"))
+                    {
+                        RemoveAvatar RemoveFurre = new RemoveAvatar(data);
+                        Dream.FurreList.Remove(RemoveFurre.AvatarID);
+                        ProcessServerInstruction?.Invoke(RemoveFurre,
+                                new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
+                    }
+                    //Animated Move
+                    else if (data.StartsWith("/"))
+                    {
+                        player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
+                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Shape = ConvertFromBase220(data.Substring(9, 2));
+                        FURRE Bot = Dream.FurreList[ConnectedCharacterFurcadiaID];
+                        ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
+                        if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <= player.Position.y &
+                            VisableRectangle.height >= player.Position.y & VisableRectangle.length >=
+                            player.Position.x)
+                        {
+                            player.Visible = true;
+                        }
+                        else
+                        {
+                            player.Visible = false;
+                        }
+                        if (Dream.FurreList.Contains(player))
+                            Dream.FurreList[player.ID] = player;
+                    }
+                    // Move Avatar
+                    else if (data.StartsWith("A"))
+                    {
+                        player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
+                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Shape = ConvertFromBase220(data.Substring(9, 2));
+
+                        FURRE Bot = Dream.FurreList[ConnectedCharacterFurcadiaID];
+                        ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
+
+                        if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
+                            player.Position.y & VisableRectangle.height >= player.Position.y &
+                            VisableRectangle.length >= player.Position.x)
+                        {
+                            player.Visible = true;
+                        }
+                        else
+                        {
+                            player.Visible = false;
+                        }
+                    }
+                    //Update ColorString
+                    else if (data.StartsWith("B") & InDream)
+                    {
+                        //fuid 4 b220 bytes
+                        player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
+                        UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
+
+                        ProcessServerInstruction?.Invoke(ColorStringUpdate,
+                                new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
+                    }
+                    //Hide Avatar
+                    else if (data.StartsWith("C") != false)
+                    {
+                        player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
+                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
                         player.Visible = false;
-                    }
-                }
-                //if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))
-                //{
-                //}
-                ProcessServerInstruction?.Invoke(FurreSpawn,
-                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
-            }
-            //Remove Furre
-            else if (data.StartsWith(")") & serverconnectphase == ConnectionPhase.Connected)
-            {
-                int remID = ConvertFromBase220(data.Substring(1, 4));
-                // remove departure from List
-                if (Dream.FurreList.Contains(remID) == true)
-                {
-                    player = Dream.FurreList[remID];
-                    Dream.FurreList.Remove(remID);
-                }
-
-                SendToClient(data);
-                return;
-            }
-            //Animated Move
-            else if (data.StartsWith("/") & serverconnectphase == ConnectionPhase.Connected)
-            {
-                player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
-                player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                player.Position.y = ConvertFromBase220(data.Substring(7, 2));
-                player.Shape = ConvertFromBase220(data.Substring(9, 2));
-                FURRE Bot = Dream.FurreList[ConnectedCharacterFurcadiaID];
-                ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
-                if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <= player.Position.y &
-                    VisableRectangle.height >= player.Position.y & VisableRectangle.length >=
-                    player.Position.x)
-                {
-                    player.Visible = true;
-                }
-                else
-                {
-                    player.Visible = false;
-                }
-                if (Dream.FurreList.Contains(player))
-                    Dream.FurreList[player.ID] = player;
-
-                SendToClient(data);
-                return;
-            }
-            // Move Avatar
-            else if (data.StartsWith("A") & serverconnectphase == ConnectionPhase.Connected)
-            {
-                player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
-                player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                player.Position.y = ConvertFromBase220(data.Substring(7, 2));
-                player.Shape = ConvertFromBase220(data.Substring(9, 2));
-
-                FURRE Bot = Dream.FurreList[ConnectedCharacterFurcadiaID];
-                ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
-
-                if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
-                    player.Position.y & VisableRectangle.height >= player.Position.y &
-                    VisableRectangle.length >= player.Position.x)
-                {
-                    player.Visible = true;
-                }
-                else
-                {
-                    player.Visible = false;
-                }
-
-                SendToClient(data);
-                return;
-            }
-            //Update ColorString
-            else if (data.StartsWith("B") & serverconnectphase == ConnectionPhase.Connected & InDream)
-            {
-                //fuid size 4 b220 bytes
-                player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
-
-                ProcessServerInstruction?.Invoke(ColorStringUpdate,
-                        new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
-            }
-            //Hide Avatar
-            else if (data.StartsWith("C") != false & serverconnectphase == ConnectionPhase.Connected)
-            {
-                player = Dream.FurreList[ConvertFromBase220(data.Substring(1, 4))];
-                player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                player.Position.y = ConvertFromBase220(data.Substring(7, 2));
-                player.Visible = false;
-                if (Dream.FurreList.Contains(player))
-                {
-                    Dream.FurreList[player.ID] = player;
-                }
-                IsBot(ref player);
-
-                SendToClient(data);
-                return;
-                //Display Disconnection Dialog
-            }
-            else if (data.StartsWith("["))
-            {
-#if DEBUG
-                Console.WriteLine("Disconnection Dialog:" + data);
-#endif
-                InDream = false;
-                Dream.FurreList.Clear();
-                // RaiseEvent UpDateDreamList("")
-
-                SendToClient(data);
-
-                return;
-
-                //;{mapfile}	Load a local map (one in the furcadia folder)
-                //]q {name} {id}	Request to download a specific patch
-            }
-            else if (data.StartsWith(";") || data.StartsWith("]q") || data.StartsWith("]r"))
-            {
-#if DEBUG
-
-                Console.WriteLine("Entering new Dream" + data);
-#endif
-
-                hasShare = false;
-                NoEndurance = false;
-
-                Dream.FurreList.Clear();
-                //RaiseEvent UpDateDreamList("")
-                InDream = false;
-
-                SendToClient(data);
-                return;
-            }
-            else if (data.StartsWith("]z"))
-            {
-                ConnectedCharacterFurcadiaID = int.Parse(data.Remove(0, 2));
-                //Snag out UID
-            }
-            else if (data.StartsWith("]B"))
-            {
-                ConnectedCharacterFurcadiaID = int.Parse(data.Substring(2, data.Length - botName.Length - 3));
-                SendToClient(data);
-                return;
-            }
-            else if (data.StartsWith("]c"))
-            {
-#if DEBUG
-                Console.WriteLine(data);
-#endif
-                SendToClient(data);
-                return;
-            }
-            else if (data.StartsWith("]C"))
-            {
-                if (data.StartsWith("]C0"))
-                {
-                    string dname = data.Substring(10);
-                    if (dname.Contains(":"))
-                    {
-                        string NameStr = dname.Substring(0, dname.IndexOf(":"));
-                        if (FurcadiaShortName(NameStr) == FurcadiaShortName(botName))
+                        if (Dream.FurreList.Contains(player))
                         {
-                            hasShare = true;
+                            Dream.FurreList[player.ID] = player;
                         }
+                        IsBot(ref player);
+
+                        //Display Disconnection Dialog
                     }
-                    else if (dname.EndsWith("/") && !dname.Contains(":"))
+                    // Species Tags
+                    else if (data.StartsWith("]-"))
                     {
-                        string NameStr = dname.Substring(0, dname.IndexOf("/"));
-                        if (FurcadiaShortName(NameStr) == FurcadiaShortName(botName))
+                        if (data.StartsWith("]-#A"))
                         {
-                            hasShare = true;
+                            SpeciesTag.Enqueue(data.Substring(4));
                         }
+                        else if (data.StartsWith("]-#B"))
+                        {
+                            BadgeTag.Enqueue(data.Substring(2));
+                        }
+
+                        //DS Variables
                     }
-                }
+
+                    //Popup Dialogs!
+                    else if (data.StartsWith("]#"))
+                    {
+                        //]#<idstring> <style 0-17> <message that might have spaces in>
+                        Regex repqq = new Regex("^\\]#(.*?) (\\d+) (.*?)$");
+                        Match m = repqq.Match(data);
+                        Rep r = default(Rep);
+                        r.ID = m.Groups[1].Value;
+                        int num = 0;
+                        int.TryParse(m.Groups[2].Value, out num);
+                        r.Type = num;
+                        Repq.Enqueue(r);
+                        player.Message = m.Groups[3].Value;
+
+                        //]s(.+)1 (.*?) (.*?) 0
+                    }
+
+                    //Look response
+                    else if (data.StartsWith("["))
+                    {
 #if DEBUG
-                Console.WriteLine(data);
+                        Console.WriteLine("Disconnection Dialog:" + data);
 #endif
-                SendToClient(data);
-                return;
-                //Process Channels Seperatly
-            }
-            else if (data.StartsWith("("))
-            {
-                if (ThroatTired == false & data.StartsWith("(<font color='warning'>Your throat is tired. Try again in a few seconds.</font>"))
-                {
-                    //Using Furclib ServQue
-                    ThroatTired = true;
+                        InDream = false;
+                        Dream.FurreList.Clear();
+                        // RaiseEvent UpDateDreamList("")
 
-                    //(0:92) When the bot detects the "Your throat is tired. Please wait a few seconds" message,
-                    SendToClient(data);
-                }
+                        //;{mapfile}	Load a local map (one in the furcadia folder)
+                        //]q {name} {id}	Request to download a specific patch
+                    }
+                    else if (data.StartsWith(";") || data.StartsWith("]q") || data.StartsWith("]r"))
+                    {
+#if DEBUG
 
-                return;
-            }
-            else
-            {
-                SendToClient(data);
-                ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, MyServerInstruction));
+                        Console.WriteLine("Entering new Dream" + data);
+#endif
+
+                        hasShare = false;
+                        NoEndurance = false;
+
+                        Dream.FurreList.Clear();
+                        //RaiseEvent UpDateDreamList("")
+                        InDream = false;
+                    }
+                    else if (data.StartsWith("]z"))
+                    {
+                        ConnectedCharacterFurcadiaID = int.Parse(data.Remove(0, 2));
+                        //Snag out UID
+                    }
+                    else if (data.StartsWith("]B"))
+                    {
+                        ConnectedCharacterFurcadiaID = int.Parse(data.Substring(2, data.Length - botName.Length - 3));
+                    }
+                    else if (data.StartsWith("]c"))
+                    {
+#if DEBUG
+                        Console.WriteLine(data);
+#endif
+                    }
+                    else if (data.StartsWith("]C"))
+                    {
+                        if (data.StartsWith("]C0"))
+                        {
+                            string dname = data.Substring(10);
+                            if (dname.Contains(":"))
+                            {
+                                string NameStr = dname.Substring(0, dname.IndexOf(":"));
+                                if (FurcadiaShortName(NameStr) == FurcadiaShortName(botName))
+                                {
+                                    hasShare = true;
+                                }
+                            }
+                            else if (dname.EndsWith("/") && !dname.Contains(":"))
+                            {
+                                string NameStr = dname.Substring(0, dname.IndexOf("/"));
+                                if (FurcadiaShortName(NameStr) == FurcadiaShortName(botName))
+                                {
+                                    hasShare = true;
+                                }
+                            }
+                        }
+#if DEBUG
+                        Console.WriteLine(data);
+#endif
+
+                        //Process Channels Seperatly
+                    }
+                    else if (data.StartsWith("("))
+                    {
+                        if (ThroatTired == false & data.StartsWith("(<font color='warning'>Your throat is tired. Try again in a few seconds.</font>"))
+                        {
+                            //Using Furclib ServQue
+                            ThroatTired = true;
+
+                            //(0:92) When the bot detects the "Your throat is tired. Please wait a few seconds" message,
+                        }
+
+                        return;
+                    }
+
+                    break;
+
+                case ConnectionPhase.Disconnected:
+                    // Do nothing - we're disconnected...
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -1478,43 +1288,31 @@ namespace Furcadia.Net
         {
             //TODO Raise Client Data Received event
 
-            try
+            lock (clientlock)
             {
-                if ((Monitor.TryEnter(clientlock)))
+                if (data.StartsWith("connect"))
                 {
-                    if (data.StartsWith("connect"))
-                    {
-                        string test = data.Replace("connect ", "").TrimStart(' ');
-                        botName = test.Substring(0, test.IndexOf(" "));
-                        botName = botName.Replace("|", " ");
+                    string test = data.Replace("connect ", "").TrimStart(' ');
+                    botName = test.Substring(0, test.IndexOf(" "));
+                    botName = botName.Replace("|", " ");
 
-                        botName = botName.Replace("[^a-zA-Z0-9\\0x0020_.| ]+", "").ToLower();
-                    }
-                    else if (data == "vascodagama" & serverconnectphase == ConnectionPhase.Connected)
-                    {
-                        // serverconnectphase = ConnectionPhase.Conne
-                    }
-                    SendToServer(data);
+                    botName = botName.Replace("[^a-zA-Z0-9\\0x0020_.| ]+", "").ToLower();
                 }
-            }
-            finally
-            {
-                Monitor.Exit(clientlock);
+                else if (data == "vascodagama" & serverconnectphase == ConnectionPhase.Connected)
+                {
+                    // serverconnectphase = ConnectionPhase.Conne
+                }
+                SendToServer(data);
             }
         }
 
         private void onServerDataReceived(string data)
         {
-            try
+            lock (DataReceived)
             {
-                Monitor.Enter(DataReceived);
                 player = new FURRE();
                 Channel = "";
                 ParseServerData(data, false);
-            }
-            finally
-            {
-                Monitor.Exit(DataReceived);
             }
         }
 
@@ -1550,11 +1348,11 @@ namespace Furcadia.Net
 
             /// <summary>
             /// </summary>
-            public string ID { get => iD; set => iD = value; }
+            public string ID { get { return iD; } set { iD = value; } }
 
             /// <summary>
             /// </summary>
-            public int Type { get => type; set => type = value; }
+            public int Type { get { return type; } set { type = value; } }
 
             #endregion "Public Fields"
         }
@@ -1565,14 +1363,17 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        public FurcadiaSession() : base()
+        public ProxySession() : base()
         {
+            options = new Options.ProxySessionOptions();
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += onServerQueSent;
 
             ServerData2 += onServerDataReceived;
             ClientData2 += onClientDataReceived;
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect();
+
+            dream = new DREAM();
         }
 
         /// <summary>
@@ -1587,29 +1388,39 @@ namespace Furcadia.Net
         /// </param>
         /// <param name="ReconnectTimeOutDelay">
         /// </param>
-        public FurcadiaSession(string ServerHost, int ServerPort, int LocalHostPort, int ReconnectAttempts, int ReconnectTimeOutDelay) : base(ServerHost, ServerPort, LocalHostPort)
+        public ProxySession(string ServerHost, int ServerPort, int LocalHostPort, int ReconnectAttempts, int ReconnectTimeOutDelay) : base(ServerHost, ServerPort, LocalHostPort)
         {
-            ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
-            ServerData2 += onServerDataReceived;
-            ClientData2 += onClientDataReceived;
+            options = new Options.ProxySessionOptions();
+            options.GameServerHost = ServerHost;
+            options.GameServerPort = ServerPort;
+            options.LocalhostPort = LocalHostPort;
+            options.ReconnectAttempts = ReconnectAttempts;
+            options.ReconnectTimeOutDelay = ReconnectTimeOutDelay;
 
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(ReconnectAttempts, ReconnectTimeOutDelay);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="options">
-        /// Proxy Options
-        /// </param>
-        public FurcadiaSession(Options.ProxySessionOptions options) : base(options)
-        {
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += onServerQueSent;
             ServerData2 += onServerDataReceived;
             ClientData2 += onClientDataReceived;
 
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectAttempts, options.ReconnectTimeOutDelay);
+            dream = new DREAM();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="Options">
+        /// ProxySession Options
+        /// </param>
+        public ProxySession(Options.ProxySessionOptions Options) : base(Options)
+        {
+            options = Options;
+            ServerBalancer = new Utils.ServerQue();
+            ServerBalancer.OnServerSendMessage += onServerQueSent;
+            ServerData2 += onServerDataReceived;
+            ClientData2 += onClientDataReceived;
+
+            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectAttempts, options.ReconnectTimeOutDelay);
+            dream = new DREAM();
         }
 
         #endregion "Constructors"

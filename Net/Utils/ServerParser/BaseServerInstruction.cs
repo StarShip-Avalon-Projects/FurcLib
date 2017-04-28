@@ -1,8 +1,11 @@
-﻿namespace Furcadia.Net.Utils.ServerParser
+﻿using System;
+
+namespace Furcadia.Net.Utils.ServerParser
 {
     /// <summary>
     /// Server instruction object base class
     /// </summary>
+    [CLSCompliant(true)]
     public class BaseServerInstruction
     {
         #region Private Fields
@@ -35,6 +38,7 @@
         /// <summary>
         /// Which Server to Client Instruction are we?
         /// </summary>
+        [CLSCompliant(false)]
         public ServerInstructionType InstructionType
         {
             get

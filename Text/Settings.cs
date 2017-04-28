@@ -25,7 +25,10 @@ namespace Furcadia.Text
         /// </summary>
         public Settings()
         {
-            LocalPort = 6700;
+            localport = 6700;
+            localhost = "localhost";
+            Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
+            values = new string[9] { "Yes", localhost, localport.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
         }
 
         /// <summary>
@@ -35,17 +38,36 @@ namespace Furcadia.Text
         /// </param>
         public Settings(int Port)
         {
-            LocalPort = Port;
+            localport = Port;
+            localhost = "localhost";
+            Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
+            values = new string[9] { "Yes", localhost, localport.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
         }
 
         #endregion Public Constructors
 
         #region Public Properties
 
+        private static string localhost;
+        private static int localport;
+
         /// <summary>
-        /// Local TCP Port
+        /// Localhost or local IP
         /// </summary>
-        public static int LocalPort { get; set; }
+        public string Localhost
+        {
+            get { return localhost; }
+            set { localhost = value; }
+        }
+
+        /// <summary>
+        /// Local port Furcadia Client connects to
+        /// </summary>
+        public int LocalPort
+        {
+            get { return localport; }
+            set { localport = value; }
+        }
 
         #endregion Public Properties
 
@@ -64,47 +86,21 @@ namespace Furcadia.Text
         /// <summary>
         /// Proxy/Firewall Keys
         /// </summary>
-        private static string[] Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
-
-        /// <summary>
-        /// Furcadia Settings path
-        /// </summary>
-        private static string sPath;
+        private readonly string[] Keys;
 
         /// <summary>
         /// Our Proxy/Firewall Values
         /// </summary>
-        private static string[] values = new string[9] { "Yes", "localhost", LocalPort.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
+        private readonly string[] values;
+
+        /// <summary>
+        /// Furcadia Settings path
+        /// </summary>
+        private string sPath;
 
         #endregion Private Fields
 
         #region Public Methods
-
-        /// <summary>
-        /// Lets back up our Proxy/Firewall settings and then set the new settings for the Furcadia Client
-        /// </summary>
-        /// <param name="path">
-        /// Furcadia Settings.ini path
-        /// </param>
-        /// <returns>
-        /// Backup Settings for restoring later
-        /// </returns>
-        public static string[] InitializeFurcadiaSettings(string path = null)
-        {
-            if (path == null)
-                sPath = FurcPath.GetLocalSettingsPath();
-            else
-                sPath = path;
-            string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
-            string[] Backup = FurcIni.LoadFurcadiaSettings(sPath, sFile);
-            for (int Key = 0; Key < Keys.Length; Key++)
-            {
-                FurcIni.SetUserSetting(Keys[Key], values[Key], FurcSettings);
-            }
-            // Save settings.ini?
-            FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
-            return Backup;
-        }
 
         /// <summary>
         /// Loads a xml file and returns a new instance of T. T must be XML Deserializable!
@@ -114,7 +110,8 @@ namespace Furcadia.Text
         /// <param name="file">
         /// </param>
         /// <returns>
-        /// Default of T (default(T)) on file not found. Else it returns a instance of T.
+        /// Default of T (default(T)) on file not found. Else it returns a
+        /// instance of T.
         /// </returns>
         public static T Load<T>(string file)
         {
@@ -136,8 +133,9 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Loads an ini file and returns a key/value pair of values. (Note: It reads Key=Value pairs
-        /// only.) (Add: Also the ini must be proper, one key/value per line. No section garbage.)
+        /// Loads an ini file and returns a key/value pair of values. (Note:
+        /// It reads Key=Value pairs only.) (Add: Also the ini must be
+        /// proper, one key/value per line. No section garbage.)
         /// </summary>
         /// <param name="file">
         /// </param>
@@ -162,24 +160,51 @@ namespace Furcadia.Text
         }
 
         /// <summary>
+        /// Lets back up our Proxy/Firewall settings and then set the new
+        /// settings for the Furcadia Client
+        /// </summary>
+        /// <param name="path">
+        /// Furcadia Settings.ini path
+        /// </param>
+        /// <returns>
+        /// Backup Settings for restoring later
+        /// </returns>
+        public string[] InitializeFurcadiaSettings(string path = null)
+        {
+            if (path == null)
+                sPath = FurcPath.GetLocalSettingsPath();
+            else
+                sPath = path;
+            string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
+            string[] Backup = FurcIni.LoadFurcadiaSettings(sPath, sFile);
+            for (int Key = 0; Key < Keys.Length; Key++)
+            {
+                FurcIni.SetUserSetting(Keys[Key], values[Key], FurcSettings);
+            }
+            // Save settings.ini?
+            FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
+            return Backup;
+        }
+
+        /// <summary>
         /// Restores the Furcadia Settings we backed up earlier.
         /// </summary>
         /// <param name="BackupSettings">
         /// Backed up settings array
         /// </param>
-        public static void RestoreFurcadiaSettings(string[] BackupSettings)
+        public void RestoreFurcadiaSettings(string[] BackupSettings)
         {
-            /// Get the New Changes by Furcadia Suite
+            // Get the New Changes by Furcadia Suite
             string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
 
             for (int Key = 0; Key < Keys.Length; Key++)
             {
-                /// Capture Back up Fields
+                // Capture Back up Fields
                 string Value = FurcIni.GetUserSetting(Keys[Key], BackupSettings);
-                /// Use Backup for Settings
+                // Use Backup for Settings
                 FurcIni.SetUserSetting(Keys[Key], Value, FurcSettings);
             }
-            /// Save settings.ini
+            //Save settings.ini
             FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
         }
 

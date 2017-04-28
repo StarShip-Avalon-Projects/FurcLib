@@ -25,7 +25,8 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Connection Time Out timer.
         /// <para>
-        /// How long to wait before closing the Connection and starting the Next reconnect attempt
+        /// How long to wait before closing the Connection and starting the
+        /// Next reconnect attempt
         /// </para>
         /// </summary>
         private Timer ReconnectTimeOutTimer;
@@ -220,9 +221,11 @@ namespace Furcadia.Net.Utils
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            // Do not change this code. Put cleanup code in Dispose(bool
+            // disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above. GC.SuppressFinalize(this);
+            // TODO: uncomment the following line if the finalizer is
+            //       overridden above. GC.SuppressFinalize(this);
         }
 
         public virtual void Dispose(bool disposing)
@@ -237,16 +240,18 @@ namespace Furcadia.Net.Utils
                         ReconnectTimer.Dispose();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: free unmanaged resources (unmanaged objects) and
+                //       override a finalizer below.
                 // TODO: set large fields to null.
 
                 disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free
-        //       unmanaged resources. ~ProxyReconnect() { // Do not change this code. Put cleanup
-        // code in Dispose(bool disposing) above. Dispose(false); }
+        // TODO: override a finalizer only if Dispose(bool disposing) above
+        //       has code to free unmanaged resources. ~ProxyReconnect() {
+        //       // Do not change this code. Put cleanup code in
+        // Dispose(bool disposing) above. Dispose(false); }
 
         #endregion IDisposable Support
 

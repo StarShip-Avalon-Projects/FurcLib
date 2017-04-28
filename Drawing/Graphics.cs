@@ -858,7 +858,8 @@ namespace Furcadia.Drawing.Graphics
                 RemappedPal[i] = (byte)i;
             }
 
-            // try/catch block will allow us to die peacefully if an invalid colour is found
+            // try/catch block will allow us to die peacefully if an invalid
+            // colour is found
             try
             {
                 // first off parse the colour code into its components

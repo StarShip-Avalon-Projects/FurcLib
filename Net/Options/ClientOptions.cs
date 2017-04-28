@@ -8,11 +8,6 @@
         #region Private Fields
 
         /// <summary>
-        /// File Path to Character.Ini
-        /// </summary>
-        private string CharacterIniFile;
-
-        /// <summary>
         /// Host Name or IP address
         /// </summary>
         private string gameserverhost;
@@ -49,7 +44,6 @@
         #region Public Constructors
 
         /// <summary>
-        /// 
         /// </summary>
         protected ClientOptions()
         {

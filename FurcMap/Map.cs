@@ -334,15 +334,16 @@ namespace Furcadia.FurcMap
             return (int)floors[pos];
         }
 
-        /// <summary> Get a MapPosition object from the position specified by x & y </summary> <param
-        /// name="x"></param> <param name="y"></param> <returns></returns>
+        /// <summary> Get a MapPosition object from the position specified
+        /// by x & y </summary> <param name="x"></param> <param
+        /// name="y"></param> <returns></returns>
         public MapPosition getMapPos(int x, int y)
         {
             return new MapPosition(x, y, this);
         }
 
-        /// <summary> Get a MapTile object from the position specified by x & y </summary> <param
-        /// name="x"></param> <param name="y"></param> <returns></returns>
+        /// <summary> Get a MapTile object from the position specified by x
+        /// & y </summary> <param name="x"></param> <param name="y"></param> <returns></returns>
         public MapTile getMapTile(int x, int y)
         {
             return new MapTile(x, y, this);
@@ -456,8 +457,9 @@ namespace Furcadia.FurcMap
             return true;
         }
 
-        /// <summary> Set the effect number at a tile specified by x & y </summary> <param
-        /// name="x"></param> <param name="y"></param> <param name="floorNumber"></param>
+        /// <summary> Set the effect number at a tile specified by x & y
+        /// </summary> <param name="x"></param> <param name="y"></param>
+        /// <param name="floorNumber"></param>
         public void setEffectAt(int x, int y, int effectNumber)
         {
             int pos = getPosFrom(x, y);
@@ -481,8 +483,9 @@ namespace Furcadia.FurcMap
             floors[pos] = (byte)floorNumber;
         }
 
-        /// <summary> Set the object number at a tile specified by x & y </summary> <param
-        /// name="x"></param> <param name="y"></param> <param name="floorNumber"></param>
+        /// <summary> Set the object number at a tile specified by x & y
+        /// </summary> <param name="x"></param> <param name="y"></param>
+        /// <param name="floorNumber"></param>
         public void setObjectAt(int x, int y, int objectNumber)
         {
             int pos = getPosFrom(x, y);
@@ -490,8 +493,9 @@ namespace Furcadia.FurcMap
             objects[pos] = (byte)objectNumber;
         }
 
-        /// <summary> Set the region number at a tile specified by x & y </summary> <param
-        /// name="x"></param> <param name="y"></param> <param name="floorNumber"></param>
+        /// <summary> Set the region number at a tile specified by x & y
+        /// </summary> <param name="x"></param> <param name="y"></param>
+        /// <param name="floorNumber"></param>
         public void setRegionAt(int x, int y, int regionNumber)
         {
             int pos = getPosFrom(x, y);
@@ -499,8 +503,9 @@ namespace Furcadia.FurcMap
             regions[pos] = (byte)regionNumber;
         }
 
-        /// <summary> Set the wall number at a tile specified by x & y </summary> <param
-        /// name="x"></param> <param name="y"></param> <param name="floorNumber"></param>
+        /// <summary> Set the wall number at a tile specified by x & y
+        /// </summary> <param name="x"></param> <param name="y"></param>
+        /// <param name="floorNumber"></param>
         public void setWallAt(int x, int y, int wallNumber)
         {
             int pos = (this.height * x + y);

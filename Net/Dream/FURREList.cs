@@ -70,7 +70,7 @@ namespace Furcadia.Net
         /// </param>
         /// <returns>
         /// </returns>
-        public FURRE this[int index] { get => fList[index]; set => fList[index] = value; }
+        public FURRE this[int index] { get { return fList[index]; } set { fList[index] = value; } }
 
         #endregion Public Properties
 
@@ -244,15 +244,6 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        /// <returns>
-        /// </returns>
-        public bool MoveNext()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
         /// <param name="item">
         /// </param>
         /// <returns>
@@ -279,13 +270,6 @@ namespace Furcadia.Net
             fList.RemoveAt(index);
         }
 
-        /// <summary>
-        /// </summary>
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
-
         // This code added to correctly implement the disposable pattern.
         void IDisposable.Dispose()
         {
@@ -298,7 +282,7 @@ namespace Furcadia.Net
 
         IEnumerator<FURRE> IEnumerable<FURRE>.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return fList.GetEnumerator();
         }
 
         /// <summary>

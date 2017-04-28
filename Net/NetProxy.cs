@@ -6,7 +6,6 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  */
 
-using Furcadia.IO;
 using Furcadia.Net.Utils;
 using Furcadia.Text;
 using System;
@@ -38,21 +37,11 @@ namespace Furcadia.Net
     {
         #region Private Fields
 
+        private Options.ProxyOptions options;
         private Process proc;
+        private Text.Settings settings;
 
         #endregion Private Fields
-
-        #region Public Properties
-
-        /// <summary>
-        /// Furcadia Client Process
-        /// </summary>
-        public Process ClientProcess
-        {
-            get { return proc; }
-        }
-
-        #endregion Public Properties
 
         #region Event Handling
 
@@ -82,6 +71,12 @@ namespace Furcadia.Net
         /// Expects a return value.
         /// </summary>
         public event DataEventHandler2 ClientData2;
+
+        /// <summary>
+        /// This is triggered when the Server sends data to the client.
+        /// Doesn't expect a return value.
+        /// </summary>
+        public event DataEventHandler2 ServerData2;
 
         /// <summary>
         ///This is triggered when the Server Disconnects
@@ -121,22 +116,9 @@ namespace Furcadia.Net
         /// </summary>
         protected internal event DataEventHandler ServerData;
 
-        /// <summary>
-        /// This is triggered when the Server sends data to the client.
-        /// Doesn't expect a return value.
-        /// </summary>
-        protected internal event DataEventHandler2 ServerData2;
-
         #endregion Event Handling
 
         #region Private Declarations
-
-        /// <summary>
-        /// Local host TCP port
-        /// </summary>
-        public static int _lport;
-
-        private static bool _StandAloneMode = false, Clientflag = true;
 
         private static string[] BackupSettings;
 
@@ -151,12 +133,6 @@ namespace Furcadia.Net
 
         private static System.Timers.Timer NewsTimer;
         private IPEndPoint _endpoint;
-        private string _proc = "Furcadia.exe", _procpath;
-
-        /// <summary>
-        /// Command Line Arguments for the Furcadia Client
-        /// </summary>
-        private string _procCMD;
 
         /// <summary>
         /// Process IP for Furcadia.exe
@@ -165,48 +141,35 @@ namespace Furcadia.Net
 
         private string _ServerLeftOvers;
 
+        /// <summary>
+        /// Furcadia Client Connection
+        /// </summary>
         private TcpClient client = new TcpClient();
+
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
         private string clientBuild, serverBuild;
         private TcpListener listen;
+
+        /// <summary>
+        /// </summary>
         private TcpClient server;
 
         #endregion Private Declarations
 
-
-
-        #region Private Fields
-
-        /// <summary>
-        /// Use proxy.ini if it exists. otherwise use settings.ini.
-        /// </summary>
-        private Boolean UseProxyIni;
-
-        #endregion Private Fields
-
         #region Constructors
-
-        /// <summary>
-        /// Furcadia default File Paths.
-        /// <para>
-        /// we use Local App data for the Furcadia Settings.ini and the
-        /// Furcadia Characters Path
-        /// </para>
-        /// </summary>
-        protected Paths FurcPath;
 
         /// <summary>
         /// Connect to game servver with default settings
         /// </summary>
         public NetProxy()
         {
-            _lport = 6700;
-            FurcPath = new Paths();
-            string SetPath = FurcPath.GetLocalSettingsPath();
+            options = new Options.ProxyOptions();
+            settings = new Text.Settings(options.LocalhostPort);
+            string SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
             string SetFile = "settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
-            int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
-            _endpoint = ConverHostToIP(Utilities.GameServerHost, port);
+            options.GameServerPort = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
+            _endpoint = ConverHostToIP(Utilities.GameServerHost, options.GameServerPort);
         }
 
         /// <summary>
@@ -215,11 +178,11 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(int port)
         {
-            FurcPath = new Paths();
-            _lport = 6700;
+            options = new Options.ProxyOptions();
+            options.LocalhostPort = port;
             try
             {
-                _endpoint = new IPEndPoint(Dns.GetHostEntry(Utilities.GameServerHost).AddressList[0], port);
+                _endpoint = new IPEndPoint(Dns.GetHostEntry(options.GameServerHost).AddressList[0], options.LocalhostPort);
             }
             catch { }
         }
@@ -232,9 +195,10 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(int port, int lport)
         {
-            FurcPath = new Paths();
-            _lport = lport;
-            _endpoint = ConverHostToIP(Utilities.GameServerHost, port);
+            options = new Options.ProxyOptions();
+            options.LocalhostPort = port;
+            settings = new Text.Settings(options.LocalhostPort);
+            _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
 
         /// <summary>
@@ -245,22 +209,22 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(string host, int port)
         {
-            FurcPath = new Paths();
-            _lport = 6700;
-            _endpoint = ConverHostToIP(host, port);
+            options = new Options.ProxyOptions();
+            options.LocalhostPort = port;
+            settings = new Text.Settings(options.LocalhostPort);
+            _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
 
         /// <summary>
         /// Connect to Furcadia with Proxy Options
         /// </summary>
-        /// <param name="options">
+        /// <param name="Options">
         /// </param>
-        public NetProxy(Options.ProxyOptions options)
+        public NetProxy(Options.ProxyOptions Options)
         {
-            FurcPath = new Paths();
-            _lport = options.LocalhostPort;
+            options = Options;
+            settings = new Text.Settings(options.LocalhostPort);
             _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
-            _procCMD = options.CharacterIniFile;
         }
 
         /// <summary>
@@ -278,10 +242,10 @@ namespace Furcadia.Net
         public NetProxy(string host, int port, int lport)
 
         {
-            FurcPath = new Paths();
-            _lport = lport;
-
-            _endpoint = ConverHostToIP(host, port);
+            options = new Options.ProxyOptions();
+            options.LocalhostPort = port;
+            settings = new Text.Settings(options.LocalhostPort);
+            _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
 
         /// <summary>
@@ -292,8 +256,9 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(IPEndPoint endpoint, int lport)
         {
-            FurcPath = new Paths();
-            _lport = lport;
+            options = new Options.ProxyOptions();
+            options.LocalhostPort = lport;
+            settings = new Text.Settings(options.LocalhostPort);
             try
             {
                 _endpoint = endpoint;
@@ -357,61 +322,12 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// the application file name to connect to the game server.
-        /// (Default Furcadia.exe)
-        /// </summary>
-        public string Process
-        {
-            get { return _proc; }
-            set { _proc = value; }
-        }
-
-        /// <summary>
-        /// Process command line Arguments (Former Default "-pick" used to
-        /// bring up the Charcter select window for the Character ini file)
-        /// <para>
-        /// Currently we support Legasy connection mode by specifying a
-        /// Character.Ini file name and file path
-        /// </para>
-        /// </summary>
-        public string ProcessCMD
-        {
-            get { return _procCMD; }
-            set { _procCMD = value; }
-        }
-
-        /// <summary>
-        /// Process path (default: none)
-        /// </summary>
-        public string ProcessPath
-        {
-            get
-            {
-                return _procpath;
-            }
-            set
-            {
-                FurcPath = new Paths(value);
-                _procpath = value;
-            }
-        }
-
-        /// <summary>
         /// Process ID for closing Furcadia.exe
         /// </summary>
         public int ProcID
         {
             get { return _procID; }
             set { _procID = value; }
-        }
-
-        /// <summary>
-        /// Standalone Mode Keep Connection after Client Closes/Disconnects
-        /// </summary>
-        public bool StandAloneMode
-        {
-            get { return _StandAloneMode; }
-            set { _StandAloneMode = value; }
         }
 
         #endregion Properties
@@ -491,7 +407,7 @@ namespace Furcadia.Net
         /// </summary>
         public void Connect()
         {
-            if (string.IsNullOrEmpty(_procCMD))
+            if (string.IsNullOrEmpty(options.CharacterIniFile))
                 throw new Proxy.CharacterNotFoundException("Character.ini not specified");
             try
             {
@@ -518,36 +434,34 @@ namespace Furcadia.Net
                     {
                         try
                         {
-                            listen = new TcpListener(IPAddress.Any, _lport);
+                            listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
                         catch (SocketException)
                         {
-                            _lport++;
-                            listen = new TcpListener(IPAddress.Any, _lport);
+                            options.LocalhostPort++;
+                            listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
                     }
-                    else throw new NetProxyException("Port " + _lport.ToString() + " is being used.");
+                    else throw new NetProxyException("Port " + options.LocalhostPort.ToString() + " is being used.");
                 }
-                string proxyIni = "localhost " + _lport.ToString();
-                //FurcPath = new Paths(_procpath);
                 // UAC Perms Needed to Create proxy.ini Win 7 Change your
                 // UAC Level or add file create Permissions to [%program
                 // files%/furcadia] Maybe Do this at install
-                BackupSettings = Settings.InitializeFurcadiaSettings(FurcPath.GetLocalSettingsPath());
+                BackupSettings = settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.GetLocalSettingsPath());
                 //Run
-                if (string.IsNullOrEmpty(ProcessPath)) ProcessPath = FurcPath.GetInstallPath();
+
                 //check ProcessPath is not a directory
-                if (!Directory.Exists(_procpath)) throw new NetProxyException("Process path not found.");
-                if (!File.Exists(Path.Combine(_procpath, Process))) throw new NetProxyException("Client executable '" + Process + "' not found.");
+                if (!Directory.Exists(options.FurcadiaInstallPath)) throw new NetProxyException("Process path not found.");
+                if (!File.Exists(Path.Combine(options.FurcadiaInstallPath, options.FurcadiaProcess))) throw new NetProxyException("Client executable '" + options.FurcadiaProcess + "' not found.");
                 proc = new System.Diagnostics.Process(); //= System.Diagnostics.Process.Start(Process,ProcessCMD );
                 proc.EnableRaisingEvents = true;
-                proc.StartInfo.FileName = Process;
-                proc.StartInfo.Arguments = _procCMD;
-                proc.StartInfo.WorkingDirectory = _procpath;
+                proc.StartInfo.FileName = options.FurcadiaProcess;
+                proc.StartInfo.Arguments = options.CharacterIniFile;
+                proc.StartInfo.WorkingDirectory = options.FurcadiaInstallPath;
                 proc.Start();
                 proc.Exited += delegate
                 {
@@ -657,19 +571,6 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Sets the startup Process to the associated file. (default: %FurcadiaInstallPath%/Furcadia.exe)
-        /// </summary>
-        /// <param name="file">
-        /// Process full path and file name.
-        /// </param>
-        public void SetProcess(string file)
-        {
-            if (!File.Exists(file)) throw new FileNotFoundException("File not found.", file);
-            ProcessPath = Path.GetDirectoryName(file);
-            Process = Path.GetFileName(file);
-        }
-
-        /// <summary>
         /// </summary>
         /// <param name="disposing">
         /// </param>
@@ -678,7 +579,7 @@ namespace Furcadia.Net
             if (disposing)
             {
                 if (BackupSettings != null)
-                    Settings.RestoreFurcadiaSettings(BackupSettings);
+                    settings.RestoreFurcadiaSettings(BackupSettings);
                 if (listen != null) listen.Stop();
 
                 if (client != null && client.Connected == true)
@@ -745,13 +646,6 @@ namespace Furcadia.Net
                 if (Connected != null)
                 {
                     Connected();
-                    Clientflag = true;
-                    // Delete proxy.ini or restore settings.ini
-                    if (UseProxyIni)
-                    {
-                        if (File.Exists(Path.Combine(FurcPath.GetInstallPath(), "proxy.ini")))
-                            File.Delete(Path.Combine(FurcPath.GetInstallPath(), "proxy.ini"));
-                    }
 
                     // reset settings.ini 10second delay timer
                     NewsTimer = new System.Timers.Timer();
@@ -761,7 +655,7 @@ namespace Furcadia.Net
                     NewsTimer.AutoReset = false;
                 }
             }
-            catch (Exception e) { if (Error != null) Error(e, this, "AsyncListener()"); }
+            catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
         }
 
         /// <summary>
@@ -820,13 +714,16 @@ namespace Furcadia.Net
                 catch (Exception e)
                 {
                     if (client.Connected == true) ClientDisConnected();
-                    if (Error != null) Error(e, this, "GetClientData()");
+                    Error?.Invoke(e, this, "GetClientData()");
                 } // else throw e;
                 if (IsClientConnected && clientBuild.Length < 1 || IsClientConnected == false)
                     ClientDisConnected?.Invoke();
-                if (client.Connected == true && clientBuild.Length >= 1)
+                else
                 {
-                    client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
+                    if (client.Connected == true && clientBuild.Length >= 1)
+                    {
+                        client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
+                    }
                 }
             }
         }
@@ -848,8 +745,7 @@ namespace Furcadia.Net
 
                         if (read < 1)
                         {
-                            if (ServerDisConnected != null) { ServerDisConnected(); }
-                            return;
+                            ServerDisConnected?.Invoke(); return;
                         }
                         //If we have left over data add it to this server build
                         if (!string.IsNullOrEmpty(_ServerLeftOvers) && _ServerLeftOvers.Length > 0)
@@ -887,14 +783,14 @@ namespace Furcadia.Net
                 catch (Exception e)
                 {
                     // if (IsServerConnected == true) ServerDisConnected();
-                    if (Error != null) Error(e, this, "GetServerData()");
-                    if (ServerDisConnected != null) ServerDisConnected();
+                    Error?.Invoke(e, this, "GetServerData()");
+                    ServerDisConnected?.Invoke();
                     return;
                 } //else throw e;
                   // Detect if client disconnected
                 if (IsServerConnected && serverBuild.Length < 1 || IsServerConnected == false)
                 {
-                    if (ServerDisConnected != null) ServerDisConnected();
+                    ServerDisConnected?.Invoke();
                 }
 
                 if (IsServerConnected && serverBuild.Length > 0)
@@ -905,10 +801,9 @@ namespace Furcadia.Net
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             // reset settings.ini
-            Settings.RestoreFurcadiaSettings(BackupSettings);
+            settings.RestoreFurcadiaSettings(BackupSettings);
             BackupSettings = null;
-            if (this.FurcSettingsRestored != null)
-                this.FurcSettingsRestored();
+            FurcSettingsRestored?.Invoke();
         }
 
         #endregion Private Methods

@@ -13,7 +13,7 @@ namespace Furcadia.Net.Utils.ServerParser
     /// reference http://dev.furcadia.com/docs/027_movement.html
     /// </para>
     /// </remarks>
-    public class SpawnFurre : BaseServerInstruction
+    public class SpawnAvatar : BaseServerInstruction
     {
         #region Protected Fields
 
@@ -35,7 +35,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         /// <param name="ServerInstruction">
         /// </param>
-        public SpawnFurre(string ServerInstruction) : base(ServerInstruction)
+        public SpawnAvatar(string ServerInstruction) : base(ServerInstruction)
         {
             //Update What type we are
             if (ServerInstruction.StartsWith("<"))
@@ -63,7 +63,7 @@ namespace Furcadia.Net.Utils.ServerParser
 
             int FlagPos = ServerInstruction.Length - 6;
 
-            var PlayerFlags = new CharacterFlags(ServerInstruction.Substring(FlagPos, 1));
+            PlayerFlags = new CharacterFlags(ServerInstruction.Substring(FlagPos, 1));
 
             var AFK_Pos = ServerInstruction.Length - 5;
             var AFKStr = ServerInstruction.Substring(AFK_Pos, 4);

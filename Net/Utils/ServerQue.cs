@@ -210,8 +210,7 @@ namespace Furcadia.Net.Utils
         /// </param>
         public void SendToServer(string data)
         {
-            if (string.IsNullOrEmpty(data))
-                return;
+            // if (string.IsNullOrEmpty(data)) return;
             ServerStack.Enqueue(data);
             if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
             {
