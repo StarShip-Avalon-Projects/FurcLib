@@ -49,12 +49,11 @@
         #region Public Constructors
 
         /// <summary>
-        /// Deault settingds
+        /// Deault settings
         /// </summary>
         public ProxyOptions()
         {
             localhostport = 6700;
-            characterini = "";
             furcprocess = @"Furcadia.exe";
             FurcPath = new IO.Paths();
         }
@@ -67,6 +66,23 @@
 
         /// <summary>
         /// Character Ini file to connect to the Game server with
+        /// <para>
+        /// Furcadia.Exe Command Line options
+        /// </para>
+        /// &gt;
+        /// <para>
+        /// If only a Character.ini is Specified then NetProxy will Connect
+        /// with Legacy Connection.
+        /// </para>
+        /// &gt;
+        /// <para>
+        /// If NoArguments specified then we'll login with Account Login window
+        /// </para>
+        /// <para>
+        /// If we use -url="" We can Open the client and the server will
+        /// select the character for us and bypass the Account Login Screen
+        /// and the Game News feed
+        /// </para>
         /// </summary>
         public string CharacterIniFile
         {
@@ -75,6 +91,7 @@
         }
 
         /// <summary>
+        /// Furcadia working folder path to the Client install we want to use
         /// </summary>
         public string FurcadiaInstallPath
         {

@@ -30,7 +30,7 @@ namespace Furcadia.Net.Utils
         /// <returns>
         /// True when a port is found available
         /// </returns>
-        public static bool PortOpen(ref int port)
+        public static bool PortOpen(int port)
         {
             // Evaluate current system tcp connections. This is the same
             // information provided by the netstat command line application,

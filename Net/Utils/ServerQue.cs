@@ -96,7 +96,7 @@ namespace Furcadia.Net.Utils
         public ServerQue()
         {
             throattireddelaytime = 45;
-            QueueTimer = new System.Threading.Timer(ProcessQueue, null, 0, 75);
+            QueueTimer = new System.Threading.Timer(ProcessQueue, null, 0, 200);
             PingTimer = new Timer(PingTimerTick, null,
                 TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
         }
@@ -128,7 +128,7 @@ namespace Furcadia.Net.Utils
 
         #region Private Fields
 
-        private const int MASS_CRITICAL = 1600;
+        private const int MASS_CRITICAL = 2046;
         private const int MASS_DECAYPS = 400;
         private const int MASS_DEFAULT = 80;
         private const int MASS_SPEECH = 1000;
@@ -176,6 +176,8 @@ namespace Furcadia.Net.Utils
         /// </summary>
         private bool noendurance;
 
+        private object QueLock = new object();
+
         /// <summary>
         /// Throat Tired System.
         /// <para>
@@ -210,6 +212,8 @@ namespace Furcadia.Net.Utils
         /// </param>
         public void SendToServer(string data)
         {
+            if (string.IsNullOrEmpty(data))
+                return;
             // if (string.IsNullOrEmpty(data)) return;
             ServerStack.Enqueue(data);
             if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
@@ -225,14 +229,14 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void PingTimerTick(object state)
         {
-            if ((0 == Interlocked.Exchange(ref usingPing, 1)))
+            //if ((0 == Interlocked.Exchange(ref usingPing, 1)))
+            //{
+            if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
             {
-                if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
-                {
-                    ServerStack.Enqueue("Ping");
-                }
-                Interlocked.Exchange(ref usingPing, 0);
+                ServerStack.Enqueue("Ping");
             }
+            Interlocked.Exchange(ref usingPing, 0);
+            //}
         }
 
         /// <summary>
@@ -241,13 +245,13 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void ProcessQueue(object state)
         {
-            if (0 == Interlocked.Exchange(ref usingProcessQueue, 1))
-            {
-                double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
-                QueueTick(seconds);
-                TickTime = DateTime.Now;
-                Interlocked.Exchange(ref usingProcessQueue, 0);
-            }
+            //if (0 == Interlocked.Exchange(ref usingProcessQueue, 1))
+            //{
+            double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
+            QueueTick(seconds);
+            TickTime = DateTime.Now;
+            //    Interlocked.Exchange(ref usingProcessQueue, 0);
+            //}
         }
 
         /// <summary>
@@ -272,41 +276,44 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void QueueTick(double DelayTime)
         {
-            if (ServerStack.Count == 0)
-                return;
-            if (DelayTime != 0)
+            lock (QueLock)
             {
-                DelayTime = Math.Round(DelayTime, 0) + 1;
-            }
-
-            /* Send buffered speech. */
-            double decay = Math.Round(DelayTime * MASS_DECAYPS / 1000f, 0);
-            if ((decay > g_mass))
-            {
-                g_mass = 0;
-            }
-            else
-            {
-                g_mass -= decay;
-            }
-
-            if (noendurance)
-            {
-                /* just send everything right away */
-                while (ServerStack.Count > 0 & g_mass <= MASS_CRITICAL)
+                if (ServerStack.Count == 0)
+                    return;
+                if (DelayTime != 0)
                 {
-                    g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
-                    OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
+                    DelayTime = Math.Round(DelayTime, 0) + 1;
                 }
-            }
-            else if (!ThroatTired)
-            {
-                // Only send a speech line if the mass will be under the
-                // limit. */
-                while (ServerStack.Count > 0 & g_mass + MASS_SPEECH <= MASS_CRITICAL)
+
+                /* Send buffered speech. */
+                double decay = Math.Round(DelayTime * MASS_DECAYPS / 1000f, 0);
+                if ((decay > g_mass))
                 {
-                    g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
-                    OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
+                    g_mass = 0;
+                }
+                else
+                {
+                    g_mass -= decay;
+                }
+
+                if (noendurance)
+                {
+                    /* just send everything right away */
+                    while (ServerStack.Count > 0 & g_mass <= MASS_CRITICAL)
+                    {
+                        g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
+                        OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
+                    }
+                }
+                else if (!ThroatTired)
+                {
+                    // Only send a speech line if the mass will be under the
+                    // limit. */
+                    while (ServerStack.Count > 0 & g_mass + MASS_SPEECH <= MASS_CRITICAL)
+                    {
+                        g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
+                        OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
+                    }
                 }
             }
         }

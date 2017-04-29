@@ -47,7 +47,7 @@
         /// </summary>
         protected ClientOptions()
         {
-            gameserverport = 6500;
+            gameserverport = 6500; // TODO: Settings Prefered Serve Port
             gameserverhost = Utils.Utilities.GameServerHost;
         }
 
