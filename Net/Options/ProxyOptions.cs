@@ -50,6 +50,12 @@
 
         /// <summary>
         /// Deault settings
+        /// <para>
+        /// <see cref="localhostport"/> = 6700
+        /// </para>
+        /// <para>
+        /// <see cref="furcprocess"/> = "Furcadia.exe"
+        /// </para>
         /// </summary>
         public ProxyOptions()
         {
@@ -66,15 +72,15 @@
 
         /// <summary>
         /// Character Ini file to connect to the Game server with
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// Furcadia.Exe Command Line options
         /// </para>
-        /// &gt;
         /// <para>
         /// If only a Character.ini is Specified then NetProxy will Connect
         /// with Legacy Connection.
         /// </para>
-        /// &gt;
         /// <para>
         /// If NoArguments specified then we'll login with Account Login window
         /// </para>
@@ -83,7 +89,7 @@
         /// select the character for us and bypass the Account Login Screen
         /// and the Game News feed
         /// </para>
-        /// </summary>
+        /// </remarks>
         public string CharacterIniFile
         {
             get { return characterini; }
