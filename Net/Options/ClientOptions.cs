@@ -7,6 +7,13 @@
     {
         #region Private Fields
 
+        protected internal IO.Paths FurcadiaFilePaths;
+
+        /// <summary>
+        /// Furcadia Utilities
+        /// </summary>
+        protected internal Utils.Utilities FurcadiaUtilities;
+
         /// <summary>
         /// Host Name or IP address
         /// </summary>
@@ -47,8 +54,10 @@
         /// </summary>
         protected ClientOptions()
         {
+            FurcadiaUtilities = new Utils.Utilities();
+            FurcadiaFilePaths = new IO.Paths();
             gameserverport = 6500; // TODO: Settings Prefered Serve Port
-            gameserverhost = Utils.Utilities.GameServerHost;
+            gameserverhost = FurcadiaUtilities.GameServerHost;
         }
 
         #endregion Public Constructors

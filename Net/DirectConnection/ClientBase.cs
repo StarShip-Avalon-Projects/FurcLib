@@ -17,6 +17,15 @@ namespace Furcadia.Net.DirectConnection
     /// </summary>
     public class ClientBase
     {
+        #region Protected Internal Fields
+
+        /// <summary>
+        /// Furcadia Utilities
+        /// </summary>
+        protected internal Utils.Utilities FurcadiaUtilities;
+
+        #endregion Protected Internal Fields
+
         #region Event Handling
 
         /// <summary>
@@ -115,7 +124,7 @@ namespace Furcadia.Net.DirectConnection
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
             try
             {
-                _endpoint = new IPEndPoint(Dns.GetHostEntry(Utilities.GameServerHost).AddressList[0], port);
+                _endpoint = new IPEndPoint(Dns.GetHostEntry(FurcadiaUtilities.GameServerHost).AddressList[0], port);
             }
             catch { }
         }
@@ -129,7 +138,7 @@ namespace Furcadia.Net.DirectConnection
             FurcPath = new Paths();
             try
             {
-                _endpoint = new IPEndPoint(Dns.GetHostEntry(Utilities.GameServerHost).AddressList[0], port);
+                _endpoint = new IPEndPoint(Dns.GetHostEntry(FurcadiaUtilities.GameServerHost).AddressList[0], port);
             }
             catch { }
         }
@@ -299,7 +308,7 @@ namespace Furcadia.Net.DirectConnection
             try
             {
                 // Connects to the server
-                server = new TcpClient(Utilities.GameServerHost, _endpoint.Port);
+                server = new TcpClient(FurcadiaUtilities.GameServerHost, _endpoint.Port);
                 if (!server.Connected) throw new Exception("There was a problem connecting to the server.");
 
                 server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);

@@ -92,7 +92,7 @@ namespace Furcadia.Net.Pounce
 
         private static int _totalOnline;
         private static ManualResetEvent allDone = new ManualResetEvent(false);
-
+        private static Utils.Utilities FurcadiaUtilities;
         private int _num_dreams_mainmaps;
 
         private string _responseBody;
@@ -100,7 +100,7 @@ namespace Furcadia.Net.Pounce
         /// <summary>
         /// Default URL "http://on.furcadia.com/q/
         /// </summary>
-        private string _url = string.Format("http://{0}/q/", Utilities.PounceServerHost);
+        private string _url = string.Format("http://{0}/q/", FurcadiaUtilities.PounceServerHost);
 
         #endregion Private Fields
 
@@ -121,6 +121,7 @@ namespace Furcadia.Net.Pounce
         /// </param>
         public PounceConnection(string url, string[] shortN_friends, string[] Dreams)
         {
+            FurcadiaUtilities = new Utilities();
             if (!string.IsNullOrEmpty(url))
                 _url = url;
             //Make sure we have some friends.?
@@ -138,7 +139,8 @@ namespace Furcadia.Net.Pounce
         /// </summary>
         public PounceConnection()
         {
-            _url = string.Format("http://{0}/q/", Utilities.PounceServerHost);
+            FurcadiaUtilities = new Utilities();
+            _url = string.Format("http://{0}/", FurcadiaUtilities.PounceServerHost);
             // TODO: Load Online.ini (uses Players List as default
         }
 

@@ -6,7 +6,6 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  */
 
-using Furcadia.Net.Utils;
 using Furcadia.Text;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-
 using static Furcadia.Net.Utils.Utilities;
 
 namespace Furcadia.Net
@@ -40,6 +38,15 @@ namespace Furcadia.Net
     /// </remarks>
     public class NetProxy
     {
+        #region Protected Internal Fields
+
+        /// <summary>
+        /// Furcadia Utilities
+        /// </summary>
+        protected internal Utils.Utilities FurcadiaUtilities;
+
+        #endregion Protected Internal Fields
+
         #region Private Fields
 
         /// <summary>
@@ -134,20 +141,14 @@ namespace Furcadia.Net
         /// </summary>
         private const string SetFile = "settings.ini";
 
-        private static string[] BackupSettings;
-
         /// <summary>
         /// Max buffer size
         /// </summary>
         private static int BUFFER_CAP = 2048;
 
-        /// <summary>
-        /// </summary>
-        private static int ENCODE_PAGE = 1252;
-
         private IPEndPoint _endpoint;
-
         private string _ServerLeftOvers;
+        private string[] BackupSettings;
 
         /// <summary>
         /// Furcadia Client Connection
@@ -157,6 +158,10 @@ namespace Furcadia.Net
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
 
         private string clientBuild, serverBuild;
+
+        /// <summary>
+        /// </summary>
+        private int ENCODE_PAGE = 1252;
 
         private Mutex FurcMutex;
 
@@ -195,12 +200,13 @@ namespace Furcadia.Net
         /// </summary>
         public NetProxy()
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             options.GameServerPort = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
-            _endpoint = ConverHostToIP(Utilities.GameServerHost, options.GameServerPort);
+            _endpoint = ConverHostToIP(FurcadiaUtilities.GameServerHost, options.GameServerPort);
         }
 
         /// <summary>
@@ -209,6 +215,7 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(int port)
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
@@ -229,6 +236,7 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(int port, int lport)
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
@@ -245,6 +253,7 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(string host, int port)
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
@@ -260,6 +269,7 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(Options.ProxyOptions Options)
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = Options;
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
@@ -280,8 +290,8 @@ namespace Furcadia.Net
         /// Localhost port
         /// </param>
         public NetProxy(string host, int port, int lport)
-
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
@@ -298,6 +308,7 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(IPEndPoint endpoint, int lport)
         {
+            FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             options.LocalhostPort = lport;
             settings = new Text.Settings(options.LocalhostPort);
@@ -327,7 +338,7 @@ namespace Furcadia.Net
                 }
                 catch
                 {
-                    return new IPEndPoint(Utilities.GameServerIp, ServerPort);
+                    return new IPEndPoint(FurcadiaUtilities.GameServerIp, ServerPort);
                 }
             }
             return null;
@@ -375,11 +386,11 @@ namespace Furcadia.Net
 
         #endregion Properties
 
-        #region Public Static Properties
+        #region Public  Properties
 
         /// <summary>
         /// </summary>
-        public static int BufferCapacity
+        public int BufferCapacity
         {
             get
             {
@@ -389,7 +400,7 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        public static int EncoderPage
+        public int EncoderPage
         {
             get
             {
@@ -397,7 +408,7 @@ namespace Furcadia.Net
             }
         }
 
-        #endregion Public Static Properties
+        #endregion Public  Properties
 
         #region Public Methods
 
@@ -684,7 +695,7 @@ namespace Furcadia.Net
                 }
                 //listen.Stop();
                 // Connects to the server
-                server = new TcpClient(Utilities.GameServerHost, _endpoint.Port);
+                server = new TcpClient(FurcadiaUtilities.GameServerHost, _endpoint.Port);
                 if (!server.Connected) throw new Exception("There was a problem connecting to the server.");
 
                 client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);

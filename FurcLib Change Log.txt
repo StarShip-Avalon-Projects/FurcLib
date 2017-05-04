@@ -1,0 +1,15 @@
+﻿ff3pp v2 PreAlpha 2
+
+Known Issues:
+Protocol Fragmentation (Server Instructions get Chopped off)
+
+Furcadia File Paths.
+Improving Mono Support
+
+1: Look for the Application Folder for localdir.ini
+2: Read Localdir.ini forFurcadia Install Path...
+3: If those Fail... Fall back to Serching Defalut paths...
+3a: Look for Furcs localdir.ini
+
+App.config Settings
+Configure default settings For DEP Updates

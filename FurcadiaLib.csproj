@@ -84,6 +84,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -111,6 +112,7 @@
     <Compile Include="Net\DirectConnection\NetConnection.cs" />
     <Compile Include="Net\NetProxy.cs" />
     <Compile Include="Net\Options\ClientOptions.cs" />
+    <Compile Include="Net\Options\PouncrOptions.cs" />
     <Compile Include="Net\Options\ProxyOptions.cs" />
     <Compile Include="Net\Options\ProxySessionOptions.cs" />
     <Compile Include="Net\Options\ServerOptions.cs" />
@@ -202,11 +204,17 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyFileVersion1.cs</LastGenOutput>
     </None>
+    <Content Include="FurcLib Change Log.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="FurcadiaFrameWork.pfx" />
+    <None Include="localdir.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

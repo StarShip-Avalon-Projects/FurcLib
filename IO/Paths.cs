@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Furcadia.IO
 {
@@ -29,17 +30,10 @@ namespace Furcadia.IO
     {
         #region Private Fields
 
-        /// <summary>
-        /// Registry path for x86 systems ///
-        /// </summary>
-        private const string RegPathx32 = @"SOFTWARE\Dragon's Eye Productions\Furcadia\";
-
-        /// <summary>
-        /// Registry path for x64 Systems
-        /// </summary>
-        private const string RegPathx64 = @"SOFTWARE\Wow6432Node\Dragon's Eye Productions\Furcadia\";
-
         private static string _cachepath;
+
+        private static string _defaultpatchpath;
+        private static string _dynavpath;
         private static string _FurcadiaCharactersPath = null;
 
         private static string _FurcadiaDocpath;
@@ -51,9 +45,11 @@ namespace Furcadia.IO
         private static string _localsettingspath;
 
         private static string DSC_AppData;
-        private string _defaultpatchpath;
 
-        private string _dynavpath;
+        /// <summary>
+        /// Furcadia Utilities
+        /// </summary>
+        private readonly Net.Utils.Utilities FurcadiaUtilities;
 
         #endregion Private Fields
 
@@ -64,7 +60,9 @@ namespace Furcadia.IO
         /// </summary>
         public Paths()
         {
-            _installpath = null;
+            FurcadiaUtilities = new Net.Utils.Utilities();
+            _installpath = GetLocaldirPath();
+            //Localdir.ini check for our folder?
         }
 
         /// <summary>
@@ -77,6 +75,7 @@ namespace Furcadia.IO
         /// </param>
         public Paths(string path)
         {
+            FurcadiaUtilities = new Net.Utils.Utilities();
             _installpath = path;
         }
 
@@ -110,6 +109,7 @@ namespace Furcadia.IO
         {
             if (!string.IsNullOrEmpty(_cachepath)) return _cachepath;
             else _cachepath = GetLocaldirPath();
+
             if (string.IsNullOrEmpty(_cachepath))
                 _cachepath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                                           "Dragon's Eye Productions",
@@ -138,7 +138,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Patches", false))
                         {
                             if (regkey != null)
                             {
@@ -159,7 +159,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Patches", false))
                         {
                             if (regkey != null)
                             {
@@ -178,7 +178,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
+                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Patches", false))
                         {
                             if (regkey != null)
                             {
@@ -197,7 +197,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
+                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Patches", false))
                         {
                             if (regkey != null)
                             {
@@ -229,9 +229,9 @@ namespace Furcadia.IO
                 if (path == null)
                     path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + GetRegistryPath() + "Patches", "default");
                 if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + RegPathx32 + "Patches", "Default");
+                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + FurcadiaUtilities.ReggistryPathX86 + "Patches", "Default");
                 if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + RegPathx32 + "Patches", "default");
+                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + FurcadiaUtilities.ReggistryPathX86 + "Patches", "default");
             }
             if (Directory.Exists(path))
             {
@@ -250,7 +250,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Patches", false))
                         {
                             if (regkey != null)
                             {
@@ -265,70 +265,27 @@ namespace Furcadia.IO
                     }
                     catch { } //Ditch the Exceptions
                 }
-            }
 
-            // Local Machine Hive with x64 CPU Check
-            using (RegistryKey Hive = Registry.LocalMachine)
-            {
-                try
+                // Local Machine Hive with x64 CPU Check
+                using (RegistryKey Hive = Registry.LocalMachine)
                 {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx64 + "Patches", false))
+                    try
                     {
-                        if (regkey != null)
+                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Patches", false))
                         {
-                            path = regkey.GetValue("default").ToString();
-                            if (Directory.Exists(path))
+                            if (regkey != null)
                             {
-                                _defaultpatchpath = path;
-                                return _defaultpatchpath; // Path found
+                                path = regkey.GetValue("default").ToString();
+                                if (Directory.Exists(path))
+                                {
+                                    _defaultpatchpath = path;
+                                    return _defaultpatchpath; // Path found
+                                }
                             }
                         }
                     }
+                    catch { } //Ditch the Exceptions
                 }
-                catch { } //Ditch the Exceptions
-            }
-            using (RegistryKey Hive = Registry.LocalMachine)
-            {
-                try
-                {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
-                    {
-                        if (regkey != null)
-                        {
-                            path = regkey.GetValue("default").ToString();
-                            if (Directory.Exists(path))
-                            {
-                                _defaultpatchpath = path;
-                                return _defaultpatchpath; // Path found
-                            }
-                        }
-                    }
-                }
-                catch { } //Ditch the Exceptions
-            }
-            using (RegistryKey Hive = Registry.CurrentUser)
-            {
-                try
-                {
-                    using (RegistryKey regkey = Hive.OpenSubKey(RegPathx32 + "Patches", false))
-                    {
-                        if (regkey != null)
-                        {
-                            path = regkey.GetValue("default").ToString();
-                            if (Directory.Exists(path))
-                            {
-                                _defaultpatchpath = path;
-                                return _defaultpatchpath; // Path found
-                            }
-                        }
-                    }
-                    if (Directory.Exists(path))
-                    {
-                        _defaultpatchpath = path;
-                        return _defaultpatchpath; // Path found
-                    }
-                }
-                catch { } //Ditch the Exceptions
             }
 
             #endregion "Mono Runtime"
@@ -408,8 +365,20 @@ namespace Furcadia.IO
         public string GetInstallPath()
         {
             //If path already found return it.
-            if (!string.IsNullOrEmpty(_installpath)) return _installpath;
-            string path = null;
+            if (!string.IsNullOrEmpty(_installpath))
+                if (File.Exists(Path.Combine(_installpath, FurcadiaUtilities.DefaultClient)))
+                {
+                    return _installpath;
+                }
+            // First Check Our application folder for localdir.ini
+
+            string path = GetLocaldirPath();
+            if (!string.IsNullOrEmpty(path))
+                if (File.Exists(Path.Combine(path, FurcadiaUtilities.DefaultClient)))
+                {
+                    _installpath = _localdirpath;
+                    return _installpath;
+                }
 
             // Checking registry for a path (WINDOWS ONLY)
             if (Environment.OSVersion.Platform == PlatformID.Win32Windows ||
@@ -422,7 +391,7 @@ namespace Furcadia.IO
                     {
                         try
                         {
-                            using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                            using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Programs", false))
                                 if (regkeyPath != null)
                                 {
                                     path = regkeyPath.GetValue("path").ToString();
@@ -441,7 +410,7 @@ namespace Furcadia.IO
                     {
                         try
                         {
-                            using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                            using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Programs", false))
                                 if (regkeyPath != null)
                                 {
                                     path = regkeyPath.GetValue("path").ToString();
@@ -461,7 +430,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Programs", false))
                         {
                             if (regkeyPath != null)
                             {
@@ -481,7 +450,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Programs", false))
                         {
                             if (regkeyPath != null)
                             {
@@ -512,9 +481,9 @@ namespace Furcadia.IO
                 if (path == null)
                     path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + GetRegistryPath().Replace("\\", "/") + "Programs", "Path");
                 if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + RegPathx32.Replace("\\", "/") + "Programs", "Path");
+                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + FurcadiaUtilities.ReggistryPathX86.Replace("\\", "/") + "Programs", "Path");
                 if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + RegPathx32.Replace("\\", "/") + "Programs", "Path");
+                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + FurcadiaUtilities.ReggistryPathX86.Replace("\\", "/") + "Programs", "Path");
                 if (Directory.Exists(path))
                 {
                     _installpath = path;
@@ -534,7 +503,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Programs", false))
                             if (regkeyPath != null)
                             {
                                 path = regkeyPath.GetValue("path").ToString();
@@ -553,7 +522,7 @@ namespace Furcadia.IO
                 {
                     try
                     {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx64 + "Programs", false))
+                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Programs", false))
                             if (regkeyPath != null)
                             {
                                 path = regkeyPath.GetValue("path").ToString();
@@ -567,46 +536,6 @@ namespace Furcadia.IO
                     catch { } //Ditch the Exceptions
                 }
 
-                // Current User Hive with x64 CPU Check Failed
-                using (RegistryKey Hive = Registry.CurrentUser)
-                {
-                    try
-                    {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
-                        {
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _installpath = path;
-                                    return _installpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    using (RegistryKey regkeyPath = Hive.OpenSubKey(RegPathx32 + "Programs", false))
-                    {
-                        try
-                        {
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _installpath = path;
-                                    return _installpath; // Path found
-                                }
-                            }
-                        }
-                        catch { } //Ditch the Exceptions
-                    }
-                }
                 // All options were exhausted - assume Furcadia not installed.
                 if (Directory.Exists(path))
                 {
@@ -614,6 +543,7 @@ namespace Furcadia.IO
                     return _installpath; // Path found
                 }
             }
+
             throw new FurcadiaNotFoundException("Furcadia Install path not found.");
 
             #endregion "Mono Runtime"
@@ -626,33 +556,36 @@ namespace Furcadia.IO
         /// <returns>
         /// Path to the data folder from localdir.ini or null if not found.
         /// </returns>
-        public string GetLocaldirPath()
+        public string GetLocaldirPath(string ini_path = null)
         {
-            if (!string.IsNullOrEmpty(_localdirpath)) return _localdirpath;
-            string path;
-            string install_path = GetInstallPath();
+            if (!string.IsNullOrEmpty(_localdirpath) && ini_path == null) return _localdirpath;
 
-            // If we can't find Furc, we won't find localdir.ini
-            if (install_path == null)
-                return null; // Furcadia install path not found.
-
-            // Try to locate localdir.ini
-            string ini_path = string.Format("{0}/localdir.ini", install_path);
-            if (!File.Exists(ini_path))
-                return null; // localdir.ini not found - regular path structure applies.
-
-            // Read localdir.ini for remote path and verify it.
-            using (StreamReader sr = new StreamReader(ini_path))
+            if (ini_path == null)
+                ini_path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string path = null;
+            if (ini_path != null)
             {
-                path = sr.ReadLine();
-                if (!string.IsNullOrEmpty(path))
-                    path = path.Trim();
-                sr.Close();
+                ini_path = Path.Combine(ini_path, "localdir.ini");
             }
-            if (string.IsNullOrEmpty(path))
-                path = install_path;
-            if (!Directory.Exists(path))
-                throw new DirectoryNotFoundException("Path not found in localdir.ini"); // localdir.ini found, but the path in it is missing.
+            if (File.Exists(ini_path))
+            {
+                // Read localdir.ini for remote path and verify it.
+
+                using (StreamReader sr = new StreamReader(ini_path))
+                {
+                    // Read and display lines from the file until the end of
+                    // the file is reached.
+                    path = sr.ReadLine();
+                    sr.Close();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                path = path.Trim();
+                if (File.Exists(Path.Combine(path, FurcadiaUtilities.DefaultClient)))
+                    _installpath = path;
+            }
             _localdirpath = path;
             return _localdirpath; // Localdir path found!
         }
@@ -689,9 +622,9 @@ namespace Furcadia.IO
         {
             if (Environment.Is64BitOperatingSystem)
             {
-                return RegPathx64;
+                return FurcadiaUtilities.ReggistryPathX64;
             }
-            return RegPathx32;
+            return FurcadiaUtilities.ReggistryPathX86;
         }
 
         #endregion Public Methods

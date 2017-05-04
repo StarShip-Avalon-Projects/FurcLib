@@ -7,7 +7,6 @@
     {
         #region Private Fields
 
-        private static IO.Paths FurcPath;
         private string characterini;
 
         /// <summary>
@@ -19,15 +18,6 @@
         /// LocalHost port
         /// </summary>
         private int localhostport;
-
-        /// <summary>
-        /// Furcadia File Paths
-        /// </summary>
-        public IO.Paths FurcadiaFilePaths
-        {
-            get { return FurcPath; }
-            set { FurcPath = value; }
-        }
 
         #endregion Private Fields
 
@@ -57,11 +47,10 @@
         /// <see cref="furcprocess"/> = "Furcadia.exe"
         /// </para>
         /// </summary>
-        public ProxyOptions()
+        public ProxyOptions() : base()
         {
             localhostport = 6700;
-            furcprocess = @"Furcadia.exe";
-            FurcPath = new IO.Paths();
+            furcprocess = FurcadiaUtilities.DefaultClient;
         }
 
         #endregion Public Constructors
@@ -105,23 +94,14 @@
             {
                 if (string.IsNullOrEmpty(furcinstallpath))
                 {
-                    FurcPath = new IO.Paths();
-                    furcinstallpath = FurcPath.GetInstallPath();
+                    furcinstallpath = FurcadiaFilePaths.GetInstallPath();
                 }
                 return furcinstallpath;
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    FurcPath = new IO.Paths();
-                    furcinstallpath = FurcPath.GetInstallPath();
-                }
-                else
-                {
-                    FurcPath = new IO.Paths(value);
-                    furcinstallpath = FurcPath.GetInstallPath();
-                }
+                FurcadiaFilePaths = new IO.Paths(value);
+                furcinstallpath = FurcadiaFilePaths.GetInstallPath();
             }
         }
 
