@@ -1,7 +1,6 @@
 using Microsoft.Win32;
 using System;
 using System.IO;
-using System.Reflection;
 
 namespace Furcadia.IO
 {
@@ -30,92 +29,487 @@ namespace Furcadia.IO
     {
         #region Private Fields
 
-        private static string _cachepath;
-
-        private static string _defaultpatchpath;
-        private static string _dynavpath;
-        private static string _FurcadiaCharactersPath = null;
-
-        private static string _FurcadiaDocpath;
-
-        private static string _installpath;
-
-        private static string _localdirpath;
-
-        private static string _localsettingspath;
-
-        private static string DSC_AppData;
-
-        /// <summary>
-        /// Furcadia Utilities
-        /// </summary>
-        private readonly Net.Utils.Utilities FurcadiaUtilities;
+        private Net.Utils.Utilities FurcadiaUtilities;
 
         #endregion Private Fields
 
-        #region Constructors
+        #region Public Constructors
 
-        /// <summary>
-        /// Defines the base path for the Furcadia Directory
-        /// </summary>
         public Paths()
         {
             FurcadiaUtilities = new Net.Utils.Utilities();
-            _installpath = GetLocaldirPath();
-            //Localdir.ini check for our folder?
+            sLocaldirPath = GetFurcadiaLocaldirPath();
         }
 
-        /// <summary>
-        /// Defines the base path for the Furcadia Directory Throws
-        /// FurcadiaNotFound exception if furcadia.exe cannot be found in
-        /// specified path
-        /// </summary>
-        /// <param name="path">
-        /// the selected filepath for the Furcadia Installation.
-        /// </param>
         public Paths(string path)
         {
             FurcadiaUtilities = new Net.Utils.Utilities();
-            _installpath = path;
+            sLocaldirPath = GetFurcadiaLocaldirPath();
         }
 
-        #endregion Constructors
+        #endregion Public Constructors
+
+
+
+        #region Private Fields
+
+        // Storing localdir upon class generation so the information is
+        // cached. Otherwise, each property would have to look up localdir separately.
+        private string sLocaldirPath;
+
+        #endregion Private Fields
+
+        #region Public Properties
+
+        /// <summary>
+        /// Cache path - contains all the Furcadia cache and resides in the
+        /// global user space.
+        ///
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia
+        /// </summary>
+        public string CachePath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\tmp" : DefaultCachePath;
+            }
+        }
+
+        /// <summary>
+        /// Character file path - contains furcadia.ini files with login
+        /// information for each character.
+        ///
+        /// Default: My Documents\Furcadia\Furcadia Characters\
+        /// </summary>
+        public string CharacterPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath : DefaultCharacterPath;
+            }
+        }
+
+        //--- FURCADIA CACHE ------------------------------------------------//
+        public string DefaultCachePath
+        {
+            get
+            {
+                return System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) +
+                    @"\Dragon's Eye Productions\Furcadia";
+            }
+        }
+
+        public string DefaultCharacterPath
+        {
+            get
+            {
+                return DefaultPersonalDataPath + @"\Furcadia Characters";
+            }
+        }
+
+        public string DefaultDreamsPath
+        {
+            get
+            {
+                return DefaultPersonalDataPath + @"\Dreams";
+            }
+        }
+
+        /// <summary>
+        /// Default Furcadia install folder - this path is used by default
+        /// to install Furcadia to.
+        ///
+        /// Default: c:\Program Files\Furcadia
+        /// </summary>
+        public string DefaultFurcadiaPath
+        {
+            get
+            {
+                if (Environment.Is64BitOperatingSystem)
+                    return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
+                         @"\Furcadia";
+                return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) +
+                    @"\Furcadia";
+            }
+        }
+
+        public string DefaultGlobalMapsPath
+        {
+            get
+            {
+                return DefaultFurcadiaPath + @"\maps";
+            }
+        }
+
+        public string DefaultGlobalSkinsPath
+        {
+            get
+            {
+                return DefaultFurcadiaPath + @"\skins";
+            }
+        }
+
+        public string DefaultLocalSkinsPath
+        {
+            get
+            {
+                return DefaultPersonalDataPath + @"\Skins";
+            }
+        }
+
+        public string DefaultLogsPath
+        {
+            get
+            {
+                return DefaultPersonalDataPath + @"\Logs";
+            }
+        }
+
+        /// <summary>
+        /// Path to the default patch (graphics, sounds, layout) folder used
+        /// to display Furcadia itself, its tools and environment.
+        ///
+        /// Default: c:\Program Files\Furcadia\patches\default
+        /// </summary>
+        public string DefaultPatchPath
+        {
+            get
+            {
+                return GetDefaultPatchPath();
+            }
+        }
+
+        public string DefaultPermanentMapsCachePath
+        {
+            get
+            {
+                return DefaultCachePath + @"\Permanent Maps";
+            }
+        }
+
+        public string DefaultPersonalDataPath
+        {
+            get
+            {
+                return System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                    @"\Furcadia";
+            }
+        }
+
+        public string DefaultPortraitCachePath
+        {
+            get
+            {
+                return DefaultCachePath + @"\Portrait Cache";
+            }
+        }
+
+        public string DefaultScreenshotsPath
+        {
+            get
+            {
+                return DefaultPersonalDataPath + @"\Screenshots";
+            }
+        }
+
+        public string DefaultSettingsPath
+        {
+            get
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
+                    @"\Dragon's Eye Productions\Furcadia";
+            }
+        }
+
+        public string DefaultTemporaryDreamsPath
+        {
+            get
+            {
+                return DefaultCachePath + @"\Temporary Dreams";
+            }
+        }
+
+        public string DefaultTemporaryFilesPath
+        {
+            get
+            {
+                return DefaultCachePath + @"\Temporary Files";
+            }
+        }
+
+        public string DefaultTemporaryPatchesPath
+        {
+            get
+            {
+                return DefaultCachePath + @"\Temporary Patches";
+            }
+        }
+
+        public string DefaultWhisperLogsPath
+        {
+            get
+            {
+                return DefaultLogsPath + @"\Whispers";
+            }
+        }
+
+        /// <summary>
+        /// Dreams path - contains Furcadia dreams made by the player.
+        ///
+        /// Default: My Documents\Furcadia\Dreams
+        /// </summary>
+        public string DreamsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath : DefaultDreamsPath;
+            }
+        }
+
+        /// <summary>
+        /// Furcadia Localdir path - this path (when explicitly set),
+        /// indicates the whereabouts of the data files used in Furcadia. If
+        /// localdir.ini is present in the Furcadia folder, Furcadia.exe
+        /// will load those files from the specific path and not the regular ones.
+        ///
+        /// Default: -NONE-
+        /// </summary>
+        public string FurcadiaLocaldirPath
+        {
+            get
+            {
+                return GetFurcadiaLocaldirPath();
+            }
+        }
+
+        //--- FURCADIA PROGRAM FILES ----------------------------------------//
+        /// <summary>
+        /// Furcadia install path - this path corresponds to the path where
+        /// Furcadia is installed on the current machine. If Furcadia is not
+        /// found, this property will be null.
+        /// </summary>
+        public string FurcadiaPath
+        {
+            get
+            {
+                return GetFurcadiaInstallPath();
+            }
+        }
+
+        /// <summary>
+        /// Path to the global maps, distributed with Furcadia and loadable
+        /// during gameplay in some main dreams.
+        ///
+        /// Default: c:\Program Files\Furcadia\maps
+        /// </summary>
+        public string GlobalMapsPath
+        {
+            get
+            {
+                string path = FurcadiaPath;
+                return (path != null) ? path + @"\maps" : null;
+            }
+        }
+
+        /// <summary>
+        /// Path to the global skins that change Furcadia's graphical
+        /// layout. They are stored in the Furcadia program files folder.
+        ///
+        /// Default: c:\Program Files\Furcadia\skins
+        /// </summary>
+        public string GlobalSkinsPath
+        {
+            get
+            {
+                string path = FurcadiaPath;
+                return (path != null) ? path + @"\skins" : null;
+            }
+        }
+
+        /// <summary>
+        /// LocalDir path - a specific path where all the player-specific
+        /// and cache data is stored in its classic form. Used mainly to
+        /// retain the classic path structure or to run Furcadia from a
+        /// removable disk.
+        /// </summary>
+        public string LocaldirPath
+        {
+            get
+            {
+                return GetFurcadiaLocaldirPath();
+            }
+        }
+
+        /// <summary>
+        /// Local skins path - contains Furcadia skins used locally by each user.
+        ///
+        /// Default: My Documents\Furcadia\Skins
+        /// </summary>
+        public string LocalSkinsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\skins" : DefaultLocalSkinsPath;
+            }
+        }
+
+        /// <summary>
+        /// Logs path - contains session logs for each character and a
+        /// subfolder with whisper logs, should Pounce be enabled.
+        ///
+        /// Default: My Documents\Furcadia\Logs
+        /// </summary>
+        public string LogsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\logs" : DefaultLogsPath;
+            }
+        }
+
+        /// <summary>
+        /// Permanent Maps cache path - contains downloaded main maps such
+        /// as the festival maps or other DEP-specific customized dreams.
+        ///
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
+        ///          Productions\Furcadia\Permanent Maps
+        /// </summary>
+        public string PermanentMapsCachePath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\maps" : DefaultPermanentMapsCachePath;
+            }
+        }
+
+        /// <summary>
+        /// Personal data path - contains user-specific files such as logs,
+        /// patches, screenshots and character files.
+        ///
+        /// Default: My Documents\Furcadia\
+        /// </summary>
+        public string PersonalDataPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath : DefaultPersonalDataPath;
+            }
+        }
+
+        /// <summary>
+        /// Portrait cache path - contains downloaded portraits and desctags
+        /// cache for faster loading and bandwidth optimization.
+        ///
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
+        ///          Productions\Furcadia\Portrait Cache
+        /// </summary>
+        public string PortraitCachePath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\portraits" : DefaultPortraitCachePath;
+            }
+        }
+
+        /// <summary>
+        /// Screenshots path - contains screen shot files taken by Furcadia
+        /// with the CTRL+F1 hotkey. At the time of writing, in PNG format.
+        ///
+        /// Default: My Documents\Furcadia\Screenshots
+        /// </summary>
+        public string ScreenshotsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\screenshots" : DefaultScreenshotsPath;
+            }
+        }
+
+        /// <summary>
+        /// Personal settings path - contains all the Furcadia settings for
+        /// each user that uses it.
+        ///
+        /// Default (VISTA+): %USERPROFILE%\Local\AppData\Dragon's Eye Productions\Furcadia
+        /// </summary>
+        public string SettingsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? sLocaldirPath + @"\settings" : DefaultSettingsPath;
+            }
+        }
+
+        /// <summary>
+        /// Temporary dreams path - contains downloaded player dreams for
+        /// subsequent loading.
+        ///
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
+        ///          Productions\Furcadia\Temporary Dreams
+        /// </summary>
+        public string TemporaryDreamsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? CachePath : DefaultTemporaryDreamsPath;
+            }
+        }
+
+        /// <summary>
+        /// Temporary files path - contains downloaded and uploaded files
+        /// that are either used to upload packages or download them for extraction.
+        ///
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
+        ///          Productions\Furcadia\Temporary Files
+        /// </summary>
+        public string TemporaryFilesPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? CachePath : DefaultTemporaryFilesPath;
+            }
+        }
+
+        /// <summary>
+        /// Temporary patch path - contains downloaded temporary patches.
+        /// This technology is never in use, yet supported, so this folder
+        /// is always empty.
+        ///
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
+        ///          Productions\Furcadia\Temporary Patches
+        /// </summary>
+        public string TemporaryPatchesPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? CachePath : DefaultTemporaryPatchesPath;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public bool UsingLocaldir
+        {
+            get { return (sLocaldirPath != null); }
+        }
+
+        //--- FURCADIA PERSONALIZED FILES -----------------------------------//
+        /// <summary>
+        /// Whisper logs path - contains whisper logs for each character
+        /// whispered, recorded by Pounce with the whisper windows.
+        ///
+        /// Default: My Documents\Furcadia\Logs\Whispers
+        /// </summary>
+        public string WhisperLogsPath
+        {
+            get
+            {
+                return (UsingLocaldir) ? LogsPath + @"\whispers" : DefaultWhisperLogsPath;
+            }
+        }
+
+        #endregion Public Properties
 
         #region Public Methods
-
-        /// <summary>
-        /// Determines the registry path by platform. (x32/x64) Thanks to
-        /// Ioka for this one.
-        /// </summary>
-        /// <returns>
-        /// A path to the Furcadia registry folder or NullReferenceException.
-        /// </returns>
-        public static string ProgramFilesX86()
-        {
-            if (Environment.Is64BitOperatingSystem)
-            {
-                return Environment.GetEnvironmentVariable("ProgramFiles(x86)");
-            }
-            return Environment.GetEnvironmentVariable("ProgramFiles");
-        }
-
-        /// <summary>
-        /// Get the All Users Application Data path for Furcadia.
-        /// </summary>
-        /// <returns>
-        /// All Users Application Data path for Furcadia.
-        /// </returns>
-        public string GetCachePath()
-        {
-            if (!string.IsNullOrEmpty(_cachepath)) return _cachepath;
-            else _cachepath = GetLocaldirPath();
-
-            if (string.IsNullOrEmpty(_cachepath))
-                _cachepath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                                          "Dragon's Eye Productions",
-                                          "Furcadia");
-            return _cachepath;
-        }
 
         /// <summary>
         /// Find the path to the default patch folder on the current machine.
@@ -125,428 +519,111 @@ namespace Furcadia.IO
         /// </returns>
         public string GetDefaultPatchPath()
         {
-            //If path already found return it.
-            if (!string.IsNullOrEmpty(_defaultpatchpath)) return _defaultpatchpath;
             string path;
 
             // Checking registry for a path first of all.
-            if (Environment.OSVersion.Platform == PlatformID.Win32Windows ||
-                Environment.OSVersion.Platform == PlatformID.Win32NT)
+            RegistryKey regkey = Registry.LocalMachine;
+            try
             {
-                // Current Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.CurrentUser)
-                {
-                    try
-                    {
-                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Patches", false))
-                        {
-                            if (regkey != null)
-                            {
-                                path = regkey.GetValue("default").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _defaultpatchpath = path;
-                                    return _defaultpatchpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { }//Ditch the Exceptions
-                }
-
-                // Local Machine Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    try
-                    {
-                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Patches", false))
-                        {
-                            if (regkey != null)
-                            {
-                                path = regkey.GetValue("default").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _defaultpatchpath = path;
-                                    return _defaultpatchpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { }//Ditch the Exceptions
-                }
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    try
-                    {
-                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Patches", false))
-                        {
-                            if (regkey != null)
-                            {
-                                path = regkey.GetValue("default").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _defaultpatchpath = path;
-                                    return _defaultpatchpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-                using (RegistryKey Hive = Registry.CurrentUser)
-                {
-                    try
-                    {
-                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Patches", false))
-                        {
-                            if (regkey != null)
-                            {
-                                path = regkey.GetValue("default").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _defaultpatchpath = path;
-                                    return _defaultpatchpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                // Making a guess from the FurcadiaPath or
-                // FurcadiaDefaultPath property.
-                path = GetInstallPath();
-                if (string.IsNullOrEmpty(path))
-                    path = Path.Combine(ProgramFilesX86(), "Furcadia");
-
-                path = Path.Combine(path, "patches", "default");
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86, false);
+                path = regkey.GetValue("default").ToString();
+                regkey.Close();
+                if (System.IO.Directory.Exists(path))
+                    return path; // Path found
             }
-            else
+            catch
             {
-                // Search Wine paths if Wine is used
-                //TODO: Check c# Client
-                path = RegistryExplorerForWine.ReadSubKey("HKEY_LOCAL_MACHINE\\" + GetRegistryPath() + "Patches", "default");
-                if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + GetRegistryPath() + "Patches", "default");
-                if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + FurcadiaUtilities.ReggistryPathX86 + "Patches", "Default");
-                if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + FurcadiaUtilities.ReggistryPathX86 + "Patches", "default");
             }
-            if (Directory.Exists(path))
+            try
             {
-                _defaultpatchpath = path;
-                return _defaultpatchpath; // Path found
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64, false);
+                path = regkey.GetValue("default").ToString();
+                regkey.Close();
+                if (System.IO.Directory.Exists(path))
+                    return path; // Path found
             }
-
-            #region "Mono Runtime"
-
-            //Prep for c# Client Mono install
-            Type t = Type.GetType("Mono.Runtime");
-            if (t != null)
+            catch
             {
-                // Current Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.CurrentUser)
-                {
-                    try
-                    {
-                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Patches", false))
-                        {
-                            if (regkey != null)
-                            {
-                                path = regkey.GetValue("default").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _defaultpatchpath = path;
-                                    return _defaultpatchpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                // Local Machine Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    try
-                    {
-                        using (RegistryKey regkey = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Patches", false))
-                        {
-                            if (regkey != null)
-                            {
-                                path = regkey.GetValue("default").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _defaultpatchpath = path;
-                                    return _defaultpatchpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
             }
+            try
+            {
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono, false);
+                path = regkey.GetValue("default").ToString();
+                regkey.Close();
+                if (System.IO.Directory.Exists(path))
+                    return path; // Path found
+            }
+            catch
+            {
+            }
+            // Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
+            path = FurcadiaPath;
+            if (path == null)
+                path = DefaultFurcadiaPath;
 
-            #endregion "Mono Runtime"
+            path += @"\patches\default";
+
+            if (System.IO.Directory.Exists(path))
+                return path; // Path found
 
             // All options were exhausted - assume Furcadia not installed.
-            throw new DirectoryNotFoundException("Furcadia Install path not found.");
+            return null;
         }
 
-        /// <summary>
-        /// Get the All Dynamic Avatar path for Furcadia.
-        /// </summary>
-        /// <returns>
-        /// All Dynamic Avatar path for Furcadia.
-        /// </returns>
-        public string GetDynAvatarPath()
-        {
-            if (!string.IsNullOrEmpty(_dynavpath)) return _dynavpath;
-            else _dynavpath = GetLocaldirPath();
-            if (string.IsNullOrEmpty(_dynavpath))
-                _dynavpath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                                          "Dragon's Eye Productions",
-                                           "Furcadia",
-                                           "Dynamic Avatars");
-            return _dynavpath;
-        }
-
-        /// <summary>
-        /// Gets the location of the Furcadia Character Files
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> containing the location of
-        /// Furcadia Characters folder in "My Documents".
-        /// </returns>
-        public string GetFurcadiaCharactersPath()
-        {
-            if (!string.IsNullOrEmpty(_FurcadiaCharactersPath)) return _FurcadiaCharactersPath;
-            string path = Path.Combine(GetFurcadiaDocPath(), "Furcadia Characters");
-            if (!Directory.Exists(path))
-                path = GetFurcadiaDocPath();
-            if (Directory.Exists(path))
-            {
-                _FurcadiaCharactersPath = path;
-                return _FurcadiaCharactersPath;
-            }
-            throw new FurcadiaNotFoundException("Furcadia Characters path not found.");
-        }
-
-        /// <summary>
-        /// Gets the location of the Furcadia folder located in "My Documents"
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> containing the location of
-        /// Furcadia folder in "My Documents".
-        /// </returns>
-        public string GetFurcadiaDocPath()
-        {
-            if (!string.IsNullOrEmpty(_FurcadiaDocpath)) return _FurcadiaDocpath;
-            string path = GetLocaldirPath();
-            if (string.IsNullOrEmpty(path))
-                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                                    "Furcadia");
-
-            if (Directory.Exists(path))
-            {
-                _FurcadiaDocpath = path;
-                return _FurcadiaDocpath;
-            }
-            throw new FurcadiaNotFoundException("Furcadia documents path not found.");
-        }
-
+        //--- FURCADIA PERSONALIZED SETTINGS --------------------------------//
+        //---  Functions ---//
         /// <summary>
         /// Find the path to Furcadia data files currently installed on this system.
         /// </summary>
         /// <returns>
         /// Path to the Furcadia program folder or null if not found/not installed.
         /// </returns>
-        public string GetInstallPath()
+        public string GetFurcadiaInstallPath()
         {
-            //If path already found return it.
-            if (!string.IsNullOrEmpty(_installpath))
-                if (File.Exists(Path.Combine(_installpath, FurcadiaUtilities.DefaultClient)))
-                {
-                    return _installpath;
-                }
-            // First Check Our application folder for localdir.ini
+            string path;
 
-            string path = GetLocaldirPath();
-            if (!string.IsNullOrEmpty(path))
-                if (File.Exists(Path.Combine(path, FurcadiaUtilities.DefaultClient)))
-                {
-                    _installpath = _localdirpath;
-                    return _installpath;
-                }
-
-            // Checking registry for a path (WINDOWS ONLY)
-            if (Environment.OSVersion.Platform == PlatformID.Win32Windows ||
-                Environment.OSVersion.Platform == PlatformID.Win32NT)
+            // Checking registry for a path first of all.
+            RegistryKey regkey = Registry.LocalMachine;
+            try
             {
-                // Current User Hive with x64 CPU Check
-                if (Environment.Is64BitOperatingSystem)
-                {
-                    using (RegistryKey Hive = Registry.CurrentUser)
-                    {
-                        try
-                        {
-                            using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Programs", false))
-                                if (regkeyPath != null)
-                                {
-                                    path = regkeyPath.GetValue("path").ToString();
-                                    if (Directory.Exists(path))
-                                    {
-                                        _installpath = path;
-                                        return _installpath; // Path found
-                                    }
-                                }
-                        }
-                        catch { } //Ditch the Exceptions
-                    }
-
-                    // Local Machine Hive with x64 CPU Check
-                    using (RegistryKey Hive = Registry.LocalMachine)
-                    {
-                        try
-                        {
-                            using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + "Programs", false))
-                                if (regkeyPath != null)
-                                {
-                                    path = regkeyPath.GetValue("path").ToString();
-                                    if (Directory.Exists(path))
-                                    {
-                                        _installpath = path;
-                                        return _installpath; // Path found
-                                    }
-                                }
-                        }
-                        catch { } //Ditch the Exceptions
-                    }
-                }
-
-                // Current User Hive with x86 CPU Check Failed
-                using (RegistryKey Hive = Registry.CurrentUser)
-                {
-                    try
-                    {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Programs", false))
-                        {
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _installpath = path;
-                                    return _installpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    try
-                    {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + "Programs", false))
-                        {
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _installpath = path;
-                                    return _installpath; // Path found
-                                }
-                            }
-                        }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                // Making a guess from the FurcadiaDefaultPath property.
-                path = Path.Combine(ProgramFilesX86(), "Furcadia");
-                if (Directory.Exists(path))
-                {
-                    _installpath = path;
-                    return _installpath; // Path found
-                }
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64, false);
+                path = regkey.GetValue("Path").ToString();
+                regkey.Close();
+                if (System.IO.Directory.Exists(path))
+                    return path; // Path found
             }
-            // Scanning registry for a path (NON-WINDOWS ONLY)
-            else
+            catch
             {
-                path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + GetRegistryPath().Replace("\\", "/") + "Programs", "Path");
-                if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + GetRegistryPath().Replace("\\", "/") + "Programs", "Path");
-                if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_LOCAL_MACHINE\\" + FurcadiaUtilities.ReggistryPathX86.Replace("\\", "/") + "Programs", "Path");
-                if (path == null)
-                    path = RegistryExplorerForWine.ReadSubKey("\\HKEY_CURRENT_USER\\" + FurcadiaUtilities.ReggistryPathX86.Replace("\\", "/") + "Programs", "Path");
-                if (Directory.Exists(path))
-                {
-                    _installpath = path;
-                    return _installpath; // Path found
-                }
             }
-
-            #region "Mono Runtime"
-
-            //Prep for c# Client Mono install
-            // Wine don't have the registry lets Try Mono
-            Type t = Type.GetType("Mono.Runtime");
-            if (t != null)
+            try
             {
-                // Current User Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.CurrentUser)
-                {
-                    try
-                    {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Programs", false))
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _installpath = path;
-                                    return _installpath; // Path found
-                                }
-                            }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                // Local Machine Hive with x64 CPU Check
-                using (RegistryKey Hive = Registry.LocalMachine)
-                {
-                    try
-                    {
-                        using (RegistryKey regkeyPath = Hive.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + "Programs", false))
-                            if (regkeyPath != null)
-                            {
-                                path = regkeyPath.GetValue("path").ToString();
-                                if (Directory.Exists(path))
-                                {
-                                    _installpath = path;
-                                    return _installpath; // Path found
-                                }
-                            }
-                    }
-                    catch { } //Ditch the Exceptions
-                }
-
-                // All options were exhausted - assume Furcadia not installed.
-                if (Directory.Exists(path))
-                {
-                    _installpath = path;
-                    return _installpath; // Path found
-                }
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86, false);
+                path = regkey.GetValue("Path").ToString();
+                regkey.Close();
+                if (System.IO.Directory.Exists(path))
+                    return path; // Path found
             }
+            catch
+            {
+            }
+            try
+            {
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono, false);
+                path = regkey.GetValue("Path").ToString();
+                regkey.Close();
+                if (System.IO.Directory.Exists(path))
+                    return path; // Path found
+            }
+            catch
+            {
+            }
+            // Making a guess from the FurcadiaDefaultPath property.
+            path = DefaultFurcadiaPath;
+            if (System.IO.Directory.Exists(path))
+                return path; // Path found
 
-            throw new FurcadiaNotFoundException("Furcadia Install path not found.");
-
-            #endregion "Mono Runtime"
+            // All options were exhausted - assume Furcadia not installed.
+            return null;
         }
 
         /// <summary>
@@ -556,75 +633,36 @@ namespace Furcadia.IO
         /// <returns>
         /// Path to the data folder from localdir.ini or null if not found.
         /// </returns>
-        public string GetLocaldirPath(string ini_path = null)
+        public string GetFurcadiaLocaldirPath()
         {
-            if (!string.IsNullOrEmpty(_localdirpath) && ini_path == null) return _localdirpath;
+            string path;
+            string install_path = FurcadiaPath;
 
-            if (ini_path == null)
-                ini_path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string path = null;
-            if (ini_path != null)
-            {
-                ini_path = Path.Combine(ini_path, "localdir.ini");
-            }
-            if (File.Exists(ini_path))
-            {
-                // Read localdir.ini for remote path and verify it.
+            sLocaldirPath = null; // Reset in case we don't find it.
 
-                using (StreamReader sr = new StreamReader(ini_path))
-                {
-                    // Read and display lines from the file until the end of
-                    // the file is reached.
-                    path = sr.ReadLine();
-                    sr.Close();
-                }
+            // If we can't find Furc, we won't find localdir.ini
+            if (install_path == null)
+                return null; // Furcadia install path not found.
+
+            // Try to locate localdir.ini
+            string ini_path = String.Format("{0}\\localdir.ini", install_path);
+            if (!System.IO.File.Exists(ini_path))
+                return null; // localdir.ini not found - regular path structure applies.
+
+            // Read localdir.ini for remote path and verify it.
+            using (StreamReader sr = new StreamReader(ini_path))
+            {
+                path = sr.ReadLine();
+                path.Trim();
+                sr.Close();
             }
 
-            if (!string.IsNullOrEmpty(path))
-            {
-                path = path.Trim();
-                if (File.Exists(Path.Combine(path, FurcadiaUtilities.DefaultClient)))
-                    _installpath = path;
-            }
-            _localdirpath = path;
-            return _localdirpath; // Localdir path found!
-        }
+            if (!System.IO.Directory.Exists(path))
+                return null; // localdir.ini found, but the path in it is missing.
 
-        /// <summary>
-        /// Get the path to the Local settings directory for Furcadia.
-        /// </summary>
-        /// <returns>
-        /// Furcadia local settings directory.
-        /// </returns>
-        public string GetLocalSettingsPath()
-        {
-            if (!string.IsNullOrEmpty(_localsettingspath)) return _localsettingspath;
-            else
-            {
-                string p = GetLocaldirPath();
-                if (!string.IsNullOrEmpty(p))
-                    _localsettingspath = Path.Combine(p, "settings");
-            }
-            if (string.IsNullOrEmpty(GetLocaldirPath()))
-                _localsettingspath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Dragon's Eye Productions", "Furcadia");
-            return _localsettingspath;
-        }
+            sLocaldirPath = path; // Cache for the class use.
 
-        /// <summary>
-        /// Determines the registry path by platform. (x32/x64) Thanks to
-        /// Ioka for this one.
-        /// </summary>
-        /// <returns>
-        /// A path to the Furcadia registry folder.
-        /// </returns>
-        public string GetRegistryPath()
-        {
-            if (Environment.Is64BitOperatingSystem)
-            {
-                return FurcadiaUtilities.ReggistryPathX64;
-            }
-            return FurcadiaUtilities.ReggistryPathX86;
+            return sLocaldirPath; // Localdir path found!
         }
 
         #endregion Public Methods

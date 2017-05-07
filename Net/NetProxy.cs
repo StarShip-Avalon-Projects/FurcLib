@@ -203,7 +203,7 @@ namespace Furcadia.Net
             FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             options.GameServerPort = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
             _endpoint = ConverHostToIP(FurcadiaUtilities.GameServerHost, options.GameServerPort);
@@ -219,7 +219,7 @@ namespace Furcadia.Net
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             try
             {
@@ -240,7 +240,7 @@ namespace Furcadia.Net
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
@@ -257,7 +257,7 @@ namespace Furcadia.Net
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
@@ -272,7 +272,7 @@ namespace Furcadia.Net
             FurcadiaUtilities = new Utils.Utilities();
             options = Options;
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
@@ -295,7 +295,7 @@ namespace Furcadia.Net
             options = new Options.ProxyOptions();
             options.LocalhostPort = port;
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
         }
@@ -312,7 +312,7 @@ namespace Furcadia.Net
             options = new Options.ProxyOptions();
             options.LocalhostPort = lport;
             settings = new Text.Settings(options.LocalhostPort);
-            SetPath = options.FurcadiaFilePaths.GetLocalSettingsPath();
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             try
             {
@@ -492,7 +492,7 @@ namespace Furcadia.Net
                 // UAC Perms Needed to Create proxy.ini Win 7 Change your
                 // UAC Level or add file create Permissions to [%program
                 // files%/furcadia] Maybe Do this at install
-                BackupSettings = settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.GetLocalSettingsPath());
+                BackupSettings = settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
                 //Run
 
                 //check ProcessPath is not a directory

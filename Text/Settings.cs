@@ -172,7 +172,7 @@ namespace Furcadia.Text
         public string[] InitializeFurcadiaSettings(string path = null)
         {
             if (path == null)
-                sPath = FurcPath.GetLocalSettingsPath();
+                sPath = FurcPath.SettingsPath;
             else
                 sPath = path;
             string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);

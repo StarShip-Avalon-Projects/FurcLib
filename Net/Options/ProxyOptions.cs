@@ -94,14 +94,14 @@
             {
                 if (string.IsNullOrEmpty(furcinstallpath))
                 {
-                    furcinstallpath = FurcadiaFilePaths.GetInstallPath();
+                    furcinstallpath = FurcadiaFilePaths.GetFurcadiaInstallPath();
                 }
                 return furcinstallpath;
             }
             set
             {
                 FurcadiaFilePaths = new IO.Paths(value);
-                furcinstallpath = FurcadiaFilePaths.GetInstallPath();
+                furcinstallpath = FurcadiaFilePaths.GetFurcadiaInstallPath();
             }
         }
 

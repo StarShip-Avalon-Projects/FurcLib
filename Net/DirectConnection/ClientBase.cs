@@ -118,7 +118,7 @@ namespace Furcadia.Net.DirectConnection
         public ClientBase()
         {
             FurcPath = new Paths();
-            string SetPath = FurcPath.GetLocalSettingsPath();
+            string SetPath = FurcPath.SettingsPath;
             string SetFile = "settings.ini";
             string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
             int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
