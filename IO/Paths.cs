@@ -292,7 +292,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? LocaldirPath : GetFurcadiaInstallPath();
+                return  GetFurcadiaInstallPath();
             }
         }
 
