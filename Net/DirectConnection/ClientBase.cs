@@ -290,7 +290,7 @@ namespace Furcadia.Net.DirectConnection
                         serverStream.Close();
                     }
                     server.Close();
-                    server.Dispose();
+                    //server.Dispose();
                 }
                 // Free other state (managed objects).
             }

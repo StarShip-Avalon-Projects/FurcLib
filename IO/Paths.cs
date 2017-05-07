@@ -292,7 +292,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return GetFurcadiaInstallPath();
+                return (UsingLocaldir) ? LocaldirPath : GetFurcadiaInstallPath();
             }
         }
 
@@ -655,15 +655,20 @@ namespace Furcadia.IO
                 return null; // Furcadia install path not found.
 
             // Try to locate localdir.ini
-            string ini_path = Path.Combine(install_path, "localdir.ini");
+            string ini_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "localdir.ini");
             if (!System.IO.File.Exists(ini_path))
+                ini_path = Path.Combine(install_path, "localdir.ini");
+            else if (!System.IO.File.Exists(ini_path))
                 return null; // localdir.ini not found - regular path structure applies.
 
             // Read localdir.ini for remote path and verify it.
             using (StreamReader sr = new StreamReader(ini_path))
             {
                 path = sr.ReadLine();
-                path.Trim();
+                if (path != null)
+                    path = path.Trim();
+                else
+                    path = Path.GetDirectoryName(ini_path);
                 sr.Close();
             }
 
