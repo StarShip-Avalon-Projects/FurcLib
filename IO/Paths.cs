@@ -71,7 +71,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\tmp" : DefaultCachePath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"tmp") : DefaultCachePath;
             }
         }
 
@@ -94,8 +94,8 @@ namespace Furcadia.IO
         {
             get
             {
-                return System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) +
-                    @"\Dragon's Eye Productions\Furcadia";
+                return Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                    @"Dragon's Eye Productions", @"Furcadia");
             }
         }
 
@@ -103,7 +103,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultPersonalDataPath + @"\Furcadia Characters";
+                return Path.Combine(DefaultPersonalDataPath, @"Furcadia Characters");
             }
         }
 
@@ -111,7 +111,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultPersonalDataPath + @"\Dreams";
+                return Path.Combine(DefaultPersonalDataPath, @"Dreams");
             }
         }
 
@@ -126,10 +126,10 @@ namespace Furcadia.IO
             get
             {
                 if (Environment.Is64BitOperatingSystem)
-                    return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
-                         @"\Furcadia";
-                return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) +
-                    @"\Furcadia";
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                         @"Furcadia");
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    @"Furcadia");
             }
         }
 
@@ -137,7 +137,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultFurcadiaPath + @"\maps";
+                return Path.Combine(DefaultFurcadiaPath, @"maps");
             }
         }
 
@@ -145,7 +145,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultFurcadiaPath + @"\skins";
+                return Path.Combine(DefaultFurcadiaPath, @"skins");
             }
         }
 
@@ -153,7 +153,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultPersonalDataPath + @"\Skins";
+                return Path.Combine(DefaultPersonalDataPath, @"Skins");
             }
         }
 
@@ -161,7 +161,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultPersonalDataPath + @"\Logs";
+                return Path.Combine(DefaultPersonalDataPath, @"Logs");
             }
         }
 
@@ -183,7 +183,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultCachePath + @"\Permanent Maps";
+                return Path.Combine(DefaultCachePath, @"Permanent Maps");
             }
         }
 
@@ -191,8 +191,8 @@ namespace Furcadia.IO
         {
             get
             {
-                return System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-                    @"\Furcadia";
+                return Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    @"Furcadia");
             }
         }
 
@@ -200,7 +200,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultCachePath + @"\Portrait Cache";
+                return Path.Combine(DefaultCachePath, @"Portrait Cache");
             }
         }
 
@@ -208,7 +208,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultPersonalDataPath + @"\Screenshots";
+                return Path.Combine(DefaultPersonalDataPath, @"Screenshots");
             }
         }
 
@@ -216,8 +216,8 @@ namespace Furcadia.IO
         {
             get
             {
-                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-                    @"\Dragon's Eye Productions\Furcadia";
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    @"Dragon's Eye Productions", @"Furcadia");
             }
         }
 
@@ -225,7 +225,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultCachePath + @"\Temporary Dreams";
+                return Path.Combine(DefaultCachePath, @"Temporary Dreams");
             }
         }
 
@@ -233,7 +233,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultCachePath + @"\Temporary Files";
+                return Path.Combine(DefaultCachePath, @"Temporary Files");
             }
         }
 
@@ -241,7 +241,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultCachePath + @"\Temporary Patches";
+                return Path.Combine(DefaultCachePath, @"Temporary Patches");
             }
         }
 
@@ -249,7 +249,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return DefaultLogsPath + @"\Whispers";
+                return Path.Combine(DefaultLogsPath, @"Whispers");
             }
         }
 
@@ -307,7 +307,7 @@ namespace Furcadia.IO
             get
             {
                 string path = FurcadiaPath;
-                return (path != null) ? path + @"\maps" : null;
+                return (path != null) ? Path.Combine(path, @"maps") : null;
             }
         }
 
@@ -322,7 +322,7 @@ namespace Furcadia.IO
             get
             {
                 string path = FurcadiaPath;
-                return (path != null) ? path + @"\skins" : null;
+                return (path != null) ? Path.Combine(path, @"skins") : null;
             }
         }
 
@@ -349,7 +349,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\skins" : DefaultLocalSkinsPath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"skins") : DefaultLocalSkinsPath;
             }
         }
 
@@ -363,7 +363,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\logs" : DefaultLogsPath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"logs") : DefaultLogsPath;
             }
         }
 
@@ -378,7 +378,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\maps" : DefaultPermanentMapsCachePath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"maps") : DefaultPermanentMapsCachePath;
             }
         }
 
@@ -407,7 +407,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\portraits" : DefaultPortraitCachePath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"portraits") : DefaultPortraitCachePath;
             }
         }
 
@@ -421,7 +421,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\screenshots" : DefaultScreenshotsPath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"screenshots") : DefaultScreenshotsPath;
             }
         }
 
@@ -435,7 +435,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? sLocaldirPath + @"\settings" : DefaultSettingsPath;
+                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"settings") : DefaultSettingsPath;
             }
         }
 
@@ -503,7 +503,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return (UsingLocaldir) ? LogsPath + @"\whispers" : DefaultWhisperLogsPath;
+                return (UsingLocaldir) ? Path.Combine(LogsPath, @"whispers") : DefaultWhisperLogsPath;
             }
         }
 
@@ -525,7 +525,7 @@ namespace Furcadia.IO
             RegistryKey regkey = Registry.LocalMachine;
             try
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86, false);
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + @"Payches", false);
                 path = regkey.GetValue("default").ToString();
                 regkey.Close();
                 if (System.IO.Directory.Exists(path))
@@ -536,7 +536,7 @@ namespace Furcadia.IO
             }
             try
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64, false);
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + @"\Programs", false);
                 path = regkey.GetValue("default").ToString();
                 regkey.Close();
                 if (System.IO.Directory.Exists(path))
@@ -547,7 +547,7 @@ namespace Furcadia.IO
             }
             try
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono, false);
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + @"/Patches", false);
                 path = regkey.GetValue("default").ToString();
                 regkey.Close();
                 if (System.IO.Directory.Exists(path))
@@ -561,7 +561,7 @@ namespace Furcadia.IO
             if (path == null)
                 path = DefaultFurcadiaPath;
 
-            path += @"\patches\default";
+            path = System.IO.Path.Combine(path, "patches", "default");
 
             if (System.IO.Directory.Exists(path))
                 return path; // Path found
@@ -586,33 +586,43 @@ namespace Furcadia.IO
             RegistryKey regkey = Registry.LocalMachine;
             try
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64, false);
-                path = regkey.GetValue("Path").ToString();
-                regkey.Close();
-                if (System.IO.Directory.Exists(path))
-                    return path; // Path found
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + @"\Programs", false);
+                if (regkey != null)
+                {
+                    path = regkey.GetValue("Path").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                        return path; // Path found
+                }
             }
             catch
             {
             }
             try
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86, false);
-                path = regkey.GetValue("Path").ToString();
-                regkey.Close();
-                if (System.IO.Directory.Exists(path))
-                    return path; // Path found
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + @"\Programs", false);
+                if (regkey != null)
+                {
+                    path = regkey.GetValue("Path").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                        return path; // Path found
+                }
             }
             catch
             {
             }
             try
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono, false);
-                path = regkey.GetValue("Path").ToString();
-                regkey.Close();
-                if (System.IO.Directory.Exists(path))
-                    return path; // Path found
+                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + @"/Programs", false);
+
+                if (regkey != null)
+                {
+                    path = regkey.GetValue("Path").ToString();
+                    regkey.Close();
+                    if (System.IO.Directory.Exists(path))
+                        return path; // Path found
+                }
             }
             catch
             {
@@ -645,7 +655,7 @@ namespace Furcadia.IO
                 return null; // Furcadia install path not found.
 
             // Try to locate localdir.ini
-            string ini_path = String.Format("{0}\\localdir.ini", install_path);
+            string ini_path = Path.Combine(install_path, "localdir.ini");
             if (!System.IO.File.Exists(ini_path))
                 return null; // localdir.ini not found - regular path structure applies.
 
