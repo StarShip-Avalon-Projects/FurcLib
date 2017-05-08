@@ -79,7 +79,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>FurcadiaFrameWork.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>furclib.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -212,6 +212,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="FurcadiaFrameWork.pfx" />
+    <None Include="furclib.snk" />
     <None Include="localdir.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
