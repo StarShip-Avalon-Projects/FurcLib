@@ -292,7 +292,7 @@ namespace Furcadia.IO
         {
             get
             {
-                return  GetFurcadiaInstallPath();
+                return GetFurcadiaInstallPath();
             }
         }
 
@@ -522,39 +522,51 @@ namespace Furcadia.IO
             string path;
 
             // Checking registry for a path first of all.
-            RegistryKey regkey = Registry.LocalMachine;
-            try
+            using (RegistryKey regkey = Registry.LocalMachine)
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + @"Payches", false);
-                path = regkey.GetValue("default").ToString();
-                regkey.Close();
-                if (System.IO.Directory.Exists(path))
-                    return path; // Path found
-            }
-            catch
-            {
-            }
-            try
-            {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + @"\Programs", false);
-                path = regkey.GetValue("default").ToString();
-                regkey.Close();
-                if (System.IO.Directory.Exists(path))
-                    return path; // Path found
-            }
-            catch
-            {
-            }
-            try
-            {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + @"/Patches", false);
-                path = regkey.GetValue("default").ToString();
-                regkey.Close();
-                if (System.IO.Directory.Exists(path))
-                    return path; // Path found
-            }
-            catch
-            {
+                RegistryKey regpath = null;
+                try
+                {
+                    regpath = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + @"Patches", false);
+                    if (regpath != null)
+                    {
+                        path = regpath.GetValue("default").ToString();
+                        regpath.Close();
+                        if (System.IO.Directory.Exists(path))
+                            return path; // Path found
+                    }
+                }
+                catch
+                {
+                }
+                try
+                {
+                    regpath = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + @"\Patches", false);
+                    if (regpath != null)
+                    {
+                        path = regpath.GetValue("default").ToString();
+                        regpath.Close();
+                        if (System.IO.Directory.Exists(path))
+                            return path; // Path found
+                    }
+                }
+                catch
+                {
+                }
+                try
+                {
+                    regpath = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + @"/Patches", false);
+                    if (regpath != null)
+                    {
+                        path = regpath.GetValue("default").ToString();
+                        regpath.Close();
+                        if (System.IO.Directory.Exists(path))
+                            return path; // Path found
+                    }
+                }
+                catch
+                {
+                }
             }
             // Making a guess from the FurcadiaPath or FurcadiaDefaultPath property.
             path = FurcadiaPath;
@@ -583,49 +595,52 @@ namespace Furcadia.IO
             string path;
 
             // Checking registry for a path first of all.
-            RegistryKey regkey = Registry.LocalMachine;
-            try
+            using (RegistryKey regkey = Registry.LocalMachine)
             {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + @"\Programs", false);
-                if (regkey != null)
+                RegistryKey regpath = null;
+                try
                 {
-                    path = regkey.GetValue("Path").ToString();
-                    regkey.Close();
-                    if (System.IO.Directory.Exists(path))
-                        return path; // Path found
+                    regpath = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX64 + @"\Programs", false);
+                    if (regpath != null)
+                    {
+                        path = regpath.GetValue("Path").ToString();
+                        regpath.Close();
+                        if (System.IO.Directory.Exists(path))
+                            return path; // Path found
+                    }
                 }
-            }
-            catch
-            {
-            }
-            try
-            {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + @"\Programs", false);
-                if (regkey != null)
+                catch
                 {
-                    path = regkey.GetValue("Path").ToString();
-                    regkey.Close();
-                    if (System.IO.Directory.Exists(path))
-                        return path; // Path found
                 }
-            }
-            catch
-            {
-            }
-            try
-            {
-                regkey = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + @"/Programs", false);
+                try
+                {
+                    regpath = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathX86 + @"\Programs", false);
+                    if (regpath != null)
+                    {
+                        path = regkey.GetValue("Path").ToString();
+                        regpath.Close();
+                        if (System.IO.Directory.Exists(path))
+                            return path; // Path found
+                    }
+                }
+                catch
+                {
+                }
+                try
+                {
+                    regpath = regkey.OpenSubKey(FurcadiaUtilities.ReggistryPathMono + @"/Programs", false);
 
-                if (regkey != null)
-                {
-                    path = regkey.GetValue("Path").ToString();
-                    regkey.Close();
-                    if (System.IO.Directory.Exists(path))
-                        return path; // Path found
+                    if (regpath != null)
+                    {
+                        path = regpath.GetValue("Path").ToString();
+                        regpath.Close();
+                        if (System.IO.Directory.Exists(path))
+                            return path; // Path found
+                    }
                 }
-            }
-            catch
-            {
+                catch
+                {
+                }
             }
             // Making a guess from the FurcadiaDefaultPath property.
             path = DefaultFurcadiaPath;
@@ -658,7 +673,7 @@ namespace Furcadia.IO
             string ini_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "localdir.ini");
             if (!System.IO.File.Exists(ini_path))
                 ini_path = Path.Combine(install_path, "localdir.ini");
-            else if (!System.IO.File.Exists(ini_path))
+            if (!System.IO.File.Exists(ini_path))
                 return null; // localdir.ini not found - regular path structure applies.
 
             // Read localdir.ini for remote path and verify it.

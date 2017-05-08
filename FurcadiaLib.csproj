@@ -213,9 +213,7 @@
     <None Include="app.config" />
     <None Include="FurcadiaFrameWork.pfx" />
     <None Include="furclib.snk" />
-    <None Include="localdir.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="localdir.ini" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
