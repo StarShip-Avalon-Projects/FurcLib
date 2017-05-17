@@ -117,11 +117,6 @@ namespace Furcadia.Net
         protected internal event ActionDelegate Connected;
 
         /// <summary>
-        /// This is triggered when a handled Exception is thrown.
-        /// </summary>
-        protected internal event ErrorEventHandler Error;
-
-        /// <summary>
         /// This is triggered when t client is closed.
         /// </summary>
         protected internal event ActionDelegate FurcSettingsRestored;
@@ -131,6 +126,11 @@ namespace Furcadia.Net
         /// Expects a return Value
         /// </summary>
         protected internal event DataEventHandler ServerData;
+
+        /// <summary>
+        /// This is triggered when a handled Exception is thrown.
+        /// </summary>
+        protected event ErrorEventHandler Error;
 
         #endregion Event Handling
 
@@ -456,7 +456,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Connects to the Furcadia Server and starts the mini proxy.
         /// </summary>
-        public void Connect()
+        public virtual void Connect()
         {
             //if (string.IsNullOrEmpty(options.CharacterIniFile))
             //    throw new Proxy.CharacterNotFoundException("Character.ini not specified");
@@ -664,6 +664,8 @@ namespace Furcadia.Net
             // Free your own state (unmanaged objects). Set large fields to null.
         }
 
+        /// <summary>
+        /// </summary>
         private void ClientDisconnected()
         {
             if (!options.Standalone)
