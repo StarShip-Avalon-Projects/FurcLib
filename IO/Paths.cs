@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Furcadia.IO
 {
-    /// <summary>
+    ///<summary>
     /// This class contains all the paths related to the users furcadia installation.
     ///<para>***NOTICE: DO NOT REMOVE***</para>
     ///<para> Credits go to Artex for helping me fix Path issues and contributing his code.</para>
@@ -24,7 +24,7 @@ namespace Furcadia.IO
     ///<para>  If all Fail... Throw <see cref="FurcadiaNotInstalled"/> exception</para>
     ///<para>  Clients Should check for this error and then ask the user where to manually locate Furccadia</para>
     ///</remarks>
-    /// </summary>
+    ///</summary>
     public class Paths
     {
         #region Private Fields
