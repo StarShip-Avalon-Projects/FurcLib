@@ -114,6 +114,7 @@
     <Compile Include="Net\Options\ClientOptions.cs" />
     <Compile Include="Net\Options\PouncrOptions.cs" />
     <Compile Include="Net\Options\ProxyOptions.cs" />
+    <Compile Include="Net\Options\ProxyReconnectOptions.cs" />
     <Compile Include="Net\Options\ProxySessionOptions.cs" />
     <Compile Include="Net\Options\ServerOptions.cs" />
     <Compile Include="Net\Pounce\PounceClient.cs" />

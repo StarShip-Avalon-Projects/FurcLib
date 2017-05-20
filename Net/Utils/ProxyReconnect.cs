@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Furcadia.Net.Options;
+using System;
 using System.Threading;
 
 namespace Furcadia.Net.Utils
@@ -13,14 +14,9 @@ namespace Furcadia.Net.Utils
         private bool isrunning;
 
         /// <summary>
-        /// Max tries to reconnect to server before aborting
+        /// reconnection Options
         /// </summary>
-        private int reconnectmax;
-
-        /// <summary>
-        /// the time delay for the current connection attempt in seconds
-        /// </summary>
-        private TimeSpan reconnecttimeout;
+        private ProxyReconnectOptions ReconnectOptions;
 
         /// <summary>
         /// Connection Time Out timer.
@@ -50,26 +46,20 @@ namespace Furcadia.Net.Utils
         /// </summary>
         public ProxyReconnect()
         {
+            ReconnectOptions = new ProxyReconnectOptions();
             isrunning = false;
             RelogCounter = 0;
-            reconnectmax = 5;
-            reconnecttimeout = TimeSpan.FromSeconds(45 / 2);
         }
 
         /// <summary>
         /// </summary>
-        /// <param name="Attempts">
-        /// Number of max reconnect attempts
+        /// <param name="options">
         /// </param>
-        /// <param name="TimeOutDelay">
-        /// Cycle delay in seconds
-        /// </param>
-        public ProxyReconnect(int Attempts, int TimeOutDelay)
+        public ProxyReconnect(ProxyReconnectOptions options)
         {
+            ReconnectOptions = options;
             isrunning = false;
             RelogCounter = 0;
-            reconnectmax = Attempts;
-            reconnecttimeout = TimeSpan.FromSeconds(TimeOutDelay / 2);
         }
 
         #endregion Public Constructors
@@ -77,29 +67,11 @@ namespace Furcadia.Net.Utils
         #region Public Properties
 
         /// <summary>
-        /// the time delay for the current connection attempt in seconds.
-        /// </summary>
-        public int ConnectionTimeOut
-        {
-            get { return reconnecttimeout.Seconds * 2; }
-            set { reconnecttimeout = TimeSpan.FromSeconds(value / 2); }
-        }
-
-        /// <summary>
         /// Is there a reconnection process running?
         /// </summary>
         public bool IsRunning
         {
             get { return isrunning; }
-        }
-
-        /// <summary>
-        /// Maximum tries to reconnect to the server
-        /// </summary>
-        public int ReconnectMax
-        {
-            get { return reconnectmax; }
-            set { reconnectmax = value; }
         }
 
         #endregion Public Properties
@@ -121,11 +93,11 @@ namespace Furcadia.Net.Utils
 #endif
 
             if (ReconnectTimeOutTimer == null)
-                ReconnectTimeOutTimer = new Timer(ReconnectTimeOutTick, state, reconnecttimeout, TimeSpan.MaxValue);
+                ReconnectTimeOutTimer = new Timer(ReconnectTimeOutTick, state, ReconnectOptions.TimeOutTimeSpan, ReconnectOptions.TimeOutTimeSpan);
             else
-                ReconnectTimeOutTimer.Change(reconnecttimeout, TimeSpan.MaxValue);
+                ReconnectTimeOutTimer.Change(ReconnectOptions.TimeOutTimeSpan, TimeSpan.MaxValue);
 
-            OnStartProxyConnect(string.Format("Reconnect attempt {0}/{1} begin.", RelogCounter, reconnectmax.ToString()), System.EventArgs.Empty);
+            OnStartProxyConnect(string.Format("Reconnect attempt {0}/{1} begin.", RelogCounter, ReconnectOptions.ReconnectMax), System.EventArgs.Empty);
 
             //Stop current timer and wait for ReconnectTimeOutTimer to time out
             ReconnectTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -165,7 +137,7 @@ namespace Furcadia.Net.Utils
             Console.WriteLine("ReconnectTimeOutTick()");
             Console.WriteLine();
 #endif
-            if (RelogCounter >= reconnectmax)
+            if (RelogCounter >= ReconnectOptions.ReconnectMax)
             {
                 OnAttemptsExceded(string.Format("Connection attempts exceeded!!!"), System.EventArgs.Empty);
                 Dispose(true);
@@ -175,9 +147,9 @@ namespace Furcadia.Net.Utils
 
             //Begin next connection attempt in x seconds
             if (ReconnectTimeOutTimer == null)
-                ReconnectTimeOutTimer = new Timer(ReconnectAttemptTick, Obj, reconnecttimeout, TimeSpan.MaxValue);
+                ReconnectTimeOutTimer = new Timer(ReconnectAttemptTick, Obj, ReconnectOptions.TimeOutTimeSpan, TimeSpan.MaxValue);
             else
-                ReconnectTimeOutTimer.Change(reconnecttimeout, TimeSpan.MaxValue);
+                ReconnectTimeOutTimer.Change(ReconnectOptions.TimeOutTimeSpan, TimeSpan.MaxValue);
 
             //stop current timer and wait for reconnectTimeOut timer to finish
             ReconnectTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -275,7 +247,7 @@ namespace Furcadia.Net.Utils
             if (isrunning)
                 throw new Exception("Reconnection process has already started!");
             //begin the process immediately
-            ReconnectTimeOutTimer = new Timer(ReconnectAttemptTick, null, TimeSpan.Zero, reconnecttimeout);
+            ReconnectTimeOutTimer = new Timer(ReconnectAttemptTick, null, TimeSpan.Zero, ReconnectOptions.TimeOutTimeSpan);
             isrunning = true;
         }
 

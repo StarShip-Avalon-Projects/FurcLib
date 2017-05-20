@@ -42,6 +42,21 @@ namespace Furcadia.Net.Proxy
     /// </summary>
     public class ProxySession : NetProxy, IDisposable
     {
+        #region Public Properties
+
+        /// <summary>
+        /// Are we the current executing character?
+        /// </summary>
+        public bool IsConnectedCharacter
+        {
+            get
+            {
+                return player.ShortName == FurcadiaShortName(ConnectedCharacterName);
+            }
+        }
+
+        #endregion Public Properties
+
         #region Private Fields
 
         private string banishName = "";
@@ -171,6 +186,8 @@ namespace Furcadia.Net.Proxy
         #endregion "Client/Server Fata Handling"
 
         #endregion "Public Events"
+
+
 
         #region Public Properties
 
@@ -334,18 +351,6 @@ namespace Furcadia.Net.Proxy
         public int GetEnumInt<T>(T enumVal)
         {
             return Convert.ToInt32(enumVal);
-        }
-
-        /// <summary>
-        /// Are we the Current triggering furre?
-        /// </summary>
-        /// <param name="player">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public bool IsBot(ref FURRE player)
-        {
-            return player.ShortName == FurcadiaShortName(botName);
         }
 
         #endregion Public Methods
@@ -578,7 +583,7 @@ namespace Furcadia.Net.Proxy
                 string u = t.Match(data).Groups[1].Value;
                 Text = t.Match(data).Groups[2].Value;
 
-                if (!IsBot(ref player))
+                if (!IsConnectedCharacter)
                 {
                     player.Message = Text;
                 }
@@ -677,7 +682,7 @@ namespace Furcadia.Net.Proxy
                 player.Message = Text;
                 if (Dream.FurreList.Contains(player))
                     Dream.FurreList[player.ID] = player;
-                bool test = IsBot(ref player);
+                bool test = IsConnectedCharacter;
             }
             else if (Color == "channel")
             {
@@ -857,7 +862,7 @@ namespace Furcadia.Net.Proxy
                     }
                     else if (data.StartsWith("]]"))
                     {
-                        //Disconnect();
+                        Disconnect();
                         //bIsRunning = false;
                     }
                     else if (data == "&&&&&&&&&&&&&")
@@ -897,7 +902,7 @@ namespace Furcadia.Net.Proxy
                             // player = NameToFurre(data.Remove(0, length +
                             // 2)); If player.ID = 0 Then Exit Sub
                             player.Color = new ColorString(data.Substring(2, length));
-                            if (IsBot(ref player))
+                            if (IsConnectedCharacter)
                                 Look = false;
                             if (Dream.FurreList.Contains(player))
                                 Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
@@ -1010,8 +1015,6 @@ namespace Furcadia.Net.Proxy
                         {
                             Dream.FurreList[player.ID] = player;
                         }
-                        IsBot(ref player);
-
                         //Display Disconnection Dialog
                     }
                     // Species Tags
@@ -1377,36 +1380,6 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        /// <param name="ServerHost">
-        /// </param>
-        /// <param name="ServerPort">
-        /// </param>
-        /// <param name="LocalHostPort">
-        /// </param>
-        /// <param name="ReconnectAttempts">
-        /// </param>
-        /// <param name="ReconnectTimeOutDelay">
-        /// </param>
-        public ProxySession(string ServerHost, int ServerPort, int LocalHostPort, int ReconnectAttempts, int ReconnectTimeOutDelay) : base(ServerHost, ServerPort, LocalHostPort)
-        {
-            options = new Options.ProxySessionOptions();
-            options.GameServerHost = ServerHost;
-            options.GameServerPort = ServerPort;
-            options.LocalhostPort = LocalHostPort;
-            options.ReconnectAttempts = ReconnectAttempts;
-            options.ReconnectTimeOutDelay = ReconnectTimeOutDelay;
-
-            ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
-            ServerData2 += onServerDataReceived;
-            ClientData2 += onClientDataReceived;
-
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectAttempts, options.ReconnectTimeOutDelay);
-            dream = new DREAM();
-        }
-
-        /// <summary>
-        /// </summary>
         /// <param name="Options">
         /// ProxySession Options
         /// </param>
@@ -1418,7 +1391,7 @@ namespace Furcadia.Net.Proxy
             ServerData2 += onServerDataReceived;
             ClientData2 += onClientDataReceived;
 
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectAttempts, options.ReconnectTimeOutDelay);
+            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
         }
 

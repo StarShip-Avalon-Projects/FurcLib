@@ -6,8 +6,22 @@
     {
         #region Private Fields
 
-        private int reconnectattempts;
-        private int reconnectdelay;
+        private ProxyReconnectOptions reconnectOptions;
+
+        /// <summary>
+        /// reconnection manager options
+        /// </summary>
+        public ProxyReconnectOptions ReconnectOptions
+        {
+            get
+            {
+                return reconnectOptions;
+            }
+            set
+            {
+                reconnectOptions = value;
+            }
+        }
 
         #endregion Private Fields
 
@@ -18,28 +32,14 @@
         /// </summary>
         public ProxySessionOptions() : base()
         {
-            reconnectdelay = 45;
-            reconnectattempts = 5;
+            ReconnectOptions = new ProxyReconnectOptions();
+        }
+
+        public ProxySessionOptions(ProxyReconnectOptions reconnectoptions)
+        {
+            ReconnectOptions = reconnectoptions;
         }
 
         #endregion Public Constructors
-
-        #region Public Properties
-
-        /// <summary>
-        /// number of connection attempts to connect to the game server
-        /// </summary>
-        public int ReconnectAttempts { get { return reconnectattempts; } set { reconnectattempts = value; } }
-
-        /// <summary>
-        /// Reconnection Delay between attempts in seconds
-        /// </summary>
-        public int ReconnectTimeOutDelay
-        {
-            get { return reconnectdelay; }
-            set { reconnectdelay = value; }
-        }
-
-        #endregion Public Properties
     }
 }
