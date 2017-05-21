@@ -25,7 +25,7 @@ namespace Furcadia.Movement
         /// <summary>
         /// wide format ("w") String size
         /// </summary>
-        private const int ColorStringSize = 13;
+        public const int ColorStringSize = 13;
 
         /// <summary>
         /// Default Construtor

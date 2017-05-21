@@ -42,6 +42,58 @@ namespace Furcadia.Net.Proxy
     /// </summary>
     public class ProxySession : NetProxy, IDisposable
     {
+        #region "Constructors"
+
+        /// <summary>
+        /// </summary>
+        public ProxySession() : base()
+        {
+            serverconnectphase = ConnectionPhase.Init;
+            clientconnectionphase = ConnectionPhase.Init;
+            options = new Options.ProxySessionOptions();
+            ServerBalancer = new Utils.ServerQue();
+            ServerBalancer.OnServerSendMessage += onServerQueSent;
+
+            ServerData2 += onServerDataReceived;
+            ClientData2 += onClientDataReceived;
+            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect();
+
+            dream = new DREAM();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="Options">
+        /// ProxySession Options
+        /// </param>
+        public ProxySession(Options.ProxySessionOptions Options) : base(Options)
+        {
+            serverconnectphase = ConnectionPhase.Init;
+            clientconnectionphase = ConnectionPhase.Init;
+            options = Options;
+            ServerBalancer = new Utils.ServerQue();
+            ServerBalancer.OnServerSendMessage += onServerQueSent;
+            ServerData2 += onServerDataReceived;
+            ClientData2 += onClientDataReceived;
+
+            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
+            dream = new DREAM();
+        }
+
+        #endregion "Constructors"
+
+        #region Public Methods
+
+        /// <summary>
+        /// </summary>
+        public override void Connect()
+        {
+            serverconnectphase = ConnectionPhase.Connecting;
+            base.Connect();
+        }
+
+        #endregion Public Methods
+
         #region Public Properties
 
         /// <summary>
@@ -52,6 +104,22 @@ namespace Furcadia.Net.Proxy
             get
             {
                 return player.ShortName == FurcadiaShortName(ConnectedCharacterName);
+            }
+        }
+
+        /// <summary>
+        /// Allows the Furcadia Client to Disconnect from the session,
+        /// allowing the session to remain connected to the game server
+        /// </summary>
+        public bool StandAlone
+        {
+            get
+            {
+                return options.Standalone;
+            }
+            set
+            {
+                options.Standalone = value;
             }
         }
 
@@ -281,6 +349,10 @@ namespace Furcadia.Net.Proxy
         public DREAM Dream
         {
             get { return dream; }
+            set
+            {
+                dream = value;
+            }
         }
 
         /// <summary>
@@ -306,6 +378,7 @@ namespace Furcadia.Net.Proxy
         public FURRE Player
         {
             get { return player; }
+            set { player = value; }
         }
 
         /// <summary>
@@ -1360,42 +1433,6 @@ namespace Furcadia.Net.Proxy
         }
 
         #endregion "Popup Dialogs"
-
-        #region "Constructors"
-
-        /// <summary>
-        /// </summary>
-        public ProxySession() : base()
-        {
-            options = new Options.ProxySessionOptions();
-            ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
-
-            ServerData2 += onServerDataReceived;
-            ClientData2 += onClientDataReceived;
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect();
-
-            dream = new DREAM();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Options">
-        /// ProxySession Options
-        /// </param>
-        public ProxySession(Options.ProxySessionOptions Options) : base(Options)
-        {
-            options = Options;
-            ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
-            ServerData2 += onServerDataReceived;
-            ClientData2 += onClientDataReceived;
-
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
-            dream = new DREAM();
-        }
-
-        #endregion "Constructors"
 
         private void onServerQueSent(object o, EventArgs e)
         {

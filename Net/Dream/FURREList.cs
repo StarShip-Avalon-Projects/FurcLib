@@ -70,7 +70,37 @@ namespace Furcadia.Net
         /// </param>
         /// <returns>
         /// </returns>
-        public FURRE this[int index] { get { return fList[index]; } set { fList[index] = value; } }
+        public FURRE this[int index]
+        {
+            get
+            {
+                return fList[index];
+            }
+            set
+            {
+                fList[index] = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or set the furre at index of fur
+        /// </summary>
+        /// <param name="fur">
+        /// Furre
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public FURRE this[FURRE fur]
+        {
+            get
+            {
+                return fList[fList.IndexOf(fur)];
+            }
+            set
+            {
+                fList[fList.IndexOf(fur)] = value;
+            }
+        }
 
         #endregion Public Properties
 
