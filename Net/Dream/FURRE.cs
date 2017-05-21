@@ -88,6 +88,7 @@ namespace Furcadia.Net
         /// </param>
         public FURRE(string Name)
         {
+            _name = Name;
             _Color = new ColorString();
             Location = new FurrePosition();
             LastPosition = new FurrePosition();

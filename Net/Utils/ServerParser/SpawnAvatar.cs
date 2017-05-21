@@ -42,7 +42,8 @@ namespace Furcadia.Net.Utils.ServerParser
                 base.instructionType = ServerInstructionType.SpawnAvatar;
 
             //FUID Furre ID 4 Base220 bytes
-            player = new FURRE(ConvertFromBase220(ServerInstruction.Substring(1, 4)));
+            int id = ConvertFromBase220(ServerInstruction.Substring(1, 4));
+            player = new FURRE(id);
 
             // Y,Y 2 Base220 Bytes each X Coordinates are *2 in Map editor
             var Position = new Drawing.FurrePosition(ServerInstruction.Substring(5, 2),

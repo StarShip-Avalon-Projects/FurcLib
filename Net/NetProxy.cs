@@ -708,7 +708,7 @@ namespace Furcadia.Net
                     Connected();
                     // Trigger News timer to restore settings
 
-                    NewsTimer = new System.Threading.Timer(OnTimedEvent, null, TimeSpan.FromSeconds(10), TimeSpan.MaxValue);
+                    NewsTimer = new System.Threading.Timer(OnTimedEvent, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
                 }
             }
             catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }

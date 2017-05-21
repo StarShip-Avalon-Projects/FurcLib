@@ -18,7 +18,7 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        protected internal IList<FURRE> fList;
+        static protected internal IList<FURRE> fList;
 
         #endregion Protected Internal Fields
 
@@ -74,11 +74,15 @@ namespace Furcadia.Net
         {
             get
             {
-                return fList[index];
+                if (index < fList.Count)
+                    return fList[index];
+                else
+                    return null;
             }
             set
             {
-                fList[index] = value;
+                if (index < fList.Count)
+                    fList[index] = value;
             }
         }
 
@@ -94,7 +98,9 @@ namespace Furcadia.Net
         {
             get
             {
-                return fList[fList.IndexOf(fur)];
+                if (fList.Contains(fur))
+                    return fList[fList.IndexOf(fur)];
+                return fur;
             }
             set
             {

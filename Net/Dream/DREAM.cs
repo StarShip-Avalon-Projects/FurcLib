@@ -51,6 +51,17 @@ namespace Furcadia.Net
 
         #region Public Properties
 
+        private bool isModern;
+
+        /// <summary>
+        /// Is this dream Modern Mode?
+        /// </summary>
+        public bool IsModern
+        {
+            get { return isModern; }
+            set { isModern = value; }
+        }
+
         /// <summary>
         /// Number of DS Lines
         /// </summary>
