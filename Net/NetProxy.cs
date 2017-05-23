@@ -49,93 +49,6 @@ namespace Furcadia.Net
         #region Private Fields
 
         /// <summary>
-        /// Furcadia Client Process
-        /// </summary>
-        private Process furcProcess;
-
-        private Options.ProxyOptions options;
-        private Text.Settings settings;
-
-        #endregion Private Fields
-
-        #region Event Handling
-
-        /// <summary>
-        /// </summary>
-        public delegate void ActionDelegate();
-
-        /// <summary>
-        /// </summary>
-        public delegate string DataEventHandler(string data);
-
-        /// <summary>
-        /// </summary>
-        public delegate void DataEventHandler2(string data);
-
-        /// <summary>
-        /// </summary>
-        public delegate void ErrorEventHandler(Exception e, Object o, String n);
-
-        /// <summary>
-        /// This is triggered when the Client sends data to the server.
-        /// </summary>
-        public virtual event DataEventHandler ClientData;
-
-        /// <summary>
-        /// This is triggered when the Client sends data to the server.
-        /// Expects a return value.
-        /// </summary>
-        public virtual event DataEventHandler2 ClientData2;
-
-        /// <summary>
-        /// This is triggered when the Server sends data to the client.
-        /// Doesn't expect a return value.
-        /// </summary>
-        public virtual event DataEventHandler2 ServerData2;
-
-        /// <summary>
-        ///This is triggered when the Server Disconnects
-        /// </summary>
-        public event ActionDelegate ServerDisConnected;
-
-        /// <summary>
-        ///This is triggered when the Client Disconnects
-        /// </summary>
-        protected internal event ActionDelegate ClientDisConnected;
-
-        /// <summary>
-        /// This is triggered when the user has exited/logoff Furcadia and
-        /// the Furcadia client is closed.
-        /// </summary>
-        protected internal event ActionDelegate ClientExited;
-
-        //public delegate void ErrorEventHandler(Exception e);
-        /// <summary>
-        ///This is triggered when the
-        /// </summary>
-        protected internal event ActionDelegate Connected;
-
-        /// <summary>
-        /// This is triggered when t client is closed.
-        /// </summary>
-        protected internal event ActionDelegate FurcSettingsRestored;
-
-        /// <summary>
-        /// This is triggered when the Server sends data to the client.
-        /// Expects a return Value
-        /// </summary>
-        protected internal virtual event DataEventHandler ServerData;
-
-        /// <summary>
-        /// This is triggered when a handled Exception is thrown.
-        /// </summary>
-        protected event ErrorEventHandler Error;
-
-        #endregion Event Handling
-
-        #region Private Declarations
-
-        /// <summary>
         /// FurcadiaSettings File
         /// </summary>
         private const string SetFile = "settings.ini";
@@ -156,6 +69,8 @@ namespace Furcadia.Net
 
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
 
+        private object ClientBufferLock = new object();
+
         /// <summary>
         /// </summary>
         private int ClientnTaken = 0;
@@ -167,11 +82,17 @@ namespace Furcadia.Net
         private Mutex FurcMutex;
 
         /// <summary>
+        /// Furcadia Client Process
+        /// </summary>
+        private Process furcProcess;
+
+        /// <summary>
         /// Allow Furcadia Client to connect to us
         /// </summary>
         private TcpListener listen;
 
         private System.Threading.Timer NewsTimer;
+        private Options.ProxyOptions options;
 
         /// <summary>
         /// Process IP for Furcadia.exe
@@ -182,6 +103,7 @@ namespace Furcadia.Net
         /// </summary>
         private TcpClient server;
 
+        private object ServerBufferLock = new object();
         private int ServerTaken = 0;
 
         /// <summary>
@@ -194,9 +116,11 @@ namespace Furcadia.Net
         /// </summary>
         private string[] sett;
 
-        #endregion Private Declarations
+        private Text.Settings settings;
 
-        #region Constructors
+        #endregion Private Fields
+
+        #region Public Constructors
 
         /// <summary>
         /// Connect to game servver with default settings
@@ -309,32 +233,116 @@ namespace Furcadia.Net
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
         }
 
-        private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
+        #endregion Public Constructors
+
+        #region Public Delegates
+
+        /// <summary>
+        /// </summary>
+        public delegate void ActionDelegate();
+
+        /// <summary>
+        /// </summary>
+        public delegate string DataEventHandler(string data);
+
+        /// <summary>
+        /// </summary>
+        public delegate void DataEventHandler2(string data);
+
+        /// <summary>
+        /// </summary>
+        public delegate void ErrorEventHandler(Exception e, Object o, String n);
+
+        #endregion Public Delegates
+
+        #region Public Events
+
+        /// <summary>
+        /// This is triggered when the Client sends data to the server.
+        /// </summary>
+        public virtual event DataEventHandler ClientData;
+
+        /// <summary>
+        /// This is triggered when the Client sends data to the server.
+        /// Expects a return value.
+        /// </summary>
+        public virtual event DataEventHandler2 ClientData2;
+
+        /// <summary>
+        /// This is triggered when the Server sends data to the client.
+        /// Doesn't expect a return value.
+        /// </summary>
+        public virtual event DataEventHandler2 ServerData2;
+
+        /// <summary>
+        ///This is triggered when the Server Disconnects
+        /// </summary>
+        public event ActionDelegate ServerDisConnected;
+
+        #endregion Public Events
+
+        #region Protected Internal Events
+
+        /// <summary>
+        ///This is triggered when the Client Disconnects
+        /// </summary>
+        protected internal event ActionDelegate ClientDisConnected;
+
+        /// <summary>
+        /// This is triggered when the user has exited/logoff Furcadia and
+        /// the Furcadia client is closed.
+        /// </summary>
+        protected internal event ActionDelegate ClientExited;
+
+        //public delegate void ErrorEventHandler(Exception e);
+        /// <summary>
+        ///This is triggered when the
+        /// </summary>
+        protected internal event ActionDelegate Connected;
+
+        /// <summary>
+        /// This is triggered when t client is closed.
+        /// </summary>
+        protected internal event ActionDelegate FurcSettingsRestored;
+
+        /// <summary>
+        /// This is triggered when the Server sends data to the client.
+        /// Expects a return Value
+        /// </summary>
+        protected internal virtual event DataEventHandler ServerData;
+
+        #endregion Protected Internal Events
+
+        #region Protected Events
+
+        /// <summary>
+        /// This is triggered when a handled Exception is thrown.
+        /// </summary>
+        protected event ErrorEventHandler Error;
+
+        #endregion Protected Events
+
+        #region Public Properties
+
+        /// <summary>
+        /// </summary>
+        public int BufferCapacity
         {
-            IPAddress IP;
-            if (IPAddress.TryParse(HostName, out IP))
-                try
-                {
-                    return new IPEndPoint(IP, ServerPort);
-                }
-                catch { }
-            else
+            get
             {
-                try
-                {
-                    return new IPEndPoint(Dns.GetHostEntry(HostName).AddressList[0], ServerPort);
-                }
-                catch
-                {
-                    return new IPEndPoint(FurcadiaUtilities.GameServerIp, ServerPort);
-                }
+                return BUFFER_CAP;
             }
-            return null;
         }
 
-        #endregion Constructors
-
-        #region Properties
+        /// <summary>
+        /// </summary>
+        public int EncoderPage
+        {
+            get
+            {
+                return ENCODE_PAGE;
+            }
+        }
 
         /// <summary>
         /// Check the connection Status of the Furcadia Client
@@ -372,31 +380,7 @@ namespace Furcadia.Net
             get { return processID; }
         }
 
-        #endregion Properties
-
-        #region Public  Properties
-
-        /// <summary>
-        /// </summary>
-        public int BufferCapacity
-        {
-            get
-            {
-                return BUFFER_CAP;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int EncoderPage
-        {
-            get
-            {
-                return ENCODE_PAGE;
-            }
-        }
-
-        #endregion Public  Properties
+        #endregion Public Properties
 
         #region Public Methods
 
@@ -560,6 +544,19 @@ namespace Furcadia.Net
         }
 
         /// <summary>
+        /// Send Message to Server through the Load Ballancer
+        /// </summary>
+        /// <param name="message">
+        /// Client to server Instruction
+        /// </param>
+        public virtual void SendLineToServer(string message)
+        {
+            if (!message.EndsWith("\n"))
+                message += '\n';
+            SendToServer(message);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="message">
         /// </param>
@@ -567,8 +564,6 @@ namespace Furcadia.Net
         {
             if (string.IsNullOrEmpty(message))
                 return;
-            if (!message.EndsWith("\n"))
-                message += '\n';
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)
@@ -603,8 +598,7 @@ namespace Furcadia.Net
         {
             if (string.IsNullOrEmpty(message))
                 return;
-            if (!message.EndsWith("\n"))
-                message += '\n';
+
             try
             {
                 if (server.GetStream().CanWrite)
@@ -616,6 +610,10 @@ namespace Furcadia.Net
                 ServerDisConnected?.Invoke();
             }
         }
+
+        #endregion Public Methods
+
+        #region Protected Methods
 
         /// <summary>
         /// Dispose all our Disposable objects
@@ -662,15 +660,7 @@ namespace Furcadia.Net
             // Free your own state (unmanaged objects). Set large fields to null.
         }
 
-        /// <summary>
-        /// </summary>
-        private void ClientDisconnected()
-        {
-            if (!options.Standalone)
-                Disconnect();
-        }
-
-        #endregion Public Methods
+        #endregion Protected Methods
 
         #region Private Methods
 
@@ -710,14 +700,43 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
+        private void ClientDisconnected()
+        {
+            if (!options.Standalone)
+                Disconnect();
+        }
+
+        private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
+        {
+            IPAddress IP;
+            if (IPAddress.TryParse(HostName, out IP))
+                try
+                {
+                    return new IPEndPoint(IP, ServerPort);
+                }
+                catch { }
+            else
+            {
+                try
+                {
+                    return new IPEndPoint(Dns.GetHostEntry(HostName).AddressList[0], ServerPort);
+                }
+                catch
+                {
+                    return new IPEndPoint(FurcadiaUtilities.GameServerIp, ServerPort);
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="ar">
         /// </param>
         private void GetClientData(IAsyncResult ar)
         {
-            int read = 0;
-            int pos = 0;
             string line;
-            // lock (lck) {
+
             try
             {
                 if (client.Connected == false)
@@ -726,6 +745,7 @@ namespace Furcadia.Net
                 }
 
                 //read = number of bytes read
+                int read = 0;
                 read = client.GetStream().EndRead(ar);
 
                 ClientnTaken += read;
@@ -763,8 +783,9 @@ namespace Furcadia.Net
 
                     if (clientBuffer.Length <= 0)
                         ClientDisConnected();
-                    pos = client.GetStream().Read(clientBuffer, 0, clientBuffer.Length);
-                    ClientnTaken += pos;
+
+                    read = client.GetStream().Read(clientBuffer, 0, clientBuffer.Length);
+                    ClientnTaken += read;
                     do
                     {
                         line = GetLineFromClientBuffer(false);
@@ -772,6 +793,7 @@ namespace Furcadia.Net
                         {
                             ClientData2?.Invoke(line);
                             // we want ServerConnected and Check for null
+
                             // data Application may intentionally return
                             // ClientData = null to Avoid "Throat Tired"
                             // Syndrome. Let Application handle packet routing.
@@ -779,17 +801,17 @@ namespace Furcadia.Net
                                 SendToServer(ClientData?.Invoke(line));
                         }
                     } while (line != null);
-                }
-                if (ClientnTaken > 0)
-                {
-                    line = GetLineFromClientBuffer(true);
-                    ClientData2?.Invoke(line);
-                    // we want ServerConnected and Check for null data
-                    // Application may intentionally return ClientData =
-                    // null to Avoid "Throat Tired" Syndrome. Let
-                    // Application handle packet routing.
-                    if (IsServerConnected == true && ClientData != null)
-                        SendToServer(ClientData?.Invoke(line));
+                    if (ClientnTaken > 0)
+                    {
+                        line = GetLineFromClientBuffer(true);
+                        ClientData2?.Invoke(line);
+                        // we want ServerConnected and Check for null data
+                        // Application may intentionally return ClientData =
+                        // null to Avoid "Throat Tired" Syndrome. Let
+                        // Application handle packet routing.
+                        if (IsServerConnected == true && ClientData != null)
+                            SendToServer(ClientData?.Invoke(line));
+                    }
                 }
             }
             catch (Exception e)
@@ -804,114 +826,11 @@ namespace Furcadia.Net
             {
                 if (IsClientConnected == true)
                 {
-                    client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP - read, new AsyncCallback(GetClientData), client);
+                    client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
                 }
             }
             // }
         }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="ar">
-        /// </param>
-        private void GetServerData(IAsyncResult ar)
-        {
-            string line;
-            int read = 0;
-            int pos = 0;
-            try
-            {
-                if (IsServerConnected == false)
-                {
-                    throw new SocketException((int)SocketError.NotConnected);
-                }
-                else
-                {
-                    read = server.GetStream().EndRead(ar);
-                    ServerTaken += read;
-                    do
-                    {
-                        line = GetLineFromServerBuffer(false);
-                        if (line != null)
-                        {
-                            ServerData2?.Invoke(line);
-                            if (IsClientConnected == true && ServerData != null &&
-                                !string.IsNullOrEmpty(line))
-                            {
-                                NetMessage msg = new NetMessage();
-                                msg.Write(ServerData(line));
-                                SendToClient(msg);
-                            }
-                        }
-                    } while (line != null);
-                    if (read < 1)
-                    {
-                        ServerDisConnected?.Invoke(); return;
-                    }
-                    if (ServerTaken > 0)
-                    {
-                        line = GetLineFromServerBuffer(true);
-                        ServerData2?.Invoke(line);
-                    }
-                    while (server.GetStream().DataAvailable == true)
-                    {
-                        pos = server.GetStream().Read(serverBuffer, 0, serverBuffer.Length);
-                        ServerTaken += pos;
-                        do
-                        {
-                            line = GetLineFromServerBuffer(false);
-                            if (line != null)
-                            {
-                                ServerData2?.Invoke(line);
-                                if (IsClientConnected == true && ServerData != null &&
-                                    !string.IsNullOrEmpty(line))
-                                {
-                                    NetMessage msg = new NetMessage();
-                                    msg.Write(ServerData(line));
-                                    SendToClient(msg);
-                                }
-                            }
-                        } while (line != null);
-                    }
-                }
-                if (ServerTaken > 0)
-                {
-                    line = GetLineFromServerBuffer(true);
-                    ServerData2?.Invoke(line);
-                }
-            }
-            catch (Exception e)
-            {
-                // if (IsServerConnected == true) ServerDisConnected();
-                Error?.Invoke(e, this, "GetServerData()");
-                ServerDisConnected?.Invoke();
-                return;
-            } //else throw e;
-              // Detect if client disconnected
-
-            if (IsServerConnected == false)
-            {
-                ServerDisConnected?.Invoke();
-            }
-
-            if (IsServerConnected)
-                server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP - read, new AsyncCallback(GetServerData), server);
-        }
-
-        private void OnTimedEvent(object source)
-        {
-            // reset settings.ini
-            settings.RestoreFurcadiaSettings(BackupSettings);
-            BackupSettings = null;
-            FurcSettingsRestored?.Invoke();
-            if (NewsTimer != null)
-                NewsTimer.Dispose();
-        }
-
-        #endregion Private Methods
-
-        private object ClientBufferLock = new object();
-        private object ServerBufferLock = new object();
 
         /// <summary>
         /// </summary>
@@ -951,7 +870,7 @@ namespace Furcadia.Net
                             clientBuffer[j++] = clientBuffer[i++];
 
                         ClientnTaken = j;
-                        return line;
+                        return line + '\n';
                     }
 
                     // If we don't have a line and it's a forced request,
@@ -1005,7 +924,7 @@ namespace Furcadia.Net
                             serverBuffer[j++] = serverBuffer[i++];
 
                         ServerTaken = j;
-                        return line;
+                        return line + '\n';
                     }
 
                     // If we don't have a line and it's a forced request,
@@ -1020,5 +939,124 @@ namespace Furcadia.Net
                 return null;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="ar">
+        /// </param>
+        private void GetServerData(IAsyncResult ar)
+        {
+            string line;
+
+            try
+            {
+                if (IsServerConnected == false)
+                {
+                    return;
+                    //throw new SocketException((int)SocketError.NotConnected);
+                }
+                else
+                {
+                    #region One
+
+                    int read = 0;
+
+                    read = server.GetStream().EndRead(ar);
+                    // stuff += read;
+                    ServerTaken += read;
+                    do
+                    {
+                        line = GetLineFromServerBuffer(false);
+                        if (line != null)
+                        {
+                            ServerData2?.Invoke(line);
+                            if (IsClientConnected == true && ServerData != null &&
+                                !string.IsNullOrEmpty(line))
+                            {
+                                NetMessage msg = new NetMessage();
+                                msg.Write(ServerData(line));
+                                SendToClient(msg);
+                            }
+                        }
+                    } while (line != null);
+                    if (read < 1)
+                    {
+                        ServerDisConnected?.Invoke(); return;
+                    }
+                    if (ServerTaken > 0)
+                    {
+                        line = GetLineFromServerBuffer(true);
+                        ServerData2?.Invoke(line);
+                    }
+
+                    #endregion One
+
+                    #region two
+
+                    while (server.GetStream().DataAvailable == true)
+                    {
+                        read = server.GetStream().Read(serverBuffer, 0, serverBuffer.Length);
+
+                        //stuff += pos;
+                        ServerTaken += read;
+                        do
+                        {
+                            line = GetLineFromServerBuffer(false);
+                            if (line != null)
+                            {
+                                ServerData2?.Invoke(line);
+                                if (IsClientConnected == true && ServerData != null &&
+                                    !string.IsNullOrEmpty(line))
+                                {
+                                    NetMessage msg = new NetMessage();
+                                    msg.Write(ServerData(line));
+                                    SendToClient(msg);
+                                }
+                            }
+                        } while (line != null);
+                    }
+                    if (ServerTaken > 0)
+                    {
+                        line = GetLineFromServerBuffer(true);
+                        ServerData2?.Invoke(line);
+                    }
+
+                    #endregion two
+                }
+            }
+            catch (Exception e)
+            {
+                // if (IsServerConnected == true) ServerDisConnected();
+                Error?.Invoke(e, this, "GetServerData()");
+                ServerDisConnected?.Invoke();
+                return;
+            } //else throw e;
+              // Detect if client disconnected
+
+            if (IsServerConnected == false)
+            {
+                ServerDisConnected?.Invoke();
+            }
+
+            if (IsServerConnected)
+                server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), server);
+        }
+
+        /// <summary>
+        /// Reset Furcadia Settings when NewsTimer expires
+        /// </summary>
+        /// <param name="source">
+        /// </param>
+        private void OnTimedEvent(object source)
+        {
+            // reset settings.ini
+            settings.RestoreFurcadiaSettings(BackupSettings);
+            BackupSettings = null;
+            FurcSettingsRestored?.Invoke();
+            if (NewsTimer != null)
+                NewsTimer.Dispose();
+        }
+
+        #endregion Private Methods
     }
 }

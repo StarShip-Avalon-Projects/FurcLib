@@ -509,7 +509,7 @@ namespace Furcadia.Net.Proxy
                     result = (char)34 + arg;
                     break;
             }
-            SendToServer(result);
+            SendLineToServer(result);
         }
 
         /// <summary>
@@ -1408,6 +1408,19 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
+        /// Send a Message with line terminator to Server through the Load Ballancer
+        /// </summary>
+        /// <param name="message">
+        /// Client to server Instruction
+        /// </param>
+        public override void SendLineToServer(string message)
+        {
+            if (!message.EndsWith("\n"))
+                message += '\n';
+            ServerBalancer.SendToServer(message);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="data">
         /// </param>
@@ -1418,7 +1431,8 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// Send Message to Server through the Load Ballancer
+        /// Send a message with out a line terminator to Server through the
+        /// Load Ballancer
         /// </summary>
         /// <param name="message">
         /// Client to server Instruction
