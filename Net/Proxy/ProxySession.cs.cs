@@ -54,9 +54,9 @@ namespace Furcadia.Net.Proxy
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += onServerQueSent;
 
-            ServerData2 += onServerDataReceived;
+            base.ServerData2 += onServerDataReceived;
             Connected += OnServerConnected;
-            ClientData2 += onClientDataReceived;
+            base.ClientData2 += onClientDataReceived;
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect();
 
             dream = new DREAM();
@@ -74,9 +74,9 @@ namespace Furcadia.Net.Proxy
             options = Options;
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += onServerQueSent;
-            ServerData2 += onServerDataReceived;
+            base.ServerData2 += onServerDataReceived;
             Connected += OnServerConnected;
-            ClientData2 += onClientDataReceived;
+            base.ClientData2 += onClientDataReceived;
 
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
@@ -463,6 +463,56 @@ namespace Furcadia.Net.Proxy
         #endregion Public Methods
 
         /// <summary>
+        /// This is triggered when the Client sends data to the server.
+        /// Expects a return value.
+        /// </summary>
+        public override event DataEventHandler2 ClientData2;
+
+        /// <summary>
+        /// This is triggered when the Server sends data to the client.
+        /// Doesn't expect a return value.
+        /// </summary>
+        public override event DataEventHandler2 ServerData2;
+
+        /// <summary>
+        /// Text Channel Prefixes (shout,whisper emote, Raw Server command)
+        /// </summary>
+        /// <param name="arg">
+        /// </param>
+        public void FormatSpokenCommandForServer(ref string arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+                return;
+            //Clean Text input to match Client
+            string result = "";
+            switch (arg.Substring(0, 1))
+            {
+                case "`":
+                    result = arg.Remove(0, 1);
+                    break;
+
+                case "/":
+                    result = "wh " + arg.Substring(1);
+                    break;
+
+                case ":":
+                    result = arg;
+
+                    break;
+
+                case "-":
+                    result = arg;
+
+                    break;
+
+                default:
+                    result = (char)34 + arg;
+                    break;
+            }
+            SendToServer(result);
+        }
+
+        /// <summary>
         /// Parse Channel Data
         /// </summary>
         /// <param name="data">
@@ -484,10 +534,9 @@ namespace Furcadia.Net.Proxy
         /// FTR http://ftr.icerealm.org/ref-instructions/
         /// </para>
         /// </remarks>
-        public void ParseServerChannel(string data, bool Handled)
+        public void ParseServerChannel(string data, ref bool Handled)
         {
             //TODO: needs to move and refactored to ServerParser Class
-
             data = data.Remove(0, 1);
 
             string Color = Regex.Match(data, EntryFilter).Groups[1].Value;
@@ -733,9 +782,6 @@ namespace Furcadia.Net.Proxy
                 }
 
                 //NameFilter
-
-                SendToClient("(" + data);
-                return;
             }
             else if (Color == "whisper")
             {
@@ -982,7 +1028,8 @@ namespace Furcadia.Net.Proxy
                         //ProcessServerInstruction?.Invoke(FurreSpawn,
                         //        new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
 
-                        ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                        ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase,
+                            ServerInstructionType.Unknown));
                     }
                     break;
 
@@ -1050,16 +1097,25 @@ namespace Furcadia.Net.Proxy
                         //if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))
                         //{
                         //}
-                        ProcessServerInstruction?.Invoke(FurreSpawn,
-                            new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                        if (ProcessServerInstruction != null)
+                        {
+                            ProcessServerInstruction.Invoke(FurreSpawn,
+                                new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                            Handled = true;
+                        }
                     }
                     //Remove Furre
                     else if (data.StartsWith(")"))
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         Dream.FurreList.Remove(RemoveFurre.AvatarID);
-                        ProcessServerInstruction?.Invoke(RemoveFurre,
-                                new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
+
+                        if (ProcessServerInstruction != null)
+                        {
+                            ProcessServerInstruction.Invoke(RemoveFurre,
+                                    new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
+                            Handled = true;
+                        }
                     }
                     //Animated Move
                     else if (data.StartsWith("/"))
@@ -1192,7 +1248,7 @@ namespace Furcadia.Net.Proxy
                     {
 #if DEBUG
 
-                        Console.WriteLine("Entering new Dream" + data);
+                        Console.WriteLine(":::DEBUG::: Entering new Dream" + data);
 #endif
 
                         hasShare = false;
@@ -1258,7 +1314,7 @@ namespace Furcadia.Net.Proxy
 
                             //(0:92) When the bot detects the "Your throat is tired. Please wait a few seconds" message,
                         }
-                        ParseServerChannel(data, Handled);
+                        ParseServerChannel(data, ref Handled);
                         return;
                     }
 
@@ -1274,27 +1330,6 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// </summary>
-        /// <param name="data">
-        /// </param>
-        public override void SendToClient(string data)
-        {
-            if (IsClientConnected)
-                base.SendToClient(data);
-        }
-
-        /// <summary>
-        /// Send Message to Server through the Load Ballancer
-        /// </summary>
-        /// <param name="message">
-        /// Client to server Instruction
-        /// </param>
-        public override void SendToServer(string message)
-        {
-            ServerBalancer.SendToServer(message);
-        }
-
-        /// <summary>
         /// Format basic furcadia commands and send to server
         /// <para>
         /// We also mirror the client to server banish system.
@@ -1306,9 +1341,9 @@ namespace Furcadia.Net.Proxy
         /// <param name="data">
         /// Raw Client to Server instruction
         /// </param>
-        public virtual void sndServer(ref string data)
+        public virtual void ProcessSpokenCommands(ref string data)
         {
-            if (!base.IsServerConnected)
+            if (!IsServerConnected)
                 return;
 
             if (data.StartsWith("`m "))
@@ -1369,45 +1404,28 @@ namespace Furcadia.Net.Proxy
                 BanishName = "";
             }
 
-            TextToServer(ref data);
+            FormatSpokenCommandForServer(ref data);
         }
 
         /// <summary>
-        /// Text Channel Prefixes (shout,whisper emote, Raw Server command)
         /// </summary>
-        /// <param name="arg">
+        /// <param name="data">
         /// </param>
-        public void TextToServer(ref string arg)
+        public override void SendToClient(string data)
         {
-            if (string.IsNullOrWhiteSpace(arg))
-                return;
-            //Clean Text input to match Client
-            string result = "";
-            switch (arg.Substring(0, 1))
-            {
-                case "`":
-                    result = arg.Remove(0, 1);
-                    break;
+            if (IsClientConnected)
+                base.SendToClient(data);
+        }
 
-                case "/":
-                    result = "wh " + arg.Substring(1);
-                    break;
-
-                case ":":
-                    result = arg;
-
-                    break;
-
-                case "-":
-                    result = arg;
-
-                    break;
-
-                default:
-                    result = (char)34 + arg;
-                    break;
-            }
-            SendToServer(result);
+        /// <summary>
+        /// Send Message to Server through the Load Ballancer
+        /// </summary>
+        /// <param name="message">
+        /// Client to server Instruction
+        /// </param>
+        public override void SendToServer(string message)
+        {
+            ServerBalancer.SendToServer(message);
         }
 
         /// <summary>
@@ -1442,10 +1460,15 @@ namespace Furcadia.Net.Proxy
             {
                 // serverconnectphase = ConnectionPhase.Conne
             }
-            SendToServer(data);
-            // }
+
+            ClientData2.Invoke(data);
+            //SendToServer(data);
         }
 
+        /// <summary>
+        /// Netproxy Scocet notification for Successful connecgt. Here we
+        /// start the MOTD Phase
+        /// </summary>
         private void OnServerConnected()
         {
             serverconnectphase = ConnectionPhase.MOTD;
@@ -1457,12 +1480,12 @@ namespace Furcadia.Net.Proxy
         /// </param>
         private void onServerDataReceived(string data)
         {
-            // lock (DataReceived)
-            //{
             player = new FURRE();
+            bool handled = false;
+            ParseServerData(data, handled);
 
-            ParseServerData(data, false);
-            // }
+            if (!handled & ClientData2 != null)
+                ServerData2?.Invoke(data);
         }
 
         #region "Dice Rolls"

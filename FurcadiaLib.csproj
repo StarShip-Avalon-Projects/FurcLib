@@ -106,6 +106,7 @@
     </Compile>
     <Compile Include="Avatar.cs" />
     <Compile Include="Badges.cs" />
+    <Compile Include="IO\IniFile.cs" />
     <Compile Include="LegacyAttribute.cs" />
     <Compile Include="Net\Account\AccountInfo.cs" />
     <Compile Include="Net\Account\CharacterInfo.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\UpdateColorString.cs" />
+    <Compile Include="Security\SecureTcpClient.cs" />
     <Compile Include="Security\SSL.cs" />
     <Compile Include="Security\SslCert.cs" />
     <Compile Include="Text\Base220.cs" />
@@ -201,6 +203,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="FurcLib LGPLv3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="AssemblyFileVersion.t4">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyFileVersion1.cs</LastGenOutput>

@@ -118,7 +118,10 @@ namespace Furcadia.Net
         /// </param>
         public void Add(FURRE Furre)
         {
-            fList.Add(Furre);
+            if (!fList.Contains(Furre))
+                fList.Add(Furre);
+            else
+                fList[fList.IndexOf(Furre)] = Furre;
         }
 
         /// <summary>
@@ -136,7 +139,12 @@ namespace Furcadia.Net
         /// </returns>
         public bool Contains(int FurreID)
         {
-            return fList.Contains(new Net.FURRE(FurreID));
+            foreach (FURRE fur in fList)
+            {
+                if (fur.ID == FurreID)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -147,7 +155,12 @@ namespace Furcadia.Net
         /// </returns>
         public bool Contains(FURRE Furre)
         {
-            return fList.Contains(Furre);
+            foreach (FURRE fur in fList)
+            {
+                if (fur == Furre)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>

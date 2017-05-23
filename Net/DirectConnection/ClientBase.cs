@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 
 namespace Furcadia.Net.DirectConnection
@@ -229,6 +230,7 @@ namespace Furcadia.Net.DirectConnection
         {
             //Start the async connect operation
             server = new TcpClient();
+
             server.BeginConnect(_endpoint.Address, _endpoint.Port, new AsyncCallback(AsyncListener), server);
         }
 
@@ -309,6 +311,7 @@ namespace Furcadia.Net.DirectConnection
             {
                 // Connects to the server
                 server = new TcpClient(FurcadiaUtilities.GameServerHost, _endpoint.Port);
+
                 if (!server.Connected) throw new Exception("There was a problem connecting to the server.");
 
                 server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
@@ -322,59 +325,62 @@ namespace Furcadia.Net.DirectConnection
         {
             lock (lck)
             {
-                try
+                using (SslStream sslStream = new SslStream(server.GetStream(), false))
                 {
-                    if (IsServerConnected == false)
+                    try
                     {
-                        throw new SocketException((int)SocketError.NotConnected);
+                        if (IsServerConnected == false)
+                        {
+                            throw new SocketException((int)SocketError.NotConnected);
+                        }
+                        else
+                        {
+                            List<string> lines = new List<string>();
+                            int read = server.GetStream().EndRead(ar);
+
+                            if (read == 0)
+                            {
+                                ServerDisConnected?.Invoke(); return;
+                            }
+                            //If we have left over data add it to this server build
+                            if (!string.IsNullOrEmpty(_ServerLeftOvers) && _ServerLeftOvers.Length > 0)
+                                serverBuild += _ServerLeftOvers;
+                            serverBuild = System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, read);
+
+                            while (server.GetStream().DataAvailable == true)
+                            {
+                                int pos = sslStream.Read(serverBuffer, 0, serverBuffer.Length);
+                                serverBuild += System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, pos);
+                            }
+                            lines.AddRange(serverBuild.Split('\n'));
+                            if (!serverBuild.EndsWith("\n"))
+                            {
+                                _ServerLeftOvers += lines[lines.Count - 1];
+                                lines.RemoveAt(lines.Count - 1);
+                            }
+
+                            for (int i = 0; i < lines.Count; i++)
+                            {
+                                ServerData?.Invoke(lines[i]);
+                            }
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        List<string> lines = new List<string>();
-                        int read = server.GetStream().EndRead(ar);
-
-                        if (read == 0)
-                        {
-                            ServerDisConnected?.Invoke(); return;
-                        }
-                        //If we have left over data add it to this server build
-                        if (!string.IsNullOrEmpty(_ServerLeftOvers) && _ServerLeftOvers.Length > 0)
-                            serverBuild += _ServerLeftOvers;
-                        serverBuild = System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, read);
-
-                        while (server.GetStream().DataAvailable == true)
-                        {
-                            int pos = server.GetStream().Read(serverBuffer, 0, serverBuffer.Length);
-                            serverBuild += System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, pos);
-                        }
-                        lines.AddRange(serverBuild.Split('\n'));
-                        if (!serverBuild.EndsWith("\n"))
-                        {
-                            _ServerLeftOvers += lines[lines.Count - 1];
-                            lines.RemoveAt(lines.Count - 1);
-                        }
-
-                        for (int i = 0; i < lines.Count; i++)
-                        {
-                            ServerData?.Invoke(lines[i]);
-                        }
+                        // if (IsServerConnected == true) ServerDisConnected();
+                        Error?.Invoke(e, this, "GetServerData()");
+                        ServerDisConnected?.Invoke();
+                        return;
+                    } //else throw e;
+                      // Detect if client disconnected
+                    if (IsServerConnected && serverBuild.Length < 1 || IsServerConnected == false)
+                    {
+                        ServerDisConnected?.Invoke();
                     }
-                }
-                catch (Exception e)
-                {
-                    // if (IsServerConnected == true) ServerDisConnected();
-                    Error?.Invoke(e, this, "GetServerData()");
-                    ServerDisConnected?.Invoke();
-                    return;
-                } //else throw e;
-                  // Detect if client disconnected
-                if (IsServerConnected && serverBuild.Length < 1 || IsServerConnected == false)
-                {
-                    ServerDisConnected?.Invoke();
-                }
 
-                if (IsServerConnected && serverBuild.Length > 0)
-                    server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
+                    if (IsServerConnected && serverBuild.Length > 0)
+                        sslStream.BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
+                }
             }
         }
 
