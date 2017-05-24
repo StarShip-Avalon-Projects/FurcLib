@@ -1,4 +1,5 @@
 ﻿using Furcadia.Movement;
+using Furcadia.Net.Dream;
 
 using static Furcadia.Text.Base220;
 

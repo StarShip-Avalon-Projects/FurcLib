@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Dream
 {
     /// <summary>
     /// Current Dream information

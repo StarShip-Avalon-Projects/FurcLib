@@ -1,5 +1,6 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
+using Furcadia.Net.Dream;
 using Furcadia.Net.Utils.ServerParser;
 using System;
 using System.Collections.Generic;

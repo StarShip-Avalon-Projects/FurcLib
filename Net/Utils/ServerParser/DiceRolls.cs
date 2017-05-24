@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Furcadia.Net.Dream;
+using System.Text.RegularExpressions;
 using static Furcadia.Text.FurcadiaMarkup;
 
 namespace Furcadia.Net.Utils.ServerParser
