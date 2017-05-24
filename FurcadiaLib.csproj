@@ -73,7 +73,7 @@
     <DocumentationFile>bin\Release\FurcadiaLib.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
