@@ -88,6 +88,7 @@ namespace Furcadia.Net
         /// </param>
         public FURRE(string Name)
         {
+            _name = Name;
             _Color = new ColorString();
             Location = new FurrePosition();
             LastPosition = new FurrePosition();
@@ -144,6 +145,12 @@ namespace Furcadia.Net
             set { _Desc = value; }
         }
 
+        [Obsolete]
+        public int DSSpecies
+        {
+            get { return Color.Species; }
+        }
+
         /// <summary>
         /// </summary>
         [CLSCompliant(false)]
@@ -164,6 +171,24 @@ namespace Furcadia.Net
         {
             get { return _FloorObjectOld; }
             set { _FloorObjectOld = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public Avatar.Frame FrameInfo
+        {
+            get
+            {
+                return Avatar.SpecNum(shape);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Obsolete]
+        public int Gender
+        {
+            get { return Color.Gender; }
         }
 
         /// <summary>
@@ -342,6 +367,41 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
+        /// <param name="a">
+        /// </param>
+        /// <param name="b">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static bool operator !=(FURRE a, FURRE b)
+        {
+            return !(a == b);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="a">
+        /// </param>
+        /// <param name="b">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static bool operator ==(FURRE a, FURRE b)
+        {
+            if (System.Object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            if ((object)a == null || (object)b == null)
+                return false;
+            if (string.IsNullOrEmpty(a.ShortName) || string.IsNullOrEmpty(a.ShortName))
+                return a.ID == b.ID;
+            return a.ShortName == b.ShortName;
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="obj">
         /// </param>
         /// <returns>
@@ -353,9 +413,9 @@ namespace Furcadia.Net
             if (obj.GetType() == typeof(FURRE))
             {
                 FURRE ob = (FURRE)obj;
-                if (string.IsNullOrEmpty(ShortName))
-                    return ob.ID == ID;
-                return ob.ShortName == ShortName;
+                if (!string.IsNullOrEmpty(ShortName))
+                    return ob.ShortName == ShortName;
+                return ob.ID == ID;
             }
             return base.Equals(obj);
         }
@@ -397,7 +457,7 @@ namespace Furcadia.Net
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0}", Name);
+            return string.Format("{0} - {1}", ID, Name);
         }
 
         /// <summary>

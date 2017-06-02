@@ -121,8 +121,10 @@
     <Compile Include="Net\Pounce\PounceIni.cs" />
     <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
     <Compile Include="Net\Proxy\ProxySession.cs.cs" />
+    <Compile Include="Net\Utils\ServerObjects\DiceObject.cs" />
     <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />
     <Compile Include="Net\Utils\ServerParser\ChannelObject.cs" />
+    <Compile Include="Net\Utils\ServerObjects\DataObject.cs" />
     <Compile Include="Net\Utils\ServerParser\DiceRolls.cs" />
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />

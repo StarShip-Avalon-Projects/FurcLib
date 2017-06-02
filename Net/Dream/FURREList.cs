@@ -28,12 +28,14 @@ namespace Furcadia.Net
         /// </summary>
         public FURREList()
         {
-            fList = new List<FURRE>();
+            fList = new List<FURRE>(100);
         }
 
         #endregion Public Constructors
 
         #region Public Properties
+
+        public object get { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -56,6 +58,17 @@ namespace Furcadia.Net
         }
 
         /// <summary>
+        /// </summary>
+        public IList<FURRE> ToIList
+        {
+            get
+
+            {
+                return (IList<FURRE>)fList;
+            }
+        }
+
+        /// <summary>
         /// Number of Avatars in the Dream
         /// </summary>
         public int Count => fList.Count;
@@ -74,10 +87,14 @@ namespace Furcadia.Net
         {
             get
             {
+                if (fList.Count < index)
+                    throw new ArgumentOutOfRangeException("index", "is higher then the number of Furres in the list");
                 return fList[index];
             }
             set
             {
+                if (fList.Count < index)
+                    throw new ArgumentOutOfRangeException("index", "is higher then the number of Furres in the list");
                 fList[index] = value;
             }
         }
@@ -170,7 +187,7 @@ namespace Furcadia.Net
                     return Character;
                 }
             }
-            return null;
+            return new FURRE();
         }
 
         /// <summary>
@@ -194,10 +211,11 @@ namespace Furcadia.Net
         {
             foreach (FURRE furre in fList)
             {
-                if (furre.ID == Base220.ConvertFromBase220(FurreID))
+                int id = Base220.ConvertFromBase220(FurreID);
+                if (furre.ID == id)
                     return furre;
             }
-            return null;
+            return new FURRE();
         }
 
         /// <summary>
@@ -216,7 +234,7 @@ namespace Furcadia.Net
                 if (furre.ID == FurreID)
                     return furre;
             }
-            return null;
+            return new FURRE();
         }
 
         /// <summary>

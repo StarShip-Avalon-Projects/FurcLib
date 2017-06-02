@@ -129,6 +129,35 @@ namespace Furcadia.Net
         UpdateColorString
     }
 
+    public class NetChannelEventArgs : NetServerEventArgs
+    {
+        #region Public Constructors
+
+        /// <summary>
+        /// </summary>
+        public NetChannelEventArgs() : base(ConnectionPhase.Connected, ServerInstructionType.DisplayText)
+        {
+            channel = "Unknown";
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        private string channel;
+
+        /// <summary>
+        /// Server Text Channel
+        /// </summary>
+        public string Channel
+        {
+            get { return channel; }
+            set { channel = value; }
+        }
+
+        #endregion Public Properties
+    }
+
     /// <summary>
     /// Client Status Event Arguments.
     /// </summary>
@@ -147,16 +176,16 @@ namespace Furcadia.Net
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="message">
+        /// <param name="clientdata">
         /// Optional Message
         /// </param>
         /// <param name="phase">
         /// Connection Phase
         /// </param>
-        public NetClientEventArgs(ConnectionPhase phase, string message = null)
+        public NetClientEventArgs(ConnectionPhase phase, string clientdata = null)
         {
             ConnectPhase = phase;
-            Message = message;
+            message = clientdata;
         }
 
         #endregion Public Constructors
@@ -168,10 +197,22 @@ namespace Furcadia.Net
         /// </summary>
         public ConnectionPhase ConnectPhase;
 
+        private string message;
+
         /// <summary>
         /// optional string message
         /// </summary>
-        public string Message;
+        public string ClientData
+        {
+            get
+            {
+                return message;
+            }
+            set
+            {
+                message = value;
+            }
+        }
 
         #endregion Public Fields
     }
@@ -236,8 +277,82 @@ namespace Furcadia.Net
     /// <summary>
     /// Parse Server Instruction set
     /// </summary>
+    public class ParseChannelArgs : ParseServerArgs
+    {
+        #region Private Fields
+
+        private string channel;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="ServerInstruction">
+        /// </param>
+        /// <param name="phase">
+        /// </param>
+        public ParseChannelArgs(ServerInstructionType ServerInstruction, ConnectionPhase phase) : base(ServerInstruction, phase)
+        {
+            channel = "Unknown";
+        }
+
+        /// <summary>
+        /// </summary>
+        public ParseChannelArgs() : base(ServerInstructionType.DisplayText, ConnectionPhase.Connected)
+        {
+            channel = "Unknown";
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        /// <summary>
+        /// Server Text Channel
+        /// </summary>
+        public string Channel
+        {
+            get { return channel; }
+            set { channel = value; }
+        }
+
+        #endregion Public Properties
+    }
+
+    /// <summary>
+    /// Parse Server Instruction set
+    /// </summary>
     public class ParseServerArgs : EventArgs
     {
+        #region Private Fields
+
+        private string message;
+
+        #endregion Private Fields
+
+        #region Public Properties
+
+        /// <summary>
+        /// optional string message
+        /// </summary>
+        public string ServerData
+        {
+            get
+            {
+                return message;
+            }
+            set
+            {
+                message = value;
+            }
+        }
+
+        #endregion Public Properties
+
+
+
         #region Private Fields
 
         private ConnectionPhase serverConnectedPhase;
@@ -260,6 +375,7 @@ namespace Furcadia.Net
         public ServerInstructionType ServerInstruction
         {
             get { return serverinstruction; }
+            set { serverinstruction = value; }
         }
 
         #endregion Public Properties

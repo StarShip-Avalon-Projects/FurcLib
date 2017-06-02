@@ -35,12 +35,15 @@ namespace Furcadia.Net.Utils.ServerParser
             if (ServerInstruction[0] == '(')
                 instructionType = ServerInstructionType.DisplayText;
             Channel = Regex.Match(ServerInstruction, ChannelNameFilter).Groups[1].Value;
+            channelText = Regex.Match(ServerInstruction, EntryFilter).Groups[2].Value;
             player = new FURRE();
         }
 
         #endregion Public Constructors
 
         #region Public Properties
+
+        private string channelText;
 
         /// <summary>
         /// Channel Name
@@ -49,6 +52,18 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get { return channel; }
             set { channel = value; }
+        }
+
+        public string ChannelText
+        {
+            get
+            {
+                return channelText;
+            }
+            set
+            {
+                channelText = value;
+            }
         }
 
         /// <summary>
