@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Dream
 {
     /// <summary>
     /// Furre List information for a Furcadia Dream
@@ -18,7 +18,7 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        protected internal IList<FURRE> fList;
+        static protected internal IList<FURRE> fList;
 
         #endregion Protected Internal Fields
 
@@ -28,14 +28,12 @@ namespace Furcadia.Net
         /// </summary>
         public FURREList()
         {
-            fList = new List<FURRE>(100);
+            fList = new List<FURRE>();
         }
 
         #endregion Public Constructors
 
         #region Public Properties
-
-        public object get { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -58,17 +56,6 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// </summary>
-        public IList<FURRE> ToIList
-        {
-            get
-
-            {
-                return (IList<FURRE>)fList;
-            }
-        }
-
-        /// <summary>
         /// Number of Avatars in the Dream
         /// </summary>
         public int Count => fList.Count;
@@ -87,15 +74,15 @@ namespace Furcadia.Net
         {
             get
             {
-                if (fList.Count < index)
-                    throw new ArgumentOutOfRangeException("index", "is higher then the number of Furres in the list");
-                return fList[index];
+                if (index < fList.Count)
+                    return fList[index];
+                else
+                    return null;
             }
             set
             {
-                if (fList.Count < index)
-                    throw new ArgumentOutOfRangeException("index", "is higher then the number of Furres in the list");
-                fList[index] = value;
+                if (index < fList.Count)
+                    fList[index] = value;
             }
         }
 
@@ -111,7 +98,9 @@ namespace Furcadia.Net
         {
             get
             {
-                return fList[fList.IndexOf(fur)];
+                if (fList.Contains(fur))
+                    return fList[fList.IndexOf(fur)];
+                return fur;
             }
             set
             {
@@ -129,7 +118,10 @@ namespace Furcadia.Net
         /// </param>
         public void Add(FURRE Furre)
         {
-            fList.Add(Furre);
+            if (!fList.Contains(Furre))
+                fList.Add(Furre);
+            else
+                fList[fList.IndexOf(Furre)] = Furre;
         }
 
         /// <summary>
@@ -147,7 +139,12 @@ namespace Furcadia.Net
         /// </returns>
         public bool Contains(int FurreID)
         {
-            return fList.Contains(new Net.FURRE(FurreID));
+            foreach (FURRE fur in fList)
+            {
+                if (fur.ID == FurreID)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -158,7 +155,12 @@ namespace Furcadia.Net
         /// </returns>
         public bool Contains(FURRE Furre)
         {
-            return fList.Contains(Furre);
+            foreach (FURRE fur in fList)
+            {
+                if (fur == Furre)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -187,7 +189,7 @@ namespace Furcadia.Net
                     return Character;
                 }
             }
-            return new FURRE();
+            return null;
         }
 
         /// <summary>
@@ -211,11 +213,10 @@ namespace Furcadia.Net
         {
             foreach (FURRE furre in fList)
             {
-                int id = Base220.ConvertFromBase220(FurreID);
-                if (furre.ID == id)
+                if (furre.ID == Base220.ConvertFromBase220(FurreID))
                     return furre;
             }
-            return new FURRE();
+            return null;
         }
 
         /// <summary>
@@ -234,7 +235,7 @@ namespace Furcadia.Net
                 if (furre.ID == FurreID)
                     return furre;
             }
-            return new FURRE();
+            return null;
         }
 
         /// <summary>

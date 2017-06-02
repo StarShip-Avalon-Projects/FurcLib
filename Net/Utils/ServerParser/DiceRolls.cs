@@ -1,4 +1,4 @@
-﻿using Furcadia.Net.Utils.ServerObjects;
+﻿using Furcadia.Net.Dream;
 using System.Text.RegularExpressions;
 using static Furcadia.Text.FurcadiaMarkup;
 
@@ -9,39 +9,15 @@ namespace Furcadia.Net.Utils.ServerParser
     /// </summary>
     public class DiceRolls : ChannelObject
     {
-        #region Public Fields
-
-        private double diceCount;
-
-        private double diceModifyer;
-
-        private double diceResult;
-
-        private double diceSides;
-
-        /// <summary>
-        /// </summary>
-        public DiceObject Dice
-        {
-            get
-            {
-                return dice;
-            }
-        }
-
         #region Private Fields
 
         private string diceCompnentMatch;
+        private double diceCount;
+        private double diceModifyer;
+        private double diceResult;
+        private double diceSides;
 
         #endregion Private Fields
-
-        #region Private Fields
-
-        private DiceObject dice;
-
-        #endregion Private Fields
-
-        #endregion Public Fields
 
         #region Public Constructors
 
@@ -69,12 +45,39 @@ namespace Furcadia.Net.Utils.ServerParser
             player.Message = DiceMatch.Groups[7].Value;
             double.TryParse(DiceMatch.Groups[4].Value, out diceSides);
             double.TryParse(DiceMatch.Groups[3].Value, out diceCount);
-            dice.DiceCompnentMatch = DiceMatch.Groups[6].Value;
-            dice.DiceModifyer = 0.0;
+            DiceCompnentMatch = DiceMatch.Groups[6].Value;
+            DiceModifyer = 0.0;
             double.TryParse(DiceMatch.Groups[5].Value, out diceModifyer);
             double.TryParse(DiceMatch.Groups[8].Value, out diceResult);
         }
 
         #endregion Public Constructors
+
+        #region Public Properties
+
+        /// <summary>
+        /// </summary>
+        public string DiceCompnentMatch { get { return diceCompnentMatch; } set { diceCompnentMatch = value; } }
+
+        /// <summary>
+        /// Number of Dice
+        /// </summary>
+        public double DiceCount { get { return diceCount; } set { diceCount = value; } }
+
+        /// <summary>
+        /// Die offset +/- n
+        /// </summary>
+        public double DiceModifyer { get { return diceModifyer; } set { diceModifyer = value; } }
+
+        /// <summary>
+        /// </summary>
+        public double DiceResult { get { return diceResult; } set { diceResult = value; } }
+
+        /// <summary>
+        /// Number of sides per Die
+        /// </summary>
+        public double DiceSides { get { return diceSides; } set { diceSides = value; } }
+
+        #endregion Public Properties
     }
 }

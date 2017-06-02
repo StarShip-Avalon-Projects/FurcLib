@@ -1,15 +1,68 @@
-﻿ff3pp v2 PreAlpha 2
+﻿:::Contact:::
+Furcadia Gerolkae
+E-Mail getolkae@gmail.com
 
-Known Issues:
-Protocol Fragmentation (Server Instructions get Chopped off)
+:::BugTraq:::
+http://bugtraq.tsprojects.org/
+For an account, Give Username and E-Mail address and an account will be created
 
-Furcadia File Paths.
-Improving Mono Support
+:::GitHub:::
+https://github.com/StarShip-Avalon-Projects/FurcLib
 
-1: Look for the Application Folder for localdir.ini
-2: Read Localdir.ini forFurcadia Install Path...
-3: If those Fail... Fall back to Serching Defalut paths...
-3a: Look for Furcs localdir.ini
+
+:::Known Issues:::
+
+Protocol Fragmentation (Server Instructions get chopped off) 
+(TCP streeam needs conversion to byte handling add TLS support here)
+
+Furre pose and facing direction not working due to protocol updates
+::BUG::  http://bugtraq.tsprojects.org/view.php?id=56
+
+Paw objects not working as expected
+::BUG:: http://bugtraq.tsprojects.org/view.php?id=58
+
+
+:::TODO:::
+
+Legacy Ini File downloader or send charachter-ini config to Fured
+
+Move ParseServer ParseChennels to seperate object and link with NetConnection
+NetConnection byte parsing
+
+Fix Furcadia Settings... 
+-Read Default URLs
+- Seperate Furcadia Proxy/firewall settings update into its own object with Mutex to 
+  prevent Other FurcLib Apps from overriding Settings during connection
+- Add optional settings list. (Preload with defaults)
+
+add support for Modern/Legasy mode dreams (there are protocol differences)
+ADD TLS/SSL support  (See Protocol Fragmentation)
+
+ff3pp V2 PreAlpha4
+
+m Changed NetProxy to Byte Parsing This fixes Protocol Fragmentation
++ Added IniFile Class. (This supports Dragon Speak Constructor Wizard Scripts with 
+  the [Code] block compnent)
+
+ff3pp v2 PreAlpha3
+
++ Enabled Server PreProcessor
++ Added Connection Phases for Server Status
+m Fixed some bugs in FURRE Class and FURREList
+m fixed chharacter flags
+m Updateed color-code strings for FURRE class (now supports 't' and 'w' formats) useful for parsing
+  legacy character ini-files
+
+ff3pp v2 PreAlpha 2
+
+m repaired Furcadia file paths reading.
+m Improved Mono support (Furcadia installs itself under 32bit Wine, 
+  Linux/Mac Mono does not see the Furcadia installation)
+
+1: Look for the application folder for localdir.ini
+2: Read Localdir.ini for Furcadia install path...
+3: If those fail... Fall back to searching defalut paths...
+3a: Look for Furcadia's localdir.ini
 
 App.config Settings
-Configure default settings For DEP Updates
+Configure default settings for DEP updates

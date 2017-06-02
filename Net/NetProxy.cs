@@ -598,8 +598,7 @@ namespace Furcadia.Net
         {
             if (string.IsNullOrEmpty(message))
                 return;
-            if (!IsServerConnected)
-                return;
+
             try
             {
                 if (server.GetStream().CanWrite)

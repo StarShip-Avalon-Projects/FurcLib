@@ -129,28 +129,38 @@ namespace Furcadia
                         Group g = NumToEnum<Group>(grp);
                         Level l = NumToEnum<Level>(lvl);
                         result = "[" + g.ToString() + "-" + l.ToString() + "]";
-                        return result;
+                        break;
                     }
             }
             return result;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <typeparam name="T">
+        /// </typeparam>
+        /// <param name="number">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static T NumToEnum<T>(int number)
         {
             return (T)Enum.ToObject(typeof(T), number);
         }
 
+        /// <summary>
+        /// Preload the badge table
+        /// </summary>
         public static void PrimeTable()
         {
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Furcadia.Resources.badges.csv");
             try
             {
-                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Furcadia.Resources.badges.csv");
                 using (StreamReader reader = new StreamReader(stream))
                 {
                     string result = reader.ReadToEnd();
-                    result = result.Replace("\r", "");
                     result = result.Replace("\"", "");
-                    string[] csvRows = result.Split('\n');
+                    string[] csvRows = result.Split('\n', '\r');
                     string[] fields = null;
                     dt = new DataTable();
 
@@ -165,8 +175,10 @@ namespace Furcadia
                     }
                 }
             }
-            catch
+            finally
             {
+                stream.Close();
+                stream.Dispose();
             }
         }
 

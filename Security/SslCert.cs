@@ -12,7 +12,7 @@ namespace Furcadia.Security
         public SslCert()
         {
             //Do webrequest to get info on secure site
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://mail.google.com");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://cms.furcadia.com/");
             request.AllowAutoRedirect = false;
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             response.Close();

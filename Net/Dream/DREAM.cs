@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Dream
 {
     /// <summary>
     /// Current Dream information
@@ -50,6 +50,17 @@ namespace Furcadia.Net
         #endregion Public Constructors
 
         #region Public Properties
+
+        private bool isModern;
+
+        /// <summary>
+        /// Is this dream Modern Mode?
+        /// </summary>
+        public bool IsModern
+        {
+            get { return isModern; }
+            set { isModern = value; }
+        }
 
         /// <summary>
         /// Number of DS Lines

@@ -3,7 +3,7 @@ using Furcadia.Movement;
 using System;
 using static Furcadia.Util;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.Dream
 {
     /// <summary>
     /// Class for Proxies and bots to use Furrre Data provided by the game server.
