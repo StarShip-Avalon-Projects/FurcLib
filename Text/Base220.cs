@@ -277,7 +277,8 @@ namespace Furcadia.Text
         {
             int num = 0;
             int mod = 1;
-
+            if (string.IsNullOrEmpty(b220str))
+                return 0;
             // Conversion
             for (int i = 0; i < b220str.Length; i++)
             {

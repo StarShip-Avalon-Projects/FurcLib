@@ -1,4 +1,5 @@
 ﻿using Furcadia.Net.Dream;
+using Furcadia.Net.Utils.ServerObjects;
 using System.Text.RegularExpressions;
 using static Furcadia.Text.FurcadiaMarkup;
 
@@ -11,11 +12,7 @@ namespace Furcadia.Net.Utils.ServerParser
     {
         #region Private Fields
 
-        private string diceCompnentMatch;
-        private double diceCount;
-        private double diceModifyer;
-        private double diceResult;
-        private double diceSides;
+        private DiceObject dice;
 
         #endregion Private Fields
 
@@ -27,6 +24,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         public DiceRolls(string ServerInstruction) : base(ServerInstruction)
         {
+            dice = new DiceObject();
             //Dice Filter needs Player Name "forced"
             Regex DiceREGEX = new Regex(DiceFilter, RegexOptions.IgnoreCase);
             System.Text.RegularExpressions.Match DiceMatch = DiceREGEX.Match(ServerInstruction);
@@ -43,12 +41,21 @@ namespace Furcadia.Net.Utils.ServerParser
 
             player = new FURRE((DiceMatch.Groups[3].Value));
             player.Message = DiceMatch.Groups[7].Value;
-            double.TryParse(DiceMatch.Groups[4].Value, out diceSides);
-            double.TryParse(DiceMatch.Groups[3].Value, out diceCount);
-            DiceCompnentMatch = DiceMatch.Groups[6].Value;
-            DiceModifyer = 0.0;
-            double.TryParse(DiceMatch.Groups[5].Value, out diceModifyer);
-            double.TryParse(DiceMatch.Groups[8].Value, out diceResult);
+            double num = 0;
+            double.TryParse(DiceMatch.Groups[4].Value, out num);
+            dice.DiceSides = num;
+            num = 0;
+            double.TryParse(DiceMatch.Groups[3].Value, out num);
+            dice.DiceCount = num;
+            char cchar = '+';
+            char.TryParse(DiceMatch.Groups[6].Value, out cchar);
+            dice.DiceCompnentMatch = cchar;
+            num = 0.0;
+            double.TryParse(DiceMatch.Groups[5].Value, out num);
+            dice.DiceModifyer = num;
+            num = 0;
+            double.TryParse(DiceMatch.Groups[8].Value, out num);
+            dice.DiceSides = num;
         }
 
         #endregion Public Constructors
@@ -57,26 +64,17 @@ namespace Furcadia.Net.Utils.ServerParser
 
         /// <summary>
         /// </summary>
-        public string DiceCompnentMatch { get { return diceCompnentMatch; } set { diceCompnentMatch = value; } }
-
-        /// <summary>
-        /// Number of Dice
-        /// </summary>
-        public double DiceCount { get { return diceCount; } set { diceCount = value; } }
-
-        /// <summary>
-        /// Die offset +/- n
-        /// </summary>
-        public double DiceModifyer { get { return diceModifyer; } set { diceModifyer = value; } }
-
-        /// <summary>
-        /// </summary>
-        public double DiceResult { get { return diceResult; } set { diceResult = value; } }
-
-        /// <summary>
-        /// Number of sides per Die
-        /// </summary>
-        public double DiceSides { get { return diceSides; } set { diceSides = value; } }
+        public DiceObject Dice
+        {
+            get
+            {
+                return dice;
+            }
+            set
+            {
+                dice = value;
+            }
+        }
 
         #endregion Public Properties
     }

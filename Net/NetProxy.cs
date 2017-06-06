@@ -13,6 +13,7 @@ using System.IO;
 
 //using System.ComponentModel;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
 using static Furcadia.Net.Utils.Utilities;
@@ -37,6 +38,12 @@ namespace Furcadia.Net
     /// </remarks>
     public class NetProxy
     {
+        #region Private Fields
+
+        private SslStream ServerSslStream;
+
+        #endregion Private Fields
+
         #region Protected Internal Fields
 
         /// <summary>
@@ -45,6 +52,8 @@ namespace Furcadia.Net
         protected internal Utils.Utilities FurcadiaUtilities;
 
         #endregion Protected Internal Fields
+
+
 
         #region Private Fields
 
@@ -66,6 +75,8 @@ namespace Furcadia.Net
         /// Furcadia Client Connection
         /// </summary>
         private TcpClient client = new TcpClient();
+
+        //NetworkStream stream;
 
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
 
@@ -544,30 +555,19 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Send Message to Server through the Load Ballancer
-        /// </summary>
-        /// <param name="message">
-        /// Client to server Instruction
-        /// </param>
-        public virtual void SendLineToServer(string message)
-        {
-            if (!message.EndsWith("\n"))
-                message += '\n';
-            SendToServer(message);
-        }
-
-        /// <summary>
         /// </summary>
         /// <param name="message">
         /// </param>
         public virtual void SendToClient(string message)
         {
-            if (string.IsNullOrEmpty(message))
-                return;
+            //if (string.IsNullOrEmpty(message))
+            //    return;
+            if (!message.EndsWith(string.Format("{0}", '\n')))
+                message += '\n';
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)
-                    client.GetStream().Write(System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message), 0, System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message).Length);
+                    client.GetStream().Write(System.Text.Encoding.UTF8.GetBytes(message), 0, System.Text.Encoding.UTF8.GetBytes(message).Length);
             }
             catch (Exception e) { Error?.Invoke(e, this, "SendClient()"); }
         }
@@ -596,13 +596,16 @@ namespace Furcadia.Net
         /// </param>
         public virtual void SendToServer(string message)
         {
-            if (string.IsNullOrEmpty(message))
+            //if (string.IsNullOrEmpty(message))
+            //    return;
+            if (!message.EndsWith(string.Format("{0}", '\n')))
+                message += '\n';
+            if (!IsServerConnected)
                 return;
-
             try
             {
                 if (server.GetStream().CanWrite)
-                    server.GetStream().Write(System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message), 0, System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message).Length);
+                    server.GetStream().Write(System.Text.Encoding.UTF8.GetBytes(message), 0, System.Text.Encoding.UTF8.GetBytes(message).Length);
             }
             catch (Exception e)
             {
@@ -663,6 +666,14 @@ namespace Furcadia.Net
         #endregion Protected Methods
 
         #region Private Methods
+
+        private byte[] ClientLeftOvers = new byte[BUFFER_CAP];
+
+        private int ClientLeftOversSize = 0;
+
+        private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
+
+        private int ServerLeftOversSize = 0;
 
         /// <summary>
         /// </summary>
@@ -735,209 +746,85 @@ namespace Furcadia.Net
         /// </param>
         private void GetClientData(IAsyncResult ar)
         {
-            string line;
-
-            try
+            if (client.Connected == false)
             {
-                if (client.Connected == false)
-                {
-                    throw new SocketException((int)SocketError.NotConnected);
-                }
+                throw new SocketException((int)SocketError.NotConnected);
+            }
 
-                //read = number of bytes read
-                int read = 0;
-                read = client.GetStream().EndRead(ar);
+            //read = number of bytes read
+            int read = 0;
 
-                ClientnTaken += read;
-                do
+            read = client.GetStream().EndRead(ar);
+            int currStart = 0;
+            int currEnd = -1;
+
+            for (int i = 0; i < read; i++)
+            {
+                if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
                 {
-                    line = GetLineFromClientBuffer(false);
-                    if (line != null)
+                    string test = System.Text.Encoding.UTF8.GetString(clientBuffer,
+                       0, clientBuffer.Length);
+                    if (test.Contains("@@@@"))
+                        Debug.Print(test);
+
+                    // Set the end of the data
+                    currEnd = i;
+
+                    // If we have left overs from previous runs:
+                    if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
                     {
-                        ClientData2?.Invoke(line);
-                        // we want ServerConnected and Check for null data
-                        // Application may intentionally return ClientData =
-                        // null to Avoid "Throat Tired" Syndrome. Let
-                        // Application handle packet routing.
-                        if (IsServerConnected == true && ClientData != null)
-                            SendToServer(ClientData?.Invoke(line));
+                        // Allocate enough space for the joined buffer
+                        byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
+
+                        // And add the current read as well
+                        Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
+
+                        // Get the leftover from the previous read
+                        Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
+
+                        string test2 = System.Text.Encoding.UTF8.GetString(joinedData,
+                       0, joinedData.Length);
+                        ClientData2?.Invoke(System.Text.Encoding.UTF8.GetString(joinedData,
+                       0, joinedData.Length)); //Mark that we don't have any
+                                               // leftovers anymore
+
+                        // Mark that we don't have any leftovers anymore
+                        ClientLeftOversSize = 0;
                     }
-                } while (line != null);
-                if (ClientnTaken > 0)
-                {
-                    line = GetLineFromClientBuffer(true);
-                    ClientData2?.Invoke(line);
-                    // we want ServerConnected and Check for null data
-                    // Application may intentionally return ClientData =
-                    // null to Avoid "Throat Tired" Syndrome. Let
-                    // Application handle packet routing.
-                    if (IsServerConnected == true && ClientData != null)
-                        SendToServer(ClientData?.Invoke(line));
-                }
-
-                //ClientBuild is a string containing data read off the clientBuffer
-                //    clientBuild = System.Text.Encoding.GetEncoding(EncoderPage).GetString(clientBuffer, 0, read);
-                while (client.GetStream().DataAvailable)
-                {
-                    //clientBuffer.Length = NetProxy.BUFFER_CAP
-
-                    if (clientBuffer.Length <= 0)
-                        ClientDisConnected();
-
-                    read = client.GetStream().Read(clientBuffer, 0, clientBuffer.Length);
-                    ClientnTaken += read;
-                    do
+                    else
                     {
-                        line = GetLineFromClientBuffer(false);
-                        if (line != null)
-                        {
-                            ClientData2?.Invoke(line);
-                            // we want ServerConnected and Check for null
-
-                            // data Application may intentionally return
-                            // ClientData = null to Avoid "Throat Tired"
-                            // Syndrome. Let Application handle packet routing.
-                            if (IsServerConnected == true && ClientData != null)
-                                SendToServer(ClientData?.Invoke(line));
-                        }
-                    } while (line != null);
-                    if (ClientnTaken > 0)
-                    {
-                        line = GetLineFromClientBuffer(true);
-                        ClientData2?.Invoke(line);
-                        // we want ServerConnected and Check for null data
-                        // Application may intentionally return ClientData =
-                        // null to Avoid "Throat Tired" Syndrome. Let
-                        // Application handle packet routing.
-                        if (IsServerConnected == true && ClientData != null)
-                            SendToServer(ClientData?.Invoke(line));
+                        string test3 = System.Text.Encoding.UTF8.GetString(clientBuffer,
+                        currStart, currEnd - currStart);
+                        ClientData2?.Invoke(System.Text.Encoding.UTF8.GetString(clientBuffer,
+                        currStart, currEnd - currStart));
+                        //string test = System.Text.Encoding.UTF8.GetString(clientBuffer,
+                        //currStart, currEnd);
+                        //ClientData2?.Invoke(System.Text.Encoding.UTF8.GetString(clientBuffer,
+                        //currStart, currEnd));
                     }
+
+                    // Set the new start - after our delimiter
+                    currStart = i + 1;
                 }
             }
-            catch (Exception e)
+            // See if we still have any leftovers
+            if (currStart < read)
             {
-                if (client.Connected == true) ClientDisConnected();
-                Error?.Invoke(e, this, "GetClientData()");
-            } // else throw e;
+                //ClientLeftOvers = new byte[read - currStart];
+
+                Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
+                ClientLeftOversSize = read - currStart;
+            }
 
             if (IsClientConnected == false)
+            {
                 ClientDisConnected?.Invoke();
-            else
-            {
-                if (IsClientConnected == true)
-                {
-                    client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
-                }
             }
+
+            if (client.Connected)
+                client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+
             // }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="forced">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <remarks>
-        /// Credits Heindal tester by Artex
-        /// </remarks>
-        private string GetLineFromClientBuffer(bool forced)
-        {
-            lock (ClientBufferLock)
-            {
-                string line = null;
-
-                if (ClientnTaken > 0)
-                {
-                    // Find a line break character.
-                    int i = 0;
-                    for (; i < ClientnTaken; i++)
-                    {
-                        if (clientBuffer[i] == '\n')
-                        {
-                            line = System.Text.Encoding.GetEncoding(EncoderPage).GetString(clientBuffer, 0, i);
-                            break;
-                        }
-                    }
-
-                    // If we took out a line, collapse the buffer.
-                    if (line != null)
-                    {
-                        int j = 0;
-                        i++; // Skip the \n
-
-                        while (i < ClientnTaken)
-                            clientBuffer[j++] = clientBuffer[i++];
-
-                        ClientnTaken = j;
-                        return line + '\n';
-                    }
-
-                    // If we don't have a line and it's a forced request,
-                    // give them what's left in the buffer.
-                    if (forced)
-                    {
-                        ClientnTaken = 0;
-                        return System.Text.Encoding.GetEncoding(EncoderPage).GetString(clientBuffer, 0, ClientnTaken);
-                    }
-                }
-
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="forced">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <remarks>
-        /// Credits Heindal tester by Artex
-        /// </remarks>
-        private string GetLineFromServerBuffer(bool forced)
-        {
-            lock (ServerBufferLock)
-            {
-                string line = null;
-
-                if (ServerTaken > 0)
-                {
-                    // Find a line break character.
-                    int i = 0;
-                    for (; i < ServerTaken; i++)
-                    {
-                        if (serverBuffer[i] == '\n')
-                        {
-                            line = System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, i);
-                            break;
-                        }
-                    }
-
-                    // If we took out a line, collapse the buffer.
-                    if (line != null)
-                    {
-                        int j = 0;
-                        i++; // Skip the \n
-
-                        while (i < ServerTaken)
-                            serverBuffer[j++] = serverBuffer[i++];
-
-                        ServerTaken = j;
-                        return line + '\n';
-                    }
-
-                    // If we don't have a line and it's a forced request,
-                    // give them what's left in the buffer.
-                    if (forced)
-                    {
-                        ServerTaken = 0;
-                        return System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, ServerTaken);
-                    }
-                }
-
-                return null;
-            }
         }
 
         /// <summary>
@@ -946,99 +833,80 @@ namespace Furcadia.Net
         /// </param>
         private void GetServerData(IAsyncResult ar)
         {
-            string line;
-
-            try
+            if (IsServerConnected == false)
             {
-                if (IsServerConnected == false)
+                return;
+                //throw new SocketException((int)SocketError.NotConnected);
+            }
+            //read = number of bytes read
+            int read = 0;
+
+            read = server.GetStream().EndRead(ar);
+            int currStart = 0;
+            int currEnd = -1;
+
+            for (int i = 0; i < read; i++)
+            {
+                string test2 = System.Text.Encoding.UTF8.GetString(serverBuffer,
+   0, serverBuffer.Length);
+                if (test2.Contains("@@@@"))
+                    Debug.Print(test2);
+                if (i < BUFFER_CAP && serverBuffer[i] == 10)
                 {
-                    return;
-                    //throw new SocketException((int)SocketError.NotConnected);
-                }
-                else
-                {
-                    #region One
+                    // Set the end of the data
+                    currEnd = i;
 
-                    int read = 0;
+                    // If we have left overs from previous runs:
+                    if (ServerLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                    {
+                        // Allocate enough space for the joined buffer
+                        byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
 
-                    read = server.GetStream().EndRead(ar);
-                    // stuff += read;
-                    ServerTaken += read;
-                    do
-                    {
-                        line = GetLineFromServerBuffer(false);
-                        if (line != null)
-                        {
-                            ServerData2?.Invoke(line);
-                            if (IsClientConnected == true && ServerData != null &&
-                                !string.IsNullOrEmpty(line))
-                            {
-                                NetMessage msg = new NetMessage();
-                                msg.Write(ServerData(line));
-                                SendToClient(msg);
-                            }
-                        }
-                    } while (line != null);
-                    if (read < 1)
-                    {
-                        ServerDisConnected?.Invoke(); return;
+                        // And add the current read as well
+                        Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
+
+                        // Get the leftover from the previous read
+                        Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
+
+                        // Now handle it string test =
+                        string test = System.Text.Encoding.UTF8.GetString(joinedData,
+                        0, joinedData.Length);
+                        ServerData2?.Invoke(System.Text.Encoding.UTF8.GetString(joinedData,
+                                      0, joinedData.Length));
+                        ServerLeftOversSize = 0;
                     }
-                    if (ServerTaken > 0)
+                    else
                     {
-                        line = GetLineFromServerBuffer(true);
-                        ServerData2?.Invoke(line);
+                        string test = System.Text.Encoding.UTF8.GetString(serverBuffer,
+                            currStart, currEnd - currStart);
+                        ServerData2?.Invoke(System.Text.Encoding.UTF8.GetString(serverBuffer,
+                         currStart, currEnd - currStart));
+
+                        // Handle the data, from the start to the end,
+                        // between delimiter
+
+                        //ServerData2?.Invoke(System.Text.Encoding.UTF8.GetString(serverBuffer, currStart, currEnd));
                     }
-
-                    #endregion One
-
-                    #region two
-
-                    while (server.GetStream().DataAvailable == true)
-                    {
-                        read = server.GetStream().Read(serverBuffer, 0, serverBuffer.Length);
-
-                        //stuff += pos;
-                        ServerTaken += read;
-                        do
-                        {
-                            line = GetLineFromServerBuffer(false);
-                            if (line != null)
-                            {
-                                ServerData2?.Invoke(line);
-                                if (IsClientConnected == true && ServerData != null &&
-                                    !string.IsNullOrEmpty(line))
-                                {
-                                    NetMessage msg = new NetMessage();
-                                    msg.Write(ServerData(line));
-                                    SendToClient(msg);
-                                }
-                            }
-                        } while (line != null);
-                    }
-                    if (ServerTaken > 0)
-                    {
-                        line = GetLineFromServerBuffer(true);
-                        ServerData2?.Invoke(line);
-                    }
-
-                    #endregion two
+                    // Set the new start - after our delimiter
+                    currStart = i + 1;
                 }
             }
-            catch (Exception e)
+
+            // See if we still have any leftovers
+            if (currStart < read)
             {
-                // if (IsServerConnected == true) ServerDisConnected();
-                Error?.Invoke(e, this, "GetServerData()");
-                ServerDisConnected?.Invoke();
-                return;
-            } //else throw e;
-              // Detect if client disconnected
+                // ServerLeftOvers = new byte[read - currStart];
+
+                Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
+                ServerLeftOversSize = read - currStart;
+            }
 
             if (IsServerConnected == false)
             {
                 ServerDisConnected?.Invoke();
             }
 
-            if (IsServerConnected)
+            if (server.Connected)
                 server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), server);
         }
 

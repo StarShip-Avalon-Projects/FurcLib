@@ -7,7 +7,7 @@
     {
         #region Private Fields
 
-        private string diceCompnentMatch;
+        private char diceCompnentMatch;
 
         private double diceCount;
 
@@ -26,6 +26,7 @@
         /// </summary>
         public DiceObject()
         {
+            diceCompnentMatch = '+';
         }
 
         #endregion Public Constructors
@@ -35,7 +36,7 @@
         /// <summary>
         /// + or - Modifyer
         /// </summary>
-        public string DiceCompnentMatch { get { return diceCompnentMatch; } set { diceCompnentMatch = value; } }
+        public char DiceCompnentMatch { get { return diceCompnentMatch; } set { diceCompnentMatch = value; } }
 
         /// <summary>
         /// Number of Dice

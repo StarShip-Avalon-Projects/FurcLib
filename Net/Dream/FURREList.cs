@@ -8,7 +8,7 @@ namespace Furcadia.Net.Dream
     /// <summary>
     /// Furre List information for a Furcadia Dream
     /// <para>
-    /// This class acts like an enhanced List(of &gt;T&lt;) because you can
+    /// This class acts like an enhanced List(of &lt;T&gt;) because you can
     /// Select a Furre by Item as well as index
     /// </para>
     /// </summary>
@@ -28,12 +28,33 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public FURREList()
         {
-            fList = new List<FURRE>();
+            fList = new List<FURRE>(100);
         }
 
         #endregion Public Constructors
 
         #region Public Properties
+
+        /// <summary>
+        /// Number of Avatars in the Dream
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                return fList.Count;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public bool IsReadOnly
+        {
+            get
+            {
+                return fList.IsReadOnly;
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -56,13 +77,15 @@ namespace Furcadia.Net.Dream
         }
 
         /// <summary>
-        /// Number of Avatars in the Dream
+        /// Convert Furre List to <see cref=" IList"/>
         /// </summary>
-        public int Count => fList.Count;
-
-        /// <summary>
-        /// </summary>
-        public bool IsReadOnly => fList.IsReadOnly;
+        public IList<FURRE> ToIList
+        {
+            get
+            {
+                return fList;
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -104,13 +127,16 @@ namespace Furcadia.Net.Dream
             }
             set
             {
-                fList[fList.IndexOf(fur)] = value;
+                if (fList.Contains(fur))
+                    fList[fList.IndexOf(fur)] = value;
             }
         }
 
         #endregion Public Properties
 
         #region Public Methods
+
+        private object RemoveLock = new object();
 
         /// <summary>
         /// </summary>
@@ -189,7 +215,7 @@ namespace Furcadia.Net.Dream
                     return Character;
                 }
             }
-            return null;
+            return new FURRE(sname);
         }
 
         /// <summary>
@@ -216,7 +242,7 @@ namespace Furcadia.Net.Dream
                 if (furre.ID == Base220.ConvertFromBase220(FurreID))
                     return furre;
             }
-            return null;
+            return new FURRE(Base220.ConvertFromBase220(FurreID));
         }
 
         /// <summary>
@@ -235,7 +261,7 @@ namespace Furcadia.Net.Dream
                 if (furre.ID == FurreID)
                     return furre;
             }
-            return null;
+            return new FURRE(FurreID);
         }
 
         /// <summary>
@@ -256,10 +282,9 @@ namespace Furcadia.Net.Dream
         /// </param>
         public void Remove(string FurreID)
         {
-            foreach (FURRE furre in fList)
+            lock (RemoveLock)
             {
-                if (furre.ID == Base220.ConvertFromBase220(FurreID))
-                    fList.Remove(furre);
+                fList.Remove(new FURRE(Base220.ConvertFromBase220(FurreID)));
             }
         }
 

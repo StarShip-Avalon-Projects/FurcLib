@@ -28,7 +28,8 @@
         {
             if (ServerInstruction.StartsWith(")"))
                 base.instructionType = ServerInstructionType.RemoveAvatar;
-            AvatarID = ServerInstruction.Substring(1, 4);
+            if (ServerInstruction.Length > 4)
+                AvatarID = ServerInstruction.Substring(1, 4);
         }
 
         #endregion Public Constructors

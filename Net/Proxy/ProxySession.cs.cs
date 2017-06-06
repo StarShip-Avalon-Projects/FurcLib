@@ -1,5 +1,6 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
+using Furcadia.Net.Dream;
 using Furcadia.Net.Utils.ServerParser;
 using System;
 using System.Collections.Generic;
@@ -48,18 +49,8 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public ProxySession() : base()
         {
-            serverconnectphase = ConnectionPhase.Init;
-            clientconnectionphase = ConnectionPhase.Init;
             options = new Options.ProxySessionOptions();
-            ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
-
-            base.ServerData2 += onServerDataReceived;
-            base.ClientData2 += onClientDataReceived;
-            base.Connected += onServerConnected;
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect();
-
-            dream = new DREAM();
+            Initilize();
         }
 
         /// <summary>
@@ -69,18 +60,29 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public ProxySession(Options.ProxySessionOptions Options) : base(Options)
         {
+            options = Options;
+            Initilize();
+        }
+
+        private void Initilize()
+        {
             serverconnectphase = ConnectionPhase.Init;
             clientconnectionphase = ConnectionPhase.Init;
-            options = Options;
+
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += onServerQueSent;
 
             base.ServerData2 += onServerDataReceived;
             base.ClientData2 += onClientDataReceived;
             base.Connected += onServerConnected;
+            base.ServerDisConnected += onServerDisconnected;
 
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
+            BadgeTag = new Queue<string>(50);
+            LookQue = new Queue<string>(50);
+            SpeciesTag = new Queue<string>(50);
+            BanishString = new List<string>(50);
         }
 
         #endregion "Constructors"
@@ -205,7 +207,7 @@ namespace Furcadia.Net.Proxy
         private bool hasShare;
         private bool inDream = false;
         private bool Look;
-        private Queue<string> LookQue = new Queue<string>();
+        private Queue<string> LookQue;
         private Options.ProxySessionOptions options;
         private FURRE player;
 
@@ -222,7 +224,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         private Utils.ServerQue ServerBalancer;
 
-        private Queue<string> SpeciesTag = new Queue<string>();
+        private Queue<string> SpeciesTag;
 
         #endregion Private Fields
 
@@ -686,7 +688,6 @@ namespace Furcadia.Net.Proxy
                 if (LookQue.Count > 0)
                 {
                     player.Color = new ColorString(LookQue.Dequeue());
-                    string colorcode = LookQue.Peek();
                 }
                 if (BadgeTag.Count > 0)
                 {
@@ -752,11 +753,6 @@ namespace Furcadia.Net.Proxy
 
                         break;
                 }
-
-                //NameFilter
-
-                // SendToClient("(" + data);
-                return;
             }
             else if (Color == "whisper")
             {
@@ -848,15 +844,19 @@ namespace Furcadia.Net.Proxy
 
                     Regex t = new Regex("The banishment of player (.*?) has ended.");
                     NameStr = t.Match(data).Groups[1].Value;
-
-                    for (int I = 0; I <= BanishString.Count - 1; I++)
+                    player = new FURRE(NameStr);
+                    bool found = false;
+                    int I;
+                    for (I = 0; I <= BanishString.Count - 1; I++)
                     {
                         if (FurcadiaShortName(BanishString[I]) == FurcadiaShortName(NameStr))
                         {
-                            BanishString.RemoveAt(I);
-                            break; // TODO: might not be correct. Was : Exit For
+                            found = true;
+                            break;
                         }
                     }
+                    if (found)
+                        BanishString.RemoveAt(I);
                 }
             }
             else if (Color == "error")
@@ -975,7 +975,7 @@ namespace Furcadia.Net.Proxy
                         Regex t = new Regex("\\]s(.+)1 (.*?) (.*?) 0", RegexOptions.IgnoreCase);
                         System.Text.RegularExpressions.Match m = t.Match(data);
                     }
-                    if (data == "Dragonroar\n")
+                    if (data == "Dragonroar")
                     {
                         // Login Sucessful
                         serverconnectphase = ConnectionPhase.Auth;
@@ -999,7 +999,7 @@ namespace Furcadia.Net.Proxy
                         Disconnect();
                         //bIsRunning = false;
                     }
-                    else if (data == "&&&&&&&&&&&&&\n")
+                    else if (data == "&&&&&&&&&&&&&")
                     {
                         //We've connected to Furcadia
                         //Stop the reconnection manager
@@ -1212,14 +1212,16 @@ namespace Furcadia.Net.Proxy
                     }
                     else if (data.StartsWith("]z"))
                     {
+                        int ID = int.Parse(data.Remove(0, 2));
                         if (ConnectedCharacterFurcadiaID == 0)
-                            ConnectedCharacterFurcadiaID = int.Parse(data.Remove(0, 2));
+                            ConnectedCharacterFurcadiaID = ID;
                         //Snag out UID
                     }
                     else if (data.StartsWith("]B"))
                     {
+                        int ID = int.Parse(data.Substring(2, data.Length - connectedFurre.Name.Length - 3));
                         if (ConnectedCharacterFurcadiaID == 0)
-                            ConnectedCharacterFurcadiaID = int.Parse(data.Substring(2, data.Length - connectedFurre.Name.Length - 3));
+                            ConnectedCharacterFurcadiaID = ID;
                     }
                     else if (data.StartsWith("]c"))
                     {
@@ -1518,6 +1520,12 @@ namespace Furcadia.Net.Proxy
         }
 
         #endregion "Popup Dialogs"
+
+        private void onServerDisconnected()
+        {
+            serverconnectphase = ConnectionPhase.Disconnected;
+            ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+        }
 
         private void onServerQueSent(object o, EventArgs e)
         {

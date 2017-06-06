@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -130,9 +130,6 @@
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\UpdateColorString.cs" />
-    <Compile Include="Security\SecureTcpClient.cs" />
-    <Compile Include="Security\SSL.cs" />
-    <Compile Include="Security\SslCert.cs" />
     <Compile Include="Text\Base220.cs" />
     <Compile Include="Text\Base95.cs" />
     <Compile Include="Drawing\FurrePosition.cs" />
@@ -237,7 +234,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Net\Utils\ChannelObjects\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
