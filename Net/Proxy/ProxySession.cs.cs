@@ -1045,7 +1045,7 @@ namespace Furcadia.Net.Proxy
                                 connectedFurre = player;
                             Dream.FurreList.Add(player);
                         }
-                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) & !Dream.FurreList.Contains(player))
+                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                         {
                             Dream.FurreList.Add(player);
                         }
@@ -1070,16 +1070,31 @@ namespace Furcadia.Net.Proxy
                         //if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))
                         //{
                         //}
-                        ProcessServerInstruction?.Invoke(FurreSpawn,
-                            new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+
+                        if (InDream)
+                        {
+                            if (ProcessServerInstruction != null)
+                            {
+                                ProcessServerInstruction.Invoke(FurreSpawn,
+                                new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                            }
+                        }
                     }
                     //Remove Furre
                     else if (data.StartsWith(")"))
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         Dream.FurreList.Remove(RemoveFurre.AvatarID);
-                        ProcessServerInstruction?.Invoke(RemoveFurre,
-                                new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
+
+                        if (InDream)
+                        {
+                            if (ProcessServerInstruction != null)
+                            {
+                                Handled = true;
+                                ProcessServerInstruction.Invoke(RemoveFurre,
+                                    new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
+                            }
+                        }
                     }
                     //Animated Move
                     else if (data.StartsWith("/"))
@@ -1127,14 +1142,20 @@ namespace Furcadia.Net.Proxy
                         }
                     }
                     //Update ColorString
-                    else if (data.StartsWith("B") & InDream)
+                    else if (data.StartsWith("B"))
                     {
                         //fuid 4 b220 bytes
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
                         UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
 
-                        ProcessServerInstruction?.Invoke(ColorStringUpdate,
+                        if (InDream)
+                        {
+                            if (ProcessServerInstruction != null)
+                            {
+                                ProcessServerInstruction.Invoke(ColorStringUpdate,
                                 new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
+                            }
+                        }
                     }
                     //Hide Avatar
                     else if (data.StartsWith("C") != false)

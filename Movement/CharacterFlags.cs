@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using static Furcadia.Text.Base220;
+﻿using static Furcadia.Text.Base220;
 
 namespace Furcadia.Movement
 {
@@ -37,30 +36,11 @@ namespace Furcadia.Movement
 
         #region Private Fields
 
-        private static BitVector32 CharFlags;
+        private int characterFlags = 0;
 
         #endregion Private Fields
 
         #region Public Constructors
-
-        ///// <summary>
-        ///// Using flags with integer
-        ///// </summary>
-        ///// <param name="flags">
-        ///// Integer Flags
-        ///// </param>
-        //public CharacterFlags(int flags)
-        //{
-        //    CharFlags = new BitVector32(flags);
-        //}
-
-        ///// <summary>
-        ///// default construtor
-        ///// </summary>
-        //public CharacterFlags()
-        //{
-        //    CharFlags = new BitVector32(0);
-        //}
 
         /// <summary>
         /// Build Flags with Base220 string
@@ -70,8 +50,7 @@ namespace Furcadia.Movement
         /// </param>
         public CharacterFlags(string flags)
         {
-            int test = ConvertFromBase220(flags);
-            CharFlags = new BitVector32(ConvertFromBase220(flags));
+            characterFlags = ConvertFromBase220(flags);
         }
 
         #endregion Public Constructors
@@ -89,8 +68,9 @@ namespace Furcadia.Movement
         /// </returns>
         public bool HasFlag(int FlagToCheck)
         {
-            bool test = CharFlags[FlagToCheck];
-            return CharFlags[FlagToCheck];
+            if ((characterFlags & FlagToCheck) == FlagToCheck)
+                return true;
+            return false;
         }
 
         #endregion Public Methods

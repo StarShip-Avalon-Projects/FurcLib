@@ -567,7 +567,7 @@ namespace Furcadia.Net
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)
-                    client.GetStream().Write(System.Text.Encoding.UTF8.GetBytes(message), 0, System.Text.Encoding.UTF8.GetBytes(message).Length);
+                    client.GetStream().Write(System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message), 0, System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message).Length);
             }
             catch (Exception e) { Error?.Invoke(e, this, "SendClient()"); }
         }
@@ -605,7 +605,7 @@ namespace Furcadia.Net
             try
             {
                 if (server.GetStream().CanWrite)
-                    server.GetStream().Write(System.Text.Encoding.UTF8.GetBytes(message), 0, System.Text.Encoding.UTF8.GetBytes(message).Length);
+                    server.GetStream().Write(System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message), 0, System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message).Length);
             }
             catch (Exception e)
             {
@@ -748,7 +748,8 @@ namespace Furcadia.Net
         {
             if (client.Connected == false)
             {
-                throw new SocketException((int)SocketError.NotConnected);
+                return;
+                // throw new SocketException((int)SocketError.NotConnected);
             }
 
             //read = number of bytes read
@@ -762,11 +763,6 @@ namespace Furcadia.Net
             {
                 if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
                 {
-                    string test = System.Text.Encoding.UTF8.GetString(clientBuffer,
-                       0, clientBuffer.Length);
-                    if (test.Contains("@@@@"))
-                        Debug.Print(test);
-
                     // Set the end of the data
                     currEnd = i;
 
@@ -782,9 +778,7 @@ namespace Furcadia.Net
                         // Get the leftover from the previous read
                         Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
 
-                        string test2 = System.Text.Encoding.UTF8.GetString(joinedData,
-                       0, joinedData.Length);
-                        ClientData2?.Invoke(System.Text.Encoding.UTF8.GetString(joinedData,
+                        ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
                        0, joinedData.Length)); //Mark that we don't have any
                                                // leftovers anymore
 
@@ -793,14 +787,8 @@ namespace Furcadia.Net
                     }
                     else
                     {
-                        string test3 = System.Text.Encoding.UTF8.GetString(clientBuffer,
-                        currStart, currEnd - currStart);
-                        ClientData2?.Invoke(System.Text.Encoding.UTF8.GetString(clientBuffer,
+                        ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
                         currStart, currEnd - currStart));
-                        //string test = System.Text.Encoding.UTF8.GetString(clientBuffer,
-                        //currStart, currEnd);
-                        //ClientData2?.Invoke(System.Text.Encoding.UTF8.GetString(clientBuffer,
-                        //currStart, currEnd));
                     }
 
                     // Set the new start - after our delimiter
@@ -847,10 +835,6 @@ namespace Furcadia.Net
 
             for (int i = 0; i < read; i++)
             {
-                string test2 = System.Text.Encoding.UTF8.GetString(serverBuffer,
-   0, serverBuffer.Length);
-                if (test2.Contains("@@@@"))
-                    Debug.Print(test2);
                 if (i < BUFFER_CAP && serverBuffer[i] == 10)
                 {
                     // Set the end of the data
@@ -869,23 +853,17 @@ namespace Furcadia.Net
                         Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
 
                         // Now handle it string test =
-                        string test = System.Text.Encoding.UTF8.GetString(joinedData,
-                        0, joinedData.Length);
-                        ServerData2?.Invoke(System.Text.Encoding.UTF8.GetString(joinedData,
+                        ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
                                       0, joinedData.Length));
                         ServerLeftOversSize = 0;
                     }
                     else
                     {
-                        string test = System.Text.Encoding.UTF8.GetString(serverBuffer,
-                            currStart, currEnd - currStart);
-                        ServerData2?.Invoke(System.Text.Encoding.UTF8.GetString(serverBuffer,
+                        ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
                          currStart, currEnd - currStart));
 
                         // Handle the data, from the start to the end,
                         // between delimiter
-
-                        //ServerData2?.Invoke(System.Text.Encoding.UTF8.GetString(serverBuffer, currStart, currEnd));
                     }
                     // Set the new start - after our delimiter
                     currStart = i + 1;
