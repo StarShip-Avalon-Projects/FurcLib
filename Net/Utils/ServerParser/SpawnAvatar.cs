@@ -9,10 +9,10 @@ namespace Furcadia.Net.Utils.ServerParser
     /// Process the Spaw Avatar Instruction
     /// </summary>
     /// <remarks>
-    /// '$glt;' + user id + x + y + shape number + name + color code + flag
+    /// "&lt;" + user id + x + y + shape number + name + color code + flag
     /// + linefeed
     /// <para>
-    /// reference http://dev.furcadia.com/docs/027_movement.html
+    /// <see href="http://dev.furcadia.com/docs/027_movement.html"/>
     /// </para>
     /// </remarks>
     public class SpawnAvatar : BaseServerInstruction
