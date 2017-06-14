@@ -3,7 +3,7 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 
-namespace Furcadia
+namespace Furcadia.Net.Dream
 {
     public class Avatar
     {
@@ -15,7 +15,7 @@ namespace Furcadia
 
         #region Private Enums
 
-        private enum av_DIR
+        public enum av_DIR
         {
             SW,
             SE,
@@ -23,7 +23,7 @@ namespace Furcadia
             NE,
         };
 
-        private enum av_POSE
+        public enum av_POSE
         {
             AVPOSE_SIT,
             AVPOSE_WALK0,
@@ -31,6 +31,26 @@ namespace Furcadia
             AVPOSE_WALK1,
             AVPOSE_LIE,
         };
+
+        /// <summary>
+        /// </summary>
+        [Flags]
+        public enum FurrePose
+        {
+            None,
+
+            Walk1,
+
+            Stand1,
+
+            Walk2,
+
+            Stand2,
+
+            Sit,
+
+            LieDown
+        }
 
         #endregion Private Enums
 

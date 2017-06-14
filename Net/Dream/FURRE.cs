@@ -1,6 +1,7 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
 using System;
+using static Furcadia.Net.Dream.Avatar;
 using static Furcadia.Util;
 
 namespace Furcadia.Net.Dream
@@ -44,17 +45,6 @@ namespace Furcadia.Net.Dream
 
         #endregion Private Fields
 
-        private int shape;
-
-        /// <summary>
-        /// Avatar Shape, (it's Look)
-        /// </summary>
-        public int Shape
-        {
-            get { return shape; }
-            set { shape = value; }
-        }
-
         #region Public Constructors
 
         /// <summary>
@@ -95,9 +85,29 @@ namespace Furcadia.Net.Dream
             _LastStat = -1;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="FurreID">
+        /// </param>
+        /// <param name="Name">
+        /// </param>
+        public FURRE(int FurreID, string Name)
+        {
+            _ID = FurreID;
+            _name = Name;
+            _Color = new ColorString();
+            Location = new FurrePosition();
+            LastPosition = new FurrePosition();
+            _LastStat = -1;
+        }
+
         #endregion Public Constructors
 
         #region Public Properties
+
+        private av_DIR direction;
+
+        private FurrePose pose;
 
         /// <summary>
         /// Away from keyboard time
@@ -145,6 +155,14 @@ namespace Furcadia.Net.Dream
             set { _Desc = value; }
         }
 
+        /// <summary>
+        /// </summary>
+        public av_DIR Direction
+        {
+            get { return direction; }
+            set { direction = value; }
+        }
+
         [Obsolete]
         public int DSSpecies
         {
@@ -175,22 +193,21 @@ namespace Furcadia.Net.Dream
 
         /// <summary>
         /// </summary>
-        public Avatar.Frame FrameInfo
-        {
-            get
-            {
-                return Avatar.SpecNum(shape);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
         [Obsolete]
         public int Gender
         {
             get { return Color.Gender; }
         }
 
+        ///// <summary>
+        ///// </summary>
+        //public Avatar.Frame FrameInfo
+        //{
+        //    get
+        //    {
+        //        return Avatar.SpecNum(shape);
+        //    }
+        //}
         /// <summary>
         /// </summary>
         public int Group
@@ -268,6 +285,15 @@ namespace Furcadia.Net.Dream
         {
             get { return _PawObjectOld; }
             set { _PawObjectOld = value; }
+        }
+
+        /// <summary>
+        /// Furre Pose
+        /// </summary>
+        public FurrePose Pose
+        {
+            get { return pose; }
+            set { pose = value; }
         }
 
         /// <summary>

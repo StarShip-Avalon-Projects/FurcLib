@@ -104,8 +104,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyFileVersion.t4</DependentUpon>
     </Compile>
-    <Compile Include="Avatar.cs" />
-    <Compile Include="Badges.cs" />
+    <Compile Include="Net\Dream\Avatar.cs" />
+    <Compile Include="Net\Dream\Badges.cs" />
     <Compile Include="IO\IniFile.cs" />
     <Compile Include="LegacyAttribute.cs" />
     <Compile Include="Net\Account\AccountInfo.cs" />

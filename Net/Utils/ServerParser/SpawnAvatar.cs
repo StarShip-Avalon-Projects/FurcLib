@@ -1,5 +1,6 @@
 ﻿using Furcadia.Movement;
 using Furcadia.Net.Dream;
+using static Furcadia.Net.Dream.Avatar;
 using static Furcadia.Text.Base220;
 
 namespace Furcadia.Net.Utils.ServerParser
@@ -43,33 +44,36 @@ namespace Furcadia.Net.Utils.ServerParser
                 base.instructionType = ServerInstructionType.SpawnAvatar;
 
             //FUID Furre ID 4 Base220 bytes
-            int id = ConvertFromBase220(ServerInstruction.Substring(1, 4));
-            player = new FURRE(id);
+            var id = ConvertFromBase220(ServerInstruction.Substring(1, 4));
 
-            // Y,Y 2 Base220 Bytes each X Coordinates are *2 in Map editor
-            var Position = new Drawing.FurrePosition(ServerInstruction.Substring(5, 2),
-                ServerInstruction.Substring(7, 2));
-            Position.x = Position.x * 2;
+            var PosX = ServerInstruction.Substring(5, 2);
+            var PosY = ServerInstruction.Substring(7, 2);
+            var Position = new Drawing.FurrePosition(PosX, PosY);
+
+            var FurreDirection = ConvertFromBase220(ServerInstruction.Substring(9, 1));
+            var FurrePose = ConvertFromBase220(ServerInstruction.Substring(10, 1));
+            var NameIdx = ConvertFromBase220(ServerInstruction.Substring(11, 1));
+            var NameLength = NameIdx + 12;
+
+            var name = ServerInstruction.Substring(12, NameIdx);
+
+            var ColTypePos = 12 + NameIdx;
+            var ColorLength = (ServerInstruction[ColTypePos] == 'w') ? 16 : 14;
+
+            player = new FURRE(id, name);
             player.Position = Position;
+            player.Direction = (av_DIR)FurreDirection;
+            player.Pose = (FurrePose)FurrePose;
 
-            //Character's avatar shape (its look)
-            player.Shape = ConvertFromBase220(ServerInstruction.Substring(9, 2));
-
-            // Name is a Base220 String
-            var name = ServerInstruction.Substring(11);
-            int NameLength = Base220StringLengeth(ref name);
-            this.player.Name = name;
-
-            int ColTypePos = 12 + NameLength + 1;
-            player.Color = new ColorString(ServerInstruction.Substring(ColTypePos, ColorString.ColorStringSize));
+            player.Color = new ColorString(ServerInstruction.Substring(ColTypePos, ColorLength));
 
             int FlagPos = ServerInstruction.Length - 6;
 
-            PlayerFlags = new CharacterFlags(ServerInstruction.Substring(FlagPos, 1));
+            ColTypePos += ColorLength;
+            PlayerFlags = new CharacterFlags(ServerInstruction.Substring(ColTypePos, 1));
 
-            var AFK_Pos = ServerInstruction.Length - 5;
-            var AFKStr = ServerInstruction.Substring(AFK_Pos, 4);
-            player.AFK = ConvertFromBase220(AFKStr);
+            player.AFK = ConvertFromBase220(ServerInstruction.Substring(ColTypePos, 1));
+            //player.kittersize
 
             // reserverd for Future updates as Character Profiles come into existance
             //if (PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))

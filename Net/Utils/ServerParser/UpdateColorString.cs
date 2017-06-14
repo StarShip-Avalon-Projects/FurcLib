@@ -1,8 +1,6 @@
 ﻿using Furcadia.Movement;
 using Furcadia.Net.Dream;
 
-using static Furcadia.Text.Base220;
-
 namespace Furcadia.Net.Utils.ServerParser
 {
     /// <summary>
@@ -34,7 +32,7 @@ namespace Furcadia.Net.Utils.ServerParser
             player = Player;
 
             //avatar shape 2 b220
-            player.Shape = ConvertFromBase220(ServerInstruction.Substring(5, 2));
+            //  player.Shape = ConvertFromBase220(ServerInstruction.Substring(5, 2));
 
             // partial color code
             player.Color.Update(ServerInstruction.Substring(8, ColorString.ColorStringSize));

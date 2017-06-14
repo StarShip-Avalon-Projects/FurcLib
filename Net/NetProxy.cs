@@ -854,7 +854,7 @@ namespace Furcadia.Net
 
                         // Now handle it string test =
                         ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                                      0, joinedData.Length));
+                                     currStart, joinedData.Length));
                         ServerLeftOversSize = 0;
                     }
                     else

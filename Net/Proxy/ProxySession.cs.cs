@@ -1039,18 +1039,15 @@ namespace Furcadia.Net.Proxy
                     {
                         var FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
+                        Dream.FurreList.Add(player);
                         if (IsConnectedCharacter && !dream.FurreList.Contains(player))
                         {
-                            if (connectedFurre.ID != FurreSpawn.player.ID)
-                                connectedFurre = player;
-                            Dream.FurreList.Add(player);
+                            connectedFurre = player;
                         }
-                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
+                        if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                         {
-                            Dream.FurreList.Add(player);
-                        }
-                        else
                             player = Dream.FurreList.GetFurreByID(Player.ID);
+                        }
 
                         if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_SET_VISIBLE))
                         {
@@ -1081,7 +1078,7 @@ namespace Furcadia.Net.Proxy
                         }
                     }
                     //Remove Furre
-                    else if (data.StartsWith(")"))
+                    else if (data.StartsWith(")") || data.StartsWith(" "))
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         Dream.FurreList.Remove(RemoveFurre.AvatarID);
@@ -1102,7 +1099,8 @@ namespace Furcadia.Net.Proxy
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
                         player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
                         player.Position.y = ConvertFromBase220(data.Substring(7, 2));
-                        player.Shape = ConvertFromBase220(data.Substring(9, 2));
+                        // player.Shape =
+                        // ConvertFromBase220(data.Substring(9, 2));
                         connectedFurre = Dream.FurreList[connectedFurre];
                         ViewArea VisableRectangle = getTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
                         if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <= player.Position.y &
@@ -1125,7 +1123,8 @@ namespace Furcadia.Net.Proxy
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
                         player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
                         player.Position.y = ConvertFromBase220(data.Substring(7, 2));
-                        player.Shape = ConvertFromBase220(data.Substring(9, 2));
+                        // player.Shape =
+                        // ConvertFromBase220(data.Substring(9, 2));
 
                         connectedFurre = Dream.FurreList[connectedFurre];
                         ViewArea VisableRectangle = getTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
@@ -1202,7 +1201,7 @@ namespace Furcadia.Net.Proxy
                         //]s(.+)1 (.*?) (.*?) 0
                     }
 
-                    //Look response
+                    //Disconnection Error
                     else if (data.StartsWith("["))
                     {
 #if DEBUG
@@ -1216,7 +1215,12 @@ namespace Furcadia.Net.Proxy
                         //;{mapfile}	Load a local map (one in the furcadia folder)
                         //]q {name} {id}	Request to download a specific patch
                     }
-                    else if (data.StartsWith(";") || data.StartsWith("]q") || data.StartsWith("]r"))
+                    else if (data.StartsWith(";") || data.StartsWith("]r"))
+                    { }
+
+                    //Dream Load ]q
+                    //
+                    else if (data.StartsWith("]q"))
                     {
 #if DEBUG
 

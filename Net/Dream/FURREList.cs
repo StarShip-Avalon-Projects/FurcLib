@@ -280,11 +280,21 @@ namespace Furcadia.Net.Dream
         /// </summary>
         /// <param name="FurreID">
         /// </param>
-        public void Remove(string FurreID)
+        public void Remove(int FurreID)
         {
             lock (RemoveLock)
             {
-                fList.Remove(new FURRE(Base220.ConvertFromBase220(FurreID)));
+                FURRE F = null;
+                foreach (FURRE Fur in fList)
+                {
+                    if (Fur.ID == FurreID)
+                    {
+                        F = Fur;
+                        break;
+                    }
+                }
+                if (F != null)
+                    fList.Remove(F);
             }
         }
 

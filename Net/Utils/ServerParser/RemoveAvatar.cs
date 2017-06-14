@@ -1,4 +1,6 @@
-﻿namespace Furcadia.Net.Utils.ServerParser
+﻿using static Furcadia.Text.Base220;
+
+namespace Furcadia.Net.Utils.ServerParser
 {
     /// <summary>
     /// Remove Avatar Server Instruction Object
@@ -13,7 +15,7 @@
         /// 4 byte Base220 string
         /// </para>
         /// </summary>
-        public string AvatarID;
+        public int AvatarID;
 
         #endregion Public Fields
 
@@ -29,7 +31,7 @@
             if (ServerInstruction.StartsWith(")"))
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
-                AvatarID = ServerInstruction.Substring(1, 4);
+                AvatarID = ConvertFromBase220(ServerInstruction.Substring(1, 4));
         }
 
         #endregion Public Constructors
