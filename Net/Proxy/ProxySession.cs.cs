@@ -73,9 +73,11 @@ namespace Furcadia.Net.Proxy
             ServerBalancer.OnServerSendMessage += onServerQueSent;
 
             base.ServerData2 += onServerDataReceived;
-            base.ClientData2 += onClientDataReceived;
             base.Connected += onServerConnected;
             base.ServerDisConnected += onServerDisconnected;
+
+            base.ClientData2 += onClientDataReceived;
+            base.ClientDisConnected += onClientConnected;
 
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
@@ -93,9 +95,10 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (serverconnectphase == ConnectionPhase.Init)
+            if (serverconnectphase == ConnectionPhase.Init && clientconnectionphase == ConnectionPhase.Init)
             {
                 serverconnectphase = ConnectionPhase.Connecting;
+                clientconnectionphase = ConnectionPhase.Connecting;
                 base.Connect();
             }
         }
@@ -984,6 +987,12 @@ namespace Furcadia.Net.Proxy
                         // {0} {1}\n", sUsername, sPassword));
 
                         //vasecodegamma ?
+
+                        if (IsClientConnected)
+                        {
+                            serverconnectphase = ConnectionPhase.Auth;
+                            ClientStatusChanged?.Invoke(data, new NetClientEventArgs(clientconnectionphase));
+                        }
                     }
                     break;
 
@@ -1005,6 +1014,11 @@ namespace Furcadia.Net.Proxy
                         //Stop the reconnection manager
 
                         serverconnectphase = ConnectionPhase.Connected;
+                        if (IsClientConnected)
+                        {
+                            serverconnectphase = ConnectionPhase.Connected;
+                            ClientStatusChanged?.Invoke(data, new NetClientEventArgs(clientconnectionphase));
+                        }
 
                         //ProcessServerInstruction?.Invoke(FurreSpawn,
                         //        new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
@@ -1319,7 +1333,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public override void SendToClient(string data)
         {
-            if (IsClientConnected)
+            if (IsClientConnected && clientconnectionphase != ConnectionPhase.Disconnected)
                 base.SendToClient(data);
         }
 
@@ -1331,7 +1345,8 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public override void SendToServer(string message)
         {
-            ServerBalancer.SendToServer(message);
+            if (serverconnectphase != ConnectionPhase.Disconnected)
+                ServerBalancer.SendToServer(message);
         }
 
         /// <summary>
@@ -1450,6 +1465,11 @@ namespace Furcadia.Net.Proxy
             SendToServer(result);
         }
 
+        private void onClientConnected()
+        {
+            serverconnectphase = ConnectionPhase.MOTD;
+        }
+
         /// <summary>
         /// Client sent us some data, Let's deal with it
         /// </summary>
@@ -1461,33 +1481,57 @@ namespace Furcadia.Net.Proxy
 
             //lock (clientlock)
             //{
-            if (data.StartsWith("connect"))
+            switch (clientconnectionphase)
             {
-                string test = data.Replace("connect ", "").TrimStart(' ');
-                string botName = test.Substring(0, test.IndexOf(" "));
-                if (connectedFurre == null)
-                    connectedFurre = new FURRE(botName);
-                else
-                    connectedFurre.Name = botName;
+                case ConnectionPhase.Auth:
+
+                    if (data.StartsWith("connect"))
+                    {
+                        string test = data.Replace("connect ", "").TrimStart(' ');
+                        string botName = test.Substring(0, test.IndexOf(" "));
+                        if (connectedFurre == null)
+                            connectedFurre = new FURRE(botName);
+                        else
+                            connectedFurre.Name = botName;
+                    }
+                    else if (data.ToLower().StartsWith("account"))
+                    {
+                        string[] words = data.Split(' ');
+                        if (connectedFurre == null)
+                            connectedFurre = new FURRE(words[2]);
+                        else
+                            connectedFurre.Name = words[2];
+                    }
+                    ClientData2?.Invoke(data);
+                    break;
+
+                case ConnectionPhase.Connected:
+
+                    if (data == "vascodagama")
+                    {
+                        clientconnectionphase = ConnectionPhase.Connected;
+                    }
+                    ClientData2?.Invoke(data);
+                    break;
+                // Disconnected? Do Nohing
+                case ConnectionPhase.Disconnected:
+
+                    break;
+
+                case ConnectionPhase.MOTD:
+                case ConnectionPhase.Connecting:
+                    ClientData2?.Invoke(data);
+                    break;
+
+                default:
+                    ClientData2?.Invoke(data);
+                    break;
             }
-            else if (data.ToLower().StartsWith("account"))
-            {
-                string[] words = data.Split(' ');
-                if (connectedFurre == null)
-                    connectedFurre = new FURRE(words[2]);
-                else
-                    connectedFurre.Name = words[2];
-            }
-            else if (data == "vascodagama" & ClientConnectPhase == ConnectionPhase.Connected)
-            {
-                //ClientConnectPhase = ConnectionPhase.Conne
-            }
-            ClientData2?.Invoke(data);
         }
 
         private void onServerConnected()
         {
-            serverconnectphase = ConnectionPhase.MOTD;
+            clientconnectionphase = ConnectionPhase.MOTD;
         }
 
         /// <summary>
