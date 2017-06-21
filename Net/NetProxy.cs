@@ -67,15 +67,18 @@ namespace Furcadia.Net
         /// </summary>
         private static int BUFFER_CAP = 4096;
 
-        private IPEndPoint _endpoint;
-
-        private string[] BackupSettings;
-
         /// <summary>
         /// Furcadia Client Connection
         /// </summary>
-        private TcpClient client = new TcpClient();
+        private static TcpClient client = new TcpClient();
 
+        /// <summary>
+        /// </summary>
+        private static TcpClient server;
+
+        private IPEndPoint _endpoint;
+
+        private string[] BackupSettings;
         //NetworkStream stream;
 
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
@@ -109,10 +112,6 @@ namespace Furcadia.Net
         /// Process IP for Furcadia.exe
         /// </summary>
         private int processID;
-
-        /// <summary>
-        /// </summary>
-        private TcpClient server;
 
         private object ServerBufferLock = new object();
         private int ServerTaken = 0;
@@ -307,7 +306,7 @@ namespace Furcadia.Net
 
         //public delegate void ErrorEventHandler(Exception e);
         /// <summary>
-        ///This is triggered when the
+        ///This is triggered when the Client and/or Server have connected to tcp stream
         /// </summary>
         protected internal event ActionDelegate Connected;
 
@@ -362,10 +361,16 @@ namespace Furcadia.Net
         {
             get
             {
-                if (client != null)
-                    return client.Connected;
-                else
-                    return false;
+                try
+                {
+                    if (client != null)
+                    {
+                        return client.Connected;
+                    }
+                }
+                catch
+                { }
+                return false;
             }
         }
 
@@ -376,10 +381,13 @@ namespace Furcadia.Net
         {
             get
             {
-                if (server != null)
-                    return server.Connected;
-                else
-                    return false;
+                try
+                {
+                    if (server != null)
+                        return server.Connected;
+                }
+                catch { }
+                return false;
             }
         }
 
@@ -404,16 +412,11 @@ namespace Furcadia.Net
 
             if (client != null && client.Connected == true)
             {
-                NetworkStream clientStream = client.GetStream();
-                if (clientStream != null)
-                {
-                    clientStream.Flush();
-                    clientStream.Close();
-                    clientStream.Dispose();
-                }
-
                 client.Close();
             }
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         /// <summary>
@@ -503,7 +506,8 @@ namespace Furcadia.Net
                 };
                 furcProcess.Exited += delegate
                 {
-                    ClientDisconnected();
+                    //ClientDisconnect();
+                    ClientDisConnected?.Invoke();
                 };
                 processID = furcProcess.Id;
             }
@@ -523,24 +527,11 @@ namespace Furcadia.Net
 
             if (client != null && client.Connected == true)
             {
-                NetworkStream clientStream = client.GetStream();
-                if (clientStream != null)
-                {
-                    clientStream.Flush();
-                    clientStream.Close();
-                }
-
                 client.Close();
             }
 
             if (server != null && server.Connected == true)
             {
-                NetworkStream serverStream = server.GetStream();
-                if (serverStream != null)
-                {
-                    serverStream.Flush();
-                    serverStream.Close();
-                }
                 server.Close();
             }
         }
@@ -635,26 +626,11 @@ namespace Furcadia.Net
 
                 if (client != null && client.Connected == true)
                 {
-                    NetworkStream clientStream = client.GetStream();
-                    if (clientStream != null)
-                    {
-                        clientStream.Flush();
-                        clientStream.Close();
-                        clientStream.Dispose();
-                    }
-
                     client.Close();
                 }
 
                 if (server != null && server.Connected == true)
                 {
-                    NetworkStream serverStream = server.GetStream();
-                    if (serverStream != null)
-                    {
-                        serverStream.Flush();
-                        serverStream.Close();
-                        serverStream.Dispose();
-                    }
                     server.Close();
                 }
             }
@@ -667,6 +643,7 @@ namespace Furcadia.Net
 
         #region Private Methods
 
+        private object ClientDataObject = new object();
         private byte[] ClientLeftOvers = new byte[BUFFER_CAP];
 
         private int ClientLeftOversSize = 0;
@@ -697,7 +674,6 @@ namespace Furcadia.Net
                 server = new TcpClient();
                 server.Connect(_endpoint);
                 if (!server.Connected) throw new Exception("There was a problem connecting to the server.");
-
                 client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
                 server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
 
@@ -707,14 +683,6 @@ namespace Furcadia.Net
                 NewsTimer = new System.Threading.Timer(OnTimedEvent, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
             }
             catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
-        }
-
-        /// <summary>
-        /// </summary>
-        private void ClientDisconnected()
-        {
-            if (!options.Standalone)
-                Disconnect();
         }
 
         private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
@@ -746,73 +714,72 @@ namespace Furcadia.Net
         /// </param>
         private void GetClientData(IAsyncResult ar)
         {
-            if (client.Connected == false)
+            lock (ClientDataObject)
             {
-                return;
-                // throw new SocketException((int)SocketError.NotConnected);
-            }
-
-            //read = number of bytes read
-            int read = 0;
-
-            read = client.GetStream().EndRead(ar);
-            int currStart = 0;
-            int currEnd = -1;
-
-            for (int i = 0; i < read; i++)
-            {
-                if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
+                if (!IsClientConnected)
                 {
-                    // Set the end of the data
-                    currEnd = i;
-
-                    // If we have left overs from previous runs:
-                    if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
-                    {
-                        // Allocate enough space for the joined buffer
-                        byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
-
-                        // And add the current read as well
-                        Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
-
-                        // Get the leftover from the previous read
-                        Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
-
-                        ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                       0, joinedData.Length)); //Mark that we don't have any
-                                               // leftovers anymore
-
-                        // Mark that we don't have any leftovers anymore
-                        ClientLeftOversSize = 0;
-                    }
-                    else
-                    {
-                        ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
-                        currStart, currEnd - currStart));
-                    }
-
-                    // Set the new start - after our delimiter
-                    currStart = i + 1;
+                    throw new SocketException((int)SocketError.NotConnected);
                 }
+
+                int read = 0;
+
+                read = client.GetStream().EndRead(ar);
+                int currStart = 0;
+                int currEnd = -1;
+
+                for (int i = 0; i < read; i++)
+                {
+                    if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
+                    {
+                        // Set the end of the data
+                        currEnd = i;
+
+                        // If we have left overs from previous runs:
+                        if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                        {
+                            // Allocate enough space for the joined buffer
+                            byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
+
+                            // And add the current read as well
+                            Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
+
+                            // Get the leftover from the previous read
+                            Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
+
+                            ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
+                           0, joinedData.Length)); //Mark that we don't have any
+                                                   // leftovers anymore
+
+                            // Mark that we don't have any leftovers anymore
+                            ClientLeftOversSize = 0;
+                        }
+                        else
+                        {
+                            ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
+                            currStart, currEnd - currStart));
+                        }
+
+                        // Set the new start - after our delimiter
+                        currStart = i + 1;
+                    }
+                }
+                // See if we still have any leftovers
+                if (currStart < read)
+                {
+                    //ClientLeftOvers = new byte[read - currStart];
+
+                    Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
+                    ClientLeftOversSize = read - currStart;
+                }
+
+                if (IsClientConnected == false)
+                {
+                    ClientDisConnected?.Invoke();
+                }
+
+                if (IsClientConnected)
+                    client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
             }
-            // See if we still have any leftovers
-            if (currStart < read)
-            {
-                //ClientLeftOvers = new byte[read - currStart];
-
-                Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
-                ClientLeftOversSize = read - currStart;
-            }
-
-            if (IsClientConnected == false)
-            {
-                ClientDisConnected?.Invoke();
-            }
-
-            if (client.Connected)
-                client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
-
-            // }
         }
 
         /// <summary>
@@ -884,7 +851,7 @@ namespace Furcadia.Net
                 ServerDisConnected?.Invoke();
             }
 
-            if (server.Connected)
+            if (IsServerConnected)
                 server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), server);
         }
 

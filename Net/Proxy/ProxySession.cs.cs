@@ -75,10 +75,11 @@ namespace Furcadia.Net.Proxy
             base.ServerData2 += onServerDataReceived;
             base.Connected += onServerConnected;
             base.ServerDisConnected += onServerDisconnected;
-
+            // if (!options.Standalone) {
             base.ClientData2 += onClientDataReceived;
-            base.ClientDisConnected += onClientConnected;
-
+            base.ClientDisConnected += onClientDisconnected;
+            base.Connected += onClientConnected;
+            // }
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
             BadgeTag = new Queue<string>(50);
@@ -134,7 +135,12 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public int ConnectedCharacterFurcadiaID
         {
-            get { return connectedFurre.ID; }
+            get
+            {
+                if (connectedFurre == null)
+                    return -1;
+                return connectedFurre.ID;
+            }
             set
             {
                 if (connectedFurre == null)
@@ -150,6 +156,8 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
+                if (connectedFurre == null)
+                    return null;
                 return connectedFurre.Name;
             }
             set
@@ -990,7 +998,7 @@ namespace Furcadia.Net.Proxy
 
                         if (IsClientConnected)
                         {
-                            serverconnectphase = ConnectionPhase.Auth;
+                            clientconnectionphase = ConnectionPhase.Auth;
                             ClientStatusChanged?.Invoke(data, new NetClientEventArgs(clientconnectionphase));
                         }
                     }
@@ -1016,8 +1024,8 @@ namespace Furcadia.Net.Proxy
                         serverconnectphase = ConnectionPhase.Connected;
                         if (IsClientConnected)
                         {
-                            serverconnectphase = ConnectionPhase.Connected;
-                            ClientStatusChanged?.Invoke(data, new NetClientEventArgs(clientconnectionphase));
+                            clientconnectionphase = ConnectionPhase.Connected;
+                            ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
                         }
 
                         //ProcessServerInstruction?.Invoke(FurreSpawn,
@@ -1363,9 +1371,6 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public virtual void sndServer(ref string data)
         {
-            if (!base.IsServerConnected)
-                return;
-
             if (data.StartsWith("`m "))
             {
                 switch (data.Substring(2, 1))
@@ -1467,7 +1472,8 @@ namespace Furcadia.Net.Proxy
 
         private void onClientConnected()
         {
-            serverconnectphase = ConnectionPhase.MOTD;
+            clientconnectionphase = ConnectionPhase.MOTD;
+            ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
         }
 
         /// <summary>
@@ -1502,36 +1508,46 @@ namespace Furcadia.Net.Proxy
                         else
                             connectedFurre.Name = words[2];
                     }
-                    ClientData2?.Invoke(data);
-                    break;
-
-                case ConnectionPhase.Connected:
-
                     if (data == "vascodagama")
                     {
                         clientconnectionphase = ConnectionPhase.Connected;
+                        ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
                     }
                     ClientData2?.Invoke(data);
                     break;
+
                 // Disconnected? Do Nohing
                 case ConnectionPhase.Disconnected:
-
                     break;
 
-                case ConnectionPhase.MOTD:
+                case ConnectionPhase.Connected:
+                    if (data == "quit")
+                    {
+                        clientconnectionphase = ConnectionPhase.Disconnected;
+                        ClientDisconnect();
+                        ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+                    }
+                    else
+                        ClientData2?.Invoke(data);
+                    break;
+
                 case ConnectionPhase.Connecting:
-                    ClientData2?.Invoke(data);
-                    break;
-
                 default:
                     ClientData2?.Invoke(data);
                     break;
             }
         }
 
+        private void onClientDisconnected()
+        {
+            clientconnectionphase = ConnectionPhase.Disconnected;
+            ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+        }
+
         private void onServerConnected()
         {
-            clientconnectionphase = ConnectionPhase.MOTD;
+            serverconnectphase = ConnectionPhase.MOTD;
+            ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
         }
 
         /// <summary>
