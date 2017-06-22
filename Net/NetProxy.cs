@@ -427,13 +427,13 @@ namespace Furcadia.Net
             try
 
             {
-                ClientDisconnect();
+                //ClientDisconnect();
                 if (furcProcess == null)
                     furcProcess = Process.GetProcessById(processID);
                 if (furcProcess != null)
                 {
-                    furcProcess.Kill();
-                    furcProcess.Dispose();
+                    furcProcess.CloseMainWindow();
+                    //furcProcess.Dispose();
                 }
             }
             catch (Exception e) { Error?.Invoke(e, this, "CloseClient()"); }
@@ -502,12 +502,13 @@ namespace Furcadia.Net
                 furcProcess.Start();
                 furcProcess.Exited += delegate
                 {
+                    ClientDisConnected?.Invoke();
                     ClientExited?.Invoke();
                 };
                 furcProcess.Exited += delegate
                 {
                     //ClientDisconnect();
-                    ClientDisConnected?.Invoke();
+                    //
                 };
                 processID = furcProcess.Id;
             }

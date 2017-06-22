@@ -79,6 +79,7 @@ namespace Furcadia.Net.Proxy
             base.ClientData2 += onClientDataReceived;
             base.ClientDisConnected += onClientDisconnected;
             base.Connected += onClientConnected;
+            base.ClientExited += onClientExited;
             // }
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
@@ -86,6 +87,10 @@ namespace Furcadia.Net.Proxy
             LookQue = new Queue<string>(50);
             SpeciesTag = new Queue<string>(50);
             BanishString = new List<string>(50);
+        }
+
+        private void onClientExited()
+        {
         }
 
         #endregion "Constructors"
@@ -1022,11 +1027,12 @@ namespace Furcadia.Net.Proxy
                         //Stop the reconnection manager
 
                         serverconnectphase = ConnectionPhase.Connected;
-                        if (IsClientConnected)
-                        {
-                            clientconnectionphase = ConnectionPhase.Connected;
-                            ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
-                        }
+                        //if (IsClientConnected)
+                        //{
+                        //    clientconnectionphase = ConnectionPhase.Connected;
+                        //    ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+
+                        //}
 
                         //ProcessServerInstruction?.Invoke(FurreSpawn,
                         //        new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
@@ -1512,6 +1518,10 @@ namespace Furcadia.Net.Proxy
                     {
                         clientconnectionphase = ConnectionPhase.Connected;
                         ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+                        if (options.Standalone)
+                        {
+                            CloseClient();
+                        }
                     }
                     ClientData2?.Invoke(data);
                     break;
@@ -1521,13 +1531,20 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case ConnectionPhase.Connected:
+                    // Snag the quit command from the client so we can
+                    // handle the connection properly
                     if (data == "quit")
                     {
                         clientconnectionphase = ConnectionPhase.Disconnected;
-                        ClientDisconnect();
                         ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+                        if (options.Standalone)
+                        {
+                            ClientDisconnect();
+                        }
+                        else
+                            Disconnect();
                     }
-                    else
+                    if (IsClientConnected)
                         ClientData2?.Invoke(data);
                     break;
 
