@@ -64,6 +64,25 @@ namespace Furcadia.Net.Proxy
             Initilize();
         }
 
+        /// <summary>
+        /// Disconnect from Furcadia and notify delegates.
+        /// </summary>
+        public override void Disconnect()
+        {
+            base.Disconnect();
+
+            if (serverconnectphase == ConnectionPhase.Disconnected)
+            {
+                serverconnectphase = ConnectionPhase.Init;
+                ServerStatusChanged(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
+            }
+            if (clientconnectionphase == ConnectionPhase.Disconnected)
+            {
+                clientconnectionphase = ConnectionPhase.Init;
+                ClientStatusChanged(this, new NetClientEventArgs(clientconnectionphase));
+            }
+        }
+
         private void Initilize()
         {
             serverconnectphase = ConnectionPhase.Init;
@@ -1479,7 +1498,7 @@ namespace Furcadia.Net.Proxy
         private void onClientConnected()
         {
             clientconnectionphase = ConnectionPhase.MOTD;
-            ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
         }
 
         /// <summary>
@@ -1517,7 +1536,7 @@ namespace Furcadia.Net.Proxy
                     if (data == "vascodagama")
                     {
                         clientconnectionphase = ConnectionPhase.Connected;
-                        ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+                        ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
                         if (options.Standalone)
                         {
                             CloseClient();
@@ -1536,7 +1555,7 @@ namespace Furcadia.Net.Proxy
                     if (data == "quit")
                     {
                         clientconnectionphase = ConnectionPhase.Disconnected;
-                        ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+                        ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
                         if (options.Standalone)
                         {
                             ClientDisconnect();
@@ -1558,13 +1577,13 @@ namespace Furcadia.Net.Proxy
         private void onClientDisconnected()
         {
             clientconnectionphase = ConnectionPhase.Disconnected;
-            ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
+            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
         }
 
         private void onServerConnected()
         {
             serverconnectphase = ConnectionPhase.MOTD;
-            ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
         }
 
         /// <summary>
@@ -1577,7 +1596,8 @@ namespace Furcadia.Net.Proxy
             bool handled = false;
             ParseServerData(data, handled);
 
-            if (!handled & ServerData2 != null) ServerData2?.Invoke(data);
+            if (!handled)
+                ServerData2?.Invoke(data);
         }
 
         #region "Dice Rolls"

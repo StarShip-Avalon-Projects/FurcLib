@@ -76,6 +76,11 @@ namespace Furcadia.Net
         Unknown = -1,
 
         /// <summary>
+        /// No instruction Nessary
+        /// </summary>
+        None,
+
+        /// <summary>
         /// Spawns a new Furre in the dream furre list because they have
         /// joing the Dream we're in
         /// <para>

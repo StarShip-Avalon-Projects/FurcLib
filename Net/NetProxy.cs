@@ -535,6 +535,7 @@ namespace Furcadia.Net
             {
                 server.Close();
             }
+            ServerDisConnected?.Invoke();
         }
 
         /// <summary>
