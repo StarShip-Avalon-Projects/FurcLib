@@ -413,10 +413,6 @@ namespace Furcadia.Net.Proxy
         public string Channel { get { return channel; } set { channel = value; } }
 
         /// <summary>
-        /// </summary>
-        public bool ClientClose { get { return clientClose; } set { clientClose = value; } }
-
-        /// <summary>
         /// Current Connection Phase
         /// </summary>
         public ConnectionPhase ClientConnectPhase
