@@ -1,4 +1,5 @@
 ﻿using System;
+using static Furcadia.Util;
 
 namespace Furcadia.Net.Dream
 {
@@ -78,6 +79,14 @@ namespace Furcadia.Net.Dream
         {
             get { return _Name; }
             set { _Name = value; }
+        }
+
+        /// <summary>
+        /// Name of the dream
+        /// </summary>
+        public string ShortName
+        {
+            get { return FurcadiaShortName(_Name); }
         }
 
         /// <summary>

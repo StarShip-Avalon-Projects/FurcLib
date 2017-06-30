@@ -1357,28 +1357,6 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// </summary>
-        /// <param name="data">
-        /// </param>
-        public override void SendToClient(string data)
-        {
-            if (IsClientConnected && clientconnectionphase != ConnectionPhase.Disconnected)
-                base.SendToClient(data);
-        }
-
-        /// <summary>
-        /// Send Message to Server through the Load Ballancer
-        /// </summary>
-        /// <param name="message">
-        /// Client to server Instruction
-        /// </param>
-        public override void SendToServer(string message)
-        {
-            if (serverconnectphase != ConnectionPhase.Disconnected)
-                ServerBalancer.SendToServer(message);
-        }
-
-        /// <summary>
         /// Format basic furcadia commands and send to server
         /// <para>
         /// We also mirror the client to server banish system.
@@ -1390,7 +1368,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="data">
         /// Raw Client to Server instruction
         /// </param>
-        public virtual void sndServer(ref string data)
+        public virtual void SendFormattedTextToServer(ref string data)
         {
             if (data.StartsWith("`m "))
             {
@@ -1451,6 +1429,29 @@ namespace Furcadia.Net.Proxy
             }
 
             TextToServer(ref data);
+        }
+
+        /// <summary>
+        /// Send a raw instruction to the client
+        /// </summary>
+        /// <param name="data">
+        /// </param>
+        public override void SendToClient(string data)
+        {
+            if (IsClientConnected && clientconnectionphase != ConnectionPhase.Disconnected)
+                base.SendToClient(data);
+        }
+
+        /// <summary>
+        /// Send a raw instruction to Server through the Load Ballancer
+        /// </summary>
+        /// <param name="message">
+        /// Client to server Instruction
+        /// </param>
+        public override void SendToServer(string message)
+        {
+            if (serverconnectphase != ConnectionPhase.Disconnected)
+                ServerBalancer.SendToServer(message);
         }
 
         /// <summary>
