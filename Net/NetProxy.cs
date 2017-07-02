@@ -114,7 +114,6 @@ namespace Furcadia.Net
         private int processID;
 
         private object ServerBufferLock = new object();
-        private int ServerTaken = 0;
 
         /// <summary>
         /// Furcadia Settings File Path
