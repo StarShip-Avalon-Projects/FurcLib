@@ -35,7 +35,7 @@ namespace Furcadia.Movement
         }
 
         /// <summary>
-        /// Constructor with ColorStrinhg code
+        /// Constructor with <see cref="Base220"/> encoded ColorStrinhg
         /// </summary>
         /// <param name="Colors">
         /// Color String in legacy "t" format or new "w" format
@@ -111,6 +111,7 @@ namespace Furcadia.Movement
         #region Public Methods
 
         /// <summary>
+        /// Output the Base220 encoded color string
         /// </summary>
         /// <returns>
         /// Furcadia color-string in modern "w" format
@@ -145,7 +146,7 @@ namespace Furcadia.Movement
         }
 
         /// <summary>
-        /// Update the Furre's colorcode
+        /// Update the Furre's color-code
         /// </summary>
         /// <param name="Colors">
         /// Partial Color String
