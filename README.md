@@ -7,7 +7,7 @@ Furcadia Framework is a Furcadia Documentation Project and 3rd Party Development
 * Creating your very own Pounce-like client with PounceConnection.
 * Want to make a Fox Editor?  With Furcadia.Drawing you can!
 * Some extras like Furcadia.Util.Host gets the Furcadia server host.  Furcadia.IO.Paths for easy Furcadia User folder access.
-
+* Server Load balancer ([ServerQueu](https://starship-avalon-projects.github.io/FurcadiaFramework/html/T_Furcadia_Net_Utils_ServerQue.htm)) helps to regulate the flow of data going to the game server
 
 ## Disclaimer
 Furcadia Framework and its Documentation is not supported by Furcadia, Dragon's Eye Production or Catnip Studios. This project is developed and maintained independently by and for the Furcadia Community.
