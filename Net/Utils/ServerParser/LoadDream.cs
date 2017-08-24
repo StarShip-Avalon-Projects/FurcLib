@@ -1,6 +1,16 @@
 ﻿namespace Furcadia.Net.Utils.ServerParser
 {
-    internal class LoadDream : BaseServerInstruction
+    /// <summary>
+    /// Triggered when the connection enters a new dream.
+    /// <para>
+    /// This instruction tells the client to download the specified dream
+    /// data from the file server.
+    /// </para>
+    /// <para>
+    /// Respond with client command when furcadia client is not available "vasecodegamma"
+    /// </para>
+    /// </summary>
+    public class LoadDream : BaseServerInstruction
     {
         #region Private Fields
 
@@ -16,6 +26,7 @@
         /// Constructor with Dream Data definitions
         /// </summary>
         /// <param name="ServerInstruction">
+        /// Raw server instruction from the game server
         /// </param>
         public LoadDream(string ServerInstruction) : base(ServerInstruction)
         {
