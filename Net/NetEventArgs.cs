@@ -131,7 +131,19 @@ namespace Furcadia.Net
         /// 'B' + user id + shape + color code + linefeed
         /// </para>
         /// </summary>
-        UpdateColorString
+        UpdateColorString,
+
+        /// <summary>
+        /// Download Dream Data
+        /// <para>
+        /// IE: ]q pmnaiagreen 3318793420 modern
+        /// </para>
+        /// <para>
+        /// respond with client command when furcadia client is not
+        /// available "vasecodegamma"
+        /// </para>
+        /// </summary>
+        LoadDreamEvent
     }
 
     public class NetChannelEventArgs : NetServerEventArgs

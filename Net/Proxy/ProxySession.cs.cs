@@ -74,12 +74,12 @@ namespace Furcadia.Net.Proxy
             if (serverconnectphase == ConnectionPhase.Disconnected)
             {
                 serverconnectphase = ConnectionPhase.Init;
-                ServerStatusChanged(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
+                ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
             }
             if (clientconnectionphase == ConnectionPhase.Disconnected)
             {
                 clientconnectionphase = ConnectionPhase.Init;
-                ClientStatusChanged(this, new NetClientEventArgs(clientconnectionphase));
+                ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
             }
         }
 
@@ -1014,8 +1014,6 @@ namespace Furcadia.Net.Proxy
                         // Standalone / account Send(String.Format("connect
                         // {0} {1}\n", sUsername, sPassword));
 
-                        //vasecodegamma ?
-
                         if (IsClientConnected)
                         {
                             clientconnectionphase = ConnectionPhase.Auth;
@@ -1262,6 +1260,7 @@ namespace Furcadia.Net.Proxy
                     { }
 
                     //Dream Load ]q
+                    //vasecodegamma
                     //
                     else if (data.StartsWith("]q"))
                     {
