@@ -1257,7 +1257,8 @@ namespace Furcadia.Net.Proxy
                         //]q {name} {id}	Request to download a specific patch
                     }
                     else if (data.StartsWith(";") || data.StartsWith("]r"))
-                    { }
+                    {
+                    }
 
                     //Dream Load ]q
                     //vasecodegamma
@@ -1268,14 +1269,19 @@ namespace Furcadia.Net.Proxy
 
                         Console.WriteLine("Entering new Dream" + data);
 #endif
-
+                        //Set defaults (should move to some where else?
                         hasShare = false;
                         NoEndurance = false;
-
                         Dream.FurreList.Clear();
                         dream.FurreList.Add(connectedFurre);
-                        //RaiseEvent UpDateDreamList("")
                         InDream = false;
+
+                        LoadDream loadDream = new LoadDream(data);
+                        if (ProcessServerInstruction != null)
+                        {
+                            ProcessServerInstruction.Invoke(loadDream,
+                            new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
+                        }
                     }
                     else if (data.StartsWith("]z"))
                     {
