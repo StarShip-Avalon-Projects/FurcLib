@@ -538,7 +538,7 @@ namespace Furcadia.Net.Proxy
         /// FTR http://ftr.icerealm.org/ref-instructions/
         /// </para>
         /// </remarks>
-        public void ParseServerChannel(string data, bool Handled)
+        public virtual void ParseServerChannel(string data, bool Handled)
         {
             //TODO: needs to move and refactored to ServerParser Class
 
@@ -832,7 +832,7 @@ namespace Furcadia.Net.Proxy
                 System.Text.RegularExpressions.Match n = usr.Match(Text);
                 Text = usr.Replace(Text, "");
 
-                // player = NameToFurre(n.Groups[3].Value);
+                player = dream.FurreList.GerFurreByName(n.Groups[3].Value);
 
                 player.Message = Text;
                 if (Dream.FurreList.Contains(player))
@@ -1281,6 +1281,13 @@ namespace Furcadia.Net.Proxy
                         {
                             ProcessServerInstruction.Invoke(loadDream,
                             new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
+                        }
+
+                        // Set Proxy to Stand-Alone Operation
+                        if (!IsClientConnected && StandAlone)
+                        {
+                            SendToServer("vasecodegamma");
+                            InDream = true;
                         }
                     }
                     else if (data.StartsWith("]z"))
