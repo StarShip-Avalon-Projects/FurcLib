@@ -1455,7 +1455,7 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// Send a raw instruction to Server through the Load Ballancer
+        /// Send a raw instruction to Server through the Load Balancer
         /// </summary>
         /// <param name="message">
         /// Client to server Instruction
@@ -1463,7 +1463,7 @@ namespace Furcadia.Net.Proxy
         public override void SendToServer(string message)
         {
             if (serverconnectphase != ConnectionPhase.Disconnected)
-                ServerBalancer.SendToServer(message);
+                ServerBalancer.SendToServer(ref message);
         }
 
         /// <summary>

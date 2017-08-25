@@ -210,7 +210,7 @@ namespace Furcadia.Net.Utils
         /// <param name="data">
         /// Raw Client to Server Instruction.
         /// </param>
-        public void SendToServer(string data)
+        public void SendToServer(ref string data)
         {
             if (string.IsNullOrEmpty(data))
                 return;
@@ -218,7 +218,8 @@ namespace Furcadia.Net.Utils
             ServerStack.Enqueue(data);
             if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
             {
-                QueueTick(0);
+                double t = 0;
+                QueueTick(ref t);
             }
         }
 
@@ -248,7 +249,7 @@ namespace Furcadia.Net.Utils
             //if (0 == Interlocked.Exchange(ref usingProcessQueue, 1))
             //{
             double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
-            QueueTick(seconds);
+            QueueTick(ref seconds);
             TickTime = DateTime.Now;
             //    Interlocked.Exchange(ref usingProcessQueue, 0);
             //}
@@ -274,7 +275,7 @@ namespace Furcadia.Net.Utils
         /// <param name="DelayTime">
         /// Delay Time in Milliseconds
         /// </param>
-        private void QueueTick(double DelayTime)
+        private void QueueTick(ref double DelayTime)
         {
             lock (QueLock)
             {
