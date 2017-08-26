@@ -21,9 +21,13 @@ namespace Furcadia.Net.Utils.ServerParser
         #region Public Constructors
 
         /// <summary>
-        /// Read Sthe raw server instruction and Set this object to its settings
+        /// Reads the raw server instruction and set this object to its settings
+        /// <para>
+        /// Default Server instruction type is <see cref="ServerInstructionType.Unknown"/>
+        /// </para>
         /// </summary>
         /// <param name="ServerInstruction">
+        /// raw server instruction
         /// </param>
         public BaseServerInstruction(string ServerInstruction)
         {

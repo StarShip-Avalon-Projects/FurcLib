@@ -18,12 +18,6 @@ namespace Furcadia.Net.Utils.ServerParser
 
         #endregion Internal Fields
 
-        #region Private Fields
-
-        private string channel;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
@@ -34,8 +28,7 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             if (ServerInstruction[0] == '(')
                 instructionType = ServerInstructionType.DisplayText;
-            Channel = Regex.Match(ServerInstruction, ChannelNameFilter).Groups[1].Value;
-            channelText = Regex.Match(ServerInstruction, EntryFilter).Groups[2].Value;
+
             player = new FURRE();
         }
 
@@ -43,15 +36,12 @@ namespace Furcadia.Net.Utils.ServerParser
 
         #region Public Properties
 
-        private string channelText;
-
         /// <summary>
         /// Channel Name
         /// </summary>
         public string Channel
         {
-            get { return channel; }
-            set { channel = value; }
+            get { return Regex.Match(RawInstruction, ChannelNameFilter).Groups[1].Value; }
         }
 
         /// <summary>
@@ -61,11 +51,7 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                return channelText;
-            }
-            set
-            {
-                channelText = value;
+                return Regex.Match(RawInstruction, EntryFilter).Groups[2].Value; ;
             }
         }
 
@@ -77,7 +63,7 @@ namespace Furcadia.Net.Utils.ServerParser
             get
             {
                 Regex txt = new Regex(ChannelNameFilter);
-                return txt.Replace(channelText, string.Empty);
+                return txt.Replace(ChannelText, "[$1]");
             }
         }
 
