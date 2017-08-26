@@ -529,7 +529,7 @@ namespace Furcadia.Net.Proxy
         /// This is derived content from the Furcadia Dev Docs and Furcadia
         /// Technical Resources
         /// <para>
-        /// Update 23 Avatar Moement http://dev.furcadia.com/docs/023_new_movement.pdf
+        /// Update 23 Avatar Movement http://dev.furcadia.com/docs/023_new_movement.pdf
         /// </para>
         /// <para>
         /// Update 27 Movement http://dev.furcadia.com/docs/027_movement.html
@@ -836,7 +836,7 @@ namespace Furcadia.Net.Proxy
 
                 player.Message = Text;
                 if (Dream.FurreList.Contains(player))
-                    Dream.FurreList[player.ID] = player;
+                    Dream.FurreList[player] = player;
                 bool test = IsConnectedCharacter;
             }
             else if (Color == "channel")

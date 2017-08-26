@@ -675,9 +675,12 @@ namespace Furcadia.Net
                 server = new TcpClient();
                 server.Connect(_endpoint);
                 if (!server.Connected) throw new Exception("There was a problem connecting to the server.");
-                client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
-                server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
-
+                try
+                {
+                    client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
+                    server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
+                }
+                catch { return; }
                 Connected?.Invoke();
 
                 // Trigger News timer to restore settings
@@ -719,7 +722,8 @@ namespace Furcadia.Net
             {
                 if (!IsClientConnected)
                 {
-                    throw new SocketException((int)SocketError.NotConnected);
+                    ClientDisConnected?.Invoke();
+                    return;
                 }
 
                 int read = 0;
@@ -773,13 +777,14 @@ namespace Furcadia.Net
                     ClientLeftOversSize = read - currStart;
                 }
 
-                if (IsClientConnected == false)
-                {
-                    ClientDisConnected?.Invoke();
-                }
-
                 if (IsClientConnected)
-                    client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+                {
+                    try
+                    {
+                        client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+                    }
+                    catch { }
+                }
             }
         }
 
@@ -789,10 +794,10 @@ namespace Furcadia.Net
         /// </param>
         private void GetServerData(IAsyncResult ar)
         {
-            if (IsServerConnected == false)
+            if (!IsServerConnected)
             {
+                ServerDisConnected?.Invoke();
                 return;
-                //throw new SocketException((int)SocketError.NotConnected);
             }
             //read = number of bytes read
             int read = 0;
@@ -845,11 +850,6 @@ namespace Furcadia.Net
 
                 Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
                 ServerLeftOversSize = read - currStart;
-            }
-
-            if (IsServerConnected == false)
-            {
-                ServerDisConnected?.Invoke();
             }
 
             if (IsServerConnected)
