@@ -54,6 +54,9 @@ namespace Furcadia.Net.Utils.ServerParser
             set { channel = value; }
         }
 
+        /// <summary>
+        /// Raw unformatted channel text
+        /// </summary>
         public string ChannelText
         {
             get
@@ -63,6 +66,18 @@ namespace Furcadia.Net.Utils.ServerParser
             set
             {
                 channelText = value;
+            }
+        }
+
+        /// <summary>
+        /// returns Clear Text to display in a log
+        /// </summary>
+        public string FormattedChannelText
+        {
+            get
+            {
+                Regex txt = new Regex(ChannelNameFilter);
+                return txt.Replace(channelText, string.Empty);
             }
         }
 
