@@ -1,7 +1,7 @@
 ﻿namespace Furcadia.Text
 {
     /// <summary>
-    /// Stuff for Furcadia Markup Language (FML)
+    /// Furcadia Markup Language (FML) REGEX
     /// </summary>
     public class FurcadiaMarkup
     {
@@ -32,6 +32,11 @@
         public const string Iconfilter = "<img src='fsh://system.fsh:([^']*)'(.*?)/>";
 
         /// <summary>
+        /// HTML images filter
+        /// </summary>
+        public const string ImgTagFilter = "<img src='fsh://system.fsh:([^']*)'(.*?)/>";
+
+        /// <summary>
         /// </summary>
         public const string NameFilter = "<name shortname='([^']*)' ?(.*?)?>([\\x21-\\x3B\\=\\x3F-\\x7E]+)</name>";
 
@@ -39,6 +44,11 @@
         /// Whispers Name
         /// </summary>
         public const string RegExName = "< name shortname='(.*?)' src='whisper-(.*?)'>";
+
+        /// <summary>
+        /// Regex for working with HTML URLS
+        /// </summary>
+        public const string UrlFilter = "<a href='?\"?(.*?)'?\"?>(.*?)</a>";
 
         /// <summary>
         /// </summary>
