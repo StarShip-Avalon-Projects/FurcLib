@@ -379,7 +379,7 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// Server Queue NoEndurance modew
+        /// Server Queue NoEndurance mode
         /// </summary>
         internal bool NoEndurance
         {
@@ -399,7 +399,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Current Name for Banish Operations
         /// <para>
-        /// We mirror Furcadia's Banish system for effciency
+        /// We mirror Furcadia's Banish system for efficiency
         /// </para>
         /// </summary>
         public string BanishName { get { return banishName; } set { banishName = value; } }
@@ -410,7 +410,10 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        public string Channel { get { return channel; } set { channel = value; } }
+        public string Channel
+        {
+            get { return channel; }
+        }
 
         /// <summary>
         /// Current Connection Phase
@@ -445,11 +448,11 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        public string ErrorMsg { get { return errorMsg; } set { errorMsg = value; } }
+        public string ErrorMsg { get { return errorMsg; } }
 
         /// <summary>
         /// </summary>
-        public short ErrorNum { get { return errorNum; } set { errorNum = value; } }
+        public short ErrorNum { get { return errorNum; } }
 
         /// <summary>
         /// We have Dream Share or We are Dream owner
@@ -458,7 +461,7 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        public bool InDream { get { return inDream; } set { inDream = value; } }
+        public bool InDream { get { return inDream; } }
 
         /// <summary>
         /// Current Triggering player
@@ -466,7 +469,7 @@ namespace Furcadia.Net.Proxy
         public FURRE Player
         {
             get { return player; }
-            set { player = value; }
+            // set { player = value; }
         }
 
         /// <summary>
@@ -540,7 +543,7 @@ namespace Furcadia.Net.Proxy
         /// </remarks>
         public virtual void ParseServerChannel(string data, bool Handled)
         {
-            //TODO: needs to move and refactored to ServerParser Class
+            //TODO: needs to move and re factored to ServerParser Class
 
             data = data.Remove(0, 1);
 
@@ -550,30 +553,30 @@ namespace Furcadia.Net.Proxy
             string Text = "";
             if (!Handled)
             {
-                Text = Regex.Match(data, EntryFilter).Groups[2].Value;
-                User = Regex.Match(data, NameFilter).Groups[3].Value;
-                // if (!string.IsNullOrEmpty(User)) player = NameToFurre(User);
-                player.Message = "";
+                Text = Regex.Replace(data, NameFilter, string.Empty);
+
+                User = Regex.Match(data, NameFilter).Groups[1].Value;
+                if (!string.IsNullOrEmpty(User))
+                    player = dream.FurreList.GerFurreByName(User);
+
                 Desc = Regex.Match(data, DescFilter).Groups[2].Value;
-                Regex mm = new Regex(Iconfilter);
-                Match ds = mm.Match(Text);
-                Text = mm.Replace(Text, "[" + ds.Groups[1].Value + "] ");
+
                 Regex s = new Regex(ChannelNameFilter);
                 Text = s.Replace(Text, "");
-            }
-            else
-            {
-                User = player.Name;
-                Text = player.Message;
+                bool HasFurcIcon = SystemFshIcon(ref Text, "[$1]");
+                player.Message = Text;
+                if (!string.IsNullOrEmpty(Desc))
+                    player.Desc = Desc;
             }
 
-            ErrorMsg = "";
-            ErrorNum = 0;
+            errorMsg = "";
+            errorNum = 0;
 
-            if (Channel == "@news" | Channel == "@spice")
-            {
-            }
-            else if (Color == "success")
+            //if (Channel == "@news" | Channel == "@spice")
+            //{
+            //}
+            // else
+            if (Color == "success")
             {
                 if (Text.Contains(" has been banished from your dreams."))
                 {
@@ -629,13 +632,13 @@ namespace Furcadia.Net.Proxy
                     Regex CookiesReady = new Regex(string.Format("{0}", "Your cookies are ready.  http://furcadia.com/cookies/ for more info!"));
                 }
             }
-            else if (Channel == "@roll")
-            {
-            }
-            else if (Channel == "@dragonspeak" || Channel == "@emit" || Color == "emit")
-            {
-                //'BCast (Advertisments, Announcments)
-            }
+            //else if (Channel == "@roll")
+            //{
+            //}
+            //else if (Channel == "@dragonspeak" || Channel == "@emit" || Color == "emit")
+            //{
+            //    //'BCast (Advertisments, Announcments)
+            //}
             else if (Color == "bcast")
             {
                 string AdRegEx = "<channel name='(.*)' />";
@@ -703,7 +706,7 @@ namespace Furcadia.Net.Proxy
                         if (Dream.FurreList.Contains(player))
                             Dream.FurreList[player] = player;
                     }
-                    Channel = "say";
+                    channel = "say";
                 }
                 else
                 {
@@ -751,35 +754,32 @@ namespace Furcadia.Net.Proxy
             else if (Color == "query")
             {
                 string QCMD = Regex.Match(data, "<a.*?href='command://(.*?)'>").Groups[1].Value;
-                //player = NameToFurre(User, True)
+
                 switch (QCMD)
                 {
                     case "summon":
-                        //'JOIN
+                    //'JOIN
 
-                        break;
+                    // break;
 
                     case "join":
-                        //'SUMMON
+                    //'SUMMON
 
-                        break;
+                    // break;
 
                     case "follow":
-                        //'LEAD
+                    //'LEAD
 
-                        break;
+                    // break;
 
                     case "lead":
-                        //'FOLLOW
+                    //'FOLLOW
 
-                        //If Not IsBot(player) Then
+                    //If Not IsBot(player) Then
 
-                        break;
+                    // break;
 
                     case "cuddle":
-
-                        break;
-
                     default:
 
                         break;
@@ -810,8 +810,8 @@ namespace Furcadia.Net.Proxy
             }
             else if (Color == "warning")
             {
-                ErrorMsg = Text;
-                ErrorNum = 1;
+                errorMsg = Text;
+                errorNum = 1;
             }
             else if (Color == "trade")
             {
@@ -844,10 +844,10 @@ namespace Furcadia.Net.Proxy
                 //ChannelNameFilter2
                 Regex chan = new Regex(ChannelNameFilter);
                 System.Text.RegularExpressions.Match ChanMatch = chan.Match(data);
-                Regex r = new Regex("<img src='(.*?)' alt='(.*?)' />");
+                Regex r = new Regex(ImgTagFilter);
                 System.Text.RegularExpressions.Match ss = r.Match(Text);
-                if (ss.Success)
-                    Text = Text.Replace(ss.Groups[0].Value, "");
+                //if (ss.Success)
+                Text = Text.Replace(ss.Groups[0].Value, "");
                 r = new Regex(NameFilter + ":");
                 ss = r.Match(Text);
                 if (ss.Success)
@@ -892,8 +892,8 @@ namespace Furcadia.Net.Proxy
             }
             else if (Color == "error")
             {
-                ErrorMsg = Text;
-                ErrorNum = 2;
+                errorMsg = Text;
+                errorNum = 2;
 
                 string NameStr = "";
                 if (Text.Contains("There are no furres around right now with a name starting with "))
@@ -918,9 +918,9 @@ namespace Furcadia.Net.Proxy
 
                     BanishString.Clear();
                 }
-                else if (Text == "You do not have any cookies to give away right now!")
-                {
-                }
+                //else if (Text == "You do not have any cookies to give away right now!")
+                //{
+                //}
             }
             else if (data.StartsWith("Communication"))
             {
@@ -960,14 +960,16 @@ namespace Furcadia.Net.Proxy
             {
                 Color = "PhoenixSpeak";
             }
-            else if (data.StartsWith("(You enter the dream of"))
-            {
-            }
-            else
-            {
-            }
+            //else if (data.StartsWith("(You enter the dream of"))
+            //{
+            //}
+            //else
+            //{
+            //}
             ChannelObject chanObject = new ChannelObject(data);
             chanObject.Player = player;
+            chanObject.Channel = channel;
+            chanObject.InstructionType = ServerInstructionType.DisplayText;
 
             ParseChannelArgs args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
 
@@ -1248,7 +1250,7 @@ namespace Furcadia.Net.Proxy
 #if DEBUG
                         Console.WriteLine("Disconnection Dialog:" + data);
 #endif
-                        InDream = false;
+                        inDream = false;
                         dream.FurreList.Clear();
                         dream.FurreList.Add(connectedFurre);
                         // RaiseEvent UpDateDreamList("")
@@ -1256,9 +1258,9 @@ namespace Furcadia.Net.Proxy
                         //;{mapfile}	Load a local map (one in the furcadia folder)
                         //]q {name} {id}	Request to download a specific patch
                     }
-                    else if (data.StartsWith(";") || data.StartsWith("]r"))
-                    {
-                    }
+                    //else if (data.StartsWith(";") || data.StartsWith("]r"))
+                    //{
+                    //}
 
                     //Dream Load ]q
                     //vasecodegamma
@@ -1274,7 +1276,7 @@ namespace Furcadia.Net.Proxy
                         NoEndurance = false;
                         Dream.FurreList.Clear();
                         dream.FurreList.Add(connectedFurre);
-                        InDream = false;
+                        inDream = false;
 
                         LoadDream loadDream = new LoadDream(data);
                         if (ProcessServerInstruction != null)
@@ -1287,7 +1289,7 @@ namespace Furcadia.Net.Proxy
                         if (!IsClientConnected && StandAlone)
                         {
                             SendToServer("vasecodegamma");
-                            InDream = true;
+                            inDream = true;
                         }
                     }
                     else if (data.StartsWith("]z"))
@@ -1313,7 +1315,7 @@ namespace Furcadia.Net.Proxy
                     {
                         if (data.StartsWith("]C0"))
                         {
-                            InDream = true;
+                            inDream = true;
                             string dname = data.Substring(10);
                             Dream.Name = dname;
                             Dream.URL = data.Substring(3);
@@ -1344,7 +1346,7 @@ namespace Furcadia.Net.Proxy
                     //Process Channels Seperatly
                     else if (data.StartsWith("("))
                     {
-                        Channel = "";
+                        channel = "";
                         if (ThroatTired == false & data.StartsWith("(<font color='warning'>Your throat is tired. Try again in a few seconds.</font>"))
                         {
                             //Using Furclib ServQue

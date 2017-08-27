@@ -9,6 +9,12 @@ namespace Furcadia.Net.Utils.ServerParser
     /// </summary>
     public class ChannelObject : BaseServerInstruction
     {
+        #region Private Fields
+
+        private string channel;
+
+        #endregion Private Fields
+
         #region Internal Fields
 
         /// <summary>
@@ -41,7 +47,10 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public string Channel
         {
-            get { return Regex.Match(RawInstruction, ChannelNameFilter).Groups[1].Value; }
+            get
+            { return channel; }
+            set
+            { channel = value; }
         }
 
         /// <summary>
@@ -56,14 +65,23 @@ namespace Furcadia.Net.Utils.ServerParser
         }
 
         /// <summary>
+        /// Dynamic Channel filter
+        /// </summary>
+        public string DynamicChannel
+        {
+            get { return Regex.Match(RawInstruction, ChannelNameFilter).Groups[1].Value; }
+        }
+
+        /// <summary>
         /// returns Clear Text to display in a log
         /// </summary>
         public string FormattedChannelText
         {
             get
             {
-                Regex txt = new Regex(ChannelNameFilter);
-                return txt.Replace(ChannelText, "[$1]");
+                string Text = ChannelText;
+                SystemFshIcon(ref Text, "[$1]");
+                return Text;
             }
         }
 

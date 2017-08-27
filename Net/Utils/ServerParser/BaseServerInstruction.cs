@@ -49,6 +49,10 @@ namespace Furcadia.Net.Utils.ServerParser
             {
                 return instructionType;
             }
+            set
+            {
+                instructionType = value;
+            }
         }
 
         /// <summary>
