@@ -42,3 +42,6 @@ using System.Reflection;
 [assembly: AssemblyVersion("2.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
 [assembly: AssemblyFileVersion("2.0.<#= revisionNumber.ToString("D3") #>.<#= CurrentDate #>")]
 [assembly: AssemblyCopyright("Copyright © 2012 - <#= CurrentYear #>")]
+
+
+

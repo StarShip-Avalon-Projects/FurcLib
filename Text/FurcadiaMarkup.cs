@@ -61,7 +61,7 @@ namespace Furcadia.Text
         /// <summary>
         /// Dynamic Channel tags
         /// <para>
-        /// &gt;channel name='@channelName' /&lt;
+        /// &lt;channel name='@channelName' / &gt;
         /// </para>
         /// </summary>
         public const string ChannelNameFilter = "<channel name='(.*?)' />";
