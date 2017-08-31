@@ -8,7 +8,9 @@
 using Furcadia.IO;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Xml.Serialization;
 
 namespace Furcadia.Text
@@ -145,18 +147,42 @@ namespace Furcadia.Text
         public static Hashtable Load(string file)
         {
             Hashtable ret = new Hashtable();
-            if (File.Exists(file))
+            List<string> lines = new List<string>();
+            lines.AddRange(ReadSettingIni(file));
+            foreach (string line in lines)
             {
-                string[] lines = File.ReadAllLines(file);
-                foreach (string line in lines)
-                {
-                    //get key/value!
-                    string[] key_value = line.Split(new char[] { '=' }, 2);
-                    if (key_value.Length == 2) ret.Add(key_value[0], key_value[1]);
-                }
-                return ret;
+                //get key/value!
+                string[] key_value = line.Split(new char[] { '=' }, 2);
+                if (key_value.Length == 2) ret.Add(key_value[0], key_value[1]);
             }
-            else { throw new FileNotFoundException(file); }
+            return ret;
+        }
+
+        /// <summary>
+        /// Rrad Furcadia settings from Furcadia install path. If the settings does not exist We'll use our Embedded fresource
+        /// </summary>
+        /// <param name="SettingsIni"></param>
+        /// <returns></returns>
+        public static string[] ReadSettingIni(string SettingsIni)
+        {
+            List<string> lines = new List<string>();
+            if (File.Exists(SettingsIni))
+            {
+                lines.AddRange(File.ReadAllLines(SettingsIni));
+            }
+            else
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var resourceName = "Furcadia.Resources.settings.ini";
+
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    while (!reader.EndOfStream)
+                        lines.Add(reader.ReadLine());
+                }
+            }
+            return lines.ToArray();
         }
 
         /// <summary>

@@ -99,7 +99,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyFileVersion.cs">
+    <Compile Include="AssemblyFileVersion1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyFileVersion.t4</DependentUpon>
@@ -213,6 +213,7 @@
     <Content Include="FurcLib Change Log.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\settings.ini" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -227,7 +228,7 @@
       <LogicalName>DefaultMapData</LogicalName>
     </Resource>
     <None Include="README.md" />
-    <None Include="Resources\furc.pal" />
+    <EmbeddedResource Include="Resources\furc.pal" />
     <EmbeddedResource Include="Resources\SpeciesTable.csv" />
     <EmbeddedResource Include="Resources\badges.csv" />
   </ItemGroup>

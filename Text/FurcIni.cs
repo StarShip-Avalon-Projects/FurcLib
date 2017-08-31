@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Furcadia.Text.Settings;
 
 namespace Furcadia.Text
 {
@@ -47,7 +48,7 @@ namespace Furcadia.Text
                     return m.Groups[2].Value;
                 }
             }
-            throw new Exception("++ ERROR: Couldn't find " + WhichSetting + " to change.");
+            throw new Exception("Couldn't find Furcadia setting(" + WhichSetting + ") to change.");
         }
 
         /// <summary>
@@ -65,12 +66,12 @@ namespace Furcadia.Text
             string[] SettingFile;
             try
             {
-                SettingFile = File.ReadAllLines(Path.Combine(path, file));
+                SettingFile = ReadSettingIni(Path.Combine(path, file));
                 return SettingFile;
             }
             catch (Exception ex)
             {
-                throw new Exception("++ ERROR: Couldn't Load " + file + " to change.", ex);
+                throw new Exception(" Couldn't Load Furcadia settings (" + file + ") to change.", ex);
             }
         }
 
@@ -91,7 +92,7 @@ namespace Furcadia.Text
             }
             catch (Exception e)
             {
-                throw new Exception("++ ERROR: Couldn't Load " + file + " to change.", e);
+                throw new Exception("Couldn't Save Furcadia settings (" + file + ") to change.", e);
             }
         }
 
@@ -115,7 +116,7 @@ namespace Furcadia.Text
                     return;
                 }
             }
-            throw new Exception("++ ERROR: Couldn't find " + WhichSetting + " to change.");
+            throw new Exception("Couldn't find setting" + WhichSetting + " to change.");
         }
 
         #endregion Public Methods

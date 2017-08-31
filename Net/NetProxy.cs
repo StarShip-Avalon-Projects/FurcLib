@@ -504,11 +504,6 @@ namespace Furcadia.Net
                     ClientDisConnected?.Invoke();
                     ClientExited?.Invoke();
                 };
-                furcProcess.Exited += delegate
-                {
-                    //ClientDisconnect();
-                    //
-                };
                 processID = furcProcess.Id;
             }
             catch (NetProxyException e)
@@ -799,61 +794,64 @@ namespace Furcadia.Net
                 ServerDisConnected?.Invoke();
                 return;
             }
-            //read = number of bytes read
-            int read = 0;
-
-            read = server.GetStream().EndRead(ar);
-            int currStart = 0;
-            int currEnd = -1;
-
-            for (int i = 0; i < read; i++)
+            try
             {
-                if (i < BUFFER_CAP && serverBuffer[i] == 10)
+                int read = 0;
+
+                read = server.GetStream().EndRead(ar);
+                int currStart = 0;
+                int currEnd = -1;
+
+                for (int i = 0; i < read; i++)
                 {
-                    // Set the end of the data
-                    currEnd = i;
-
-                    // If we have left overs from previous runs:
-                    if (ServerLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                    if (i < BUFFER_CAP && serverBuffer[i] == 10)
                     {
-                        // Allocate enough space for the joined buffer
-                        byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
+                        // Set the end of the data
+                        currEnd = i;
 
-                        // And add the current read as well
-                        Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
+                        // If we have left overs from previous runs:
+                        if (ServerLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                        {
+                            // Allocate enough space for the joined buffer
+                            byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
 
-                        // Get the leftover from the previous read
-                        Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
+                            // And add the current read as well
+                            Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
 
-                        // Now handle it string test =
-                        ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                                     currStart, joinedData.Length));
-                        ServerLeftOversSize = 0;
+                            // Get the leftover from the previous read
+                            Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
+
+                            // Now handle it string test =
+                            ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
+                                         currStart, joinedData.Length));
+                            ServerLeftOversSize = 0;
+                        }
+                        else
+                        {
+                            ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
+                             currStart, currEnd - currStart));
+
+                            // Handle the data, from the start to the end,
+                            // between delimiter
+                        }
+                        // Set the new start - after our delimiter
+                        currStart = i + 1;
                     }
-                    else
-                    {
-                        ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
-                         currStart, currEnd - currStart));
-
-                        // Handle the data, from the start to the end,
-                        // between delimiter
-                    }
-                    // Set the new start - after our delimiter
-                    currStart = i + 1;
                 }
+
+                // See if we still have any leftovers
+                if (currStart < read)
+                {
+                    // ServerLeftOvers = new byte[read - currStart];
+
+                    Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
+                    ServerLeftOversSize = read - currStart;
+                }
+
+                if (IsServerConnected)
+                    server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), server);
             }
-
-            // See if we still have any leftovers
-            if (currStart < read)
-            {
-                // ServerLeftOvers = new byte[read - currStart];
-
-                Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
-                ServerLeftOversSize = read - currStart;
-            }
-
-            if (IsServerConnected)
-                server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), server);
+            catch { ServerDisConnected?.Invoke(); }
         }
 
         /// <summary>

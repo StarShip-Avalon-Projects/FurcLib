@@ -117,6 +117,7 @@ namespace Furcadia.Net.Proxy
         #region Public Methods
 
         /// <summary>
+        /// Execute the Proxy connection sequence
         /// </summary>
         public override void Connect()
         {
@@ -846,7 +847,7 @@ namespace Furcadia.Net.Proxy
                 System.Text.RegularExpressions.Match ChanMatch = chan.Match(data);
                 Regex r = new Regex(ImgTagFilter);
                 System.Text.RegularExpressions.Match ss = r.Match(Text);
-                //if (ss.Success)
+                if (ss.Success)
                 Text = Text.Replace(ss.Groups[0].Value, "");
                 r = new Regex(NameFilter + ":");
                 ss = r.Match(Text);
