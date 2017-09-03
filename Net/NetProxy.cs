@@ -53,8 +53,6 @@ namespace Furcadia.Net
 
         #endregion Protected Internal Fields
 
-
-
         #region Private Fields
 
         /// <summary>
@@ -327,7 +325,21 @@ namespace Furcadia.Net
         /// <summary>
         /// This is triggered when a handled Exception is thrown.
         /// </summary>
-        protected event ErrorEventHandler Error;
+       public event ErrorEventHandler Error;
+
+        /// <summary>
+        /// send errors to the error handler
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="o"></param>
+        /// <param name="text"></param>
+        protected virtual void SendError(Exception e, object o, string text)
+        {
+            if (Error != null)
+                Error?.Invoke(e, o, text);
+            else
+                throw new Exception("Unhandled exception for" + text, e);
+        }
 
         #endregion Protected Events
 
@@ -708,6 +720,7 @@ namespace Furcadia.Net
         }
 
         /// <summary>
+        /// handle the raw data coming from he Furcadia client
         /// </summary>
         /// <param name="ar">
         /// </param>
@@ -720,70 +733,75 @@ namespace Furcadia.Net
                     ClientDisConnected?.Invoke();
                     return;
                 }
-
-                int read = 0;
-
-                read = client.GetStream().EndRead(ar);
-                int currStart = 0;
-                int currEnd = -1;
-
-                for (int i = 0; i < read; i++)
+                try
                 {
-                    if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
+                    int read = 0;
+
+                    read = client.GetStream().EndRead(ar);
+                    int currStart = 0;
+                    int currEnd = -1;
+
+                    for (int i = 0; i < read; i++)
                     {
-                        // Set the end of the data
-                        currEnd = i;
-
-                        // If we have left overs from previous runs:
-                        if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                        if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
                         {
-                            // Allocate enough space for the joined buffer
-                            byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
+                            // Set the end of the data
+                            currEnd = i;
 
-                            // And add the current read as well
-                            Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
+                            // If we have left overs from previous runs:
+                            if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                            {
+                                // Allocate enough space for the joined buffer
+                                byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
 
-                            // Get the leftover from the previous read
-                            Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
+                                // And add the current read as well
+                                Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
 
-                            ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                           0, joinedData.Length)); //Mark that we don't have any
-                                                   // leftovers anymore
+                                // Get the leftover from the previous read
+                                Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
 
-                            // Mark that we don't have any leftovers anymore
-                            ClientLeftOversSize = 0;
+                                ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
+                               0, joinedData.Length)); //Mark that we don't have any
+                                                       // leftovers anymore
+
+                                // Mark that we don't have any leftovers anymore
+                                ClientLeftOversSize = 0;
+                            }
+                            else
+                            {
+                                ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
+                                currStart, currEnd - currStart));
+                            }
+
+                            // Set the new start - after our delimiter
+                            currStart = i + 1;
                         }
-                        else
-                        {
-                            ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
-                            currStart, currEnd - currStart));
-                        }
-
-                        // Set the new start - after our delimiter
-                        currStart = i + 1;
                     }
-                }
-                // See if we still have any leftovers
-                if (currStart < read)
-                {
-                    //ClientLeftOvers = new byte[read - currStart];
-
-                    Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
-                    ClientLeftOversSize = read - currStart;
-                }
-
-                if (IsClientConnected)
-                {
-                    try
+                    // See if we still have any leftovers
+                    if (currStart < read)
                     {
+                        //ClientLeftOvers = new byte[read - currStart];
+
+                        Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
+                        ClientLeftOversSize = read - currStart;
+                    }
+
+                    if (IsClientConnected)
+                    {
+
                         client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+
                     }
-                    catch { }
+                }
+                catch (Exception ex) //Catch any unknown exception and close the connection gracefully
+                {
+                    Error?.Invoke(ex, this, ex.Message);
+                    ClientDisConnected?.Invoke();
                 }
             }
         }
-
         /// <summary>
+        /// Handle the raw server data
         /// </summary>
         /// <param name="ar">
         /// </param>
@@ -851,7 +869,11 @@ namespace Furcadia.Net
                 if (IsServerConnected)
                     server.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), server);
             }
-            catch { ServerDisConnected?.Invoke(); }
+            catch (Exception ex) //Catch any unknown exception and close the connection gracefully
+            {
+                Error?.Invoke(ex, this, ex.Message);
+                ServerDisConnected?.Invoke();
+            }
         }
 
         /// <summary>

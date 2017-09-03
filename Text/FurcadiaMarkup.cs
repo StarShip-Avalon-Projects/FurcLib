@@ -89,7 +89,7 @@ namespace Furcadia.Text
         /// <summary>
         /// HTML images filter
         /// </summary>
-        public const string ImgTagFilter = "<img src='(.*?)' alt='?(.*?)?'? />";
+        public const string ImgTagFilter = "<img src='|\"(.*?)'|\" alt='|\"(.*?)'|\" />";
 
         /// <summary>
         /// </summary>
