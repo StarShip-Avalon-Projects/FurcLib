@@ -53,7 +53,6 @@ namespace Furcadia.Net.Proxy
             Initilize();
         }
 
-
         /// <summary>
         /// </summary>
         /// <param name="Options">
@@ -118,7 +117,7 @@ namespace Furcadia.Net.Proxy
         #region Public Methods
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override void Connect()
         {
@@ -302,8 +301,6 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public event ClientStatusChangedEventHandler ClientStatusChanged;
 
-  
-
         /// <summary>
         /// This is triggered when the Server sends data to the client.
         /// Doesn't expect a return value.
@@ -358,8 +355,6 @@ namespace Furcadia.Net.Proxy
         #endregion "Client/Server Fata Handling"
 
         #endregion "Public Events"
-
-
 
         #region Public Properties
 
@@ -545,37 +540,54 @@ namespace Furcadia.Net.Proxy
             //TODO: needs to move and re factored to ServerParser Class
 
             data = data.Remove(0, 1);
-            Regex NameRegex = new Regex( NameFilter,RegexOptions.IgnoreCase|RegexOptions.CultureInvariant);
+            Regex NameRegex = new Regex(NameFilter, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
             try
             {
+                string Color = Regex.Match(data, EntryFilter).Groups[1].Value;
+                string User = null;
+                if (NameRegex.Match(data).Success)
+                {
+                    User = NameRegex.Match(data).Groups[1].Value;
+                    player = dream.FurreList.GerFurreByName(User);
+                }
 
-                string Color =  Regex.Match(data, EntryFilter).Groups[1].Value;
-                string User = NameRegex.Match(data).Groups[1].Value;
-                string Desc = "";
                 string Text = NameRegex.Replace(data, "$2");
+                Regex ChannelRegEx = new Regex(ChannelNameFilter);
+                if (ChannelRegEx.Match(data).Success)
+                {
+                    channel = ChannelRegEx.Match(data).Groups[1].Value;
+                }
                 if (!Handled)
                 {
+                    Regex DescRegex = new Regex(DescFilter);
+                    if (DescRegex.Match(data).Success)
+                    {
+                        player = dream.FurreList.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
+                        player.Desc = DescRegex.Match(data).Groups[2].Value;
+                        // player = NameToFurre(DescName);
+                        if (LookQue.Count > 0)
+                        {
+                            player.Color = new ColorString(LookQue.Dequeue());
+                        }
+                        if (BadgeTag.Count > 0)
+                        {
+                            player.Badge = BadgeTag.Dequeue(); ;
+                        }
+                        else if (!string.IsNullOrEmpty(player.Badge))
+                        {
+                            player.Badge = "";
+                        }
+                        Look = false;
+                    }
 
-                    if (!string.IsNullOrEmpty(User))
-                        player = dream.FurreList.GerFurreByName(User);
-
-                    Desc = Regex.Match(data, DescFilter).Groups[2].Value;
-
-                    Regex s = new Regex(ChannelNameFilter);
-                    Text = s.Replace(Text, "");
-                    bool HasFurcIcon = SystemFshIcon(ref Text, "[$1]");
+                    Text = ChannelRegEx.Replace(data, "[$1]");
+                    bool HasFurcIcon = SystemFshIcon(ref Text, string.Empty);
                     player.Message = Text;
-                    if (!string.IsNullOrEmpty(Desc))
-                        player.Desc = Desc;
                 }
 
                 errorMsg = "";
                 errorNum = 0;
 
-                //if (Channel == "@news" | Channel == "@spice")
-                //{
-                //}
-                // else
                 if (Color == "success")
                 {
                     if (Text.Contains(" has been banished from your dreams."))
@@ -626,19 +638,7 @@ namespace Furcadia.Net.Proxy
                             NoEndurance = true;
                         }
                     }
-                    else if (Channel == "@cookie")
-                    {
-                        //(0:96) When the Bot sees "Your cookies are ready."
-                        Regex CookiesReady = new Regex(string.Format("{0}", "Your cookies are ready.  http://furcadia.com/cookies/ for more info!"));
-                    }
                 }
-                //else if (Channel == "@roll")
-                //{
-                //}
-                //else if (Channel == "@dragonspeak" || Channel == "@emit" || Color == "emit")
-                //{
-                //    //'BCast (Advertisments, Announcments)
-                //}
                 else if (Color == "bcast")
                 {
                     string AdRegEx = "<channel name='(.*)' />";
@@ -676,21 +676,22 @@ namespace Furcadia.Net.Proxy
 
                     //'SAY
                 }
+                else if (Color == "shout")
+                {
+                    channel = "shout";
+                }
                 else if (Color == "myspeech")
                 {
                     Regex t = new Regex(YouSayFilter);
                     string u = t.Match(data).Groups[1].Value;
                     Text = t.Match(data).Groups[2].Value;
-                    if (SpeciesTag.Count > 0)
-                    {
-                        //player.Color = SpeciesTag.Dequeue();
-                        if (Dream.FurreList.Contains(player))
-                            Dream.FurreList[player.ID] = player;
-                    }
 
                     player.Message = Text;
                 }
-                else if (!string.IsNullOrEmpty(User) & string.IsNullOrEmpty(Channel) & string.IsNullOrEmpty(Color) & Regex.Match(data, NameFilter).Groups[2].Value != "forced")
+                else if (!string.IsNullOrEmpty(User)
+                    & string.IsNullOrEmpty(Channel) &
+                    string.IsNullOrEmpty(Color) &
+                    Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
                     Match tt = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.IgnoreCase);
                     Regex t = new Regex(NameFilter);
@@ -714,91 +715,21 @@ namespace Furcadia.Net.Proxy
                         Look = true;
                     }
                 }
-                else if (!string.IsNullOrEmpty(Desc))
-                {
-                    string DescName = Regex.Match(data, DescFilter).Groups[1].Value;
-
-                    // player = NameToFurre(DescName);
-                    if (LookQue.Count > 0)
-                    {
-                        player.Color = new ColorString(LookQue.Dequeue());
-                    }
-                    if (BadgeTag.Count > 0)
-                    {
-                        player.Badge = BadgeTag.Dequeue(); ;
-                    }
-                    else if (!string.IsNullOrEmpty(player.Badge))
-                    {
-                        player.Badge = "";
-                    }
-                    player.Desc = Desc.Substring(6);
-                    if (Dream.FurreList.Contains(player))
-                        Dream.FurreList[player] = player;
-
-                    //sndDisplay)
-
-                    Look = false;
-                }
-                else if (Color == "shout")
-                {
-                    //'SHOUT
-                    Regex t = new Regex(YouSayFilter);
-                    string u = t.Match(data).Groups[1].Value;
-                    Text = t.Match(data).Groups[2].Value;
-
-                    if (!IsConnectedCharacter)
-                    {
-                        player.Message = Text;
-                    }
-                }
                 else if (Color == "query")
                 {
-                    string QCMD = Regex.Match(data, "<a.*?href='command://(.*?)'>").Groups[1].Value;
-
-                    switch (QCMD)
-                    {
-                        case "summon":
-                        //'JOIN
-
-                        // break;
-
-                        case "join":
-                        //'SUMMON
-
-                        // break;
-
-                        case "follow":
-                        //'LEAD
-
-                        // break;
-
-                        case "lead":
-                        //'FOLLOW
-
-                        //If Not IsBot(player) Then
-
-                        // break;
-
-                        case "cuddle":
-                        default:
-
-                            break;
-                    }
+                    channel = "query";
                 }
                 else if (Color == "whisper")
                 {
+                    channel = "whisper";
                     Regex WhisperIncoming = new Regex("^\\<font color=('whisper'|\"whisper\")\\>\\[ \\<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") src=('whisper-from'|\"whisper-from\")\\>(?<name>.{2,64})\\</name\\> whispers, \"(?<msg>.+)\" to you\\. \\]\\</font\\>$", RegexOptions.IgnoreCase);
                     Regex WhisperOutgoing = new Regex("^\\<font color=('whisper'|\"whisper\")\\>\\[ You whisper \"(?<msg>.+)\" to \\<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") forced(=('forced'|\"forced\"))? src=('whisper-to'|\"whisper-to\")\\>(?<name>.{2,64})\\</name\\>\\. \\]\\</font\\>$", RegexOptions.IgnoreCase);
                     //'WHISPER
-                   // string WhisperFrom = WhisperIncoming.Match(data).Captures[1].Value;
-                    if (WhisperIncoming.Match( data).Success)
+                    // string WhisperFrom = WhisperIncoming.Match(data).Captures[1].Value;
+                    if (WhisperIncoming.Match(data).Success)
                     {
-                        string WhisperFrom = WhisperIncoming.Match(data).Groups[5].Value;
-
-
-
-                        //player = NameToFurre(User, True)
-                        player.Message = WhisperFrom;
+                        player = dream.FurreList.GerFurreByName(WhisperIncoming.Match(data).Groups[4].Value);
+                        player.Message = WhisperIncoming.Match(data).Groups[5].Value;
                         if (BadgeTag.Count > 0)
                         {
                             player.Badge = BadgeTag.Dequeue();
@@ -807,9 +738,11 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Badge = "";
                         }
-
-                        if (Dream.FurreList.Contains(player))
-                            Dream.FurreList[player.ID] = player;
+                    }
+                    else if (WhisperOutgoing.Match(data).Success)
+                    {
+                        player = dream.FurreList.GerFurreByName(WhisperOutgoing.Match(data).Groups[4].Value);
+                        player.Message = WhisperOutgoing.Match(data).Groups[5].Value;
                     }
                 }
                 else if (Color == "warning")
@@ -819,6 +752,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "trade")
                 {
+                    channel = "trade";
                     string TextStr = Regex.Match(data, "\\s<name (.*?)</name>").Groups[0].Value;
                     Text = Text.Substring(6);
                     if (!string.IsNullOrEmpty(User))
@@ -827,6 +761,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "emote")
                 {
+                    channel = "emote";
                     // ''EMOTE
                     if (SpeciesTag.Count > 0)
                     {
@@ -835,22 +770,12 @@ namespace Furcadia.Net.Proxy
                     Regex usr = new Regex(NameFilter);
                     System.Text.RegularExpressions.Match n = usr.Match(Text);
                     Text = usr.Replace(Text, "");
-
-                    player = dream.FurreList.GerFurreByName(n.Groups[3].Value);
-
-                    player.Message = Text;
-                    if (Dream.FurreList.Contains(player))
-                        Dream.FurreList[player] = player;
-                    bool test = IsConnectedCharacter;
                 }
                 else if (Color == "channel")
                 {
                     //ChannelNameFilter2
-                    Regex chan = new Regex(ChannelNameFilter);
-                    System.Text.RegularExpressions.Match ChanMatch = chan.Match(data);
                     Regex r = new Regex(ImgTagFilter);
                     Text = r.Replace(Text, "[$2]");
-
                 }
                 else if (Color == "notify")
                 {
@@ -932,40 +857,28 @@ namespace Furcadia.Net.Proxy
                     // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
                     //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
 
-                    Regex CookieToMe = new Regex(string.Format("{0}", CookieToMeREGEX));
-                    if (CookieToMe.Match(data).Success)
-                    {
-                    }
-                    Regex CookieToAnyone = new Regex(string.Format("<name shortname='(.*?)'>(.*?)</name> just gave <name shortname='(.*?)'>(.*?)</name> a (.*?)"));
-                    if (CookieToAnyone.Match(data).Success)
-                    {
-                    }
-                    Regex CookieFail = new Regex(string.Format("You do not have any (.*?) left!"));
-                    if (CookieFail.Match(data).Success)
-                    {
-                    }
                     Regex EatCookie = new Regex(Regex.Escape("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.") + "(.*?)");
                     if (EatCookie.Match(data).Success)
                     {
                         player.Message = "You eat a cookie." + EatCookie.Replace(data, "");
                     }
-                    //Dim args As New ServerReceiveEventArgs
-                    //args.Channel = Channel
-                    //args.Text = data
-                    //args.Handled = True
-                    //RaiseEvent ServerChannelProcessed(data, args)
                 }
                 else if (data.StartsWith("PS"))
                 {
                     Color = "PhoenixSpeak";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 SendError(ex, this, "");
             }
+
+            if (Dream.FurreList.Contains(player))
+                Dream.FurreList[player] = player;
+
             ChannelObject chanObject = new ChannelObject(data);
             chanObject.Player = player;
+
             chanObject.Channel = channel;
             chanObject.InstructionType = ServerInstructionType.DisplayText;
 
@@ -1309,6 +1222,12 @@ namespace Furcadia.Net.Proxy
                         Console.WriteLine(data);
 #endif
                     }
+                    // Dream Bookmark
+                    //]CBookmark Type[1]Dream URL[*]
+                    // Type 0 = temporary
+                    // Type 1 = Regular (per user requests)
+                    // DreamUrl = "furc://uploadername:dreamname/entrycode "
+                    // Credits FTR
                     else if (data.StartsWith("]C"))
                     {
                         if (data.StartsWith("]C0"))
@@ -1356,13 +1275,12 @@ namespace Furcadia.Net.Proxy
                         {
                             ParseServerChannel(data, Handled);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
-                           SendError(ex, this, "");
+                            SendError(ex, this, "");
                         }
 
-                            return;
-
+                        return;
                     }
 
                     break;

@@ -21,6 +21,15 @@
         #endregion Private Fields
 
         #region Public Constructors
+        /// <summary>
+        /// 
+        /// </summary>
+        public LoadDream() : base()
+        {
+            dreamName = null;
+            crc = null;
+            mode = "legacy";
+        }
 
         /// <summary>
         /// Constructor with Dream Data definitions
@@ -31,9 +40,15 @@
         public LoadDream(string ServerInstruction) : base(ServerInstruction)
         {
             string[] Options = ServerInstruction.Substring(3).Split(' ');
-            dreamName = Options[0];
-            crc = Options[1];
-            mode = Options[4];
+            if (Options.Length >= 2)
+            {
+                dreamName = Options[0];
+                crc = Options[1];
+            }
+            if (Options.Length == 4)
+                mode = Options[4];
+            else
+                mode = "legacy";
         }
 
         #endregion Public Constructors

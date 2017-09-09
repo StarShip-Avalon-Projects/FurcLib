@@ -29,9 +29,17 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <param name="ServerInstruction">
         /// raw server instruction
         /// </param>
-        public BaseServerInstruction(string ServerInstruction)
+        public BaseServerInstruction(string ServerInstruction) : this()
         {
+          
             rawInstruction = ServerInstruction;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public BaseServerInstruction()
+        {
+            rawInstruction = null;
             instructionType = ServerInstructionType.Unknown;
         }
 
