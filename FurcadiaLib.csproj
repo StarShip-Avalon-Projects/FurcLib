@@ -104,6 +104,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyFileVersion.t4</DependentUpon>
     </Compile>
+    <Compile Include="AssemblyInfoersion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyInfoersion.tt</DependentUpon>
+    </Compile>
     <Compile Include="Net\Dream\Avatar.cs" />
     <Compile Include="Net\Dream\Badges.cs" />
     <Compile Include="IO\IniFile.cs" />
@@ -203,6 +208,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AssemblyInfoersion.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfoersion.cs</LastGenOutput>
+    </Content>
     <Content Include="FurcLib LGPLv3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
