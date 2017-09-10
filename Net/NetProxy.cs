@@ -17,6 +17,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
 using static Furcadia.Net.Utils.Utilities;
+using Furcadia.Net.Options;
 
 namespace Furcadia.Net
 {
@@ -146,7 +147,7 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="port">
         /// </param>
-        public NetProxy(int port)
+        public NetProxy(ref int port)
         {
             FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
@@ -162,7 +163,7 @@ namespace Furcadia.Net
         /// </param>
         /// <param name="lport">
         /// </param>
-        public NetProxy(int port, int lport)
+        public NetProxy(ref int port, ref int lport)
         {
             FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
@@ -193,7 +194,7 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="Options">
         /// </param>
-        public NetProxy(Options.ProxyOptions Options)
+        public NetProxy(ref Options.ProxyOptions Options)
         {
             FurcadiaUtilities = new Utils.Utilities();
             options = Options;
@@ -235,6 +236,19 @@ namespace Furcadia.Net
             FurcadiaUtilities = new Utils.Utilities();
             options = new Options.ProxyOptions();
             options.LocalhostPort = lport;
+            settings = new Text.Settings(options.LocalhostPort);
+            SetPath = options.FurcadiaFilePaths.SettingsPath;
+            sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Options"></param>
+        public NetProxy(ref ProxySessionOptions Options)
+        {
+            FurcadiaUtilities = new Utils.Utilities();
+            this.options = Options;
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);

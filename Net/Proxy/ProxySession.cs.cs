@@ -58,7 +58,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="Options">
         /// ProxySession Options
         /// </param>
-        public ProxySession(Options.ProxySessionOptions Options) : base(Options)
+        public ProxySession(ref Options.ProxySessionOptions Options) : base( ref Options)
         {
             options = Options;
             Initilize();
@@ -673,12 +673,6 @@ namespace Furcadia.Net.Proxy
 #endif
                             break;
                     }
-
-                    //'SAY
-                }
-                else if (Color == "shout")
-                {
-                    channel = "shout";
                 }
                 else if (Color == "myspeech")
                 {
@@ -718,6 +712,14 @@ namespace Furcadia.Net.Proxy
                 else if (Color == "query")
                 {
                     channel = "query";
+                }
+                else if (data.StartsWith("PS"))
+                {
+                    channel = "PhoenixSpeak";
+                }
+                else if (Color == "shout")
+                {
+                    channel = "shout";
                 }
                 else if (Color == "whisper")
                 {
@@ -769,13 +771,7 @@ namespace Furcadia.Net.Proxy
                     }
                     Regex usr = new Regex(NameFilter);
                     System.Text.RegularExpressions.Match n = usr.Match(Text);
-                    Text = usr.Replace(Text, "");
-                }
-                else if (Color == "channel")
-                {
-                    //ChannelNameFilter2
-                    Regex r = new Regex(ImgTagFilter);
-                    Text = r.Replace(Text, "[$2]");
+                    Text = usr.Replace(Text, string.Empty);
                 }
                 else if (Color == "notify")
                 {
@@ -816,6 +812,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "error")
                 {
+                    channel = "error";
                     errorMsg = Text;
                     errorNum = 2;
 
@@ -842,15 +839,12 @@ namespace Furcadia.Net.Proxy
 
                         BanishString.Clear();
                     }
-                    //else if (Text == "You do not have any cookies to give away right now!")
-                    //{
-                    //}
                 }
                 else if (data.StartsWith("Communication"))
                 {
                     Disconnect();
                 }
-                else if (Channel == "@cookie")
+                else if (channel == "@cookie")
                 {
                     // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Cookie <a href='http://www.furcadia.com/cookies/Cookie%20Economy.html'>bank</a> has currently collected: 0</font>
                     // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> All-time Cookie total: 0</font>
@@ -862,10 +856,6 @@ namespace Furcadia.Net.Proxy
                     {
                         player.Message = "You eat a cookie." + EatCookie.Replace(data, "");
                     }
-                }
-                else if (data.StartsWith("PS"))
-                {
-                    Color = "PhoenixSpeak";
                 }
             }
             catch (Exception ex)
@@ -1230,7 +1220,7 @@ namespace Furcadia.Net.Proxy
                     // Credits FTR
                     else if (data.StartsWith("]C"))
                     {
-                        if (data.StartsWith("]C0"))
+                        if (data.StartsWith("]C0") || data.StartsWith("]C1"))
                         {
                             inDream = true;
                             string dname = data.Substring(10);
@@ -1292,7 +1282,7 @@ namespace Furcadia.Net.Proxy
                 default:
                     break;
             }
-            //ServerData2?.Invoke(data);
+
         }
 
         /// <summary>
@@ -1303,58 +1293,16 @@ namespace Furcadia.Net.Proxy
         /// <para>
         /// This maybe a good place to place Proxy/Bot commands for controls
         /// </para>
+        /// <para>
+        /// default to say or "normal spoken command"
+        /// </para>
         /// </summary>
         /// <param name="data">
         /// Raw Client to Server instruction
         /// </param>
         public virtual void SendFormattedTextToServer(ref string data)
         {
-            if (data.StartsWith("`m "))
-            {
-                switch (data.Substring(2, 1))
-                {
-                    case "7":
-
-                        break;
-
-                    case "9":
-
-                        break;
-
-                    case "1":
-
-                        break;
-
-                    case "3":
-
-                        break;
-                }
-            }
-            else if (data == "`use")
-            {
-            }
-            else if (data == "`get")
-            {
-            }
-            else if (data == "`>")
-            {
-            }
-            else if (data == "`<")
-            {
-            }
-            else if (data == "`lie")
-            {
-            }
-            else if (data == "`liedown")
-            {
-            }
-            else if (data == "`sit")
-            {
-            }
-            else if (data == "`stand")
-            {
-            }
-            else if (data.StartsWith("banish "))
+            if (data.StartsWith("banish "))
             {
                 BanishName = data.Substring(7);
             }
@@ -1395,6 +1343,9 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// Text Channel Prefixes (shout,whisper emote, Raw Server command)
+        /// <para>
+        /// default to say or "normal spoken command"
+        /// </para>
         /// </summary>
         /// <param name="arg">
         /// </param>
@@ -1425,7 +1376,7 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 default:
-                    result = (char)34 + arg;
+                    result = "\"" + arg;
                     break;
             }
             SendToServer(result);
