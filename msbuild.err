@@ -1,1 +1,0 @@
-   9:2>E:\Net Source Code\Monkey System 2\Setup\Setup.wixproj(177,5): error MSB3441: Cannot get assembly name for "..\Build\Release\SilverMonkey.exe". Could not load file or assembly 'SilverMonkey.exe' or one of its dependencies. The system cannot find the file specified.

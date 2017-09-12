@@ -1,8 +1,0 @@
-[submodule "MonkeySpeakEx"]
-	path = MonkeySpeakEx
-	url = https://github.com/StarShip-Avalon-Projects/MonkeySpeakEx.git
-
-[submodule "VerbotSDK"]
-	
-	path = VerbotSDK
-	url = https://github.com/StarShip-Avalon-Projects/Verbot-SDK.git

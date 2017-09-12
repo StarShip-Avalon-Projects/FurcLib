@@ -1,3 +1,0 @@
-Silver Monkey is released under GPLv2. You can modify and redistribute this program under the rules of GPLv2.
-
-Plugins for Silver Monkey built using the provided API are not subject to the GPL and may be licensed as the author terms and conditions.

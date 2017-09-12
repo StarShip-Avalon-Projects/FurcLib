@@ -1,5 +1,0 @@
-* Giving permission to Emitloud
-(0:32) When a furre says something with {!emitloud},
-   (1:70) and the triggering furre's name is {...},
-      (3:1) The whole map
-            (5:201) emit message {[C] [PARAM1] - [FURRE]} to any furre present.

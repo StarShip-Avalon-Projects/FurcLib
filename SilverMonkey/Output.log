@@ -1,7 +1,0 @@
-Entering constructor for: unSignedSoftworks.NSISProject.NSISProjectPackage
-Entering Initialize() of: unSignedSoftworks.NSISProject.NSISProjectPackage
-Entering constructor for: unSignedSoftworks.NSISProject.NSISProjectFactory
-Entering constructor for: unSignedSoftworks.NSISLanguage.NSISLanguageService
-Declarations loaded
-KEYWORD@6;IntOp=$(user_var: result) val1 OP [val2] OP=(+ - * / % | & ^ ~ ! || && << >>)#3^1@KEYWORD							: Could not parse IntelliseSense KEYWORD line: {0}!
-DIRECTIVE@9;!define=([/date|/utcdate] symbol [value]) | (/file symbol filename) | (/math symbol val1 OP val2) OP=(+ - * / % & | ^)#1^4@DIRECTIVE							: Could not parse IntelliseSense KEYWORD line: {0}!
