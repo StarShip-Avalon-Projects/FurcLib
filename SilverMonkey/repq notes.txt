@@ -1,9 +1,0 @@
-Just so happens I was working on repq today. From memory (so might be wrong) param 1 is the window id (which comes from the first param of the window popup command from the server and *is not guaranteed to be numeric* - usually is, but don't rely on it), and param 2 is which button you pressed. 0 means "unknown", 1 = cancel, 2 = ok, 3=no, 4=yes, 5=retry.
-[4/12/2013 10:20:27 PM] Jeremy: Oh Thank you!
-[4/12/2013 10:22:27 PM] Dewi Morgan: The second param from the "show popup" command is a number that controls which buttons to show the user, so you can work out the valid values from that. I think it's 0-2 is OK button only, 3-6 is on/cancel, 7-9 is ok/retry, 10-13 is yes/no, and 14-17 is yes/no/cancel. there are multiple ones for each because it also controls which icon it shows at the same time (warning, info, error, and sometimes question).
-[4/12/2013 10:23:51 PM] Jeremy: O.o Great info here...
-[4/12/2013 10:25:17 PM] Dewi Morgan: Message from server is in format:
-]#<idstring> <style 0-17> <message that might have spaces in>\n
-Your response should be:
-repq <idstring> <buttonval 0-5>\n
-Note there's a space before the id in the repq but not the ]# command.

@@ -1,5 +1,0 @@
-Credits:
-Lothus Marque, Idea Springboard and Snippet contributions
-Squizzle, Origional version of Wizerd and Starting the Furclib Project
-Daiktana, Providing the ErrorLogging class to make debugging and bug reports easier.
-Oxil, Testing and reporting bugs

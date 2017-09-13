@@ -1,8 +1,0 @@
-*Codes by Crunchward
-*Giving permission to Share
-(0:31) When a furre says {!share},
-   (1:70) and the triggering furre's name is {...},
-      (3:10) in the space right in front of the triggering furre,
-            (5:103) share dream control with any furre present.
-            (5:200) emit message {[C] You have given shared control with the furre in front of you} to the triggering furre.
-            (5:201) emit message {[C] [FURRE] has given you shared control of this dream.} to any furre present.

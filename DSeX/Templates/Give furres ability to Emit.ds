@@ -1,5 +1,0 @@
-* Giving permission to Emit
-(0:32) When a furre says something with {!emit},
-   (1:70) and the triggering furre's name is {...},
-      (3:8) everyplace that the triggering furre can see,
-            (5:201) emit message {[C] [PARAM1] - [FURRE]} to any furre present.

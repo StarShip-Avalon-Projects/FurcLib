@@ -1,4 +1,0 @@
-(0:9) When a furre arrives in the dream,
-   (1:70) and their name is {...},
-            (5:200) emit message {Sorry, you've been banned!} to whoever set off the trigger.
-            (5:78) eject the triggering furre.
