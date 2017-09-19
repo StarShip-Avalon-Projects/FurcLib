@@ -37,7 +37,7 @@ namespace Furcadia.Net
     /// </summary>
     /// <remarks>
     /// </remarks>
-    public class NetProxy
+    public class NetProxy : IDisposable
     {
         #region Private Fields
 
@@ -640,6 +640,7 @@ namespace Furcadia.Net
         {
             if (disposing)
             {
+                isDisosed = true;
                 if (NewsTimer != null)
                     NewsTimer.Dispose();
                 if (BackupSettings != null)
@@ -673,6 +674,7 @@ namespace Furcadia.Net
         private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
 
         private int ServerLeftOversSize = 0;
+        private bool isDisosed;
 
         /// <summary>
         /// </summary>
@@ -680,6 +682,8 @@ namespace Furcadia.Net
         /// </param>
         private void AsyncListener(IAsyncResult ar)
         {
+            if (isDisosed)
+                return;
             try
             {
                 try
