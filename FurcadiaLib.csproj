@@ -132,6 +132,7 @@
     <Compile Include="Net\Utils\ServerParser\ChannelObject.cs" />
     <Compile Include="Net\Utils\ServerObjects\DataObject.cs" />
     <Compile Include="Net\Utils\ServerParser\DiceRolls.cs" />
+    <Compile Include="Net\Utils\ServerParser\DreamBookmark.cs" />
     <Compile Include="Net\Utils\ServerParser\LoadDream.cs" />
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />

@@ -143,9 +143,13 @@ namespace Furcadia.Net
         /// available "vasecodegamma"
         /// </para>
         /// </summary>
-        LoadDreamEvent
-    }
+        LoadDreamEvent,
 
+            BookmarkDream
+    }
+    /// <summary>
+    /// 
+    /// </summary>
     public class NetChannelEventArgs : NetServerEventArgs
     {
         #region Public Constructors

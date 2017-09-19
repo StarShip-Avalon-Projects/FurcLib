@@ -58,7 +58,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="Options">
         /// ProxySession Options
         /// </param>
-        public ProxySession(ref Options.ProxySessionOptions Options) : base( ref Options)
+        public ProxySession(ref Options.ProxySessionOptions Options) : base(ref Options)
         {
             options = Options;
             Initilize();
@@ -1244,6 +1244,9 @@ namespace Furcadia.Net.Proxy
                                     hasShare = true;
                                 }
                             }
+                            var bookmark = new DreamBookmark(data);
+                            ProcessServerInstruction.Invoke(bookmark,
+                                new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));
                         }
 #if DEBUG
                         Console.WriteLine(data);
@@ -1282,7 +1285,6 @@ namespace Furcadia.Net.Proxy
                 default:
                     break;
             }
-
         }
 
         /// <summary>

@@ -26,6 +26,7 @@
         /// </summary>
         public LoadDream() : base()
         {
+            base.InstructionType = ServerInstructionType.LoadDreamEvent;
             dreamName = null;
             crc = null;
             mode = "legacy";
@@ -39,6 +40,7 @@
         /// </param>
         public LoadDream(string ServerInstruction) : base(ServerInstruction)
         {
+            base.InstructionType = ServerInstructionType.LoadDreamEvent;
             string[] Options = ServerInstruction.Substring(3).Split(' ');
             if (Options.Length >= 2)
             {
