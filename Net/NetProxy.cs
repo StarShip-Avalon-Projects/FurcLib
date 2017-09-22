@@ -497,13 +497,16 @@ namespace Furcadia.Net
                         try
                         {
                             listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
+                            listen.ExclusiveAddressUse = false;
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
                         catch (SocketException)
                         {
                             options.LocalhostPort++;
+                            listen.Stop();
                             listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
+                            listen.ExclusiveAddressUse = false;
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
@@ -563,8 +566,9 @@ namespace Furcadia.Net
         /// </summary>
         public virtual void Dispose()
         {
+          //  isDisosed = true;
             Dispose(true);
-            GC.SuppressFinalize(this);
+            GC.WaitForPendingFinalizers();
         }
 
         /// <summary>
