@@ -1,17 +1,21 @@
 ﻿namespace Furcadia.Drawing
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea'
 
+    /// <summary>
+    /// Furre Visible area
+    /// </summary>
     public static class VisibleArea
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea'
     {
         #region Public Methods
 
-        //Reference http://pastebin.com/QbnjwjNc
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.getTargetRectFromCenterCoord(int, int)'
+            /// <summary>
+            /// Gets the target View area from the center coordinates, This is useful for finding the View area of the Connected Furre
+            /// </summary>
+            /// <param name="X"></param>
+            /// <param name="Y"></param>
+            /// <returns></returns>
+        public static ViewArea GetTargetRectFromCenterCoord(int X, int Y)
 
-        public static ViewArea getTargetRectFromCenterCoord(int X, int Y)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.getTargetRectFromCenterCoord(int, int)'
         {
             // Set the size of the rectangle drawn around the player. The +1
             // is the tile the player is on.
@@ -38,10 +42,12 @@
             return rec;
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.IsOdd(int)'
-
+        /// <summary>
+        /// Integer is Odd
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool IsOdd(int value)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.IsOdd(int)'
         {
             return value % 2 != 0;
         }
@@ -49,25 +55,32 @@
         #endregion Public Methods
     }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea'
-
+    /// <summary>
+    /// Visible are a Furre can see
+    /// </summary>
     public class ViewArea
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea'
     {
         #region Public Fields
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.height'
+        /// <summary>
+        /// height
+        /// </summary>
         public int height;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.height'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.length'
+
+        /// <summary>
+        /// length
+        /// </summary>
         public int length;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.length'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.X'
+
+        /// <summary>
+        /// X Coordinate
+        /// </summary>
         public int X;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.X'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.Y'
+
+        /// <summary>
+        /// Y Coordinate
+        /// </summary>
         public int Y;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.Y'
 
         #endregion Public Fields
     }

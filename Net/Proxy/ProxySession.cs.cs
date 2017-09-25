@@ -1054,7 +1054,7 @@ namespace Furcadia.Net.Proxy
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
                         connectedFurre = Dream.FurreList[connectedFurre];
-                        ViewArea VisableRectangle = getTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
                         if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <= player.Position.y &
                             VisableRectangle.height >= player.Position.y & VisableRectangle.length >=
                             player.Position.x)
@@ -1079,7 +1079,7 @@ namespace Furcadia.Net.Proxy
                         // ConvertFromBase220(data.Substring(9, 2));
 
                         connectedFurre = Dream.FurreList[connectedFurre];
-                        ViewArea VisableRectangle = getTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
 
                         if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
                             player.Position.y & VisableRectangle.height >= player.Position.y &

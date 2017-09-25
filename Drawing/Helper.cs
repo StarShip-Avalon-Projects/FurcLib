@@ -20,7 +20,7 @@ namespace Furcadia.Drawing
         /// </returns>
         public static int CharToDescTag(char c)
         {
-            return (int)(c - 33);
+            return c - 33;
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Helper.ToBitmapArray(FurcadiaShapes)'

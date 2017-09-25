@@ -69,11 +69,11 @@ namespace Furcadia.FurcMap
             this.width = width / 2;
             this.height = height;
 
-            floors = new byte[this.bytesLayerCount];
-            objects = new byte[this.bytesLayerCount];
-            walls = new byte[this.bytesLayerCount];
-            regions = new byte[this.bytesLayerCount];
-            effects = new byte[this.bytesLayerCount];
+            floors = new byte[bytesLayerCount];
+            objects = new byte[bytesLayerCount];
+            walls = new byte[bytesLayerCount];
+            regions = new byte[bytesLayerCount];
+            effects = new byte[bytesLayerCount];
 
             String mapData = String.Format(Properties.Resources.DefaultMapData, this.height, this.width, "");
             String[] mapLines = mapData.Split(new String[] { "\r\n", "\n" }, StringSplitOptions.None);
@@ -119,76 +119,77 @@ namespace Furcadia.FurcMap
 
         #region Public Variables
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowDreamURL'
-
+        /// <summary>
+        /// Allow furres to enter via the Dream URL?
+        /// </summary>
         public bool AllowDreamURL
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowDreamURL'
         {
-            get { return this.allowfurl; }
-            set { this.allowfurl = value; }
+            get { return allowfurl; }
+            set { allowfurl = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowJoinSummon'
-
+        /// <summary>
+        /// Allow Furres to Sommon and join each other in this dream?
+        /// </summary>
         public bool AllowJoinSummon
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowJoinSummon'
         {
             get { return this.allowjs; }
             set { this.allowjs = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLargeDreamSize'
-
+        /// <summary>
+        /// Allow Dream Pack sizes?
+        /// </summary>
         public bool AllowLargeDreamSize
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLargeDreamSize'
         {
-            get { return this.allowlarge; }
-            set { this.allowlarge = value; }
+            get { return allowlarge; }
+            set { allowlarge = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLeadFollow'
-
+        /// <summary>
+        /// Allow Lead and Follow commands in the dream?
+        /// </summary>
         public bool AllowLeadFollow
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLeadFollow'
         {
-            get { return this.allowlf; }
-            set { this.allowlf = value; }
+            get { return allowlf; }
+            set { allowlf = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowShouting'
-
+        /// <summary>
+        /// Allow Furres to use the shout channel in the dream?
+        /// </summary>
         public bool AllowShouting
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowShouting'
+
         {
-            get { return this.allowshouts; }
-            set { this.allowshouts = value; }
+            get { return allowshouts; }
+            set { allowshouts = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.EncodeDream'
-
+        /// <summary>
+        /// Encrypt the dream?
+        /// </summary>
         public bool EncodeDream
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.EncodeDream'
         {
-            get { return this.encoded; }
-            set { this.encoded = value; }
+            get { return encoded; }
+            set { encoded = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.EnforceParentalControls'
-
+        /// <summary>
+        /// enforce parental controls
+        /// </summary>
         public bool EnforceParentalControls
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.EnforceParentalControls'
         {
-            get { return this.parentalcontrols; }
-            set { this.parentalcontrols = value; }
+            get { return parentalcontrols; }
+            set { parentalcontrols = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.ForceSitting'
-
+        /// <summary>
+        /// force sitting ?
+        /// </summary>
         public bool ForceSitting
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.ForceSitting'
         {
-            get { return this.forcesittable; }
-            set { this.forcesittable = value; }
+            get { return forcesittable; }
+            set { forcesittable = value; }
         }
 
         /// <summary>
@@ -196,88 +197,89 @@ namespace Furcadia.FurcMap
         /// </summary>
         public int Height
         {
-            get { return this.height; }
+            get { return height; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.Name'
-
+        /// <summary>
+        /// Name of the dream. Dream  Title?
+        /// </summary>
         public String Name
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.Name'
         {
-            get { return this.name; }
-            set { this.name = value; }
+            get { return name; }
+            set { name = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PatchArchive'
-
+        /// <summary>
+        /// Link to the Patch archive
+        /// </summary>
         public String PatchArchive
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PatchArchive'
         {
-            get { return this.patchs; }
-            set { this.patchs = value; }
+            get { return patchs; }
+            set { patchs = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventPlayerListing'
-
+        /// <summary>
+        /// prevent F4 to see the player list?
+        /// </summary>
         public bool PreventPlayerListing
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventPlayerListing'
         {
-            get { return this.nowho; }
-            set { this.nowho = value; }
+            get { return nowho; }
+            set { nowho = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventSeasonalAvatars'
-
+        /// <summary>
+        /// Allow Seasonal Avatars in the dream?
+        /// </summary>
         public bool PreventSeasonalAvatars
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventSeasonalAvatars'
         {
-            get { return this.nonovelty; }
-            set { this.nonovelty = value; }
+            get { return nonovelty; }
+            set { nonovelty = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventTabListing'
-
+        /// <summary>
+        /// prevent Tab from showing furre names
+        /// </summary>
         public bool PreventTabListing
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventTabListing'
         {
-            get { return this.notab; }
-            set { this.notab = value; }
+            get { return notab; }
+            set { notab = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.Rating'
-
+        /// <summary>
+        /// Dream Rating
+        /// </summary>
         public String Rating
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.Rating'
         {
-            get { return this.rating; }
-            set { this.rating = value; }
+            get { return rating; }
+            set { rating = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.Revision'
-
+        /// <summary>
+        /// revision?
+        /// </summary>
         public int Revision
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.Revision'
         {
-            get { return this.revision; }
-            set { this.revision = value; }
+            get { return revision; }
+            set { revision = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.UsePatch'
-
+        /// <summary>
+        /// type of dream patch to use
+        /// </summary>
         public int UsePatch
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.UsePatch'
         {
-            get { return this.patcht; }
-            set { this.patcht = value; }
+            get { return patcht; }
+            set { patcht = value; }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.UseSwearFilter'
-
+        /// <summary>
+        /// Swear Filter
+        /// </summary>
         public bool UseSwearFilter
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.UseSwearFilter'
         {
-            get { return this.swearfilter; }
-            set { this.swearfilter = value; }
+            get { return swearfilter; }
+            set { swearfilter = value; }
         }
 
         /// <summary>
@@ -285,7 +287,7 @@ namespace Furcadia.FurcMap
         /// </summary>
         public int Width
         {
-            get { return this.width * 2; }
+            get { return width * 2; }
         }
 
         #endregion Public Variables
@@ -384,9 +386,9 @@ namespace Furcadia.FurcMap
         /// </returns>
         public int getEffectAt(int x, int y)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
-            return (int)effects[pos];
+            return effects[pos];
         }
 
         /// <summary>
@@ -400,20 +402,19 @@ namespace Furcadia.FurcMap
         /// <returns>
         /// The floor number
         /// </returns>
-        public int getFloorAt(int x, int y)
+        public int GetFloorAt(int x, int y)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
-            return (int)floors[pos];
+            return floors[pos];
         }
 
-#pragma warning disable CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
-
         /// <summary> Get a MapPosition object from the position specified
-        /// by x & y </summary> <param name="x"></param> <param
-        /// name="y"></param> <returns></returns>
-        public MapPosition getMapPos(int x, int y)
-#pragma warning restore CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
+        /// by x &amp; y </summary>
+        /// <param name="x">X Coordinate</param>
+        /// <param name="y">Y Coordinate</param>
+        /// <returns></returns>
+        public MapPosition GetMapPos(int x, int y)
         {
             return new MapPosition(x, y, this);
         }
@@ -428,7 +429,7 @@ namespace Furcadia.FurcMap
         /// Y coordinate
         /// </param>
         /// <returns>the Tile data</returns>
-        public MapTile getMapTile(int x, int y)
+        public MapTile GetMapTile(int x, int y)
         {
             return new MapTile(x, y, this);
         }
@@ -446,9 +447,9 @@ namespace Furcadia.FurcMap
         /// </returns>
         public int getObjectAt(int x, int y)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
-            return (int)objects[pos];
+            return objects[pos];
         }
 
         /// <summary>
@@ -464,9 +465,9 @@ namespace Furcadia.FurcMap
         /// </returns>
         public int getRegionAt(int x, int y)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
-            return (int)regions[pos];
+            return regions[pos];
         }
 
         /// <summary>
@@ -480,11 +481,11 @@ namespace Furcadia.FurcMap
         /// <returns>
         /// The wall number
         /// </returns>
-        public int getWallAt(int x, int y)
+        public int GetWallAt(int x, int y)
         {
-            int pos = (this.height * x + y);
+            int pos = (height * x + y);
 
-            return (int)walls[pos];
+            return walls[pos];
         }
 
         /// <summary>
@@ -508,35 +509,35 @@ namespace Furcadia.FurcMap
             BinaryWriter sw = new BinaryWriter(fs, Encoding.GetEncoding(1252));
 
             String headerData = "MAP V01.40 Furcadia\n";
-            headerData += "height=" + this.height + "\n";
-            headerData += "width=" + this.width + "\n";
-            headerData += "revision=" + this.revision + "\n";
-            headerData += "patcht=" + this.patcht + "\n";
-            headerData += "name=" + this.name + "\n";
-            headerData += "patchs=" + this.patchs + "\n";
-            headerData += "encoded=" + (this.encoded ? "1" : "0") + "\n";
-            headerData += "allowjs=" + (this.allowjs ? "1" : "0") + "\n";
-            headerData += "allowlf=" + (this.allowlf ? "1" : "0") + "\n";
-            headerData += "allowfurl=" + (this.allowfurl ? "1" : "0") + "\n";
-            headerData += "swearfilter=" + (this.swearfilter ? "1" : "0") + "\n";
-            headerData += "nowho=" + (this.nowho ? "1" : "0") + "\n";
-            headerData += "forcesittable=" + (this.forcesittable ? "1" : "0") + "\n";
-            headerData += "allowshouts=" + (this.allowshouts ? "1" : "0") + "\n";
-            headerData += "rating=" + this.rating + "\n";
-            headerData += "allowlarge=" + (this.allowlarge ? "1" : "0") + "\n";
-            headerData += "notab=" + (this.notab ? "1" : "0") + "\n";
-            headerData += "nonovelty=" + (this.nonovelty ? "1" : "0") + "\n";
-            headerData += "parentalcontrols=" + (this.parentalcontrols ? "1" : "0") + "\n";
+            headerData += "height=" + height + "\n";
+            headerData += "width=" + width + "\n";
+            headerData += "revision=" + revision + "\n";
+            headerData += "patcht=" + patcht + "\n";
+            headerData += "name=" + name + "\n";
+            headerData += "patchs=" + patchs + "\n";
+            headerData += "encoded=" + (encoded ? "1" : "0") + "\n";
+            headerData += "allowjs=" + (allowjs ? "1" : "0") + "\n";
+            headerData += "allowlf=" + (allowlf ? "1" : "0") + "\n";
+            headerData += "allowfurl=" + (allowfurl ? "1" : "0") + "\n";
+            headerData += "swearfilter=" + (swearfilter ? "1" : "0") + "\n";
+            headerData += "nowho=" + (nowho ? "1" : "0") + "\n";
+            headerData += "forcesittable=" + (forcesittable ? "1" : "0") + "\n";
+            headerData += "allowshouts=" + (allowshouts ? "1" : "0") + "\n";
+            headerData += "rating=" + rating + "\n";
+            headerData += "allowlarge=" + (allowlarge ? "1" : "0") + "\n";
+            headerData += "notab=" + (notab ? "1" : "0") + "\n";
+            headerData += "nonovelty=" + (nonovelty ? "1" : "0") + "\n";
+            headerData += "parentalcontrols=" + (parentalcontrols ? "1" : "0") + "\n";
             headerData += "BODY\n";
 
             byte[] headerDataBytes = Encoding.GetEncoding(1252).GetBytes(headerData);
 
             sw.Write(headerDataBytes);
-            sw.Write(this.floors);
-            sw.Write(this.objects);
-            sw.Write(this.walls);
-            sw.Write(this.regions);
-            sw.Write(this.effects);
+            sw.Write(floors);
+            sw.Write(objects);
+            sw.Write(walls);
+            sw.Write(regions);
+            sw.Write(effects);
 
             sw.Close();
             fs.Close();
@@ -554,7 +555,7 @@ namespace Furcadia.FurcMap
         /// <param name="effectNumber"></param>
         public void setEffectAt(int x, int y, int effectNumber)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
             effects[pos] = (byte)effectNumber;
         }
@@ -569,16 +570,14 @@ namespace Furcadia.FurcMap
         /// </param>
         /// <param name="floorNumber">
         /// </param>
-        public void setFloorAt(int x, int y, int floorNumber)
+        public void SetFloorAt(int x, int y, int floorNumber)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
             floors[pos] = (byte)floorNumber;
         }
 
-#pragma warning disable CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
-
-        /// <summary> Set the object number at a tile specified by x & y
+        /// <summary> Set the object number at a tile specified by x &amp; y
         /// </summary>
         /// <param name="x">
         /// x coordinate
@@ -586,45 +585,41 @@ namespace Furcadia.FurcMap
         /// Y coordinate
         /// </param>
         /// <param name="objectNumber"></param>
-        public void setObjectAt(int x, int y, int objectNumber)
-#pragma warning restore CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
+        public void SetObjectAt(int x, int y, int objectNumber)
         {
-            int pos = getPosFrom(x, y);
+            int pos = GetPosFrom(x, y);
 
             objects[pos] = (byte)objectNumber;
         }
 
-#pragma warning disable CS1570 // XML comment has badly formed XML -- 'Expected an end tag for element 'summary'.'
+
 
         /// <summary> Set the region number at a tile specified by x &amp; y
-        /// <param name="x">
-        /// x coordinate
-        /// </param> <param name="y">
-        /// Y coordinate
-        /// </param>
-        /// <paramref name="regionNumber"/>
-        public void setRegionAt(int x, int y, int regionNumber)
-#pragma warning restore CS1570 // XML comment has badly formed XML -- 'Expected an end tag for element 'summary'.'
-        {
-            int pos = getPosFrom(x, y);
-
-            regions[pos] = (byte)regionNumber;
-        }
-
-#pragma warning disable CS1570 // XML comment has badly formed XML -- 'End tag was not expected at this location.'
-        /// <summary> Set the wall number at a tile specified by x &amp; y
         /// </summary>
         /// <param name="x">
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
         /// </param>
-        /// </param><param name="wallNumber"></param>
+        ///<param name="regionNumber"></param>
+        public void SetRegionAt(int x, int y, int regionNumber)
 
-        public void setWallAt(int x, int y, int wallNumber)
-#pragma warning restore CS1570 // XML comment has badly formed XML -- 'End tag was not expected at this location.'
         {
-            int pos = (this.height * x + y);
+            int pos = GetPosFrom(x, y);
+
+            regions[pos] = (byte)regionNumber;
+        }
+
+        /// <summary> Set the wall number at a tile specified by x &amp; y
+        /// </summary>
+        /// <param name="x">
+        /// x coordinate
+        /// </param> <param name="y">
+        ///
+        /// </param><param name="wallNumber"></param>
+        public void SetWallAt(int x, int y, int wallNumber)
+        {
+            int pos = (height * x + y);
 
             walls[pos] = (byte)wallNumber;
         }
@@ -633,41 +628,41 @@ namespace Furcadia.FurcMap
 
         #region Private Methods
 
-        private int getPosFrom(int x, int y)
+        private int GetPosFrom(int x, int y)
         {
-            return ((this.height * (x / 2) + y) * 2);
+            return ((height * (x / 2) + y) * 2);
         }
 
         private bool ParseMatrix(byte[] matrix)
         {
-            if (matrix.Length != this.bytesLayerCount * 5)
+            if (matrix.Length != bytesLayerCount * 5)
             {
                 Console.WriteLine("Something is wrong here...");
                 return false;
             }
-            this.mapMatrix = matrix;
+            mapMatrix = matrix;
 
-            for (int i = 0; i < this.bytesLayerCount; i++)
+            for (int i = 0; i < bytesLayerCount; i++)
                 floors[i] = matrix[i];
 
-            for (int i = 0; i < this.bytesLayerCount; i++)
+            for (int i = 0; i < bytesLayerCount; i++)
             {
-                objects[i] = matrix[i + this.bytesLayerCount];
+                objects[i] = matrix[i + bytesLayerCount];
             }
 
-            for (int i = 0; i < this.bytesLayerCount; i++)
+            for (int i = 0; i < bytesLayerCount; i++)
             {
-                walls[i] = matrix[i + (this.bytesLayerCount * 2)];
+                walls[i] = matrix[i + (bytesLayerCount * 2)];
             }
 
-            for (int i = 0; i < this.bytesLayerCount; i++)
+            for (int i = 0; i < bytesLayerCount; i++)
             {
-                regions[i] = matrix[i + (this.bytesLayerCount * 3)];
+                regions[i] = matrix[i + (bytesLayerCount * 3)];
             }
 
-            for (int i = 0; i < this.bytesLayerCount; i++)
+            for (int i = 0; i < bytesLayerCount; i++)
             {
-                effects[i] = matrix[i + (this.bytesLayerCount * 4)];
+                effects[i] = matrix[i + (bytesLayerCount * 4)];
             }
 
             return true;
@@ -680,61 +675,61 @@ namespace Furcadia.FurcMap
         private void SetMapHeaders(Dictionary<String, String> Values)
         {
             if (Values.ContainsKey("height"))
-                this.width = int.Parse(Values["height"]);
+                width = int.Parse(Values["height"]);
 
             if (Values.ContainsKey("width"))
-                this.width = int.Parse(Values["width"]);
+                width = int.Parse(Values["width"]);
 
             if (Values.ContainsKey("revision"))
-                this.revision = int.Parse(Values["revision"]);
+                revision = int.Parse(Values["revision"]);
 
             if (Values.ContainsKey("patcht"))
-                this.patcht = int.Parse(Values["patcht"]);
+                patcht = int.Parse(Values["patcht"]);
 
             if (Values.ContainsKey("name"))
-                this.name = Values["name"];
+                name = Values["name"];
 
             if (Values.ContainsKey("patchs"))
-                this.patchs = Values["patchs"];
+                patchs = Values["patchs"];
 
             if (Values.ContainsKey("rating"))
-                this.rating = Values["rating"];
+                rating = Values["rating"];
 
             if (Values.ContainsKey("allowjs"))
-                this.allowjs = Values["allowjs"] == "1";
+                allowjs = Values["allowjs"] == "1";
 
             if (Values.ContainsKey("allowlf"))
-                this.allowlf = Values["allowlf"] == "1";
+                allowlf = Values["allowlf"] == "1";
 
             if (Values.ContainsKey("allowfurl"))
-                this.allowfurl = Values["allowfurl"] == "1";
+                allowfurl = Values["allowfurl"] == "1";
 
             if (Values.ContainsKey("swearfilter"))
-                this.swearfilter = Values["swearfilter"] == "1";
+                swearfilter = Values["swearfilter"] == "1";
 
             if (Values.ContainsKey("nowho"))
-                this.nowho = Values["nowho"] == "1";
+                nowho = Values["nowho"] == "1";
 
             if (Values.ContainsKey("forcesittable"))
-                this.forcesittable = Values["forcesittable"] == "1";
+                forcesittable = Values["forcesittable"] == "1";
 
             if (Values.ContainsKey("allowlarge"))
-                this.allowlarge = Values["allowlarge"] == "1";
+                allowlarge = Values["allowlarge"] == "1";
 
             if (Values.ContainsKey("allowshouts"))
-                this.allowshouts = Values["allowshouts"] == "1";
+                allowshouts = Values["allowshouts"] == "1";
 
             if (Values.ContainsKey("notab"))
-                this.notab = Values["notab"] == "1";
+                notab = Values["notab"] == "1";
 
             if (Values.ContainsKey("nonovelty"))
-                this.nonovelty = Values["nonovelty"] == "1";
+                nonovelty = Values["nonovelty"] == "1";
 
             if (Values.ContainsKey("parentalcontrols"))
-                this.parentalcontrols = Values["parentalcontrols"] == "1";
+                parentalcontrols = Values["parentalcontrols"] == "1";
 
             if (Values.ContainsKey("encoded"))
-                this.encoded = Values["encoded"] == "1";
+                encoded = Values["encoded"] == "1";
         }
 
         #endregion Private Methods

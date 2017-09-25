@@ -43,20 +43,20 @@
         {
             this.x = x;
             this.y = y;
-            this.floorNumber = map.getFloorAt(x, y);
+            this.floorNumber = map.GetFloorAt(x, y);
             this.objectNumber = map.getObjectAt(x, y);
             this.regionNumber = map.getRegionAt(x, y);
             this.effectNumber = map.getEffectAt(x, y);
 
             if (x % 2 == 0)
             {
-                this.wallNENumber = map.getWallAt(x + 1, y);
-                this.wallNWNumber = map.getWallAt(x, y);
+                this.wallNENumber = map.GetWallAt(x + 1, y);
+                this.wallNWNumber = map.GetWallAt(x, y);
             }
             else
             {
-                this.wallNENumber = map.getWallAt(x, y);
-                this.wallNWNumber = map.getWallAt(x - 1, y);
+                this.wallNENumber = map.GetWallAt(x, y);
+                this.wallNWNumber = map.GetWallAt(x - 1, y);
             }
         }
 
