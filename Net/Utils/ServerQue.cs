@@ -124,8 +124,6 @@ namespace Furcadia.Net.Utils
 
         #endregion Internal Fields
 
-
-
         #region Private Fields
 
         private const int MASS_CRITICAL = 2046;
@@ -199,10 +197,14 @@ namespace Furcadia.Net.Utils
         /// </summary>
         private int usingPing = 0;
 
+#pragma warning disable CS0414 // The field 'ServerQue.usingProcessQueue' is assigned but its value is never used
+
         /// <summary>
         /// Queue processing <see cref=" Interlocked.Exchange(ref int, int)"/>
         /// </summary>
         private int usingProcessQueue = 0;
+
+#pragma warning restore CS0414 // The field 'ServerQue.usingProcessQueue' is assigned but its value is never used
 
         /// <summary>
         /// Incoming Messages for server processing

@@ -6,6 +6,7 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  */
 
+using Furcadia.Net.Options;
 using Furcadia.Text;
 using System;
 using System.Diagnostics;
@@ -13,19 +14,11 @@ using System.IO;
 
 //using System.ComponentModel;
 using System.Net;
-using System.Net.Security;
 using System.Net.Sockets;
-using System.Threading;
 using static Furcadia.Net.Utils.Utilities;
-using Furcadia.Net.Options;
 
 namespace Furcadia.Net
 {
-    // TODO: Redo FurcadiaSettings to a seperate Object with a Settings
-    //       restore Event. add Mutex to Lock Furcadia Settings betweenn new
-    // sessions connecting... Accunt Login will Bypass News Timer Update.
-    // Arg -url=""
-
     /// <summary>
     /// Furcadia base proxy connect between Client and Server. This is a low
     /// level class that handles the raw connections and furcadia
@@ -41,7 +34,7 @@ namespace Furcadia.Net
     {
         #region Private Fields
 
-        private SslStream ServerSslStream;
+        // private SslStream ServerSslStream;
 
         #endregion Private Fields
 
@@ -86,13 +79,7 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        private int ClientnTaken = 0;
-
-        /// <summary>
-        /// </summary>
         private int ENCODE_PAGE = 1252;
-
-        private Mutex FurcMutex;
 
         /// <summary>
         /// Furcadia Client Process
@@ -104,8 +91,7 @@ namespace Furcadia.Net
         /// </summary>
         private TcpListener listen;
 
-        private System.Threading.Timer NewsTimer;
-        private Options.ProxyOptions options;
+        private ProxyOptions options;
 
         /// <summary>
         /// Process IP for Furcadia.exe
@@ -150,8 +136,10 @@ namespace Furcadia.Net
         public NetProxy(ref int port)
         {
             FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions();
-            options.LocalhostPort = port;
+            options = new Options.ProxyOptions
+            {
+                LocalhostPort = port
+            };
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
@@ -166,8 +154,10 @@ namespace Furcadia.Net
         public NetProxy(ref int port, ref int lport)
         {
             FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions();
-            options.LocalhostPort = port;
+            options = new Options.ProxyOptions
+            {
+                LocalhostPort = port
+            };
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
@@ -182,8 +172,10 @@ namespace Furcadia.Net
         public NetProxy(string host, int port)
         {
             FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions();
-            options.LocalhostPort = port;
+            options = new Options.ProxyOptions
+            {
+                LocalhostPort = port
+            };
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
@@ -218,8 +210,10 @@ namespace Furcadia.Net
         public NetProxy(string host, int port, int lport)
         {
             FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions();
-            options.LocalhostPort = port;
+            options = new Options.ProxyOptions
+            {
+                LocalhostPort = port
+            };
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
@@ -234,15 +228,17 @@ namespace Furcadia.Net
         public NetProxy(IPEndPoint endpoint, int lport)
         {
             FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions();
-            options.LocalhostPort = lport;
+            options = new Options.ProxyOptions
+            {
+                LocalhostPort = lport
+            };
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Options"></param>
         public NetProxy(ref ProxySessionOptions Options)
@@ -278,10 +274,12 @@ namespace Furcadia.Net
 
         #region Public Events
 
-        /// <summary>
-        /// This is triggered when the Client sends data to the server.
-        /// </summary>
-        public virtual event DataEventHandler ClientData;
+        //#pragma warning disable CS0067 // The event 'NetProxy.ClientData' is never used
+        //        /// <summary>
+        //        /// This is triggered when the Client sends data to the server.
+        //        /// </summary>
+        //        public virtual event DataEventHandler ClientData;
+        //#pragma warning restore CS0067 // The event 'NetProxy.ClientData' is never used
 
         /// <summary>
         /// This is triggered when the Client sends data to the server.
@@ -321,16 +319,13 @@ namespace Furcadia.Net
         /// </summary>
         protected internal event ActionDelegate Connected;
 
-        /// <summary>
-        /// This is triggered when t client is closed.
-        /// </summary>
-        protected internal event ActionDelegate FurcSettingsRestored;
-
-        /// <summary>
-        /// This is triggered when the Server sends data to the client.
-        /// Expects a return Value
-        /// </summary>
-        protected internal virtual event DataEventHandler ServerData;
+        //#pragma warning disable CS0067 // The event 'NetProxy.ServerData' is never used
+        //        /// <summary>
+        //        /// This is triggered when the Server sends data to the client.
+        //        /// Expects a return Value
+        //        /// </summary>
+        //        protected internal virtual event DataEventHandler ServerData;
+        //#pragma warning restore CS0067 // The event 'NetProxy.ServerData' is never used
 
         #endregion Protected Internal Events
 
@@ -339,7 +334,7 @@ namespace Furcadia.Net
         /// <summary>
         /// This is triggered when a handled Exception is thrown.
         /// </summary>
-       public event ErrorEventHandler Error;
+        public event ErrorEventHandler Error;
 
         /// <summary>
         /// send errors to the error handler
@@ -352,7 +347,7 @@ namespace Furcadia.Net
             if (Error != null)
                 Error?.Invoke(e, o, text);
             else
-                throw new Exception("Unhandled exception for" + text, e);
+                throw e;
         }
 
         #endregion Protected Events
@@ -496,8 +491,10 @@ namespace Furcadia.Net
                     {
                         try
                         {
-                            listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
-                            listen.ExclusiveAddressUse = false;
+                            listen = new TcpListener(IPAddress.Any, options.LocalhostPort)
+                            {
+                                ExclusiveAddressUse = false
+                            };
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
@@ -505,8 +502,10 @@ namespace Furcadia.Net
                         {
                             options.LocalhostPort++;
                             listen.Stop();
-                            listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
-                            listen.ExclusiveAddressUse = false;
+                            listen = new TcpListener(IPAddress.Any, options.LocalhostPort)
+                            {
+                                ExclusiveAddressUse = false
+                            };
                             listen.Start();
                             listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                         }
@@ -522,8 +521,10 @@ namespace Furcadia.Net
                 //check ProcessPath is not a directory
                 if (!Directory.Exists(options.FurcadiaInstallPath)) throw new NetProxyException("Process path not found.");
                 if (!File.Exists(Path.Combine(options.FurcadiaInstallPath, options.FurcadiaProcess))) throw new NetProxyException("Client executable '" + options.FurcadiaProcess + "' not found.");
-                furcProcess = new System.Diagnostics.Process(); //= System.Diagnostics.Process.Start(Process,ProcessCMD );
-                furcProcess.EnableRaisingEvents = true;
+                furcProcess = new System.Diagnostics.Process
+                {
+                    EnableRaisingEvents = true
+                }; //= System.Diagnostics.Process.Start(Process,ProcessCMD );
                 furcProcess.StartInfo.FileName = options.FurcadiaProcess;
                 furcProcess.StartInfo.Arguments = options.CharacterIniFile;
                 furcProcess.StartInfo.WorkingDirectory = options.FurcadiaInstallPath;
@@ -566,7 +567,7 @@ namespace Furcadia.Net
         /// </summary>
         public virtual void Dispose()
         {
-          //  isDisosed = true;
+            //  isDisosed = true;
             Dispose(true);
             GC.WaitForPendingFinalizers();
         }
@@ -645,8 +646,6 @@ namespace Furcadia.Net
             if (disposing)
             {
                 isDisosed = true;
-                if (NewsTimer != null)
-                    NewsTimer.Dispose();
                 if (BackupSettings != null)
                     settings.RestoreFurcadiaSettings(BackupSettings);
                 if (listen != null) listen.Stop();
@@ -675,10 +674,10 @@ namespace Furcadia.Net
 
         private int ClientLeftOversSize = 0;
 
+        private bool isDisosed;
         private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
 
         private int ServerLeftOversSize = 0;
-        private bool isDisosed;
 
         /// <summary>
         /// </summary>
@@ -712,16 +711,14 @@ namespace Furcadia.Net
                 catch { return; }
                 Connected?.Invoke();
 
-                // Trigger News timer to restore settings
-                NewsTimer = new System.Threading.Timer(OnTimedEvent, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+                settings.RestoreFurcadiaSettings(BackupSettings);
             }
             catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
         }
 
         private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
         {
-            IPAddress IP;
-            if (IPAddress.TryParse(HostName, out IP))
+            if (IPAddress.TryParse(HostName, out IPAddress IP))
                 try
                 {
                     return new IPEndPoint(IP, ServerPort);
@@ -810,9 +807,7 @@ namespace Furcadia.Net
 
                     if (IsClientConnected)
                     {
-
                         client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
-
                     }
                 }
                 catch (Exception ex) //Catch any unknown exception and close the connection gracefully
@@ -822,6 +817,7 @@ namespace Furcadia.Net
                 }
             }
         }
+
         /// <summary>
         /// Handle the raw server data
         /// </summary>
@@ -896,21 +892,6 @@ namespace Furcadia.Net
                 Error?.Invoke(ex, this, ex.Message);
                 ServerDisConnected?.Invoke();
             }
-        }
-
-        /// <summary>
-        /// Reset Furcadia Settings when NewsTimer expires
-        /// </summary>
-        /// <param name="source">
-        /// </param>
-        private void OnTimedEvent(object source)
-        {
-            // reset settings.ini
-            settings.RestoreFurcadiaSettings(BackupSettings);
-            BackupSettings = null;
-            FurcSettingsRestored?.Invoke();
-            if (NewsTimer != null)
-                NewsTimer.Dispose();
         }
 
         #endregion Private Methods

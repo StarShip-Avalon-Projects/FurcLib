@@ -22,7 +22,10 @@ namespace Furcadia.Net
 
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.NetMessage()'
+
         public NetMessage()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.NetMessage()'
         {
             _data = new StringBuilder();
         }
@@ -31,17 +34,26 @@ namespace Furcadia.Net
 
         #region Public Methods
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.GetString()'
+
         public string GetString()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.GetString()'
         {
             return _data.ToString();
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.Write(string)'
+
         public void Write(string data)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.Write(string)'
         {
             _data.Append(data);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.Write(byte[])'
+
         public void Write(byte[] data)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'NetMessage.Write(byte[])'
         {
             _data.Append(Encoding.GetEncoding(Utilities.GetEncoding).GetString(data));
         }

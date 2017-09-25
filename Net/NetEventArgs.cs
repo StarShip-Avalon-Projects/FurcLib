@@ -145,10 +145,13 @@ namespace Furcadia.Net
         /// </summary>
         LoadDreamEvent,
 
-            BookmarkDream
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ServerInstructionType.BookmarkDream'
+        BookmarkDream
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ServerInstructionType.BookmarkDream'
     }
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class NetChannelEventArgs : NetServerEventArgs
     {
@@ -371,8 +374,6 @@ namespace Furcadia.Net
         }
 
         #endregion Public Properties
-
-
 
         #region Private Fields
 

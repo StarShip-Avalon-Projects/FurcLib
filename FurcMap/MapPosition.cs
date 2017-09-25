@@ -2,33 +2,55 @@
 
 namespace Furcadia.FurcMap
 {
+    /// <summary>
+    ///tile data
+    /// </summary>
     [CLSCompliant(true)]
     public class MapPosition
     {
         #region Public Fields
 
+        /// <summary>
+        ///objects
+        /// </summary>
         public int floorNumber, objectNumber, wallNumber, regionNumber, effectNumber;
+
+        /// <summary>
+        ///Coordinates
+        /// </summary>
         public int x, y;
 
         #endregion Public Fields
 
         #region Public Constructors
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public MapPosition(int x, int y)
+
         {
             this.x = x;
             this.y = y;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="map"></param>
         public MapPosition(int x, int y, Map map)
         {
             this.x = x;
             this.y = y;
-            this.floorNumber = map.getFloorAt(x, y);
-            this.objectNumber = map.getObjectAt(x, y);
-            this.wallNumber = map.getWallAt(x, y);
-            this.regionNumber = map.getRegionAt(x, y);
-            this.effectNumber = map.getEffectAt(x, y);
+            floorNumber = map.GetFloorAt(x, y);
+            objectNumber = map.getObjectAt(x, y);
+            wallNumber = map.GetWallAt(x, y);
+            regionNumber = map.getRegionAt(x, y);
+            effectNumber = map.getEffectAt(x, y);
         }
 
         #endregion Public Constructors

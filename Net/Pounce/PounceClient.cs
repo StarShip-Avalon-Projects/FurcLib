@@ -53,13 +53,19 @@ namespace Furcadia.Net.Pounce
 
         private Dictionary<string, PounceFurre> _furreList = new Dictionary<string, PounceFurre>();
 
+#pragma warning disable CS0169 // The field 'PounceClient._onlineList' is never used
         private string _onlineList;
+#pragma warning restore CS0169 // The field 'PounceClient._onlineList' is never used
 
+#pragma warning disable CS0169 // The field 'PounceClient.lastaccess' is never used
         private System.DateTime lastaccess;
+#pragma warning restore CS0169 // The field 'PounceClient.lastaccess' is never used
 
         private Timer PounceTimer;
 
+#pragma warning disable CS0414 // The field 'PounceClient.usingPounce' is assigned but its value is never used
         private int usingPounce = 0;
+#pragma warning restore CS0414 // The field 'PounceClient.usingPounce' is assigned but its value is never used
         private int UsingPounce1;
 
         #endregion Private Fields

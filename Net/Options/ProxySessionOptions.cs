@@ -35,7 +35,10 @@
             ReconnectOptions = new ProxyReconnectOptions();
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ProxySessionOptions.ProxySessionOptions(ProxyReconnectOptions)'
+
         public ProxySessionOptions(ProxyReconnectOptions reconnectoptions)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ProxySessionOptions.ProxySessionOptions(ProxyReconnectOptions)'
         {
             ReconnectOptions = reconnectoptions;
         }

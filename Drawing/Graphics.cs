@@ -14,45 +14,83 @@ using System.IO;
 
 namespace Furcadia.Drawing.Graphics
 {
+    /// <summary>
+    ///
+    /// </summary>
     public struct Frame
     {
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormat'
         public FrameFormats FrameFormat;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormat'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.FramePos'
         public Pos FramePos;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.FramePos'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.FurrePos'
         public Pos FurrePos;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.FurrePos'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.Height'
+#pragma warning disable CS3003 // Type of 'Frame.Height' is not CLS-compliant
         public ushort Height;
+#pragma warning restore CS3003 // Type of 'Frame.Height' is not CLS-compliant
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.Height'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.ImageData'
         public byte[] ImageData;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.ImageData'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.ImageDataSize'
+#pragma warning disable CS3003 // Type of 'Frame.ImageDataSize' is not CLS-compliant
         public uint ImageDataSize;
+#pragma warning restore CS3003 // Type of 'Frame.ImageDataSize' is not CLS-compliant
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.ImageDataSize'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.Width'
+#pragma warning disable CS3003 // Type of 'Frame.Width' is not CLS-compliant
         public ushort Width;
+#pragma warning restore CS3003 // Type of 'Frame.Width' is not CLS-compliant
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.Width'
 
         #endregion Public Fields
 
         #region Public Enums
 
         [Flags]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormats'
+#pragma warning disable CS3009 // 'Frame.FrameFormats': base type 'ushort' is not CLS-compliant
         public enum FrameFormats : ushort
+#pragma warning restore CS3009 // 'Frame.FrameFormats': base type 'ushort' is not CLS-compliant
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormats'
         {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormats.Format8Bit'
             Format8Bit = 1,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormats.Format8Bit'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormats.FormatRGB'
             FormatRGB
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.FrameFormats.FormatRGB'
         }
 
         #endregion Public Enums
 
         #region Public Structs
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.Pos'
+
         public struct Pos
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.Pos'
         {
             #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.Pos.X'
             public short X;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.Pos.X'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Frame.Pos.Y'
             public short Y;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Frame.Pos.Y'
 
             #endregion Public Fields
         }
@@ -60,76 +98,151 @@ namespace Furcadia.Drawing.Graphics
         #endregion Public Structs
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape'
+
     public struct Shape
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape'
     {
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.Flags'
         public ShapeFlags Flags;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.Flags'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.Frames'
         public Frame[] Frames;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.Frames'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.KitterSpeak'
         public StepBlock[] KitterSpeak;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.KitterSpeak'
 
+#pragma warning disable CS3003 // Type of 'Shape.NumFrames' is not CLS-compliant
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.NumFrames'
         public ushort NumFrames;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.NumFrames'
+#pragma warning restore CS3003 // Type of 'Shape.NumFrames' is not CLS-compliant
 
+#pragma warning disable CS3003 // Type of 'Shape.NumSteps' is not CLS-compliant
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.NumSteps'
         public ushort NumSteps;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.NumSteps'
+#pragma warning restore CS3003 // Type of 'Shape.NumSteps' is not CLS-compliant
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeNum'
         public short ShapeNum;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeNum'
 
         #endregion Public Fields
 
         #region Public Enums
 
         [Flags]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags'
+#pragma warning disable CS3009 // 'Shape.ShapeFlags': base type 'ushort' is not CLS-compliant
         public enum ShapeFlags : ushort
+#pragma warning restore CS3009 // 'Shape.ShapeFlags': base type 'ushort' is not CLS-compliant
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags'
         {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags.Walkable'
             Walkable = 1,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags.Walkable'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags.Gettable'
             Gettable = 2,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags.Gettable'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags.Sittable'
             Sittable = 4
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Shape.ShapeFlags.Sittable'
         }
 
         #endregion Public Enums
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock'
+
     public struct StepBlock
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock'
     {
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.CounterMax'
         public short CounterMax;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.CounterMax'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepType'
         public StepBlockStepTypes StepType;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepType'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.Value'
         public short Value;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.Value'
 
         #endregion Public Fields
 
         #region Public Enums
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes'
+#pragma warning disable CS3009 // 'StepBlock.StepBlockStepTypes': base type 'ushort' is not CLS-compliant
+
         public enum StepBlockStepTypes : ushort
+#pragma warning restore CS3009 // 'StepBlock.StepBlockStepTypes': base type 'ushort' is not CLS-compliant
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes'
         {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Frame'
             Frame = 1,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Frame'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Delay'
             Delay,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Delay'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Loop'
             Loop,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Loop'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Jump'
             Jump,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Jump'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.PosX'
             PosX,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.PosX'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.PosY'
             PosY,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.PosY'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.FurreX'
             FurreX,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.FurreX'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.FurreY'
             FurreY,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.FurreY'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.DrawFront'
             DrawFront,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.DrawFront'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.DrawBehind'
             DrawBehind,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.DrawBehind'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.AutoFrameDelay'
             AutoFrameDelay,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.AutoFrameDelay'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Stop'
             Stop,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.Stop'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.CameraState'
             CameraState
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'StepBlock.StepBlockStepTypes.CameraState'
         }
 
         #endregion Public Enums
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaPaletteException'
+
     public class FurcadiaPaletteException : System.ApplicationException
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaPaletteException'
     {
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaPaletteException.FurcadiaPaletteException(string)'
+
         public FurcadiaPaletteException(string msg)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaPaletteException.FurcadiaPaletteException(string)'
             : base(msg)
         {
         }
@@ -137,24 +250,46 @@ namespace Furcadia.Drawing.Graphics
         #endregion Public Constructors
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes'
+
     public class FurcadiaShapes
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes'
     {
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Encryption'
         public int Encryption;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Encryption'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Generator'
         public int Generator;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Generator'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Header'
         public string Header;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Header'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.NumShapes'
         public int NumShapes;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.NumShapes'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Reserved1'
         public int Reserved1;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Reserved1'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Reserved2'
         public int Reserved2;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Reserved2'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Shapes'
         public Shape[] Shapes;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Shapes'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Version'
         public int Version;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.Version'
 
         #endregion Public Fields
 
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.FurcadiaShapes(string)'
+
         public FurcadiaShapes(string path)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.FurcadiaShapes(string)'
         {
             /* Don't fiddle with extensions */
             System.IO.BinaryReader br = new System.IO.BinaryReader(new System.IO.StreamReader(path).BaseStream);
@@ -163,15 +298,15 @@ namespace Furcadia.Drawing.Graphics
             switch (header)
             {
                 case "fshx":
-                    loadFOX(path);
+                    LoadFOX(path);
                     break;
 
                 case "fsh2":
-                    loadFS2(path);
+                    LoadFS2(path);
                     break;
 
                 default:
-                    loadFSH(path);
+                    LoadFSH(path);
                     break;
             }
         }
@@ -194,7 +329,10 @@ namespace Furcadia.Drawing.Graphics
 
         #region Public Methods
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.ToBitmap(Frame, Palette)'
+
         public System.Drawing.Bitmap ToBitmap(Furcadia.Drawing.Graphics.Frame frame, Palette pal)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapes.ToBitmap(Frame, Palette)'
         {
             /* Create a new bitmap */
             try
@@ -234,9 +372,11 @@ namespace Furcadia.Drawing.Graphics
                 }
                 else if (frame.FrameFormat == Frame.FrameFormats.FormatRGB)
                 {
+#pragma warning disable CS1030 // #warning: '24-bit is not supported in this version. For updates: http://furcadia.codeplex.com/'
 #warning 24-bit is not supported in this version. For updates: http://furcadia.codeplex.com/
                     //24 bit support
                 }
+#pragma warning restore CS1030 // #warning: '24-bit is not supported in this version. For updates: http://furcadia.codeplex.com/'
                 return bmp;
             }
             catch
@@ -250,7 +390,7 @@ namespace Furcadia.Drawing.Graphics
 
         #region Private Methods
 
-        private string changeExtension(string path, string newExtension)
+        private string ChangeExtension(string path, string newExtension)
         {
             char[] delims = { '/', '\\' };
             string[] structure = path.Split(delims);
@@ -260,9 +400,9 @@ namespace Furcadia.Drawing.Graphics
             return (filepath + filename + "." + newExtension);
         }
 
-        private void loadFBJ(string path)
+        private void LoadFBJ(string path)
         {
-            string file = changeExtension(path, "fbj");
+            string file = ChangeExtension(path, "fbj");
             if (!File.Exists(file)) return;
             System.IO.BinaryReader br = new System.IO.BinaryReader(new System.IO.StreamReader(file).BaseStream);
 
@@ -291,7 +431,7 @@ namespace Furcadia.Drawing.Graphics
             br.Close();
         }
 
-        private void loadFOX(string path)
+        private void LoadFOX(string path)
         {
             System.IO.BinaryReader br = new System.IO.BinaryReader(new System.IO.StreamReader(path).BaseStream);
 
@@ -349,7 +489,7 @@ namespace Furcadia.Drawing.Graphics
             br.Close();
         }
 
-        private void loadFS2(string path)
+        private void LoadFS2(string path)
         {
             System.IO.BinaryReader br = new System.IO.BinaryReader(new System.IO.StreamReader(path).BaseStream);
 
@@ -392,7 +532,7 @@ namespace Furcadia.Drawing.Graphics
 
             try
             {
-                loadFBJ(path);
+                LoadFBJ(path);
             }
             catch
             {
@@ -400,7 +540,7 @@ namespace Furcadia.Drawing.Graphics
             }
         }
 
-        private void loadFSH(string path)
+        private void LoadFSH(string path)
         {
             System.IO.BinaryReader br = new System.IO.BinaryReader(new System.IO.StreamReader(path).BaseStream);
 
@@ -439,17 +579,23 @@ namespace Furcadia.Drawing.Graphics
 
             br.Close();
 
-            loadFBJ(path);
+            LoadFBJ(path);
         }
 
         #endregion Private Methods
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapesException'
+
     public class FurcadiaShapesException : System.ApplicationException
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapesException'
     {
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapesException.FurcadiaShapesException(string)'
+
         public FurcadiaShapesException(string msg)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaShapesException.FurcadiaShapesException(string)'
             : base(msg)
         {
         }
@@ -457,11 +603,16 @@ namespace Furcadia.Drawing.Graphics
         #endregion Public Constructors
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Palette'
+
     public class Palette
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Palette'
     {
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Palette.Colors'
         public readonly Color[] Colors;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Palette.Colors'
 
         #endregion Public Fields
 
@@ -473,7 +624,10 @@ namespace Furcadia.Drawing.Graphics
 
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Palette.Palette(string)'
+
         public Palette(string pcxPath)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Palette.Palette(string)'
         {
             Furcpath = new Paths();
 
@@ -500,7 +654,10 @@ namespace Furcadia.Drawing.Graphics
             Colors = cols;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Palette.Palette(string, string)'
+
         public Palette(string pcxPath, string fpath)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Palette.Palette(string, string)'
         {
             Furcpath = new Paths(fpath);
 
@@ -542,17 +699,26 @@ namespace Furcadia.Drawing.Graphics
         #endregion Public Properties
     }
 
-    public class Remapper
+    /// <summary>
+    /// Remap colors
+    /// </summary>
+    public static class Remapper
     {
         #region Remaps
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.BadgeRemap'
+
         public static byte[] BadgeRemap = new byte[] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.BadgeRemap'
             14, 12, 10, 240, 135, 39, 37, 35, 27, 21, 55, 51, 49, 241, 56, 70,
             75, 73, 242, 244, 86, 85, 83, 245, 238, 230, 228, 226, 242, 237, 133, 131,
             129, 99, 235, 111, 110, 109, 115, 175
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.BootRemap'
+
         public static byte[][] BootRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.BootRemap'
             new byte[] { 10, 10, 11, 12, 13, 14, 15, 15 },
             new byte[] { 16, 17, 18, 19, 20, 21, 22, 23 },
             new byte[] { 24, 25, 26, 27, 28, 29, 30, 31 },
@@ -584,8 +750,11 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 234, 234, 235, 236, 237, 238, 239, 239 },
             new byte[] { 88, 88, 89, 90, 90, 91, 91, 92 },
         };
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.BracersRemap'
 
         public static byte[][] BracersRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.BracersRemap'
             new byte[] { 10, 10, 11, 12, 13, 14, 15, 15 },
             new byte[] { 16, 17, 18, 19, 20, 21, 22, 23 },
             new byte[] { 24, 25, 26, 27, 28, 29, 30, 31 },
@@ -617,8 +786,11 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 234, 234, 235, 236, 237, 238, 239, 239 },
             new byte[] { 88, 88, 89, 90, 90, 91, 91, 92 },
         };
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.CapeRemap'
 
         public static byte[][] CapeRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.CapeRemap'
             new byte[] { 10, 10, 11, 12, 13, 14, 15, 15 },
             new byte[] { 16, 17, 18, 19, 20, 21, 22, 23 },
             new byte[] { 24, 25, 26, 27, 28, 29, 30, 31 },
@@ -651,12 +823,18 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 88, 88, 89, 90, 90, 91, 91, 92 },
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.EyeRemap'
+
         public static byte[] EyeRemap = new byte[] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.EyeRemap'
             23, 37, 50, 52, 67, 83, 86, 110, 185, 234, 236, 238, 243, 244, 245, 150,
             153, 156, 207, 129, 10, 159, 90, 230, 240, 241, 242, 202, 127, 172
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.FurRemap'
+
         public static byte[][] FurRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.FurRemap'
             new byte[] { 199, 200, 201, 202, 203, 204, 205, 206 },
             new byte[] { 89, 90, 91, 92, 93, 94, 95, 174 },
             new byte[] { 204, 204, 205, 205, 206, 206, 207, 207 },
@@ -684,7 +862,10 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 232, 233, 234, 235, 236, 237, 238, 239 },
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.HairRemap'
+
         public static byte[][] HairRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.HairRemap'
             new byte[] { 12, 13, 14, 15, 159, 159, 159, 159 },
             new byte[] { 10, 11, 12, 13, 14, 14, 14, 14 },
             new byte[] { 10, 10, 10, 11, 12, 12, 12, 12 },
@@ -732,7 +913,10 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 120, 122, 124, 126, 127, 127, 127, 127 },
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.MarkingsRemap'
+
         public static byte[][] MarkingsRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.MarkingsRemap'
             new byte[] { 199, 200, 201, 202, 203, 204, 205, 206 },
             new byte[] { 89, 90, 91, 92, 93, 94, 95, 174 },
             new byte[] { 204, 204, 205, 205, 206, 206, 207, 207 },
@@ -760,7 +944,10 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 232, 233, 234, 235, 236, 237, 238, 239 },
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.TrousersRemap'
+
         public static byte[][] TrousersRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.TrousersRemap'
             new byte[] { 10, 10, 11, 12, 13, 14, 15, 15 },
             new byte[] { 16, 17, 18, 19, 20, 21, 22, 23 },
             new byte[] { 24, 25, 26, 27, 28, 29, 30, 31 },
@@ -793,7 +980,10 @@ namespace Furcadia.Drawing.Graphics
             new byte[] { 88, 88, 89, 90, 90, 91, 91, 92 },
         };
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.VestRemap'
+
         public static byte[][] VestRemap = new byte[][] {
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.VestRemap'
             new byte[] { 10, 10, 11, 12, 13, 14, 15, 15 },
             new byte[] { 16, 17, 18, 19, 20, 21, 22, 23 },
             new byte[] { 24, 25, 26, 27, 28, 29, 30, 31 },
@@ -830,14 +1020,21 @@ namespace Furcadia.Drawing.Graphics
 
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.Palette'
         public static Color[] Palette;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.Palette'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.PalLoaded'
         public static bool PalLoaded = false;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.PalLoaded'
 
         #endregion Public Fields
 
         #region Public Methods
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Remapper.Remap(byte[], int, int, string, int)'
+
         public static Bitmap Remap(byte[] source, int width, int height, string colourcode, int highlight)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Remapper.Remap(byte[], int, int, string, int)'
         {
             byte[] RawPal = Properties.Resources.furc;
             Color[] ConvPal = new Color[256];
@@ -962,8 +1159,10 @@ namespace Furcadia.Drawing.Graphics
 
                 System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Output);
                 ImageAttributes attr = new ImageAttributes();
-                ColorMatrix mtx = new ColorMatrix();
-                mtx.Matrix33 = 0.25F;
+                ColorMatrix mtx = new ColorMatrix
+                {
+                    Matrix33 = 0.25F
+                };
                 attr.SetColorMatrix(mtx, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                 g.DrawImage(Orig,
                     new Rectangle(0, 0, width, height),

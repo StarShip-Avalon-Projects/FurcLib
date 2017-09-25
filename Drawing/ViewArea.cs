@@ -1,11 +1,21 @@
 ﻿namespace Furcadia.Drawing
 {
+
+    /// <summary>
+    /// Furre Visible area
+    /// </summary>
     public static class VisibleArea
     {
         #region Public Methods
 
-        //Reference http://pastebin.com/QbnjwjNc
-        public static ViewArea getTargetRectFromCenterCoord(int X, int Y)
+            /// <summary>
+            /// Gets the target View area from the center coordinates, This is useful for finding the View area of the Connected Furre
+            /// </summary>
+            /// <param name="X"></param>
+            /// <param name="Y"></param>
+            /// <returns></returns>
+        public static ViewArea GetTargetRectFromCenterCoord(int X, int Y)
+
         {
             // Set the size of the rectangle drawn around the player. The +1
             // is the tile the player is on.
@@ -32,6 +42,11 @@
             return rec;
         }
 
+        /// <summary>
+        /// Integer is Odd
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool IsOdd(int value)
         {
             return value % 2 != 0;
@@ -40,13 +55,31 @@
         #endregion Public Methods
     }
 
+    /// <summary>
+    /// Visible are a Furre can see
+    /// </summary>
     public class ViewArea
     {
         #region Public Fields
 
+        /// <summary>
+        /// height
+        /// </summary>
         public int height;
+
+        /// <summary>
+        /// length
+        /// </summary>
         public int length;
+
+        /// <summary>
+        /// X Coordinate
+        /// </summary>
         public int X;
+
+        /// <summary>
+        /// Y Coordinate
+        /// </summary>
         public int Y;
 
         #endregion Public Fields

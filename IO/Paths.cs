@@ -4,6 +4,8 @@ using System.IO;
 
 namespace Furcadia.IO
 {
+#pragma warning disable CS1570 // XML comment has badly formed XML -- 'An identifier was expected.'
+
     ///<summary>
     /// This class contains all the paths related to the users furcadia installation.
     ///<para>***NOTICE: DO NOT REMOVE***</para>
@@ -13,10 +15,11 @@ namespace Furcadia.IO
     ///<para>Format: (date,Version) AuthorName, Changes.</para>
     ///<para> (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path</para>
     ///<para>  (June 1, 2016) Gerolkae, Added possible missing Registry Paths for x86/x64 Windows and Mono Support. Wine Support also contains these corrections.</para>
+    ///</summary>
     ///<remarks>
     ///  Theory check all known default paths
     ///<para> check localdir.ini</para>
-    ///<para>  then check each registry hives for active CPU type</para><
+    ///<para>  then check each registry hives for active CPU type</para>
     ///<para>  Then check each give for default 32bit path(Non wow6432node)</para>
     ///<para>  then check Wine variants(C++ Win32 client)</para>
     ///<para>  then check Mono Versions for before mentioned(C#? Client)</para>
@@ -24,8 +27,8 @@ namespace Furcadia.IO
     ///<para>  If all Fail... Throw <see cref="FurcadiaNotInstalled"/> exception</para>
     ///<para>  Clients Should check for this error and then ask the user where to manually locate Furccadia</para>
     ///</remarks>
-    ///</summary>
     public class Paths
+#pragma warning restore CS1570 // XML comment has badly formed XML -- 'An identifier was expected.'
     {
         #region Private Fields
 
@@ -35,21 +38,25 @@ namespace Furcadia.IO
 
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths()'
+
         public Paths()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths()'
         {
             FurcadiaUtilities = new Net.Utils.Utilities();
             sLocaldirPath = GetFurcadiaLocaldirPath();
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths(string)'
+
         public Paths(string path)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths(string)'
         {
             FurcadiaUtilities = new Net.Utils.Utilities();
             sLocaldirPath = GetFurcadiaLocaldirPath();
         }
 
         #endregion Public Constructors
-
-
 
         #region Private Fields
 
@@ -90,7 +97,10 @@ namespace Furcadia.IO
         }
 
         //--- FURCADIA CACHE ------------------------------------------------//
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCachePath'
+
         public string DefaultCachePath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCachePath'
         {
             get
             {
@@ -99,7 +109,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCharacterPath'
+
         public string DefaultCharacterPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCharacterPath'
         {
             get
             {
@@ -107,7 +120,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultDreamsPath'
+
         public string DefaultDreamsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultDreamsPath'
         {
             get
             {
@@ -133,7 +149,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalMapsPath'
+
         public string DefaultGlobalMapsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalMapsPath'
         {
             get
             {
@@ -141,7 +160,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalSkinsPath'
+
         public string DefaultGlobalSkinsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalSkinsPath'
         {
             get
             {
@@ -149,7 +171,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLocalSkinsPath'
+
         public string DefaultLocalSkinsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLocalSkinsPath'
         {
             get
             {
@@ -157,7 +182,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLogsPath'
+
         public string DefaultLogsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLogsPath'
         {
             get
             {
@@ -179,7 +207,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPermanentMapsCachePath'
+
         public string DefaultPermanentMapsCachePath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPermanentMapsCachePath'
         {
             get
             {
@@ -187,7 +218,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPersonalDataPath'
+
         public string DefaultPersonalDataPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPersonalDataPath'
         {
             get
             {
@@ -196,7 +230,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPortraitCachePath'
+
         public string DefaultPortraitCachePath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPortraitCachePath'
         {
             get
             {
@@ -204,7 +241,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultScreenshotsPath'
+
         public string DefaultScreenshotsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultScreenshotsPath'
         {
             get
             {
@@ -212,7 +252,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultSettingsPath'
+
         public string DefaultSettingsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultSettingsPath'
         {
             get
             {
@@ -221,7 +264,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryDreamsPath'
+
         public string DefaultTemporaryDreamsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryDreamsPath'
         {
             get
             {
@@ -229,7 +275,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryFilesPath'
+
         public string DefaultTemporaryFilesPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryFilesPath'
         {
             get
             {
@@ -237,7 +286,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryPatchesPath'
+
         public string DefaultTemporaryPatchesPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryPatchesPath'
         {
             get
             {
@@ -245,7 +297,10 @@ namespace Furcadia.IO
             }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultWhisperLogsPath'
+
         public string DefaultWhisperLogsPath
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultWhisperLogsPath'
         {
             get
             {

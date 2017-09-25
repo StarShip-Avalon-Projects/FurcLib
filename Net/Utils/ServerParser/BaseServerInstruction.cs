@@ -31,11 +31,11 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         public BaseServerInstruction(string ServerInstruction) : this()
         {
-          
             rawInstruction = ServerInstruction;
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public BaseServerInstruction()
         {

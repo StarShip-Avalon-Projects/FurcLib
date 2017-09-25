@@ -20,20 +20,22 @@
     public class DreamBookmark : BaseServerInstruction
     {
         #region Private Fields
+
         private int type;
         private string dreamURL;
+
         #endregion Private Fields
 
         #region Public Constructors
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public DreamBookmark() : base()
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
             dreamURL = null;
             type = -1;
-
         }
 
         /// <summary>
@@ -63,6 +65,7 @@
                 return dreamURL;
             }
         }
+
         /// <summary>
         /// Dream Type
         /// <para> Type 0 = Temporary</para>
@@ -73,7 +76,6 @@
         {
             get { return type; }
         }
-
 
         #endregion Public Properties
     }

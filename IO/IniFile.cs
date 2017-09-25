@@ -29,7 +29,10 @@ namespace Furcadia.IO
         #region "Public Constructors"
 
         // Public constructor
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniFile()'
+
         public IniFile()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniFile()'
         {
             m_sections = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
         }
@@ -38,13 +41,19 @@ namespace Furcadia.IO
 
         #region "Public Properties"
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Code'
+
         public string Code
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Code'
         {
             get { return _code; }
         }
 
         // Gets all the sections
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Sections'
+
         public System.Collections.ICollection Sections
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Sections'
         {
             get { return m_sections.Values; }
         }
@@ -55,7 +64,10 @@ namespace Furcadia.IO
 
         // Adds a section to the IniFile object, returns a IniSection object
         // to the new or existing object
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.AddSection(string)'
+
         public IniSection AddSection(string sSection)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.AddSection(string)'
         {
             IniSection s = null;
             sSection = sSection.Trim();
@@ -73,7 +85,10 @@ namespace Furcadia.IO
         }
 
         // Returns a KeyValue in a certain section
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.GetKeyValue(string, string)'
+
         public string GetKeyValue(string sSection, string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.GetKeyValue(string, string)'
         {
             IniSection s = GetSection(sSection);
             if (s != null)
@@ -88,7 +103,10 @@ namespace Furcadia.IO
         }
 
         // Returns an IniSection to the section by name, NULL if it was not found
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.GetSection(string)'
+
         public IniSection GetSection(string sSection)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.GetSection(string)'
         {
             sSection = sSection.Trim();
             // Trim spaces
@@ -100,7 +118,10 @@ namespace Furcadia.IO
         }
 
         // Loads the Reads the data in the ini file into the IniFile object
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Load(string, bool)'
+
         public void Load(string sFileName, bool bMerge = false)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Load(string, bool)'
         {
             if (!bMerge)
             {
@@ -171,14 +192,20 @@ namespace Furcadia.IO
         }
 
         // Removes all existing sections, returns trus on success
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveAllSections()'
+
         public bool RemoveAllSections()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveAllSections()'
         {
             m_sections.Clear();
             return (m_sections.Count == 0);
         }
 
         // Remove a key by section name and key name
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveKey(string, string)'
+
         public bool RemoveKey(string sSection, string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveKey(string, string)'
         {
             IniSection s = GetSection(sSection);
             if (s != null)
@@ -189,14 +216,20 @@ namespace Furcadia.IO
         }
 
         // Removes a section by its name sSection, returns trus on success
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveSection(string)'
+
         public bool RemoveSection(string sSection)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveSection(string)'
         {
             sSection = sSection.Trim();
             return RemoveSection(GetSection(sSection));
         }
 
         // Removes section by object, returns trus on success
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveSection(IniFile.IniSection)'
+
         public bool RemoveSection(IniSection Section)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RemoveSection(IniFile.IniSection)'
         {
             if (Section != null)
             {
@@ -215,7 +248,10 @@ namespace Furcadia.IO
 
         // Renames an existing key returns true on success, false if the key
         // didn't exist or there was another section with the same sNewKey
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RenameKey(string, string, string)'
+
         public bool RenameKey(string sSection, string sKey, string sNewKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RenameKey(string, string, string)'
         {
             // Note string trims are done in lower calls.
             IniSection s = GetSection(sSection);
@@ -232,7 +268,10 @@ namespace Furcadia.IO
 
         // Renames an existing section returns true on success, false if the
         // section didn't exist or there was another section with the same sNewSection
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RenameSection(string, string)'
+
         public bool RenameSection(string sSection, string sNewSection)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.RenameSection(string, string)'
         {
             // Note string trims are done in lower calls.
             bool bRval = false;
@@ -245,7 +284,10 @@ namespace Furcadia.IO
         }
 
         // Used to save the data back to the file or your choice
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Save(string)'
+
         public void Save(string sFileName)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.Save(string)'
         {
             StreamWriter oWriter = new StreamWriter(sFileName, false);
 
@@ -274,7 +316,10 @@ namespace Furcadia.IO
         }
 
         // Sets a KeyValuePair in a certain section
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.SetKeyValue(string, string, string)'
+
         public bool SetKeyValue(string sSection, string sKey, string sValue)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.SetKeyValue(string, string, string)'
         {
             IniSection s = AddSection(sSection);
             if (s != null)
@@ -294,7 +339,10 @@ namespace Furcadia.IO
         #region "Public Classes"
 
         // IniSection class
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection'
+
         public class IniSection
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection'
         {
             #region "Private Fields"
 
@@ -314,7 +362,10 @@ namespace Furcadia.IO
             #region "Protected Internal Constructors"
 
             // Constuctor so objects are internally managed
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniSection(IniFile, string)'
+
             protected internal IniSection(IniFile parent, string sSection)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniSection(IniFile, string)'
             {
                 m_pIniFile = parent;
                 m_sSection = sSection;
@@ -326,13 +377,19 @@ namespace Furcadia.IO
             #region "Public Properties"
 
             // Returns all the keys in a section
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.Keys'
+
             public System.Collections.ICollection Keys
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.Keys'
             {
                 get { return m_keys.Values; }
             }
 
             // Returns the section name
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.Name'
+
             public string Name
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.Name'
             {
                 get { return m_sSection; }
             }
@@ -343,7 +400,10 @@ namespace Furcadia.IO
 
             // Adds a key to the IniSection object, returns a IniKey object
             // to the new or existing object
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.AddKey(string)'
+
             public IniKey AddKey(string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.AddKey(string)'
             {
                 sKey = sKey.Trim();
                 IniSection.IniKey k = null;
@@ -364,7 +424,10 @@ namespace Furcadia.IO
 
             // Returns a IniKey object to the key by name, NULL if it was
             // not found
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.GetKey(string)'
+
             public IniKey GetKey(string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.GetKey(string)'
             {
                 sKey = sKey.Trim();
                 if (m_keys.ContainsKey(sKey))
@@ -375,26 +438,38 @@ namespace Furcadia.IO
             }
 
             // Returns the section name
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.GetName()'
+
             public string GetName()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.GetName()'
             {
                 return m_sSection;
             }
 
             // Removes all the keys in the section
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.RemoveAllKeys()'
+
             public bool RemoveAllKeys()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.RemoveAllKeys()'
             {
                 m_keys.Clear();
                 return (m_keys.Count == 0);
             }
 
             // Removes a single key by string
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.RemoveKey(string)'
+
             public bool RemoveKey(string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.RemoveKey(string)'
             {
                 return RemoveKey(GetKey(sKey));
             }
 
             // Removes a single key by IniKey object
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.RemoveKey(IniFile.IniSection.IniKey)'
+
             public bool RemoveKey(IniKey Key)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.RemoveKey(IniFile.IniSection.IniKey)'
             {
                 if (Key != null)
                 {
@@ -413,7 +488,10 @@ namespace Furcadia.IO
 
             // Sets the section name, returns true on success, fails if the
             // section name sSection already exists
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.SetName(string)'
+
             public bool SetName(string sSection)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.SetName(string)'
             {
                 sSection = sSection.Trim();
                 if (sSection.Length != 0)
@@ -447,7 +525,10 @@ namespace Furcadia.IO
             #region "Public Classes"
 
             // IniKey class
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey'
+
             public class IniKey
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey'
             {
                 #region "Private Fields"
 
@@ -467,7 +548,10 @@ namespace Furcadia.IO
                 #region "Protected Internal Constructors"
 
                 // Constuctor so objects are internally managed
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.IniKey(IniFile.IniSection, string)'
+
                 protected internal IniKey(IniSection parent, string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.IniKey(IniFile.IniSection, string)'
                 {
                     m_section = parent;
                     m_sKey = sKey;
@@ -478,13 +562,19 @@ namespace Furcadia.IO
                 #region "Public Properties"
 
                 // Returns the name of the Key
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.Name'
+
                 public string Name
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.Name'
                 {
                     get { return m_sKey; }
                 }
 
                 // Sets or Gets the value of the key
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.Value'
+
                 public string Value
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.Value'
                 {
                     get { return m_sValue; }
                     set { m_sValue = value; }
@@ -495,20 +585,29 @@ namespace Furcadia.IO
                 #region "Public Methods"
 
                 // Returns the name of the Key
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.GetName()'
+
                 public string GetName()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.GetName()'
                 {
                     return m_sKey;
                 }
 
                 // Returns the value of the Key
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.GetValue()'
+
                 public string GetValue()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.GetValue()'
                 {
                     return m_sValue;
                 }
 
                 // Sets the key name Returns true on success, fails if the
                 // section name sKey already exists
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.SetName(string)'
+
                 public bool SetName(string sKey)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.SetName(string)'
                 {
                     sKey = sKey.Trim();
                     if (sKey.Length != 0)
@@ -537,7 +636,10 @@ namespace Furcadia.IO
                 }
 
                 // Sets the value of the key
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.SetValue(string)'
+
                 public void SetValue(string sValue)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'IniFile.IniSection.IniKey.SetValue(string)'
                 {
                     m_sValue = sValue;
                 }
