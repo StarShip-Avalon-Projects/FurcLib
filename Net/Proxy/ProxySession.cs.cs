@@ -89,16 +89,16 @@ namespace Furcadia.Net.Proxy
             clientconnectionphase = ConnectionPhase.Init;
 
             ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
+            ServerBalancer.OnServerSendMessage += OnServerQueSent;
 
-            base.ServerData2 += onServerDataReceived;
-            base.Connected += onServerConnected;
-            base.ServerDisConnected += onServerDisconnected;
+            base.ServerData2 += OnServerDataReceived;
+            base.Connected += OnServerConnected;
+            base.ServerDisConnected += OnServerDisconnected;
             // if (!options.Standalone) {
-            base.ClientData2 += onClientDataReceived;
-            base.ClientDisConnected += onClientDisconnected;
-            base.Connected += onClientConnected;
-            base.ClientExited += onClientExited;
+            base.ClientData2 += OnClientDataReceived;
+            base.ClientDisConnected += OnClientDisconnected;
+            base.Connected += OnClientConnected;
+            //ClientExited += onClientExited;
             // }
             ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
@@ -106,10 +106,6 @@ namespace Furcadia.Net.Proxy
             LookQue = new Queue<string>(50);
             SpeciesTag = new Queue<string>(50);
             BanishString = new List<string>(50);
-        }
-
-        private void onClientExited()
-        {
         }
 
         #endregion "Constructors"
@@ -874,11 +870,13 @@ namespace Furcadia.Net.Proxy
             if (Dream.FurreList.Contains(player))
                 Dream.FurreList[player] = player;
 
-            ChannelObject chanObject = new ChannelObject(data);
-            chanObject.Player = player;
+            ChannelObject chanObject = new ChannelObject(data)
+            {
+                Player = player,
 
-            chanObject.Channel = channel;
-            chanObject.InstructionType = ServerInstructionType.DisplayText;
+                Channel = channel,
+                InstructionType = ServerInstructionType.DisplayText
+            };
 
             ParseChannelArgs args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
 
@@ -1049,15 +1047,15 @@ namespace Furcadia.Net.Proxy
                     else if (data.StartsWith("/"))
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
                         connectedFurre = Dream.FurreList[connectedFurre];
-                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
-                        if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <= player.Position.y &
-                            VisableRectangle.height >= player.Position.y & VisableRectangle.length >=
-                            player.Position.x)
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
+                        if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <= player.Position.Y &
+                            VisableRectangle.height >= player.Position.Y & VisableRectangle.length >=
+                            player.Position.X)
                         {
                             player.Visible = true;
                         }
@@ -1073,17 +1071,17 @@ namespace Furcadia.Net.Proxy
                     {
                         int id = ConvertFromBase220(data.Substring(1, 4));
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
 
                         connectedFurre = Dream.FurreList[connectedFurre];
-                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
 
-                        if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
-                            player.Position.y & VisableRectangle.height >= player.Position.y &
-                            VisableRectangle.length >= player.Position.x)
+                        if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <=
+                            player.Position.Y & VisableRectangle.height >= player.Position.Y &
+                            VisableRectangle.length >= player.Position.X)
                         {
                             player.Visible = true;
                         }
@@ -1112,8 +1110,8 @@ namespace Furcadia.Net.Proxy
                     else if (data.StartsWith("C") != false)
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         player.Visible = false;
                         if (Dream.FurreList.Contains(player))
                         {
@@ -1144,8 +1142,7 @@ namespace Furcadia.Net.Proxy
                         Match m = repqq.Match(data);
                         Rep r = default(Rep);
                         r.ID = m.Groups[1].Value;
-                        int num = 0;
-                        int.TryParse(m.Groups[2].Value, out num);
+                        int.TryParse(m.Groups[2].Value, out int num);
                         r.Type = num;
                         Repq.Enqueue(r);
                         player.Message = m.Groups[3].Value;
@@ -1392,7 +1389,7 @@ namespace Furcadia.Net.Proxy
             SendToServer(result);
         }
 
-        private void onClientConnected()
+        private void OnClientConnected()
         {
             clientconnectionphase = ConnectionPhase.MOTD;
             ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
@@ -1403,7 +1400,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="data">
         /// </param>
-        private void onClientDataReceived(string data)
+        private void OnClientDataReceived(string data)
         {
             //TODO Raise Client Data Received event
 
@@ -1471,13 +1468,13 @@ namespace Furcadia.Net.Proxy
             }
         }
 
-        private void onClientDisconnected()
+        private void OnClientDisconnected()
         {
             clientconnectionphase = ConnectionPhase.Disconnected;
             ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
         }
 
-        private void onServerConnected()
+        private void OnServerConnected()
         {
             serverconnectphase = ConnectionPhase.MOTD;
             ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
@@ -1487,7 +1484,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="data">
         /// </param>
-        private void onServerDataReceived(string data)
+        private void OnServerDataReceived(string data)
         {
             player = new FURRE();
             bool handled = false;
@@ -1550,13 +1547,13 @@ namespace Furcadia.Net.Proxy
 
         #endregion "Popup Dialogs"
 
-        private void onServerDisconnected()
+        private void OnServerDisconnected()
         {
             serverconnectphase = ConnectionPhase.Disconnected;
             ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
         }
 
-        private void onServerQueSent(object o, EventArgs e)
+        private void OnServerQueSent(object o, EventArgs e)
         {
             base.SendToServer(o.ToString());
         }

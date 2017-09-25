@@ -44,9 +44,9 @@
             this.x = x;
             this.y = y;
             this.floorNumber = map.GetFloorAt(x, y);
-            this.objectNumber = map.getObjectAt(x, y);
-            this.regionNumber = map.getRegionAt(x, y);
-            this.effectNumber = map.getEffectAt(x, y);
+            this.objectNumber = map.GetObjectAt(x, y);
+            this.regionNumber = map.GetRegionAt(x, y);
+            this.effectNumber = map.GetEffectAt(x, y);
 
             if (x % 2 == 0)
             {

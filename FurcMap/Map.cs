@@ -69,11 +69,11 @@ namespace Furcadia.FurcMap
             this.width = width / 2;
             this.height = height;
 
-            floors = new byte[bytesLayerCount];
-            objects = new byte[bytesLayerCount];
-            walls = new byte[bytesLayerCount];
-            regions = new byte[bytesLayerCount];
-            effects = new byte[bytesLayerCount];
+            floors = new byte[BytesLayerCount];
+            objects = new byte[BytesLayerCount];
+            walls = new byte[BytesLayerCount];
+            regions = new byte[BytesLayerCount];
+            effects = new byte[BytesLayerCount];
 
             String mapData = String.Format(Properties.Resources.DefaultMapData, this.height, this.width, "");
             String[] mapLines = mapData.Split(new String[] { "\r\n", "\n" }, StringSplitOptions.None);
@@ -91,7 +91,7 @@ namespace Furcadia.FurcMap
 
             SetMapHeaders(this.mapData);
 
-            byte[] mapMatrix = new byte[this.bytesLayerCount * 5];
+            byte[] mapMatrix = new byte[this.BytesLayerCount * 5];
             this.mapMatrix = mapMatrix;
         }
 
@@ -107,7 +107,7 @@ namespace Furcadia.FurcMap
 
         #region Internal Properties
 
-        internal int bytesLayerCount
+        internal int BytesLayerCount
         {
             get
             {
@@ -349,11 +349,11 @@ namespace Furcadia.FurcMap
 
             m.SetMapHeaders(m.mapData);
 
-            m.floors = new byte[m.bytesLayerCount];
-            m.objects = new byte[m.bytesLayerCount];
-            m.walls = new byte[m.bytesLayerCount];
-            m.regions = new byte[m.bytesLayerCount];
-            m.effects = new byte[m.bytesLayerCount];
+            m.floors = new byte[m.BytesLayerCount];
+            m.objects = new byte[m.BytesLayerCount];
+            m.walls = new byte[m.BytesLayerCount];
+            m.regions = new byte[m.BytesLayerCount];
+            m.effects = new byte[m.BytesLayerCount];
 
             List<byte> mapMatrix = new List<byte>();
             int read = 0;
@@ -384,7 +384,7 @@ namespace Furcadia.FurcMap
         /// <returns>
         /// The effect number
         /// </returns>
-        public int getEffectAt(int x, int y)
+        public int GetEffectAt(int x, int y)
         {
             int pos = GetPosFrom(x, y);
 
@@ -445,7 +445,7 @@ namespace Furcadia.FurcMap
         /// <returns>
         /// The object number
         /// </returns>
-        public int getObjectAt(int x, int y)
+        public int GetObjectAt(int x, int y)
         {
             int pos = GetPosFrom(x, y);
 
@@ -463,7 +463,7 @@ namespace Furcadia.FurcMap
         /// <returns>
         /// The region number
         /// </returns>
-        public int getRegionAt(int x, int y)
+        public int GetRegionAt(int x, int y)
         {
             int pos = GetPosFrom(x, y);
 
@@ -553,7 +553,7 @@ namespace Furcadia.FurcMap
         /// Y coordinate
         /// </param>
         /// <param name="effectNumber"></param>
-        public void setEffectAt(int x, int y, int effectNumber)
+        public void SetEffectAt(int x, int y, int effectNumber)
         {
             int pos = GetPosFrom(x, y);
 
@@ -635,34 +635,34 @@ namespace Furcadia.FurcMap
 
         private bool ParseMatrix(byte[] matrix)
         {
-            if (matrix.Length != bytesLayerCount * 5)
+            if (matrix.Length != BytesLayerCount * 5)
             {
                 Console.WriteLine("Something is wrong here...");
                 return false;
             }
             mapMatrix = matrix;
 
-            for (int i = 0; i < bytesLayerCount; i++)
+            for (int i = 0; i < BytesLayerCount; i++)
                 floors[i] = matrix[i];
 
-            for (int i = 0; i < bytesLayerCount; i++)
+            for (int i = 0; i < BytesLayerCount; i++)
             {
-                objects[i] = matrix[i + bytesLayerCount];
+                objects[i] = matrix[i + BytesLayerCount];
             }
 
-            for (int i = 0; i < bytesLayerCount; i++)
+            for (int i = 0; i < BytesLayerCount; i++)
             {
-                walls[i] = matrix[i + (bytesLayerCount * 2)];
+                walls[i] = matrix[i + (BytesLayerCount * 2)];
             }
 
-            for (int i = 0; i < bytesLayerCount; i++)
+            for (int i = 0; i < BytesLayerCount; i++)
             {
-                regions[i] = matrix[i + (bytesLayerCount * 3)];
+                regions[i] = matrix[i + (BytesLayerCount * 3)];
             }
 
-            for (int i = 0; i < bytesLayerCount; i++)
+            for (int i = 0; i < BytesLayerCount; i++)
             {
-                effects[i] = matrix[i + (bytesLayerCount * 4)];
+                effects[i] = matrix[i + (BytesLayerCount * 4)];
             }
 
             return true;

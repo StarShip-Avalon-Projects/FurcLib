@@ -333,8 +333,8 @@ namespace Furcadia.Net.Dream
         [Obsolete("use LasPosition as FurrePosition", false)]
         public int SourceX
         {
-            get { return LastPosition.x; }
-            set { LastPosition.x = value; }
+            get { return LastPosition.X; }
+            set { LastPosition.X = value; }
         }
 
         /// <summary>
@@ -346,8 +346,8 @@ namespace Furcadia.Net.Dream
         [Obsolete("use LasPosition as FurrePosition", false)]
         public int SourceY
         {
-            get { return LastPosition.y; }
-            set { LastPosition.y = value; }
+            get { return LastPosition.Y; }
+            set { LastPosition.Y = value; }
         }
 
         /// <summary>
@@ -375,8 +375,8 @@ namespace Furcadia.Net.Dream
         [Obsolete("use Position as FurrePosition", false)]
         public int X
         {
-            get { return Position.x; }
-            set { Position.x = value; }
+            get { return Position.X; }
+            set { Position.X = value; }
         }
 
         /// <summary>
@@ -385,8 +385,8 @@ namespace Furcadia.Net.Dream
         [Obsolete("use Position as FurrePosition", false)]
         public int Y
         {
-            get { return Position.y; }
-            set { Position.y = value; }
+            get { return Position.Y; }
+            set { Position.Y = value; }
         }
 
         #endregion Public Properties
