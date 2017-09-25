@@ -130,9 +130,9 @@
     <Compile Include="Net\Proxy\ProxySession.cs.cs" />
     <Compile Include="Net\Utils\ServerObjects\DiceObject.cs" />
     <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />
-    <Compile Include="Net\Utils\ServerParser\ChannelObject.cs" />
+    <Compile Include="Net\Utils\ChannelObjects\ChannelObject.cs" />
     <Compile Include="Net\Utils\ServerObjects\DataObject.cs" />
-    <Compile Include="Net\Utils\ServerParser\DiceRolls.cs" />
+    <Compile Include="Net\Utils\ChannelObjects\DiceRolls.cs" />
     <Compile Include="Net\Utils\ServerParser\DreamBookmark.cs" />
     <Compile Include="Net\Utils\ServerParser\LoadDream.cs" />
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
@@ -246,9 +246,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Net\Utils\ChannelObjects\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

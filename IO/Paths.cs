@@ -24,7 +24,7 @@ namespace Furcadia.IO
     ///<para>  then check Wine variants(C++ Win32 client)</para>
     ///<para>  then check Mono Versions for before mentioned(C#? Client)</para>
     ///<para>  then check default drive folder paths</para>
-    ///<para>  If all Fail... Throw <see cref="FurcadiaNotInstalled"/> exception</para>
+    ///<para>  If all Fail... Throw <see cref="FurcadiaNotFoundException"/> exception</para>
     ///<para>  Clients Should check for this error and then ask the user where to manually locate Furccadia</para>
     ///</remarks>
     public class Paths
@@ -38,19 +38,20 @@ namespace Furcadia.IO
 
         #region Public Constructors
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths()'
-
+        /// <summary>
+        /// Load Default Furcadia Paths
+        /// </summary>
         public Paths()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths()'
         {
             FurcadiaUtilities = new Net.Utils.Utilities();
             sLocaldirPath = GetFurcadiaLocaldirPath();
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths(string)'
-
+        /// <summary>
+        /// Load Paths Based on <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">Specified directory to look for a nonstandard Furcadia install</param>
         public Paths(string path)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.Paths(string)'
         {
             FurcadiaUtilities = new Net.Utils.Utilities();
             sLocaldirPath = GetFurcadiaLocaldirPath();
@@ -96,11 +97,10 @@ namespace Furcadia.IO
             }
         }
 
-        //--- FURCADIA CACHE ------------------------------------------------//
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCachePath'
-
+        /// <summary>
+        /// c:\Program Data\
+        /// </summary>
         public string DefaultCachePath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCachePath'
         {
             get
             {
@@ -109,10 +109,11 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCharacterPath'
-
+        /// <summary>
+        /// Default Character Path
+        /// </summary>
+        [Legacy]
         public string DefaultCharacterPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultCharacterPath'
         {
             get
             {
@@ -120,10 +121,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultDreamsPath'
-
+        /// <summary>
+        /// Personal Dreams Folder
+        /// </summary>
         public string DefaultDreamsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultDreamsPath'
         {
             get
             {
@@ -149,10 +150,11 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalMapsPath'
-
+        /// <summary>
+        /// Main Maps Default path
+        /// </summary>
         public string DefaultGlobalMapsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalMapsPath'
+
         {
             get
             {
@@ -160,10 +162,11 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalSkinsPath'
-
+        /// <summary>
+        /// default skins
+        /// </summary>
         public string DefaultGlobalSkinsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultGlobalSkinsPath'
+
         {
             get
             {
@@ -171,10 +174,11 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLocalSkinsPath'
-
+        /// <summary>
+        /// default local skins
+        /// </summary>
         public string DefaultLocalSkinsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLocalSkinsPath'
+
         {
             get
             {
@@ -182,10 +186,11 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLogsPath'
-
+        /// <summary>
+        /// default personal log folder
+        /// </summary>
+        [Legacy]
         public string DefaultLogsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultLogsPath'
         {
             get
             {
@@ -207,10 +212,11 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPermanentMapsCachePath'
-
+        /// <summary>
+        /// Default Main Maps
+        /// </summary>
         public string DefaultPermanentMapsCachePath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPermanentMapsCachePath'
+
         {
             get
             {
@@ -218,10 +224,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPersonalDataPath'
-
+        /// <summary>
+        /// Default Documents\Furcadia
+        /// </summary>
         public string DefaultPersonalDataPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPersonalDataPath'
         {
             get
             {
@@ -230,10 +236,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPortraitCachePath'
-
+        /// <summary>
+        /// Portrait cache
+        /// </summary>
         public string DefaultPortraitCachePath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultPortraitCachePath'
         {
             get
             {
@@ -241,10 +247,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultScreenshotsPath'
-
+        /// <summary>
+        /// Furcadia Screen Shots default folder
+        /// </summary>
         public string DefaultScreenshotsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultScreenshotsPath'
         {
             get
             {
@@ -252,10 +258,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultSettingsPath'
-
+        /// <summary>
+        /// User App Data Settings
+        /// </summary>
         public string DefaultSettingsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultSettingsPath'
         {
             get
             {
@@ -264,10 +270,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryDreamsPath'
-
+        /// <summary>
+        /// Temporary dreams
+        /// </summary>
         public string DefaultTemporaryDreamsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryDreamsPath'
         {
             get
             {
@@ -275,10 +281,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryFilesPath'
-
+        /// <summary>
+        /// Default Temporary Files
+        /// </summary>
         public string DefaultTemporaryFilesPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryFilesPath'
         {
             get
             {
@@ -286,10 +292,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryPatchesPath'
-
+        /// <summary>
+        /// Temporary patches
+        /// </summary>
         public string DefaultTemporaryPatchesPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultTemporaryPatchesPath'
         {
             get
             {
@@ -297,10 +303,10 @@ namespace Furcadia.IO
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultWhisperLogsPath'
-
+        /// <summary>
+        /// Whisper Logs
+        /// </summary>
         public string DefaultWhisperLogsPath
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Paths.DefaultWhisperLogsPath'
         {
             get
             {
@@ -337,7 +343,6 @@ namespace Furcadia.IO
             }
         }
 
-        //--- FURCADIA PROGRAM FILES ----------------------------------------//
         /// <summary>
         /// Furcadia install path - this path corresponds to the path where
         /// Furcadia is installed on the current machine. If Furcadia is not
@@ -353,9 +358,10 @@ namespace Furcadia.IO
 
         /// <summary>
         /// Path to the global maps, distributed with Furcadia and loadable
-        /// during gameplay in some main dreams.
-        ///
+        /// during game play in some main dreams.
+        ///<para>
         /// Default: c:\Program Files\Furcadia\maps
+        /// </para>
         /// </summary>
         public string GlobalMapsPath
         {
@@ -369,8 +375,9 @@ namespace Furcadia.IO
         /// <summary>
         /// Path to the global skins that change Furcadia's graphical
         /// layout. They are stored in the Furcadia program files folder.
-        ///
-        /// Default: c:\Program Files\Furcadia\skins
+        ///<para>
+        ///Default: c:\Program Files\Furcadia\skins
+        /// </para>
         /// </summary>
         public string GlobalSkinsPath
         {
@@ -397,8 +404,9 @@ namespace Furcadia.IO
 
         /// <summary>
         /// Local skins path - contains Furcadia skins used locally by each user.
-        ///
+        /// <para>
         /// Default: My Documents\Furcadia\Skins
+        /// </para>
         /// </summary>
         public string LocalSkinsPath
         {
@@ -410,9 +418,10 @@ namespace Furcadia.IO
 
         /// <summary>
         /// Logs path - contains session logs for each character and a
-        /// subfolder with whisper logs, should Pounce be enabled.
-        ///
+        /// sub-folder with whisper logs, should Pounce be enabled.
+        /// <para>
         /// Default: My Documents\Furcadia\Logs
+        /// </para>
         /// </summary>
         public string LogsPath
         {
@@ -425,9 +434,9 @@ namespace Furcadia.IO
         /// <summary>
         /// Permanent Maps cache path - contains downloaded main maps such
         /// as the festival maps or other DEP-specific customized dreams.
-        ///
-        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
-        ///          Productions\Furcadia\Permanent Maps
+        ///<para>
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia\Permanent Maps
+        /// </para>
         /// </summary>
         public string PermanentMapsCachePath
         {
@@ -439,9 +448,10 @@ namespace Furcadia.IO
 
         /// <summary>
         /// Personal data path - contains user-specific files such as logs,
-        /// patches, screenshots and character files.
-        ///
+        /// patches, screen shots and character files.
+        ///<para >
         /// Default: My Documents\Furcadia\
+        /// </para>
         /// </summary>
         public string PersonalDataPath
         {
@@ -454,9 +464,9 @@ namespace Furcadia.IO
         /// <summary>
         /// Portrait cache path - contains downloaded portraits and desctags
         /// cache for faster loading and bandwidth optimization.
-        ///
-        /// Default: %ALLUSERSPROFILE%\Dragon's Eye
-        ///          Productions\Furcadia\Portrait Cache
+        /// <para>
+        /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia\Portrait Cache
+        /// </para>
         /// </summary>
         public string PortraitCachePath
         {
@@ -469,8 +479,9 @@ namespace Furcadia.IO
         /// <summary>
         /// Screenshots path - contains screen shot files taken by Furcadia
         /// with the CTRL+F1 hotkey. At the time of writing, in PNG format.
-        ///
+        /// <para>
         /// Default: My Documents\Furcadia\Screenshots
+        /// </para>
         /// </summary>
         public string ScreenshotsPath
         {
@@ -547,7 +558,6 @@ namespace Furcadia.IO
             get { return (sLocaldirPath != null); }
         }
 
-        //--- FURCADIA PERSONALIZED FILES -----------------------------------//
         /// <summary>
         /// Whisper logs path - contains whisper logs for each character
         /// whispered, recorded by Pounce with the whisper windows.
@@ -637,8 +647,6 @@ namespace Furcadia.IO
             return null;
         }
 
-        //--- FURCADIA PERSONALIZED SETTINGS --------------------------------//
-        //---  Functions ---//
         /// <summary>
         /// Find the path to Furcadia data files currently installed on this system.
         /// </summary>

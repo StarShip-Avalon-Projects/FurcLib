@@ -7,9 +7,11 @@
     {
         #region Private Fields
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ClientOptions.FurcadiaFilePaths'
+        /// <summary>
+        /// Furcadia Paths File Path Structure.
+        /// </summary>
         protected internal IO.Paths FurcadiaFilePaths;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ClientOptions.FurcadiaFilePaths'
+
 
         /// <summary>
         /// Furcadia Utilities

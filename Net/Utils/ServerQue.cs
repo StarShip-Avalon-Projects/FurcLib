@@ -49,6 +49,9 @@ namespace Furcadia.Net.Utils
 
         /// <summary>
         /// If Proxy get "Your throat is tired" Pause for a number of seconds
+        /// <para>
+        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
+        /// </para>
         /// </summary>
         public bool ThroatTired
         {
@@ -102,12 +105,13 @@ namespace Furcadia.Net.Utils
         }
 
         /// <summary>
+        /// Queue Manager constructor
         /// </summary>
         /// <param name="ThroatTiredTime">
         /// Delay time to pause for Throat Tired Syndrome
         /// </param>
         /// <param name="PingTimerTime">
-        /// Optional Server Ping timme in seconds
+        /// Optional ping the game server time in seconds
         /// </param>
         public ServerQue(int ThroatTiredTime, int PingTimerTime = 30)
         {
@@ -197,15 +201,6 @@ namespace Furcadia.Net.Utils
         /// </summary>
         private int usingPing = 0;
 
-#pragma warning disable CS0414 // The field 'ServerQue.usingProcessQueue' is assigned but its value is never used
-
-        /// <summary>
-        /// Queue processing <see cref=" Interlocked.Exchange(ref int, int)"/>
-        /// </summary>
-        private int usingProcessQueue = 0;
-
-#pragma warning restore CS0414 // The field 'ServerQue.usingProcessQueue' is assigned but its value is never used
-
         /// <summary>
         /// Incoming Messages for server processing
         /// </summary>
@@ -232,14 +227,13 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void PingTimerTick(object state)
         {
-            //if ((0 == Interlocked.Exchange(ref usingPing, 1)))
-            //{
+
             if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
             {
                 ServerStack.Enqueue("Ping");
             }
             Interlocked.Exchange(ref usingPing, 0);
-            //}
+
         }
 
         /// <summary>
@@ -248,13 +242,11 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void ProcessQueue(object state)
         {
-            //if (0 == Interlocked.Exchange(ref usingProcessQueue, 1))
-            //{
+
             double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
             QueueTick(ref seconds);
             TickTime = DateTime.Now;
-            //    Interlocked.Exchange(ref usingProcessQueue, 0);
-            //}
+
         }
 
         /// <summary>
@@ -355,6 +347,7 @@ namespace Furcadia.Net.Utils
             Dispose(true);
             // TODO: uncomment the following line if the finalizer is
             //       overridden above. GC.SuppressFinalize(this);
+            GC.WaitForPendingFinalizers();
         }
 
         /// <summary>

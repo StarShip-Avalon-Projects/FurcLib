@@ -117,7 +117,7 @@ namespace Furcadia.Net
         #region Public Constructors
 
         /// <summary>
-        /// Connect to game servver with default settings
+        /// Connect to game server with default settings
         /// </summary>
         public NetProxy()
         {
@@ -196,7 +196,7 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Connect to the Game serer by Host name ot IP address
+        /// Connect to the Game serer by Host name to IP address
         /// </summary>
         /// <param name="host">
         /// GameServer Ip address or hostname
@@ -244,7 +244,7 @@ namespace Furcadia.Net
         public NetProxy(ref ProxySessionOptions Options)
         {
             FurcadiaUtilities = new Utils.Utilities();
-            this.options = Options;
+            options = Options;
             settings = new Text.Settings(options.LocalhostPort);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
             sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
@@ -308,14 +308,14 @@ namespace Furcadia.Net
         protected internal event ActionDelegate ClientDisConnected;
 
         /// <summary>
-        /// This is triggered when the user has exited/logoff Furcadia and
+        /// This is triggered when the user has exited/log-off Furcadia and
         /// the Furcadia client is closed.
         /// </summary>
         protected internal event ActionDelegate ClientExited;
 
         //public delegate void ErrorEventHandler(Exception e);
         /// <summary>
-        ///This is triggered when the Client and/or Server have connected to tcp stream
+        ///This is triggered when the Client and/or Server have connected to TCP stream
         /// </summary>
         protected internal event ActionDelegate Connected;
 
@@ -548,7 +548,11 @@ namespace Furcadia.Net
         /// </summary>
         public virtual void Disconnect()
         {
-            if (listen != null) listen.Stop();
+            if (listen != null)
+            {
+                listen.Stop();
+                listen = null;
+            }
 
             if (client != null && client.Connected == true)
             {

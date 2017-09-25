@@ -39,7 +39,7 @@
         #region Public Constructors
 
         /// <summary>
-        /// Deault settings
+        /// Default settings
         /// <para>
         /// <see cref="localhostport"/> = 6700
         /// </para>

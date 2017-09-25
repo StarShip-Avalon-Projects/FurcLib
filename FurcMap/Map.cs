@@ -592,8 +592,6 @@ namespace Furcadia.FurcMap
             objects[pos] = (byte)objectNumber;
         }
 
-
-
         /// <summary> Set the region number at a tile specified by x &amp; y
         /// </summary>
         /// <param name="x">

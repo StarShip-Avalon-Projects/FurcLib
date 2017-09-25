@@ -38,7 +38,7 @@ namespace Furcadia.Net.Proxy
     /// Part2a: Proxy Functions do link to Monkey Speak trigger execution
     /// </para>
     /// <para>
-    /// Part3: This Class Links loosley to the GUI
+    /// Part3: This Class Links loosely to the GUI
     /// </para>
     /// </summary>
     public class ProxySession : NetProxy, IDisposable
@@ -92,15 +92,15 @@ namespace Furcadia.Net.Proxy
             ServerBalancer.OnServerSendMessage += OnServerQueSent;
 
             base.ServerData2 += OnServerDataReceived;
-            base.Connected += OnServerConnected;
-            base.ServerDisConnected += OnServerDisconnected;
+            Connected += OnServerConnected;
+            ServerDisConnected += OnServerDisconnected;
             // if (!options.Standalone) {
             base.ClientData2 += OnClientDataReceived;
-            base.ClientDisConnected += OnClientDisconnected;
-            base.Connected += OnClientConnected;
+            ClientDisConnected += OnClientDisconnected;
+            Connected += OnClientConnected;
             //ClientExited += onClientExited;
             // }
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
+            ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
             BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
@@ -154,6 +154,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Connected Characters Furcadia ID
         /// </summary>
+        [Legacy]
         public int ConnectedCharacterFurcadiaID
         {
             get
@@ -162,17 +163,18 @@ namespace Furcadia.Net.Proxy
                     return -1;
                 return connectedFurre.ID;
             }
-            set
-            {
-                if (connectedFurre == null)
-                    connectedFurre = new FURRE(value);
-                connectedFurre.ID = value;
-            }
+            //set
+            //{
+            //    if (connectedFurre == null)
+            //        connectedFurre = new FURRE(value);
+            //    connectedFurre.ID = value;
+            //}
         }
 
         /// <summary>
         /// Our Connected Character name
         /// </summary>
+        [Legacy]
         public string ConnectedCharacterName
         {
             get
@@ -181,12 +183,12 @@ namespace Furcadia.Net.Proxy
                     return null;
                 return connectedFurre.Name;
             }
-            set
-            {
-                if (connectedFurre == null)
-                    connectedFurre = new FURRE(value);
-                connectedFurre.Name = value;
-            }
+            //set
+            //{
+            //    if (connectedFurre == null)
+            //        connectedFurre = new FURRE(value);
+            //    connectedFurre.Name = value;
+            //}
         }
 
         /// <summary>
@@ -207,8 +209,6 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                //if (player == null | connectedFurre == null)
-                //    return false;
                 return player == connectedFurre;
             }
         }
@@ -220,23 +220,9 @@ namespace Furcadia.Net.Proxy
         private string banishName = "";
         private List<string> banishString = new List<string>();
 
-#pragma warning disable CS0649 // Field 'ProxySession.botName' is never assigned to, and will always have its default value null
-
-        /// <summary>
-        /// Furre Name we connected with
-        /// </summary>
-        private string botName;
-
-#pragma warning restore CS0649 // Field 'ProxySession.botName' is never assigned to, and will always have its default value null
-
-#pragma warning disable CS0169 // The field 'ProxySession.botUID' is never used
-        private int botUID;
-#pragma warning restore CS0169 // The field 'ProxySession.botUID' is never used
         private string channel;
         private object ChannelLock = new object();
-#pragma warning disable CS0414 // The field 'ProxySession.clientClose' is assigned but its value is never used
-        private bool clientClose = false;
-#pragma warning restore CS0414 // The field 'ProxySession.clientClose' is assigned but its value is never used
+
         private ConnectionPhase clientconnectionphase;
         private object clientlock = new object();
         private object DataReceived = new object();
@@ -257,7 +243,7 @@ namespace Furcadia.Net.Proxy
         private Utils.ProxyReconnect ReconnectionManager;
 
         /// <summary>
-        /// Balance thhe out going load to server
+        /// Balance the out going load to server
         /// <para>
         /// Throat Tired Syndrome and No Endurance Control
         /// </para>
@@ -316,7 +302,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public event ServerStatusChangedEventHandler ServerStatusChanged;
 
-        #region "Client/Server Fata Handling"
+        #region "Client/Server data handling"
 
         /// <summary>
         /// Send Data to Furcadia Client or Game Server
@@ -325,7 +311,7 @@ namespace Furcadia.Net.Proxy
         /// Raw instruction to send
         /// </param>
         /// <param name="e">
-        /// Cliemt or Server Event Argumentss with Instruction type
+        /// Client or Server Event Arguments with Instruction type
         /// </param>
         public delegate void DataHandler(string Message, EventArgs e);
 
@@ -338,7 +324,7 @@ namespace Furcadia.Net.Proxy
         public delegate void ProcessChannel(ChannelObject InstructionObject, ParseServerArgs Args);
 
         /// <summary>
-        /// Send Server to Client Instruction object to Subclassed for handlings
+        /// Send Server to Client Instruction object to Sub-classed for handling.
         /// </summary>
         /// <param name="InstructionObject">
         /// Server Instruction Object
@@ -356,7 +342,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public event ProcessInstruction ProcessServerInstruction;
 
-        #endregion "Client/Server Fata Handling"
+        #endregion "Client/Server data handling"
 
         #endregion "Public Events"
 
@@ -366,6 +352,9 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// ServerQueue Throat Tired Mode
+        /// <para>
+        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
+        /// </para>
         /// </summary>
         /// <returns>
         /// State <see cref="Furcadia.Net.Utils.ServerQue.ThroatTired"/>
@@ -400,13 +389,14 @@ namespace Furcadia.Net.Proxy
         /// We mirror Furcadia's Banish system for efficiency
         /// </para>
         /// </summary>
-        public string BanishName { get { return banishName; } set { banishName = value; } }
+        public string BanishName { get { return banishName; } private set { banishName = value; } }
 
         /// <summary>
         /// </summary>
-        public List<string> BanishString { get { return banishString; } set { banishString = value; } }
+        public List<string> BanishString { get { return banishString; } private set { banishString = value; } }
 
         /// <summary>
+        /// Channel name?
         /// </summary>
         public string Channel
         {
@@ -438,10 +428,7 @@ namespace Furcadia.Net.Proxy
         public DREAM Dream
         {
             get { return dream; }
-            set
-            {
-                dream = value;
-            }
+            set { dream = value; }
         }
 
         /// <summary>
@@ -467,11 +454,10 @@ namespace Furcadia.Net.Proxy
         public FURRE Player
         {
             get { return player; }
-            // set { player = value; }
         }
 
         /// <summary>
-        /// Curent server connection phase
+        /// Current server connection phase
         /// </summary>
         public ConnectionPhase ServerConnectPhase
         {
@@ -637,7 +623,7 @@ namespace Furcadia.Net.Proxy
                     {
                         Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.");
                         string m = t.Match(Text).Groups[1].Value;
-                        if (FurcadiaShortName(m) == FurcadiaShortName(botName))
+                        if (FurcadiaShortName(m) == ConnectedFurre.ShortName)
                         {
                             NoEndurance = true;
                         }
@@ -855,6 +841,8 @@ namespace Furcadia.Net.Proxy
                     // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
                     //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
 
+                    // TODO: Check Cookie handler for this
+
                     Regex EatCookie = new Regex(Regex.Escape("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.") + "(.*?)");
                     if (EatCookie.Match(data).Success)
                     {
@@ -895,7 +883,7 @@ namespace Furcadia.Net.Proxy
         /// This is derived content from the Furcadia Dev Docs and Furcadia
         /// Technical Resources
         /// <para>
-        /// Update 23 Avatar Moement http://dev.furcadia.com/docs/023_new_movement.pdf
+        /// Update 23 Avatar Movement http://dev.furcadia.com/docs/023_new_movement.pdf
         /// </para>
         /// <para>
         /// Update 27 Movement http://dev.furcadia.com/docs/027_movement.html
@@ -1198,18 +1186,26 @@ namespace Furcadia.Net.Proxy
                             inDream = true;
                         }
                     }
+                    // ]z UID[*]
+                    // Unique User ID
+                    // This instruction is sent as a response to the uid command. The purpose of this is unclear.
+                    // Credits Artex, FTR
                     else if (data.StartsWith("]z"))
                     {
-                        int ID = int.Parse(data.Remove(0, 2));
-                        if (ConnectedCharacterFurcadiaID == 0)
-                            ConnectedCharacterFurcadiaID = ID;
-                        //Snag out UID
+                        //int ID = int.Parse(data.Remove(0, 2));
+                        //if (ConnectedCharacterFurcadiaID == 0)
+                        //    ConnectedCharacterFurcadiaID = ID;
                     }
+                    // ]BUserID[*]
+                    // Set Own ID
+                    // This instruction informs the client of which user-name is it logged into. Knowing your
+                    // own UserID can help you find your own avatar within the dream.
+                    // Credits Artex, FTR
                     else if (data.StartsWith("]B"))
                     {
                         int ID = int.Parse(data.Substring(2, data.Length - connectedFurre.Name.Length - 3));
-                        if (ConnectedCharacterFurcadiaID == 0)
-                            ConnectedCharacterFurcadiaID = ID;
+                        if (ConnectedCharacterFurcadiaID < 1)
+                            connectedFurre = Dream.FurreList.GetFurreByID(ID);
                     }
                     else if (data.StartsWith("]c"))
                     {

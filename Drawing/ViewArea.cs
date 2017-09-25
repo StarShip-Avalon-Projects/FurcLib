@@ -1,6 +1,5 @@
 ﻿namespace Furcadia.Drawing
 {
-
     /// <summary>
     /// Furre Visible area
     /// </summary>
@@ -8,12 +7,12 @@
     {
         #region Public Methods
 
-            /// <summary>
-            /// Gets the target View area from the center coordinates, This is useful for finding the View area of the Connected Furre
-            /// </summary>
-            /// <param name="X"></param>
-            /// <param name="Y"></param>
-            /// <returns></returns>
+        /// <summary>
+        /// Gets the target View area from the center coordinates, This is useful for finding the View area of the Connected Furre
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <returns></returns>
         public static ViewArea GetTargetRectFromCenterCoord(int X, int Y)
 
         {
