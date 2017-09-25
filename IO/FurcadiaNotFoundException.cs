@@ -19,15 +19,24 @@ namespace Furcadia.IO
     {
         #region Public Constructors
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException()'
+
         public FurcadiaNotFoundException()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException()'
         {
         }
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException(string)'
 
         public FurcadiaNotFoundException(string message) : base(message)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException(string)'
         {
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException(string, Exception)'
+
         public FurcadiaNotFoundException(string message, Exception innerException) : base(message, innerException)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException(string, Exception)'
         {
         }
 
@@ -36,7 +45,10 @@ namespace Furcadia.IO
         #region Protected Constructors
 
         // This constructor is needed for serialization.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException(SerializationInfo, StreamingContext)'
+
         protected FurcadiaNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FurcadiaNotFoundException.FurcadiaNotFoundException(SerializationInfo, StreamingContext)'
         {
         }
 

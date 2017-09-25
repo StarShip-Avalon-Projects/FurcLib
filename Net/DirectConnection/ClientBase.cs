@@ -84,7 +84,9 @@ namespace Furcadia.Net.DirectConnection
 
         private string _ServerLeftOvers;
 
+#pragma warning disable CS0414 // The field 'ClientBase.CConnected' is assigned but its value is never used
         private bool CConnected = false;
+#pragma warning restore CS0414 // The field 'ClientBase.CConnected' is assigned but its value is never used
 
         private TcpClient server;
 

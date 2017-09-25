@@ -224,15 +224,23 @@ namespace Furcadia.Net.Proxy
         private string banishName = "";
         private List<string> banishString = new List<string>();
 
+#pragma warning disable CS0649 // Field 'ProxySession.botName' is never assigned to, and will always have its default value null
+
         /// <summary>
         /// Furre Name we connected with
         /// </summary>
         private string botName;
 
+#pragma warning restore CS0649 // Field 'ProxySession.botName' is never assigned to, and will always have its default value null
+
+#pragma warning disable CS0169 // The field 'ProxySession.botUID' is never used
         private int botUID;
+#pragma warning restore CS0169 // The field 'ProxySession.botUID' is never used
         private string channel;
         private object ChannelLock = new object();
+#pragma warning disable CS0414 // The field 'ProxySession.clientClose' is assigned but its value is never used
         private bool clientClose = false;
+#pragma warning restore CS0414 // The field 'ProxySession.clientClose' is assigned but its value is never used
         private ConnectionPhase clientconnectionphase;
         private object clientlock = new object();
         private object DataReceived = new object();
@@ -1491,13 +1499,23 @@ namespace Furcadia.Net.Proxy
 
         #region "Dice Rolls"
 
+#pragma warning disable CS0169 // The field 'ProxySession.diceCompnentMatch' is never used
         private string diceCompnentMatch;
+#pragma warning restore CS0169 // The field 'ProxySession.diceCompnentMatch' is never used
 
+#pragma warning disable CS0414 // The field 'ProxySession.diceCount' is assigned but its value is never used
         private double diceCount = 0.0;
+#pragma warning restore CS0414 // The field 'ProxySession.diceCount' is assigned but its value is never used
 
+#pragma warning disable CS0414 // The field 'ProxySession.diceModifyer' is assigned but its value is never used
         private double diceModifyer = 0.0;
+#pragma warning restore CS0414 // The field 'ProxySession.diceModifyer' is assigned but its value is never used
+#pragma warning disable CS0414 // The field 'ProxySession.diceResult' is assigned but its value is never used
         private double diceResult = 0.0;
+#pragma warning restore CS0414 // The field 'ProxySession.diceResult' is assigned but its value is never used
+#pragma warning disable CS0414 // The field 'ProxySession.diceSides' is assigned but its value is never used
         private double diceSides = 0.0;
+#pragma warning restore CS0414 // The field 'ProxySession.diceSides' is assigned but its value is never used
         //TODO Check MS Engine Dice lines
 
         #endregion "Dice Rolls"

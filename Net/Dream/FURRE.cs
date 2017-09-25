@@ -164,7 +164,9 @@ namespace Furcadia.Net.Dream
         }
 
         [Obsolete]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FURRE.DSSpecies'
         public int DSSpecies
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FURRE.DSSpecies'
         {
             get { return Color.Species; }
         }

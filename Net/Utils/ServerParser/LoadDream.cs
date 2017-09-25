@@ -21,8 +21,9 @@
         #endregion Private Fields
 
         #region Public Constructors
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public LoadDream() : base()
         {

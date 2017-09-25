@@ -4,7 +4,10 @@ using System.Drawing;
 
 namespace Furcadia.Drawing
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Helper'
+
     public static class Helper
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Helper'
     {
         #region Public Methods
 
@@ -20,7 +23,10 @@ namespace Furcadia.Drawing
             return (int)(c - 33);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Helper.ToBitmapArray(FurcadiaShapes)'
+
         public static Bitmap[] ToBitmapArray(FurcadiaShapes toConvert)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Helper.ToBitmapArray(FurcadiaShapes)'
         {
             List<Bitmap> bitmaps = new List<Bitmap>();
             Palette pal = Palette.Default;

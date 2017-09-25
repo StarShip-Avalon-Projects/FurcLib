@@ -52,7 +52,10 @@ namespace Furcadia.Net.Options
             set { reconnectmax = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnectOptions.TimeOutTimeSpan'
+
         public TimeSpan TimeOutTimeSpan
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnectOptions.TimeOutTimeSpan'
         {
             get
             {

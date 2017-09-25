@@ -1,11 +1,17 @@
 ﻿namespace Furcadia.Drawing
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea'
+
     public static class VisibleArea
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea'
     {
         #region Public Methods
 
         //Reference http://pastebin.com/QbnjwjNc
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.getTargetRectFromCenterCoord(int, int)'
+
         public static ViewArea getTargetRectFromCenterCoord(int X, int Y)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.getTargetRectFromCenterCoord(int, int)'
         {
             // Set the size of the rectangle drawn around the player. The +1
             // is the tile the player is on.
@@ -32,7 +38,10 @@
             return rec;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.IsOdd(int)'
+
         public static bool IsOdd(int value)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'VisibleArea.IsOdd(int)'
         {
             return value % 2 != 0;
         }
@@ -40,14 +49,25 @@
         #endregion Public Methods
     }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea'
+
     public class ViewArea
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea'
     {
         #region Public Fields
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.height'
         public int height;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.height'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.length'
         public int length;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.length'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.X'
         public int X;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.X'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.Y'
         public int Y;
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ViewArea.Y'
 
         #endregion Public Fields
     }

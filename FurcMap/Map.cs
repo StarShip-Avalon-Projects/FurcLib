@@ -6,25 +6,38 @@ using System.Text;
 namespace Furcadia.FurcMap
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static class MapRating
     {
         #region Public Fields
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const String Adult = "Adult 18+";
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'MapRating.AdultOnly'
         public const String AdultOnly = "Adults Only";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'MapRating.AdultOnly'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'MapRating.AOClean'
         public const String AOClean = "AOClean";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'MapRating.AOClean'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'MapRating.Everyone'
         public const String Everyone = "Everyone";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'MapRating.Everyone'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'MapRating.Mature'
         public const String Mature = "Mature 16+";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'MapRating.Mature'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'MapRating.Teen'
         public const String Teen = "Teen+";
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'MapRating.Teen'
 
         #endregion Public Fields
     }
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class Map
     {
@@ -106,49 +119,73 @@ namespace Furcadia.FurcMap
 
         #region Public Variables
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowDreamURL'
+
         public bool AllowDreamURL
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowDreamURL'
         {
             get { return this.allowfurl; }
             set { this.allowfurl = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowJoinSummon'
+
         public bool AllowJoinSummon
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowJoinSummon'
         {
             get { return this.allowjs; }
             set { this.allowjs = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLargeDreamSize'
+
         public bool AllowLargeDreamSize
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLargeDreamSize'
         {
             get { return this.allowlarge; }
             set { this.allowlarge = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLeadFollow'
+
         public bool AllowLeadFollow
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowLeadFollow'
         {
             get { return this.allowlf; }
             set { this.allowlf = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowShouting'
+
         public bool AllowShouting
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.AllowShouting'
         {
             get { return this.allowshouts; }
             set { this.allowshouts = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.EncodeDream'
+
         public bool EncodeDream
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.EncodeDream'
         {
             get { return this.encoded; }
             set { this.encoded = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.EnforceParentalControls'
+
         public bool EnforceParentalControls
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.EnforceParentalControls'
         {
             get { return this.parentalcontrols; }
             set { this.parentalcontrols = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.ForceSitting'
+
         public bool ForceSitting
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.ForceSitting'
         {
             get { return this.forcesittable; }
             set { this.forcesittable = value; }
@@ -162,55 +199,82 @@ namespace Furcadia.FurcMap
             get { return this.height; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.Name'
+
         public String Name
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.Name'
         {
             get { return this.name; }
             set { this.name = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PatchArchive'
+
         public String PatchArchive
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PatchArchive'
         {
             get { return this.patchs; }
             set { this.patchs = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventPlayerListing'
+
         public bool PreventPlayerListing
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventPlayerListing'
         {
             get { return this.nowho; }
             set { this.nowho = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventSeasonalAvatars'
+
         public bool PreventSeasonalAvatars
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventSeasonalAvatars'
         {
             get { return this.nonovelty; }
             set { this.nonovelty = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventTabListing'
+
         public bool PreventTabListing
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.PreventTabListing'
         {
             get { return this.notab; }
             set { this.notab = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.Rating'
+
         public String Rating
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.Rating'
         {
             get { return this.rating; }
             set { this.rating = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.Revision'
+
         public int Revision
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.Revision'
         {
             get { return this.revision; }
             set { this.revision = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.UsePatch'
+
         public int UsePatch
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.UsePatch'
         {
             get { return this.patcht; }
             set { this.patcht = value; }
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Map.UseSwearFilter'
+
         public bool UseSwearFilter
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.UseSwearFilter'
         {
             get { return this.swearfilter; }
             set { this.swearfilter = value; }
@@ -314,7 +378,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <returns>
         /// The effect number
         /// </returns>
@@ -332,7 +396,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <returns>
         /// The floor number
         /// </returns>
@@ -343,23 +407,26 @@ namespace Furcadia.FurcMap
             return (int)floors[pos];
         }
 
+#pragma warning disable CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
+
         /// <summary> Get a MapPosition object from the position specified
         /// by x & y </summary> <param name="x"></param> <param
         /// name="y"></param> <returns></returns>
         public MapPosition getMapPos(int x, int y)
+#pragma warning restore CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
         {
             return new MapPosition(x, y, this);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Get a MapTile object from the position specified by x
-        /// &amp; y 
-        /// </summary> 
+        /// &amp; y
+        /// </summary>
         /// <param name="x">
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <returns>the Tile data</returns>
         public MapTile getMapTile(int x, int y)
         {
@@ -373,7 +440,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <returns>
         /// The object number
         /// </returns>
@@ -391,7 +458,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <returns>
         /// The region number
         /// </returns>
@@ -409,7 +476,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <returns>
         /// The wall number
         /// </returns>
@@ -483,7 +550,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <param name="effectNumber"></param>
         public void setEffectAt(int x, int y, int effectNumber)
         {
@@ -499,7 +566,7 @@ namespace Furcadia.FurcMap
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <param name="floorNumber">
         /// </param>
         public void setFloorAt(int x, int y, int floorNumber)
@@ -509,45 +576,53 @@ namespace Furcadia.FurcMap
             floors[pos] = (byte)floorNumber;
         }
 
+#pragma warning disable CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
+
         /// <summary> Set the object number at a tile specified by x & y
-        /// </summary> 
+        /// </summary>
         /// <param name="x">
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <param name="objectNumber"></param>
         public void setObjectAt(int x, int y, int objectNumber)
+#pragma warning restore CS1570 // XML comment has badly formed XML -- 'Whitespace is not allowed at this location.'
         {
             int pos = getPosFrom(x, y);
 
             objects[pos] = (byte)objectNumber;
         }
 
+#pragma warning disable CS1570 // XML comment has badly formed XML -- 'Expected an end tag for element 'summary'.'
+
         /// <summary> Set the region number at a tile specified by x &amp; y
         /// <param name="x">
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// <paramref name="regionNumber"/>
         public void setRegionAt(int x, int y, int regionNumber)
+#pragma warning restore CS1570 // XML comment has badly formed XML -- 'Expected an end tag for element 'summary'.'
         {
             int pos = getPosFrom(x, y);
 
             regions[pos] = (byte)regionNumber;
         }
 
+#pragma warning disable CS1570 // XML comment has badly formed XML -- 'End tag was not expected at this location.'
         /// <summary> Set the wall number at a tile specified by x &amp; y
-        /// </summary> 
+        /// </summary>
         /// <param name="x">
         /// x coordinate
         /// </param> <param name="y">
         /// Y coordinate
-        /// </param> 
+        /// </param>
         /// </param><param name="wallNumber"></param>
 
         public void setWallAt(int x, int y, int wallNumber)
+#pragma warning restore CS1570 // XML comment has badly formed XML -- 'End tag was not expected at this location.'
         {
             int pos = (this.height * x + y);
 
@@ -599,7 +674,7 @@ namespace Furcadia.FurcMap
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Values"></param>
         private void SetMapHeaders(Dictionary<String, String> Values)

@@ -65,7 +65,10 @@ namespace Furcadia
 
         #region Public Methods
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetGroup(string)'
+
         public static int GetGroup(string tag)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetGroup(string)'
         {
             int result = 0;
             if (tag == "")
@@ -87,7 +90,10 @@ namespace Furcadia
             return result;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetLevel(string)'
+
         public static int GetLevel(string tag)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetLevel(string)'
         {
             int result = 0;
             if (tag == "")
@@ -109,7 +115,10 @@ namespace Furcadia
             return result;
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetTag(string)'
+
         public static string GetTag(string tag)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetTag(string)'
         {
             string result = null;
             if (tag == "")

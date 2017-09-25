@@ -92,7 +92,9 @@ namespace Furcadia.IO
                         return fs;
                     }
                 }
+#pragma warning disable CS0168 // The variable 'ioEx' is declared but never used
                 catch (IOException ioEx)
+#pragma warning restore CS0168 // The variable 'ioEx' is declared but never used
                 {
                     attempts++;
                     if (attempts > maximumAttempts)
@@ -106,7 +108,9 @@ namespace Furcadia.IO
                     }
                 }
             }
+#pragma warning disable CS0162 // Unreachable code detected
             return fs;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         #endregion UGLY Wine Registry Code

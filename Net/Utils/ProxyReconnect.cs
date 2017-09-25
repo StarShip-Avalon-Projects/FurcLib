@@ -27,10 +27,14 @@ namespace Furcadia.Net.Utils
         /// </summary>
         private Timer ReconnectTimeOutTimer;
 
+#pragma warning disable CS0649 // Field 'ProxyReconnect.ReconnectTimer' is never assigned to, and will always have its default value null
+
         /// <summary>
         /// delay till the next reconnect attempt
         /// </summary>
         private Timer ReconnectTimer;
+
+#pragma warning restore CS0649 // Field 'ProxyReconnect.ReconnectTimer' is never assigned to, and will always have its default value null
 
         /// <summary>
         /// Current Attempt to reconnect
@@ -191,7 +195,10 @@ namespace Furcadia.Net.Utils
         private bool disposedValue = false; // To detect redundant calls
 
         // This code added to correctly implement the disposable pattern.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose()'
+
         public void Dispose()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose()'
         {
             // Do not change this code. Put cleanup code in Dispose(bool
             // disposing) above.
@@ -200,7 +207,10 @@ namespace Furcadia.Net.Utils
             //       overridden above. GC.SuppressFinalize(this);
         }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose(bool)'
+
         public virtual void Dispose(bool disposing)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose(bool)'
         {
             if (!disposedValue)
             {

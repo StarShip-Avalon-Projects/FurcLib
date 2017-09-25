@@ -109,6 +109,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfoersion.t4</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Net\Dream\Avatar.cs" />
     <Compile Include="Net\Dream\Badges.cs" />
     <Compile Include="IO\IniFile.cs" />
