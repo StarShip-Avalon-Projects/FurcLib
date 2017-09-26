@@ -113,6 +113,7 @@ namespace Furcadia.IO
         /// Default Character Path
         /// </summary>
         [Legacy]
+        [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string DefaultCharacterPath
         {
             get
@@ -190,6 +191,7 @@ namespace Furcadia.IO
         /// default personal log folder
         /// </summary>
         [Legacy]
+        [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string DefaultLogsPath
         {
             get
@@ -306,6 +308,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Whisper Logs
         /// </summary>
+        [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string DefaultWhisperLogsPath
         {
             get
@@ -423,6 +426,7 @@ namespace Furcadia.IO
         /// Default: My Documents\Furcadia\Logs
         /// </para>
         /// </summary>
+        [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string LogsPath
         {
             get
@@ -477,7 +481,7 @@ namespace Furcadia.IO
         }
 
         /// <summary>
-        /// Screenshots path - contains screen shot files taken by Furcadia
+        /// Screen shots path - contains screen shot files taken by Furcadia
         /// with the CTRL+F1 hotkey. At the time of writing, in PNG format.
         /// <para>
         /// Default: My Documents\Furcadia\Screenshots
@@ -494,7 +498,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Personal settings path - contains all the Furcadia settings for
         /// each user that uses it.
-        ///
+        ///<para/>
         /// Default (VISTA+): %USERPROFILE%\Local\AppData\Dragon's Eye Productions\Furcadia
         /// </summary>
         public string SettingsPath
@@ -508,7 +512,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Temporary dreams path - contains downloaded player dreams for
         /// subsequent loading.
-        ///
+        ///<para/>
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye
         ///          Productions\Furcadia\Temporary Dreams
         /// </summary>
@@ -523,7 +527,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Temporary files path - contains downloaded and uploaded files
         /// that are either used to upload packages or download them for extraction.
-        ///
+        ///<para/>
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye
         ///          Productions\Furcadia\Temporary Files
         /// </summary>
@@ -539,7 +543,7 @@ namespace Furcadia.IO
         /// Temporary patch path - contains downloaded temporary patches.
         /// This technology is never in use, yet supported, so this folder
         /// is always empty.
-        ///
+        /// <para/>
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye
         ///          Productions\Furcadia\Temporary Patches
         /// </summary>
@@ -552,6 +556,7 @@ namespace Furcadia.IO
         }
 
         /// <summary>
+        /// Has LoclDir.ini been detected?
         /// </summary>
         public bool UsingLocaldir
         {
@@ -564,6 +569,7 @@ namespace Furcadia.IO
         ///
         /// Default: My Documents\Furcadia\Logs\Whispers
         /// </summary>
+        [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string WhisperLogsPath
         {
             get
