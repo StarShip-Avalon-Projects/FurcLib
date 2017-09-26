@@ -4,7 +4,6 @@ using System.IO;
 
 namespace Furcadia.IO
 {
-#pragma warning disable CS1570 // XML comment has badly formed XML -- 'An identifier was expected.'
 
     ///<summary>
     /// This class contains all the paths related to the users furcadia installation.
@@ -28,7 +27,7 @@ namespace Furcadia.IO
     ///<para>  Clients Should check for this error and then ask the user where to manually locate Furccadia</para>
     ///</remarks>
     public class Paths
-#pragma warning restore CS1570 // XML comment has badly formed XML -- 'An identifier was expected.'
+
     {
         #region Private Fields
 
@@ -72,7 +71,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Cache path - contains all the Furcadia cache and resides in the
         /// global user space.
-        ///
+        ///<para/>
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia
         /// </summary>
         public string CachePath
@@ -86,9 +85,11 @@ namespace Furcadia.IO
         /// <summary>
         /// Character file path - contains furcadia.ini files with login
         /// information for each character.
-        ///
+        ///<para/>
         /// Default: My Documents\Furcadia\Furcadia Characters\
         /// </summary>
+        [Legacy]
+        [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string CharacterPath
         {
             get
@@ -136,7 +137,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Default Furcadia install folder - this path is used by default
         /// to install Furcadia to.
-        ///
+        ///<para/>
         /// Default: c:\Program Files\Furcadia
         /// </summary>
         public string DefaultFurcadiaPath
@@ -203,7 +204,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Path to the default patch (graphics, sounds, layout) folder used
         /// to display Furcadia itself, its tools and environment.
-        ///
+        ///<para/>
         /// Default: c:\Program Files\Furcadia\patches\default
         /// </summary>
         public string DefaultPatchPath
@@ -308,6 +309,7 @@ namespace Furcadia.IO
         /// <summary>
         /// Whisper Logs
         /// </summary>
+        [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string DefaultWhisperLogsPath
         {
@@ -426,6 +428,7 @@ namespace Furcadia.IO
         /// Default: My Documents\Furcadia\Logs
         /// </para>
         /// </summary>
+        [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string LogsPath
         {
@@ -569,6 +572,7 @@ namespace Furcadia.IO
         ///
         /// Default: My Documents\Furcadia\Logs\Whispers
         /// </summary>
+        [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
         public string WhisperLogsPath
         {
@@ -644,9 +648,9 @@ namespace Furcadia.IO
             if (path == null)
                 path = DefaultFurcadiaPath;
 
-            path = System.IO.Path.Combine(path, "patches", "default");
+            path = Path.Combine(path, "patches", "default");
 
-            if (System.IO.Directory.Exists(path))
+            if (Directory.Exists(path))
                 return path; // Path found
 
             // All options were exhausted - assume Furcadia not installed.
@@ -756,7 +760,7 @@ namespace Furcadia.IO
                 sr.Close();
             }
 
-            if (!System.IO.Directory.Exists(path))
+            if (!Directory.Exists(path))
                 return null; // localdir.ini found, but the path in it is missing.
 
             sLocaldirPath = path; // Cache for the class use.

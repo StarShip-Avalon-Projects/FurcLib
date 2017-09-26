@@ -145,9 +145,27 @@ namespace Furcadia.Net
         /// </summary>
         LoadDreamEvent,
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ServerInstructionType.BookmarkDream'
+        /// <summary>
+        /// Unique User ID
+        ///  <para/>]z UID[*]
+        /// <para/>This instruction is sent as a response to the uid command. The purpose of this is unclear.
+        ///  <para/> Credits Artex, FTR
+        /// </summary>
+        UniqueUserId,
+        /// <summary>
+        /// Set Own ID
+        /// <para/> ]BUserID[*]
+        /// <para/>This instruction informs the client of which user-name is it logged into. Knowing your
+        /// own UserID can help you find your own avatar within the dream.
+        /// <para/>Credits Artex, FTR
+        /// </summary>
+        SetOwnId,
+        /// <summary>
+        ///  Dream Book Mark
+        ///  <para/>Triggers Pounce to add the dream to the list marked temporary
+        /// </summary>
         BookmarkDream
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ServerInstructionType.BookmarkDream'
+
     }
 
     /// <summary>

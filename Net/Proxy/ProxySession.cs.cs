@@ -317,21 +317,22 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        /// <param name="InstructionObject">
+        /// <param name="sender">
+        /// ChannelObject
         /// </param>
         /// <param name="Args">
         /// </param>
-        public delegate void ProcessChannel(ChannelObject InstructionObject, ParseServerArgs Args);
+        public delegate void ProcessChannel(object sender, ParseChannelArgs Args);
 
         /// <summary>
         /// Send Server to Client Instruction object to Sub-classed for handling.
         /// </summary>
-        /// <param name="InstructionObject">
+        /// <param name="sender">
         /// Server Instruction Object
         /// </param>
         /// <param name="Args">
         /// </param>
-        public delegate void ProcessInstruction(BaseServerInstruction InstructionObject, ParseServerArgs Args);
+        public delegate void ProcessInstruction(object sender, ParseServerArgs Args);
 
         /// <summary>
         /// Process Display Text and Channels
@@ -530,10 +531,11 @@ namespace Furcadia.Net.Proxy
             //TODO: needs to move and re factored to ServerParser Class
 
             data = data.Remove(0, 1);
+            string Color = null;
             Regex NameRegex = new Regex(NameFilter, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
             try
             {
-                string Color = Regex.Match(data, EntryFilter).Groups[1].Value;
+                 Color = Regex.Match(data, EntryFilter).Groups[1].Value;
                 string User = null;
                 if (NameRegex.Match(data).Success)
                 {
@@ -699,18 +701,6 @@ namespace Furcadia.Net.Proxy
                         Look = true;
                     }
                 }
-                else if (Color == "query")
-                {
-                    channel = "query";
-                }
-                else if (data.StartsWith("PS"))
-                {
-                    channel = "PhoenixSpeak";
-                }
-                else if (Color == "shout")
-                {
-                    channel = "shout";
-                }
                 else if (Color == "whisper")
                 {
                     channel = "whisper";
@@ -720,7 +710,7 @@ namespace Furcadia.Net.Proxy
                     // string WhisperFrom = WhisperIncoming.Match(data).Captures[1].Value;
                     if (WhisperIncoming.Match(data).Success)
                     {
-                        player = dream.FurreList.GerFurreByName(WhisperIncoming.Match(data).Groups[4].Value);
+                        player = dream.FurreList.GerFurreByName(WhisperIncoming.Match(data).Groups[2].Value);
                         player.Message = WhisperIncoming.Match(data).Groups[5].Value;
                         if (BadgeTag.Count > 0)
                         {
@@ -857,12 +847,16 @@ namespace Furcadia.Net.Proxy
 
             if (Dream.FurreList.Contains(player))
                 Dream.FurreList[player] = player;
+            string targetChannel;
+            if (string.IsNullOrEmpty(channel))
+                targetChannel = Color;
+            else
+                targetChannel = channel;
 
             ChannelObject chanObject = new ChannelObject(data)
             {
                 Player = player,
-
-                Channel = channel,
+                Channel = targetChannel,
                 InstructionType = ServerInstructionType.DisplayText
             };
 
@@ -1174,10 +1168,8 @@ namespace Furcadia.Net.Proxy
 
                         LoadDream loadDream = new LoadDream(data);
                         if (ProcessServerInstruction != null)
-                        {
-                            ProcessServerInstruction.Invoke(loadDream,
+                         ProcessServerInstruction.Invoke(loadDream,
                             new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
-                        }
 
                         // Set Proxy to Stand-Alone Operation
                         if (!IsClientConnected && StandAlone)
@@ -1195,6 +1187,9 @@ namespace Furcadia.Net.Proxy
                         //int ID = int.Parse(data.Remove(0, 2));
                         //if (ConnectedCharacterFurcadiaID == 0)
                         //    ConnectedCharacterFurcadiaID = ID;
+
+                            ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
+                                new ParseServerArgs(ServerInstructionType.UniqueUserId, serverconnectphase));
                     }
                     // ]BUserID[*]
                     // Set Own ID
@@ -1206,6 +1201,9 @@ namespace Furcadia.Net.Proxy
                         int ID = int.Parse(data.Substring(2, data.Length - connectedFurre.Name.Length - 3));
                         if (ConnectedCharacterFurcadiaID < 1)
                             connectedFurre = Dream.FurreList.GetFurreByID(ID);
+
+                            ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
+                                new ParseServerArgs(ServerInstructionType.SetOwnId, serverconnectphase));
                     }
                     else if (data.StartsWith("]c"))
                     {
@@ -1246,7 +1244,7 @@ namespace Furcadia.Net.Proxy
                                 }
                             }
                             var bookmark = new DreamBookmark(data);
-                            ProcessServerInstruction.Invoke(bookmark,
+                            ProcessServerInstruction?.Invoke(bookmark,
                                 new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));
                         }
 #if DEBUG
