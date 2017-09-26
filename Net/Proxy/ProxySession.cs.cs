@@ -38,7 +38,7 @@ namespace Furcadia.Net.Proxy
     /// Part2a: Proxy Functions do link to Monkey Speak trigger execution
     /// </para>
     /// <para>
-    /// Part3: This Class Links loosley to the GUI
+    /// Part3: This Class Links loosely to the GUI
     /// </para>
     /// </summary>
     public class ProxySession : NetProxy, IDisposable
@@ -89,27 +89,23 @@ namespace Furcadia.Net.Proxy
             clientconnectionphase = ConnectionPhase.Init;
 
             ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += onServerQueSent;
+            ServerBalancer.OnServerSendMessage += OnServerQueSent;
 
-            base.ServerData2 += onServerDataReceived;
-            base.Connected += onServerConnected;
-            base.ServerDisConnected += onServerDisconnected;
+            base.ServerData2 += OnServerDataReceived;
+            Connected += OnServerConnected;
+            ServerDisConnected += OnServerDisconnected;
             // if (!options.Standalone) {
-            base.ClientData2 += onClientDataReceived;
-            base.ClientDisConnected += onClientDisconnected;
-            base.Connected += onClientConnected;
-            base.ClientExited += onClientExited;
+            base.ClientData2 += OnClientDataReceived;
+            ClientDisConnected += OnClientDisconnected;
+            Connected += OnClientConnected;
+            //ClientExited += onClientExited;
             // }
-            ReconnectionManager = new Furcadia.Net.Utils.ProxyReconnect(options.ReconnectOptions);
+            ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
             BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
             SpeciesTag = new Queue<string>(50);
             BanishString = new List<string>(50);
-        }
-
-        private void onClientExited()
-        {
         }
 
         #endregion "Constructors"
@@ -158,6 +154,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Connected Characters Furcadia ID
         /// </summary>
+        [Legacy]
         public int ConnectedCharacterFurcadiaID
         {
             get
@@ -166,17 +163,18 @@ namespace Furcadia.Net.Proxy
                     return -1;
                 return connectedFurre.ID;
             }
-            set
-            {
-                if (connectedFurre == null)
-                    connectedFurre = new FURRE(value);
-                connectedFurre.ID = value;
-            }
+            //set
+            //{
+            //    if (connectedFurre == null)
+            //        connectedFurre = new FURRE(value);
+            //    connectedFurre.ID = value;
+            //}
         }
 
         /// <summary>
         /// Our Connected Character name
         /// </summary>
+        [Legacy]
         public string ConnectedCharacterName
         {
             get
@@ -185,12 +183,12 @@ namespace Furcadia.Net.Proxy
                     return null;
                 return connectedFurre.Name;
             }
-            set
-            {
-                if (connectedFurre == null)
-                    connectedFurre = new FURRE(value);
-                connectedFurre.Name = value;
-            }
+            //set
+            //{
+            //    if (connectedFurre == null)
+            //        connectedFurre = new FURRE(value);
+            //    connectedFurre.Name = value;
+            //}
         }
 
         /// <summary>
@@ -211,8 +209,6 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                //if (player == null | connectedFurre == null)
-                //    return false;
                 return player == connectedFurre;
             }
         }
@@ -224,23 +220,9 @@ namespace Furcadia.Net.Proxy
         private string banishName = "";
         private List<string> banishString = new List<string>();
 
-#pragma warning disable CS0649 // Field 'ProxySession.botName' is never assigned to, and will always have its default value null
-
-        /// <summary>
-        /// Furre Name we connected with
-        /// </summary>
-        private string botName;
-
-#pragma warning restore CS0649 // Field 'ProxySession.botName' is never assigned to, and will always have its default value null
-
-#pragma warning disable CS0169 // The field 'ProxySession.botUID' is never used
-        private int botUID;
-#pragma warning restore CS0169 // The field 'ProxySession.botUID' is never used
         private string channel;
         private object ChannelLock = new object();
-#pragma warning disable CS0414 // The field 'ProxySession.clientClose' is assigned but its value is never used
-        private bool clientClose = false;
-#pragma warning restore CS0414 // The field 'ProxySession.clientClose' is assigned but its value is never used
+
         private ConnectionPhase clientconnectionphase;
         private object clientlock = new object();
         private object DataReceived = new object();
@@ -261,7 +243,7 @@ namespace Furcadia.Net.Proxy
         private Utils.ProxyReconnect ReconnectionManager;
 
         /// <summary>
-        /// Balance thhe out going load to server
+        /// Balance the out going load to server
         /// <para>
         /// Throat Tired Syndrome and No Endurance Control
         /// </para>
@@ -320,7 +302,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public event ServerStatusChangedEventHandler ServerStatusChanged;
 
-        #region "Client/Server Fata Handling"
+        #region "Client/Server data handling"
 
         /// <summary>
         /// Send Data to Furcadia Client or Game Server
@@ -329,7 +311,7 @@ namespace Furcadia.Net.Proxy
         /// Raw instruction to send
         /// </param>
         /// <param name="e">
-        /// Cliemt or Server Event Argumentss with Instruction type
+        /// Client or Server Event Arguments with Instruction type
         /// </param>
         public delegate void DataHandler(string Message, EventArgs e);
 
@@ -342,7 +324,7 @@ namespace Furcadia.Net.Proxy
         public delegate void ProcessChannel(ChannelObject InstructionObject, ParseServerArgs Args);
 
         /// <summary>
-        /// Send Server to Client Instruction object to Subclassed for handlings
+        /// Send Server to Client Instruction object to Sub-classed for handling.
         /// </summary>
         /// <param name="InstructionObject">
         /// Server Instruction Object
@@ -360,7 +342,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public event ProcessInstruction ProcessServerInstruction;
 
-        #endregion "Client/Server Fata Handling"
+        #endregion "Client/Server data handling"
 
         #endregion "Public Events"
 
@@ -370,6 +352,9 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// ServerQueue Throat Tired Mode
+        /// <para>
+        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
+        /// </para>
         /// </summary>
         /// <returns>
         /// State <see cref="Furcadia.Net.Utils.ServerQue.ThroatTired"/>
@@ -404,13 +389,14 @@ namespace Furcadia.Net.Proxy
         /// We mirror Furcadia's Banish system for efficiency
         /// </para>
         /// </summary>
-        public string BanishName { get { return banishName; } set { banishName = value; } }
+        public string BanishName { get { return banishName; } private set { banishName = value; } }
 
         /// <summary>
         /// </summary>
-        public List<string> BanishString { get { return banishString; } set { banishString = value; } }
+        public List<string> BanishString { get { return banishString; } private set { banishString = value; } }
 
         /// <summary>
+        /// Channel name?
         /// </summary>
         public string Channel
         {
@@ -442,10 +428,7 @@ namespace Furcadia.Net.Proxy
         public DREAM Dream
         {
             get { return dream; }
-            set
-            {
-                dream = value;
-            }
+            set { dream = value; }
         }
 
         /// <summary>
@@ -471,11 +454,10 @@ namespace Furcadia.Net.Proxy
         public FURRE Player
         {
             get { return player; }
-            // set { player = value; }
         }
 
         /// <summary>
-        /// Curent server connection phase
+        /// Current server connection phase
         /// </summary>
         public ConnectionPhase ServerConnectPhase
         {
@@ -641,7 +623,7 @@ namespace Furcadia.Net.Proxy
                     {
                         Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.");
                         string m = t.Match(Text).Groups[1].Value;
-                        if (FurcadiaShortName(m) == FurcadiaShortName(botName))
+                        if (FurcadiaShortName(m) == ConnectedFurre.ShortName)
                         {
                             NoEndurance = true;
                         }
@@ -859,6 +841,8 @@ namespace Furcadia.Net.Proxy
                     // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
                     //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
 
+                    // TODO: Check Cookie handler for this
+
                     Regex EatCookie = new Regex(Regex.Escape("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.") + "(.*?)");
                     if (EatCookie.Match(data).Success)
                     {
@@ -874,11 +858,13 @@ namespace Furcadia.Net.Proxy
             if (Dream.FurreList.Contains(player))
                 Dream.FurreList[player] = player;
 
-            ChannelObject chanObject = new ChannelObject(data);
-            chanObject.Player = player;
+            ChannelObject chanObject = new ChannelObject(data)
+            {
+                Player = player,
 
-            chanObject.Channel = channel;
-            chanObject.InstructionType = ServerInstructionType.DisplayText;
+                Channel = channel,
+                InstructionType = ServerInstructionType.DisplayText
+            };
 
             ParseChannelArgs args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
 
@@ -897,7 +883,7 @@ namespace Furcadia.Net.Proxy
         /// This is derived content from the Furcadia Dev Docs and Furcadia
         /// Technical Resources
         /// <para>
-        /// Update 23 Avatar Moement http://dev.furcadia.com/docs/023_new_movement.pdf
+        /// Update 23 Avatar Movement http://dev.furcadia.com/docs/023_new_movement.pdf
         /// </para>
         /// <para>
         /// Update 27 Movement http://dev.furcadia.com/docs/027_movement.html
@@ -1049,15 +1035,15 @@ namespace Furcadia.Net.Proxy
                     else if (data.StartsWith("/"))
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
                         connectedFurre = Dream.FurreList[connectedFurre];
-                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
-                        if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <= player.Position.y &
-                            VisableRectangle.height >= player.Position.y & VisableRectangle.length >=
-                            player.Position.x)
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
+                        if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <= player.Position.Y &
+                            VisableRectangle.height >= player.Position.Y & VisableRectangle.length >=
+                            player.Position.X)
                         {
                             player.Visible = true;
                         }
@@ -1073,17 +1059,17 @@ namespace Furcadia.Net.Proxy
                     {
                         int id = ConvertFromBase220(data.Substring(1, 4));
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
 
                         connectedFurre = Dream.FurreList[connectedFurre];
-                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.x, connectedFurre.Position.y);
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
 
-                        if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
-                            player.Position.y & VisableRectangle.height >= player.Position.y &
-                            VisableRectangle.length >= player.Position.x)
+                        if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <=
+                            player.Position.Y & VisableRectangle.height >= player.Position.Y &
+                            VisableRectangle.length >= player.Position.X)
                         {
                             player.Visible = true;
                         }
@@ -1112,8 +1098,8 @@ namespace Furcadia.Net.Proxy
                     else if (data.StartsWith("C") != false)
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.x = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
+                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         player.Visible = false;
                         if (Dream.FurreList.Contains(player))
                         {
@@ -1144,8 +1130,7 @@ namespace Furcadia.Net.Proxy
                         Match m = repqq.Match(data);
                         Rep r = default(Rep);
                         r.ID = m.Groups[1].Value;
-                        int num = 0;
-                        int.TryParse(m.Groups[2].Value, out num);
+                        int.TryParse(m.Groups[2].Value, out int num);
                         r.Type = num;
                         Repq.Enqueue(r);
                         player.Message = m.Groups[3].Value;
@@ -1201,18 +1186,26 @@ namespace Furcadia.Net.Proxy
                             inDream = true;
                         }
                     }
+                    // ]z UID[*]
+                    // Unique User ID
+                    // This instruction is sent as a response to the uid command. The purpose of this is unclear.
+                    // Credits Artex, FTR
                     else if (data.StartsWith("]z"))
                     {
-                        int ID = int.Parse(data.Remove(0, 2));
-                        if (ConnectedCharacterFurcadiaID == 0)
-                            ConnectedCharacterFurcadiaID = ID;
-                        //Snag out UID
+                        //int ID = int.Parse(data.Remove(0, 2));
+                        //if (ConnectedCharacterFurcadiaID == 0)
+                        //    ConnectedCharacterFurcadiaID = ID;
                     }
+                    // ]BUserID[*]
+                    // Set Own ID
+                    // This instruction informs the client of which user-name is it logged into. Knowing your
+                    // own UserID can help you find your own avatar within the dream.
+                    // Credits Artex, FTR
                     else if (data.StartsWith("]B"))
                     {
                         int ID = int.Parse(data.Substring(2, data.Length - connectedFurre.Name.Length - 3));
-                        if (ConnectedCharacterFurcadiaID == 0)
-                            ConnectedCharacterFurcadiaID = ID;
+                        if (ConnectedCharacterFurcadiaID < 1)
+                            connectedFurre = Dream.FurreList.GetFurreByID(ID);
                     }
                     else if (data.StartsWith("]c"))
                     {
@@ -1392,7 +1385,7 @@ namespace Furcadia.Net.Proxy
             SendToServer(result);
         }
 
-        private void onClientConnected()
+        private void OnClientConnected()
         {
             clientconnectionphase = ConnectionPhase.MOTD;
             ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
@@ -1403,7 +1396,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="data">
         /// </param>
-        private void onClientDataReceived(string data)
+        private void OnClientDataReceived(string data)
         {
             //TODO Raise Client Data Received event
 
@@ -1471,13 +1464,13 @@ namespace Furcadia.Net.Proxy
             }
         }
 
-        private void onClientDisconnected()
+        private void OnClientDisconnected()
         {
             clientconnectionphase = ConnectionPhase.Disconnected;
             ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
         }
 
-        private void onServerConnected()
+        private void OnServerConnected()
         {
             serverconnectphase = ConnectionPhase.MOTD;
             ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
@@ -1487,7 +1480,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="data">
         /// </param>
-        private void onServerDataReceived(string data)
+        private void OnServerDataReceived(string data)
         {
             player = new FURRE();
             bool handled = false;
@@ -1550,13 +1543,13 @@ namespace Furcadia.Net.Proxy
 
         #endregion "Popup Dialogs"
 
-        private void onServerDisconnected()
+        private void OnServerDisconnected()
         {
             serverconnectphase = ConnectionPhase.Disconnected;
             ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
         }
 
-        private void onServerQueSent(object o, EventArgs e)
+        private void OnServerQueSent(object o, EventArgs e)
         {
             base.SendToServer(o.ToString());
         }

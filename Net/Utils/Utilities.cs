@@ -23,9 +23,11 @@ namespace Furcadia.Net.Utils
 
         /// <summary>
         /// Checks TCP port and scans for an available TCP port on the host
-        /// system <paraa>
-        /// TODO: Find an Available Port?</paraa>
+        /// system
         /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="port"/> is 0
+        /// </exception>
         /// <param name="port">
         /// ref TCP Port
         /// </param>
@@ -60,9 +62,8 @@ namespace Furcadia.Net.Utils
         #region Public Constructors
 
         /// <summary>
-        /// Default Constructor
+        /// Furcadia Defaults with optional app.config
         /// </summary>
-        [Legacy]
         public Utilities()
         {
             var appSettings = ConfigurationManager.AppSettings;
@@ -81,7 +82,7 @@ namespace Furcadia.Net.Utils
         private readonly string defaultClient;
 
         /// <summary>
-        /// Furcadia Client Executable
+        /// Furcadia Client Executable Name with extension
         /// </summary>
         public string DefaultClient
         {
@@ -101,7 +102,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Game Server IP (Furcadia v31c)
         /// <para>
-        /// update to library config file?
+        /// update to library configuration file?
         /// </para>
         /// </summary>
         private readonly string gameserverip;
@@ -109,10 +110,11 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Pounce Server Host (Furcadia v31c)
         /// <para>
-        /// update to library config file?
+        /// update to library configuration file?
         /// </para>
         /// </summary>
-        private readonly string pounceserverhost;
+        [Legacy] private readonly string pounceserverhost;
+
 
         /// <summary>
         /// Registry path for Mono
@@ -125,7 +127,7 @@ namespace Furcadia.Net.Utils
         private readonly string RegPathx64;
 
         /// <summary>
-        /// Registry path for x86 systems ///
+        /// Registry path for x86 systems 
         /// </summary>
         private readonly string RegPathx86;
 
@@ -167,7 +169,7 @@ namespace Furcadia.Net.Utils
         #region Public Properties
 
         /// <summary>
-        /// Master Config set Encoders to Win 1252 encoding.
+        /// Master configuration set Encoders to Win 1252 encoding.
         /// </summary>
         public static int GetEncoding { get { return EncoderPage; } }
 

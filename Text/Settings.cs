@@ -159,10 +159,11 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Rrad Furcadia settings from Furcadia install path. If the settings does not exist We'll use our Embedded fresource
+        /// Read Furcadia settings from Furcadia install path. If the settings does not exist We'll use our
+        /// Embedded from source
         /// </summary>
-        /// <param name="SettingsIni"></param>
-        /// <returns></returns>
+        /// <param name="SettingsIni">Full file path to settings.ini</param>
+        /// <returns>Array of settings</returns>
         public static string[] ReadSettingIni(string SettingsIni)
         {
             List<string> lines = new List<string>();

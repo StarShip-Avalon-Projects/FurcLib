@@ -27,8 +27,8 @@ namespace Furcadia.Drawing
         /// </param>
         public FurrePosition(string X, string Y)
         {
-            x = ConvertFromBase220(X);
-            y = ConvertFromBase220(Y);
+            this.X = ConvertFromBase220(X);
+            this.Y = ConvertFromBase220(Y);
         }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace Furcadia.Drawing
         /// </param>
         public FurrePosition(int X, int Y)
         {
-            y = y;
-            x = x;
+            this.Y = this.Y;
+            this.X = this.X;
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Furcadia.Drawing
         /// </param>
         public FurrePosition(FurrePosition Position)
         {
-            x = Position.x;
-            y = Position.y;
+            X = Position.X;
+            Y = Position.Y;
         }
 
         #endregion Public Constructors
@@ -61,14 +61,14 @@ namespace Furcadia.Drawing
         #region Public Properties
 
         /// <summary>
-        /// x coordiante
+        /// x coordinate
         /// </summary>
-        public int x { get; set; }
+        public int X { get; set; }
 
         /// <summary>
-        /// y corrdinate
+        /// y coordinate
         /// </summary>
-        public int y { get; set; }
+        public int Y { get; set; }
 
         #endregion Public Properties
 
@@ -87,7 +87,7 @@ namespace Furcadia.Drawing
             if (obj.GetType() == typeof(FurrePosition))
             {
                 FurrePosition ob = (FurrePosition)obj;
-                return ob.y == y && ob.x == x;
+                return ob.Y == Y && ob.X == X;
             }
             return base.Equals(obj);
         }
@@ -107,7 +107,7 @@ namespace Furcadia.Drawing
         /// </returns>
         public override string ToString()
         {
-            return string.Format("({0}, {1})", x.ToString(), y.ToString());
+            return string.Format("({0}, {1})", X.ToString(), Y.ToString());
         }
 
         #endregion Public Methods

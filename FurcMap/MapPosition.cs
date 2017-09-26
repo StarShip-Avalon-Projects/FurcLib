@@ -47,10 +47,10 @@ namespace Furcadia.FurcMap
             this.x = x;
             this.y = y;
             floorNumber = map.GetFloorAt(x, y);
-            objectNumber = map.getObjectAt(x, y);
+            objectNumber = map.GetObjectAt(x, y);
             wallNumber = map.GetWallAt(x, y);
-            regionNumber = map.getRegionAt(x, y);
-            effectNumber = map.getEffectAt(x, y);
+            regionNumber = map.GetRegionAt(x, y);
+            effectNumber = map.GetEffectAt(x, y);
         }
 
         #endregion Public Constructors
