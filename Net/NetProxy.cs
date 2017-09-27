@@ -8,6 +8,7 @@
 
 using Furcadia.Net.Options;
 using Furcadia.Text;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +16,7 @@ using System.IO;
 //using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using static Furcadia.Net.Utils.Utilities;
 
 namespace Furcadia.Net
@@ -32,6 +34,12 @@ namespace Furcadia.Net
     /// </remarks>
     public class NetProxy : IDisposable
     {
+
+        // Flag: Has Dispose already been called?
+        bool disposed = false;
+        // Instantiate a SafeHandle instance.
+        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+
         #region Private Fields
 
         // private SslStream ServerSslStream;
@@ -566,15 +574,7 @@ namespace Furcadia.Net
             ServerDisConnected?.Invoke();
         }
 
-        /// <summary>
-        /// Implement IDisposable.
-        /// </summary>
-        public virtual void Dispose()
-        {
-            //  isDisosed = true;
-            Dispose(true);
-            GC.WaitForPendingFinalizers();
-        }
+
 
         /// <summary>
         /// </summary>
@@ -639,16 +639,31 @@ namespace Furcadia.Net
         #endregion Public Methods
 
         #region Protected Methods
+        /// <summary>
+        /// Public implementation of Dispose pattern callable by consumers.
+        /// </summary>
+        public virtual void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // 
 
         /// <summary>
-        /// Dispose all our Disposable objects
+        /// Protected implementation of Dispose pattern.
         /// </summary>
         /// <param name="disposing">
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
+            if (disposed)
+                return;
             if (disposing)
             {
+                handle.Dispose();
+                // Free any other managed objects here.
+                //
                 isDisosed = true;
                 if (BackupSettings != null)
                     settings.RestoreFurcadiaSettings(BackupSettings);
@@ -664,9 +679,10 @@ namespace Furcadia.Net
                     server.Close();
                 }
             }
-            // Free other state (managed objects).
+            // Free any unmanaged objects here.
+            //
+            disposed = true;
 
-            // Free your own state (unmanaged objects). Set large fields to null.
         }
 
         #endregion Protected Methods

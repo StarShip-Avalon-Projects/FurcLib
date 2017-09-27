@@ -2,8 +2,10 @@
 using Furcadia.Movement;
 using Furcadia.Net.Dream;
 using Furcadia.Net.Utils.ServerParser;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 //Furcadia Servver Parser
@@ -44,6 +46,9 @@ namespace Furcadia.Net.Proxy
     public class ProxySession : NetProxy, IDisposable
     {
         #region "Constructors"
+
+        // Instantiate a SafeHandle instance.
+        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
 
         /// <summary>
         /// </summary>
@@ -113,7 +118,7 @@ namespace Furcadia.Net.Proxy
         #region Public Methods
 
         /// <summary>
-        ///
+        ///Connect the Proxy to the Furcadia  Game server
         /// </summary>
         public override void Connect()
         {
@@ -535,7 +540,7 @@ namespace Furcadia.Net.Proxy
             Regex NameRegex = new Regex(NameFilter, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
             try
             {
-                 Color = Regex.Match(data, EntryFilter).Groups[1].Value;
+                Color = Regex.Match(data, EntryFilter).Groups[1].Value;
                 string User = null;
                 if (NameRegex.Match(data).Success)
                 {
@@ -1168,8 +1173,8 @@ namespace Furcadia.Net.Proxy
 
                         LoadDream loadDream = new LoadDream(data);
                         if (ProcessServerInstruction != null)
-                         ProcessServerInstruction.Invoke(loadDream,
-                            new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
+                            ProcessServerInstruction.Invoke(loadDream,
+                               new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
                         if (!IsClientConnected && StandAlone)
@@ -1188,8 +1193,8 @@ namespace Furcadia.Net.Proxy
                         //if (ConnectedCharacterFurcadiaID == 0)
                         //    ConnectedCharacterFurcadiaID = ID;
 
-                            ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
-                                new ParseServerArgs(ServerInstructionType.UniqueUserId, serverconnectphase));
+                        ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
+                            new ParseServerArgs(ServerInstructionType.UniqueUserId, serverconnectphase));
                     }
                     // ]BUserID[*]
                     // Set Own ID
@@ -1202,8 +1207,8 @@ namespace Furcadia.Net.Proxy
                         if (ConnectedCharacterFurcadiaID < 1)
                             connectedFurre = Dream.FurreList.GetFurreByID(ID);
 
-                            ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
-                                new ParseServerArgs(ServerInstructionType.SetOwnId, serverconnectphase));
+                        ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
+                            new ParseServerArgs(ServerInstructionType.SetOwnId, serverconnectphase));
                     }
                     else if (data.StartsWith("]c"))
                     {
@@ -1566,6 +1571,7 @@ namespace Furcadia.Net.Proxy
 
             if (disposing)
             {
+                handle.Dispose();
                 base.Dispose();
             }
 
