@@ -31,12 +31,18 @@ NetConnection byte parsing
 
 Fix Furcadia Settings... 
 -Read Default URLs
-- Seperate Furcadia Proxy/firewall settings update into its own object with Mutex to 
-  prevent Other FurcLib Apps from overriding Settings during connection
-- Add optional settings list. (Preload with defaults)
 
 add support for Modern/Legasy mode dreams (there are protocol differences)
 ADD TLS/SSL support  (See Protocol Fragmentation)
+
+ff3pp V2 PreAlpa6
+
+ff3pp V2 PreAlpha5
+
+Cleaned up Server parsing logic and filled in comments
+Fixed Furcadia Settings Loading and saving process...
+Removed the Settings.ini 10 second delay, New TSD news/account window made the new fetcher delay obsolete
+Re-Factored a and commented a lot of functions to make things more stable and easier to understand
 
 ff3pp V2 PreAlpha4
 
