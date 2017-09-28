@@ -559,7 +559,6 @@ namespace Furcadia.Net
             if (listen != null)
             {
                 listen.Stop();
-                listen = null;
             }
 
             if (client != null && client.Connected == true)
