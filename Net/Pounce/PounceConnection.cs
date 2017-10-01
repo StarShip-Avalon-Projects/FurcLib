@@ -24,7 +24,7 @@ namespace Furcadia.Net.Pounce
     /// <remarks>
     /// Pounce server returns a list on online objects (Furres,Dreams,Channels?)
     /// </remarks>
-    public class PounceConnection : IDisposable
+    public class PounceConnection 
     {
         #region Public Properties
 
@@ -392,7 +392,7 @@ namespace Furcadia.Net.Pounce
                             // status but store it anyways!
                             _statusCode = (int)resp.StatusCode;
                             // Split the responseBody by '\n' into an array
-                            string[] onln = this._responseBody.Split(new char[] { '\n', 'r' }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] onln = this._responseBody.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                             List<string> list = new List<string>(onln);
                             List<string> dreams = new List<string>();
                             List<string> friends = new List<string>();
@@ -439,49 +439,6 @@ namespace Furcadia.Net.Pounce
 
         #endregion Internal Methods
 
-        #region IDisposable Support
-
-        private bool disposedValue = false; // To detect redundant calls
-
-        // This code added to correctly implement the disposable pattern.
-        /// <summary>
-        /// Implement disposal pattern
-        /// </summary>
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool
-            // disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is
-            //       overridden above. GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="disposing">
-        /// </param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and
-                //       override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above
-        //       has code to free unmanaged resources. ~PounceConnection() {
-        //       // Do not change this code. Put cleanup code in
-        // Dispose(bool disposing) above. Dispose(false); }
-
-        #endregion IDisposable Support
+    
     }
 }
