@@ -509,7 +509,7 @@ namespace Furcadia.Net
                         catch (SocketException)
                         {
                             options.LocalhostPort++;
-                            listen.Stop();
+                           if(listen != null) listen.Stop();
                             listen = new TcpListener(IPAddress.Any, options.LocalhostPort)
                             {
                                 ExclusiveAddressUse = false
