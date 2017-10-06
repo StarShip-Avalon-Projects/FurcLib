@@ -1572,9 +1572,9 @@ namespace Furcadia.Net.Proxy
             if (disposing)
             {
                 handle.Dispose();
-                base.Dispose();
+               
             }
-
+            base.Dispose();
             // Free any unmanaged objects here.
             disposed = true;
         }
