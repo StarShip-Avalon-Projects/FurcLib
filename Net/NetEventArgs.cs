@@ -152,6 +152,7 @@ namespace Furcadia.Net
         ///  <para/> Credits Artex, FTR
         /// </summary>
         UniqueUserId,
+
         /// <summary>
         /// Set Own ID
         /// <para/> ]BUserID[*]
@@ -160,12 +161,12 @@ namespace Furcadia.Net
         /// <para/>Credits Artex, FTR
         /// </summary>
         SetOwnId,
+
         /// <summary>
         ///  Dream Book Mark
         ///  <para/>Triggers Pounce to add the dream to the list marked temporary
         /// </summary>
         BookmarkDream
-
     }
 
     /// <summary>

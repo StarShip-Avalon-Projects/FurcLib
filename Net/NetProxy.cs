@@ -34,11 +34,11 @@ namespace Furcadia.Net
     /// </remarks>
     public class NetProxy : IDisposable
     {
-
         // Flag: Has Dispose already been called?
-        bool disposed = false;
+        private bool disposed = false;
+
         // Instantiate a SafeHandle instance.
-        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
 
         #region Private Fields
 
@@ -509,7 +509,7 @@ namespace Furcadia.Net
                         catch (SocketException)
                         {
                             options.LocalhostPort++;
-                           if(listen != null) listen.Stop();
+                            if (listen != null) listen.Stop();
                             listen = new TcpListener(IPAddress.Any, options.LocalhostPort)
                             {
                                 ExclusiveAddressUse = false
@@ -572,8 +572,6 @@ namespace Furcadia.Net
             }
             ServerDisConnected?.Invoke();
         }
-
-
 
         /// <summary>
         /// </summary>
@@ -638,6 +636,7 @@ namespace Furcadia.Net
         #endregion Public Methods
 
         #region Protected Methods
+
         /// <summary>
         /// Public implementation of Dispose pattern callable by consumers.
         /// </summary>
@@ -647,7 +646,7 @@ namespace Furcadia.Net
             GC.SuppressFinalize(this);
         }
 
-        // 
+        //
 
         /// <summary>
         /// Protected implementation of Dispose pattern.
@@ -681,7 +680,6 @@ namespace Furcadia.Net
             // Free any unmanaged objects here.
             //
             disposed = true;
-
         }
 
         #endregion Protected Methods

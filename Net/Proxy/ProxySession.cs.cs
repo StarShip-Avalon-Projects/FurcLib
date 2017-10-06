@@ -48,7 +48,7 @@ namespace Furcadia.Net.Proxy
         #region "Constructors"
 
         // Instantiate a SafeHandle instance.
-        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
 
         /// <summary>
         /// </summary>

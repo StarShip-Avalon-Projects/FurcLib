@@ -11,7 +11,7 @@ namespace Furcadia.Net.Pounce
     /// TODO: Read default lists(Furres, Dreams, Channels) from Furcadia Online.ini
     /// </para>
     /// </summary>
-    public class PounceClient : PounceConnection , IDisposable
+    public class PounceClient : PounceConnection, IDisposable
     {
         #region Public Constructors
 
@@ -53,10 +53,8 @@ namespace Furcadia.Net.Pounce
 
         private Dictionary<string, PounceFurre> _furreList = new Dictionary<string, PounceFurre>();
 
-
-       // private string _onlineList;
-      //  private System.DateTime lastaccess;
-
+        // private string _onlineList;
+        //  private System.DateTime lastaccess;
 
         /// <summary>
         /// 30 second timer to send requests to the pounce server
@@ -110,9 +108,11 @@ namespace Furcadia.Net.Pounce
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // To detect redundant calls
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
@@ -149,10 +149,8 @@ namespace Furcadia.Net.Pounce
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        #endregion
 
-
-
+        #endregion IDisposable Support
     }
 
     #endregion Private Methods

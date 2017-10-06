@@ -227,13 +227,11 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void PingTimerTick(object state)
         {
-
             if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
             {
                 ServerStack.Enqueue("Ping");
             }
             Interlocked.Exchange(ref usingPing, 0);
-
         }
 
         /// <summary>
@@ -242,11 +240,9 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void ProcessQueue(object state)
         {
-
             double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
             QueueTick(ref seconds);
             TickTime = DateTime.Now;
-
         }
 
         /// <summary>

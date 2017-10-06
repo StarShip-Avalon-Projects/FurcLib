@@ -24,7 +24,7 @@ namespace Furcadia.Net.Pounce
     /// <remarks>
     /// Pounce server returns a list on online objects (Furres,Dreams,Channels?)
     /// </remarks>
-    public class PounceConnection 
+    public class PounceConnection
     {
         #region Public Properties
 
@@ -438,7 +438,5 @@ namespace Furcadia.Net.Pounce
         }
 
         #endregion Internal Methods
-
-    
     }
 }

@@ -12,7 +12,6 @@
         /// </summary>
         protected internal IO.Paths FurcadiaFilePaths;
 
-
         /// <summary>
         /// Furcadia Utilities
         /// </summary>
