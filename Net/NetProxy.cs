@@ -662,19 +662,22 @@ namespace Furcadia.Net
                 handle.Dispose();
                 // Free any other managed objects here.
                 //
-                isDisosed = true;
                 if (BackupSettings != null)
                     settings.RestoreFurcadiaSettings(BackupSettings);
-                if (listen != null) listen.Stop();
-
+                if (listen != null)
+                {
+                    listen.Stop();
+                    listen = null;
+                }
                 if (client != null && client.Connected == true)
                 {
                     client.Close();
+                    client = null;
                 }
-
                 if (server != null && server.Connected == true)
                 {
                     server.Close();
+                    server = null;
                 }
             }
             // Free any unmanaged objects here.
@@ -691,7 +694,6 @@ namespace Furcadia.Net
 
         private int ClientLeftOversSize = 0;
 
-        private bool isDisosed;
         private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
 
         private int ServerLeftOversSize = 0;
@@ -702,7 +704,7 @@ namespace Furcadia.Net
         /// </param>
         private void AsyncListener(IAsyncResult ar)
         {
-            if (isDisosed)
+            if (disposed)
                 return;
             try
             {
