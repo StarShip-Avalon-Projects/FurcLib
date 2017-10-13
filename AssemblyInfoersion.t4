@@ -37,5 +37,5 @@
 // 
 using System.Reflection;
 
-[assembly: AssemblyInformationalVersion("2.0.PreAlpha <#=revisionNumber.ToString()#>")]
+[assembly: AssemblyInformationalVersion("7.0Alpha <#=revisionNumber.ToString()#>")]
 
