@@ -34,11 +34,11 @@ namespace Furcadia.Net
     /// </remarks>
     public class NetProxy : IDisposable
     {
-
         // Flag: Has Dispose already been called?
-        bool disposed = false;
+        private bool disposed = false;
+
         // Instantiate a SafeHandle instance.
-        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
 
         #region Private Fields
 
@@ -509,7 +509,7 @@ namespace Furcadia.Net
                         catch (SocketException)
                         {
                             options.LocalhostPort++;
-                            listen.Stop();
+                            if (listen != null) listen.Stop();
                             listen = new TcpListener(IPAddress.Any, options.LocalhostPort)
                             {
                                 ExclusiveAddressUse = false
@@ -572,8 +572,6 @@ namespace Furcadia.Net
             }
             ServerDisConnected?.Invoke();
         }
-
-
 
         /// <summary>
         /// </summary>
@@ -638,6 +636,7 @@ namespace Furcadia.Net
         #endregion Public Methods
 
         #region Protected Methods
+
         /// <summary>
         /// Public implementation of Dispose pattern callable by consumers.
         /// </summary>
@@ -647,7 +646,7 @@ namespace Furcadia.Net
             GC.SuppressFinalize(this);
         }
 
-        // 
+        //
 
         /// <summary>
         /// Protected implementation of Dispose pattern.
@@ -663,25 +662,27 @@ namespace Furcadia.Net
                 handle.Dispose();
                 // Free any other managed objects here.
                 //
-                isDisosed = true;
                 if (BackupSettings != null)
                     settings.RestoreFurcadiaSettings(BackupSettings);
-                if (listen != null) listen.Stop();
-
+                if (listen != null)
+                {
+                    listen.Stop();
+                    listen = null;
+                }
                 if (client != null && client.Connected == true)
                 {
                     client.Close();
+                    client = null;
                 }
-
                 if (server != null && server.Connected == true)
                 {
                     server.Close();
+                    server = null;
                 }
             }
             // Free any unmanaged objects here.
             //
             disposed = true;
-
         }
 
         #endregion Protected Methods
@@ -693,7 +694,6 @@ namespace Furcadia.Net
 
         private int ClientLeftOversSize = 0;
 
-        private bool isDisosed;
         private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
 
         private int ServerLeftOversSize = 0;
@@ -704,7 +704,7 @@ namespace Furcadia.Net
         /// </param>
         private void AsyncListener(IAsyncResult ar)
         {
-            if (isDisosed)
+            if (disposed)
                 return;
             try
             {

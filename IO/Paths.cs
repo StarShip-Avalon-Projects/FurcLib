@@ -4,7 +4,6 @@ using System.IO;
 
 namespace Furcadia.IO
 {
-
     ///<summary>
     /// This class contains all the paths related to the users furcadia installation.
     ///<para>***NOTICE: DO NOT REMOVE***</para>

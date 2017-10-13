@@ -48,7 +48,7 @@ namespace Furcadia.Net.Proxy
         #region "Constructors"
 
         // Instantiate a SafeHandle instance.
-        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
 
         /// <summary>
         /// </summary>
@@ -122,7 +122,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (serverconnectphase == ConnectionPhase.Init && clientconnectionphase == ConnectionPhase.Init)
+            if (serverconnectphase == ConnectionPhase.Init )
             {
                 serverconnectphase = ConnectionPhase.Connecting;
                 clientconnectionphase = ConnectionPhase.Connecting;
@@ -602,6 +602,7 @@ namespace Furcadia.Net.Proxy
                         //banish-off-all (active list)
                         //Success: You have canceled all banishments from your dreams.
                         BanishString.Clear();
+                        channel = "banish";
                     }
                     else if (Text.EndsWith(" has been temporarily banished from your dreams."))
                     {
@@ -613,6 +614,7 @@ namespace Furcadia.Net.Proxy
 
                         // MainMSEngine.PageExecute(61)
                         BanishString.Add(BanishName);
+                        channel = "banish";
                     }
                     else if (Text == "Control of this dream is now being shared with you.")
                     {
@@ -1160,15 +1162,10 @@ namespace Furcadia.Net.Proxy
                     //
                     else if (data.StartsWith("]q"))
                     {
-#if DEBUG
-
-                        Console.WriteLine("Entering new Dream" + data);
-#endif
                         //Set defaults (should move to some where else?
                         hasShare = false;
                         NoEndurance = false;
                         Dream.FurreList.Clear();
-                        dream.FurreList.Add(connectedFurre);
                         inDream = false;
 
                         LoadDream loadDream = new LoadDream(data);
@@ -1495,23 +1492,6 @@ namespace Furcadia.Net.Proxy
 
         #region "Dice Rolls"
 
-#pragma warning disable CS0169 // The field 'ProxySession.diceCompnentMatch' is never used
-        private string diceCompnentMatch;
-#pragma warning restore CS0169 // The field 'ProxySession.diceCompnentMatch' is never used
-
-#pragma warning disable CS0414 // The field 'ProxySession.diceCount' is assigned but its value is never used
-        private double diceCount = 0.0;
-#pragma warning restore CS0414 // The field 'ProxySession.diceCount' is assigned but its value is never used
-
-#pragma warning disable CS0414 // The field 'ProxySession.diceModifyer' is assigned but its value is never used
-        private double diceModifyer = 0.0;
-#pragma warning restore CS0414 // The field 'ProxySession.diceModifyer' is assigned but its value is never used
-#pragma warning disable CS0414 // The field 'ProxySession.diceResult' is assigned but its value is never used
-        private double diceResult = 0.0;
-#pragma warning restore CS0414 // The field 'ProxySession.diceResult' is assigned but its value is never used
-#pragma warning disable CS0414 // The field 'ProxySession.diceSides' is assigned but its value is never used
-        private double diceSides = 0.0;
-#pragma warning restore CS0414 // The field 'ProxySession.diceSides' is assigned but its value is never used
         //TODO Check MS Engine Dice lines
 
         #endregion "Dice Rolls"
@@ -1572,9 +1552,9 @@ namespace Furcadia.Net.Proxy
             if (disposing)
             {
                 handle.Dispose();
-                base.Dispose();
+               
             }
-
+            base.Dispose();
             // Free any unmanaged objects here.
             disposed = true;
         }

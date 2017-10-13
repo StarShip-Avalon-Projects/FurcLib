@@ -24,8 +24,8 @@ namespace Furcadia.Net.Pounce
         /// </summary>
         public PounceClient() : base("http://on.furcadia.com/q/", null, null)
         {
-            PounceTimer = new Timer(smPounceSend, this,
-                TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+            PounceTimer = new Timer(SmPounceSend, this,
+                TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(30));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Furcadia.Net.Pounce
         /// </param>
         public PounceClient(string[] FurreList, string[] DreamList) : base("http://on.furcadia.com/q/", FurreList, DreamList)
         {
-            PounceTimer = new Timer(smPounceSend, this,
+            PounceTimer = new Timer(SmPounceSend, this,
     TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
         }
 
@@ -53,20 +53,15 @@ namespace Furcadia.Net.Pounce
 
         private Dictionary<string, PounceFurre> _furreList = new Dictionary<string, PounceFurre>();
 
-#pragma warning disable CS0169 // The field 'PounceClient._onlineList' is never used
-        private string _onlineList;
-#pragma warning restore CS0169 // The field 'PounceClient._onlineList' is never used
+        // private string _onlineList;
+        //  private System.DateTime lastaccess;
 
-#pragma warning disable CS0169 // The field 'PounceClient.lastaccess' is never used
-        private System.DateTime lastaccess;
-#pragma warning restore CS0169 // The field 'PounceClient.lastaccess' is never used
-
+        /// <summary>
+        /// 30 second timer to send requests to the pounce server
+        /// </summary>
         private Timer PounceTimer;
 
-#pragma warning disable CS0414 // The field 'PounceClient.usingPounce' is assigned but its value is never used
-        private int usingPounce = 0;
-#pragma warning restore CS0414 // The field 'PounceClient.usingPounce' is assigned but its value is never used
-        private int UsingPounce1;
+        private object PounceLock = new object();
 
         #endregion Private Fields
 
@@ -96,9 +91,9 @@ namespace Furcadia.Net.Pounce
         /// </summary>
         /// <param name="sender">
         /// </param>
-        private void smPounceSend(object sender)
+        private void SmPounceSend(object sender)
         {
-            if ((0 == Interlocked.Exchange(ref UsingPounce1, 1)))
+            lock (PounceLock)
             {
                 ClearFriends();
                 foreach (PounceFurre Furre in FurreList)
@@ -109,50 +104,94 @@ namespace Furcadia.Net.Pounce
                     }
                 }
                 ConnectAsync();
-                Interlocked.Exchange(ref UsingPounce1, 0);
             }
         }
 
-        #endregion Private Methods
+        #region IDisposable Support
 
-        #region Public Classes
+        private bool disposedValue = false; // To detect redundant calls
 
         /// <summary>
+        ///
         /// </summary>
-        public class PounceFurre
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
         {
-            #region "Public Fields"
-
-            private bool _online;
-
-            private bool _wasOnline;
-
-            /// <summary>
-            /// Furre Name
-            /// </summary>
-            public string Name { get; set; }
-
-            /// <summary>
-            /// Furre Currently online
-            /// </summary>
-            public bool Online
+            if (!disposedValue)
             {
-                get { return _online; }
-                set { this._online = value; }
-            }
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    PounceTimer.Dispose();
+                }
 
-            /// <summary>
-            /// Furre Previous Online State
-            /// </summary>
-            public bool WasOnline
-            {
-                get { return _wasOnline; }
-                set { this._wasOnline = value; }
-            }
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
 
-            #endregion "Public Fields"
+                disposedValue = true;
+            }
         }
 
-        #endregion Public Classes
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~PounceClient() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        /// <summary>
+        /// Implement IDisposable and Dispose of PounceTimer
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+
+        #endregion IDisposable Support
     }
+
+    #endregion Private Methods
+
+    #region Public Classes
+
+    /// <summary>
+    /// </summary>
+    public class PounceFurre
+    {
+        #region "Public Fields"
+
+        private bool online;
+
+        private bool wasOnline;
+
+        /// <summary>
+        /// Furre Name
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Furre Currently online
+        /// </summary>
+        public bool Online
+        {
+            get { return online; }
+            set { online = value; }
+        }
+
+        /// <summary>
+        /// Furre Previous Online State
+        /// </summary>
+        public bool WasOnline
+        {
+            get { return wasOnline; }
+            set { wasOnline = value; }
+        }
+
+        #endregion "Public Fields"
+    }
+
+    #endregion Public Classes
 }

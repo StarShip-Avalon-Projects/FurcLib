@@ -115,7 +115,6 @@ namespace Furcadia.Net.Utils
         /// </summary>
         [Legacy] private readonly string pounceserverhost;
 
-
         /// <summary>
         /// Registry path for Mono
         /// </summary>
@@ -127,7 +126,7 @@ namespace Furcadia.Net.Utils
         private readonly string RegPathx64;
 
         /// <summary>
-        /// Registry path for x86 systems 
+        /// Registry path for x86 systems
         /// </summary>
         private readonly string RegPathx86;
 
