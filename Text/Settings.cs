@@ -6,6 +6,7 @@
 */
 
 using Furcadia.IO;
+using Furcadia.Net.Options;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,56 +23,17 @@ namespace Furcadia.Text
     {
         #region Public Constructors
 
-        /// <summary>
-        /// Default Constructor
-        /// </summary>
-        public Settings()
-        {
-            localport = 6700;
-            localhost = "localhost";
-            Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
-            values = new string[9] { "Yes", localhost, localport.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
-        }
 
         /// <summary>
         /// </summary>
-        /// <param name="Port">
-        /// Local TCP Port
-        /// </param>
-        public Settings(int Port)
+        /// <param name="options">Pxoxy Options</param>
+        public Settings(ProxyOptions options)
         {
-            localport = Port;
-            localhost = "localhost";
             Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
-            values = new string[9] { "Yes", localhost, localport.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
+            values = new string[9] { "Yes", options.ProxyHost,options.LocalhostPort.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
         }
 
         #endregion Public Constructors
-
-        #region Public Properties
-
-        private static string localhost;
-        private static int localport;
-
-        /// <summary>
-        /// Localhost or local IP
-        /// </summary>
-        public string Localhost
-        {
-            get { return localhost; }
-            set { localhost = value; }
-        }
-
-        /// <summary>
-        /// Local port Furcadia Client connects to
-        /// </summary>
-        public int LocalPort
-        {
-            get { return localport; }
-            set { localport = value; }
-        }
-
-        #endregion Public Properties
 
         #region Private Fields
 
@@ -219,7 +181,7 @@ namespace Furcadia.Text
         /// <param name="BackupSettings">
         /// Backed up settings array
         /// </param>
-        public void RestoreFurcadiaSettings(string[] BackupSettings)
+        public void RestoreFurcadiaSettings(ref string[] BackupSettings)
         {
             // Get the New Changes by Furcadia Suite
             string[] FurcSettings = FurcIni.LoadFurcadiaSettings(sPath, sFile);
@@ -233,6 +195,7 @@ namespace Furcadia.Text
             }
             //Save settings.ini
             FurcIni.SaveFurcadiaSettings(sPath, sFile, FurcSettings);
+            BackupSettings = null;
         }
 
         #endregion Public Methods

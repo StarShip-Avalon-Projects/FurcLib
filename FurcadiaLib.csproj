@@ -249,6 +249,12 @@
   <ItemGroup>
     <Folder Include="Net\web\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonkeyspeakR7\Monkeyspeak.csproj">
+      <Project>{51B6668D-9904-4FA4-8FB8-6A1395B3104D}</Project>
+      <Name>Monkeyspeak</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

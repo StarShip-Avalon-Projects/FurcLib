@@ -19,6 +19,8 @@
         /// </summary>
         private int localhostport;
 
+        private string proxyHost;
+
         #endregion Private Fields
 
         private bool standalone;
@@ -50,6 +52,7 @@
         public ProxyOptions() : base()
         {
             localhostport = 6700;
+            ProxyHost = "localhost";
             furcprocess = FurcadiaUtilities.DefaultClient;
         }
 
@@ -83,6 +86,17 @@
         {
             get { return characterini; }
             set { characterini = value; }
+        }
+
+        /// <summary>
+        /// Host name or IP Address for the proxy server
+        /// <para/>
+        /// Defaults to "localhost'
+        /// </summary>
+        public string ProxyHost
+        {
+            get { return proxyHost; }
+            set { proxyHost = value; }
         }
 
         /// <summary>
