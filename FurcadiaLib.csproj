@@ -109,6 +109,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfoersion.t4</DependentUpon>
     </Compile>
+    <Compile Include="Extentions\ObjectExtensions.cs" />
+    <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Net\Dream\Avatar.cs" />
     <Compile Include="Net\Dream\Badges.cs" />
@@ -138,6 +140,9 @@
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\UpdateColorString.cs" />
+    <Compile Include="Net\web\TypeNotSupportedException.cs" />
+    <Compile Include="Net\web\Variable.cs" />
+    <Compile Include="Net\web\WebRequest.cs" />
     <Compile Include="Text\Base220.cs" />
     <Compile Include="Text\Base95.cs" />
     <Compile Include="Drawing\FurrePosition.cs" />
@@ -245,15 +250,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Net\web\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MonkeyspeakR7\Monkeyspeak.csproj">
-      <Project>{51B6668D-9904-4FA4-8FB8-6A1395B3104D}</Project>
-      <Name>Monkeyspeak</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
