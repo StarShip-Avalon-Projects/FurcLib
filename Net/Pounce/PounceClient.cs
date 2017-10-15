@@ -7,11 +7,9 @@ namespace Furcadia.Net.Pounce
 {
     /// <summary>
     /// Generic Class to use the Pounce server
-    /// <para>
-    /// TODO: Read default lists(Furres, Dreams, Channels) from Furcadia Online.ini
-    /// </para>
     /// </summary>
-    public class PounceClient : PounceConnection, IDisposable
+    /// TODO: Read default lists(Furres, Dreams, Channels) from Furcadia Online.ini
+      public class PounceClient : PounceConnection, IDisposable
     {
         #region Public Constructors
 
@@ -121,33 +119,19 @@ namespace Furcadia.Net.Pounce
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
                     PounceTimer.Dispose();
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
 
                 disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~PounceClient() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
         /// <summary>
         /// Implement IDisposable and Dispose of PounceTimer
         /// </summary>
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
 
         #endregion IDisposable Support

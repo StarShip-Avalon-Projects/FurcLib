@@ -921,33 +921,23 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case ConnectionPhase.Auth:
-                    if (data.StartsWith("]#"))
-                    {
-                        //char[] sep = { ' ' };
-                        //string[] tokens = data.Split(sep, 3);
-                        //sErrorMessage = tokens[2];
-                    }
-                    else if (data.StartsWith("]]"))
+                    //if (data.StartsWith("]#"))
+                    //{
+                    //    //char[] sep = { ' ' };
+                    //    //string[] tokens = data.Split(sep, 3);
+                    //    //sErrorMessage = tokens[2];
+                    //}
+                    //else 
+                    if (data.StartsWith("]]"))
                     {
                         Disconnect();
-                        //bIsRunning = false;
                     }
                     else if (data == "&&&&&&&&&&&&&")
                     {
                         //We've connected to Furcadia
-                        //Stop the reconnection manager
-
+                        //TODO: Stop the reconnection manager
                         serverconnectphase = ConnectionPhase.Connected;
-                        //if (IsClientConnected)
-                        //{
-                        //    clientconnectionphase = ConnectionPhase.Connected;
-                        //    ClientStatusChanged?.Invoke(null, new NetClientEventArgs(clientconnectionphase));
-
-                        //}
-
-                        //ProcessServerInstruction?.Invoke(FurreSpawn,
-                        //        new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
-
+                       
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
                     }
                     break;
@@ -988,24 +978,6 @@ namespace Furcadia.Net.Proxy
                             player = Dream.FurreList.GetFurreByID(Player.ID);
                         }
 
-                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_SET_VISIBLE))
-                        {
-                            // FURRE Bot = NameToFurre(botName);
-                            //ViewArea VisableRectangle = getTargetRectFromCenterCoord(Bot.Position.x, Bot.Position.y);
-                            //if (VisableRectangle.X <= player.Position.x & VisableRectangle.Y <=
-                            //    player.Position.y & VisableRectangle.height >=
-                            //    player.Position.y & VisableRectangle.length >= player.Position.x)
-                            //{
-                            //    player.Visible = true;
-                            //}
-                            //else
-                            //{
-                            //    player.Visible = false;
-                            //}
-                        }
-                        //if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_HAS_PROFILE))
-                        //{
-                        //}
 
                         if (InDream)
                         {
@@ -1489,12 +1461,6 @@ namespace Furcadia.Net.Proxy
             if (!handled)
                 ServerData2?.Invoke(data);
         }
-
-        #region "Dice Rolls"
-
-        //TODO Check MS Engine Dice lines
-
-        #endregion "Dice Rolls"
 
         #region "Popup Dialogs"
 

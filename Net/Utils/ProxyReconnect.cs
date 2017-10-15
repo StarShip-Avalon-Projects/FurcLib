@@ -194,23 +194,22 @@ namespace Furcadia.Net.Utils
 
         private bool disposedValue = false; // To detect redundant calls
 
-        // This code added to correctly implement the disposable pattern.
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose()'
-
+            /// <summary>
+            /// destructor
+            /// </summary>
         public void Dispose()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose()'
-        {
+       {
             // Do not change this code. Put cleanup code in Dispose(bool
             // disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is
-            //       overridden above. GC.SuppressFinalize(this);
+
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose(bool)'
-
+       /// <summary>
+        /// Implement IDisposable pattern
+        /// </summary>
+        /// <param name="disposing"></param>
         public virtual void Dispose(bool disposing)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ProxyReconnect.Dispose(bool)'
         {
             if (!disposedValue)
             {
@@ -222,18 +221,10 @@ namespace Furcadia.Net.Utils
                         ReconnectTimer.Dispose();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and
-                //       override a finalizer below.
-                // TODO: set large fields to null.
-
                 disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above
-        //       has code to free unmanaged resources. ~ProxyReconnect() {
-        //       // Do not change this code. Put cleanup code in
-        // Dispose(bool disposing) above. Dispose(false); }
 
         #endregion IDisposable Support
 
