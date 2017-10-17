@@ -9,7 +9,7 @@ namespace Furcadia.Net.Dream
     /// <summary>
     /// Class for Proxies and bots to use Furrre Data provided by the game server.
     /// </summary>
-    public class FURRE
+    public class Furre
     {
         #region Private Fields
 
@@ -31,7 +31,7 @@ namespace Furcadia.Net.Dream
         private int _LastStat;
         private int _level;
         private string _Message;
-        private string _name;
+        private string name;
 
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
@@ -49,26 +49,23 @@ namespace Furcadia.Net.Dream
 
         /// <summary>
         /// </summary>
-        public FURRE()
+        public Furre()
         {
             _Color = new ColorString();
             Location = new FurrePosition();
             LastPosition = new FurrePosition();
             _LastStat = -1;
+            name = "Unknown";
         }
 
         /// <summary>
         /// </summary>
         /// <param name="FurreID">
         /// </param>
-        public FURRE(int FurreID)
+        public Furre(int FurreID) : this()
         {
             _ID = FurreID;
 
-            _Color = new ColorString();
-            Location = new FurrePosition();
-            LastPosition = new FurrePosition();
-            _LastStat = -1;
         }
 
         /// <summary>
@@ -76,13 +73,10 @@ namespace Furcadia.Net.Dream
         /// </summary>
         /// <param name="Name">
         /// </param>
-        public FURRE(string Name)
+        public Furre(string Name) : this()
         {
-            _name = Name;
-            _Color = new ColorString();
-            Location = new FurrePosition();
-            LastPosition = new FurrePosition();
-            _LastStat = -1;
+            name = Name;
+
         }
 
         /// <summary>
@@ -91,14 +85,11 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <param name="Name">
         /// </param>
-        public FURRE(int FurreID, string Name)
+        public Furre(int FurreID, string Name) : this()
         {
             _ID = FurreID;
-            _name = Name;
-            _Color = new ColorString();
-            Location = new FurrePosition();
-            LastPosition = new FurrePosition();
-            _LastStat = -1;
+            name = Name;
+
         }
 
         #endregion Public Constructors
@@ -112,7 +103,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// Away from keyboard time
         /// </summary>
-        public int AFK
+        public int AfkTime
         {
             get { return _AFK; }
             set { _AFK = value; }
@@ -120,7 +111,7 @@ namespace Furcadia.Net.Dream
 
         /// <summary>
         /// </summary>
-        public string Badge
+        public string BeekinBadge
         {
             get { return _badge; }
             set
@@ -135,7 +126,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// Furcadia Color Code (v31c)
         /// </summary>
-        public ColorString Color
+        public ColorString FurreColors
         {
             //TODO: Move section to a Costume Sub Class
             // Furcadia now supports Costumes through Online FurEd
@@ -149,7 +140,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// Furcadia Description
         /// </summary>
-        public string Desc
+        public string FurreDescription
         {
             get { return _Desc; }
             set { _Desc = value; }
@@ -164,11 +155,11 @@ namespace Furcadia.Net.Dream
         }
 
         [Obsolete]
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'FURRE.DSSpecies'
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Furre.DSSpecies'
         public int DSSpecies
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'FURRE.DSSpecies'
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Furre.DSSpecies'
         {
-            get { return Color.Species; }
+            get { return FurreColors.Species; }
         }
 
         /// <summary>
@@ -198,7 +189,7 @@ namespace Furcadia.Net.Dream
         [Obsolete]
         public int Gender
         {
-            get { return Color.Gender; }
+            get { return FurreColors.Gender; }
         }
 
         ///// <summary>
@@ -220,7 +211,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// Furre ID
         /// </summary>
-        public int ID
+        public int FurreID
         {
             get { return _ID; }
             set { _ID = value; }
@@ -263,8 +254,8 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { _name = value; }
+            get { return name; }
+            set { name = value; }
         }
 
         /// <summary>
@@ -320,7 +311,7 @@ namespace Furcadia.Net.Dream
         {
             get
             {
-                return FurcadiaShortName(_name);
+                return FurcadiaShortName(name);
             }
         }
 
@@ -401,7 +392,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public static bool operator !=(FURRE a, FURRE b)
+        public static bool operator !=(Furre a, Furre b)
         {
             return !(a == b);
         }
@@ -414,9 +405,9 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public static bool operator ==(FURRE a, FURRE b)
+        public static bool operator ==(Furre a, Furre b)
         {
-            if (System.Object.ReferenceEquals(a, b))
+            if (ReferenceEquals(a, b))
             {
                 return true;
             }
@@ -424,7 +415,7 @@ namespace Furcadia.Net.Dream
             if ((object)a == null || (object)b == null)
                 return false;
             if (string.IsNullOrEmpty(a.ShortName) || string.IsNullOrEmpty(a.ShortName))
-                return a.ID == b.ID;
+                return a.FurreID == b.FurreID;
             return a.ShortName == b.ShortName;
         }
 
@@ -438,12 +429,12 @@ namespace Furcadia.Net.Dream
         {
             if (obj == null)
                 return false;
-            if (obj.GetType() == typeof(FURRE))
+            if (obj.GetType() == typeof(Furre))
             {
-                FURRE ob = (FURRE)obj;
+                Furre ob = (Furre)obj;
                 if (!string.IsNullOrEmpty(ShortName))
                     return ob.ShortName == ShortName;
-                return ob.ID == ID;
+                return ob.FurreID == FurreID;
             }
             return base.Equals(obj);
         }
@@ -472,7 +463,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public int ToFurcadiaID(Func<FURRE, int> format)
+        public int ToFurcadiaID(Func<Furre, int> format)
         {
             if (format != null)
                 return format(this);
@@ -485,7 +476,7 @@ namespace Furcadia.Net.Dream
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} - {1}", ID, Name);
+            return string.Format("{0} - {1}", FurreID, Name);
         }
 
         /// <summary>
@@ -494,7 +485,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public string ToString(Func<FURRE, string> format)
+        public string ToString(Func<Furre, string> format)
         {
             if (format != null)
                 return format(this);

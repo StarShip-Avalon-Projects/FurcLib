@@ -20,7 +20,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        internal FURRE player;
+        internal Furre player;
 
         #endregion Internal Fields
 
@@ -35,7 +35,7 @@ namespace Furcadia.Net.Utils.ServerParser
             if (ServerInstruction[0] == '(')
                 instructionType = ServerInstructionType.DisplayText;
 
-            player = new FURRE();
+            player = new Furre();
         }
 
         #endregion Public Constructors
@@ -88,7 +88,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        public FURRE Player
+        public Furre Player
         {
             get { return player; }
             set { player = value; }

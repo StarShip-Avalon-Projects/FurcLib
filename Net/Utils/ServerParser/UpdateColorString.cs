@@ -12,7 +12,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// the Active Player
         /// </summary>
-        public FURRE player;
+        public Furre player;
 
         #endregion Public Fields
 
@@ -24,7 +24,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         /// <param name="ServerInstruction">
         /// </param>
-        public UpdateColorString(ref FURRE Player, string ServerInstruction) : base(ServerInstruction)
+        public UpdateColorString(ref Furre Player, string ServerInstruction) : base(ServerInstruction)
         {
             if (ServerInstruction.StartsWith("B"))
                 base.instructionType = ServerInstructionType.UpdateColorString;
@@ -35,7 +35,7 @@ namespace Furcadia.Net.Utils.ServerParser
             //  player.Shape = ConvertFromBase220(ServerInstruction.Substring(5, 2));
 
             // partial color code
-            player.Color.Update(ServerInstruction.Substring(8, ColorString.ColorStringSize));
+            player.FurreColors.Update(ServerInstruction.Substring(8, ColorString.ColorStringSize));
         }
 
         #endregion Public Constructors

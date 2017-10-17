@@ -154,7 +154,7 @@ namespace Furcadia.Net.Proxy
 
         #region Connected Furre
 
-        private FURRE connectedFurre;
+        private Furre connectedFurre;
 
         /// <summary>
         /// Connected Characters Furcadia ID
@@ -166,12 +166,12 @@ namespace Furcadia.Net.Proxy
             {
                 if (connectedFurre == null)
                     return -1;
-                return connectedFurre.ID;
+                return connectedFurre.FurreID;
             }
             //set
             //{
             //    if (connectedFurre == null)
-            //        connectedFurre = new FURRE(value);
+            //        connectedFurre = new Furre(value);
             //    connectedFurre.ID = value;
             //}
         }
@@ -191,7 +191,7 @@ namespace Furcadia.Net.Proxy
             //set
             //{
             //    if (connectedFurre == null)
-            //        connectedFurre = new FURRE(value);
+            //        connectedFurre = new Furre(value);
             //    connectedFurre.Name = value;
             //}
         }
@@ -199,7 +199,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Connected Furre (Who we are)
         /// </summary>
-        public FURRE ConnectedFurre
+        public Furre ConnectedFurre
         {
             get
             {
@@ -240,7 +240,7 @@ namespace Furcadia.Net.Proxy
         private bool Look;
         private Queue<string> LookQue;
         private Options.ProxySessionOptions options;
-        private FURRE player;
+        private Furre player;
 
         /// <summary>
         /// Manage out Auto reconnects
@@ -457,7 +457,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Current Triggering player
         /// </summary>
-        public FURRE Player
+        public Furre Player
         {
             get { return player; }
         }
@@ -560,19 +560,19 @@ namespace Furcadia.Net.Proxy
                     if (DescRegex.Match(data).Success)
                     {
                         player = dream.FurreList.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
-                        player.Desc = DescRegex.Match(data).Groups[2].Value;
+                        player.FurreDescription = DescRegex.Match(data).Groups[2].Value;
                         // player = NameToFurre(DescName);
                         if (LookQue.Count > 0)
                         {
-                            player.Color = new ColorString(LookQue.Dequeue());
+                            player.FurreColors = new ColorString(LookQue.Dequeue());
                         }
                         if (BadgeTag.Count > 0)
                         {
-                            player.Badge = BadgeTag.Dequeue(); ;
+                            player.BeekinBadge = BadgeTag.Dequeue(); ;
                         }
-                        else if (!string.IsNullOrEmpty(player.Badge))
+                        else if (!string.IsNullOrEmpty(player.BeekinBadge))
                         {
-                            player.Badge = "";
+                            player.BeekinBadge = "";
                         }
                         Look = false;
                     }
@@ -721,11 +721,11 @@ namespace Furcadia.Net.Proxy
                         player.Message = WhisperIncoming.Match(data).Groups[5].Value;
                         if (BadgeTag.Count > 0)
                         {
-                            player.Badge = BadgeTag.Dequeue();
+                            player.BeekinBadge = BadgeTag.Dequeue();
                         }
                         else
                         {
-                            player.Badge = "";
+                            player.BeekinBadge = "";
                         }
                     }
                     else if (WhisperOutgoing.Match(data).Success)
@@ -754,7 +754,7 @@ namespace Furcadia.Net.Proxy
                     // ''EMOTE
                     if (SpeciesTag.Count > 0)
                     {
-                        player.Color = new ColorString(SpeciesTag.Dequeue());
+                        player.FurreColors = new ColorString(SpeciesTag.Dequeue());
                     }
                     Regex usr = new Regex(NameFilter);
                     System.Text.RegularExpressions.Match n = usr.Match(Text);
@@ -782,7 +782,7 @@ namespace Furcadia.Net.Proxy
 
                         Regex t = new Regex("The banishment of player (.*?) has ended.");
                         NameStr = t.Match(data).Groups[1].Value;
-                        player = new FURRE(NameStr);
+                        player = new Furre(NameStr);
                         bool found = false;
                         int I;
                         for (I = 0; I <= BanishString.Count - 1; I++)
@@ -804,12 +804,12 @@ namespace Furcadia.Net.Proxy
                     errorNum = 2;
 
                     string NameStr = "";
-                    if (Text.Contains("There are no furres around right now with a name starting with "))
+                    if (Text.Contains("There are no Furres around right now with a name starting with "))
                     {
                         //Banish <name> (Not online)
-                        //Error:>>  There are no furres around right now with a name starting with (.*?) .
+                        //Error:>>  There are no Furres around right now with a name starting with (.*?) .
 
-                        Regex t = new Regex("There are no furres around right now with a name starting with (.*?) .");
+                        Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .");
                         NameStr = t.Match(data).Groups[1].Value;
                     }
                     else if (Text == "Sorry, this player has not been banished from your dreams.")
@@ -956,7 +956,7 @@ namespace Furcadia.Net.Proxy
                             length = ColorString.ColorStringSize;
                             // player = NameToFurre(data.Remove(0, length +
                             // 2)); If player.ID = 0 Then Exit Sub
-                            player.Color = new ColorString(data.Substring(2, length));
+                            player.FurreColors = new ColorString(data.Substring(2, length));
                             if (IsConnectedCharacter)
                                 Look = false;
                             if (Dream.FurreList.Contains(player))
@@ -975,7 +975,7 @@ namespace Furcadia.Net.Proxy
                         }
                         if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                         {
-                            player = Dream.FurreList.GetFurreByID(Player.ID);
+                            player = Dream.FurreList.GetFurreByID(Player.FurreID);
                         }
 
 
@@ -1383,7 +1383,7 @@ namespace Furcadia.Net.Proxy
                         string test = data.Replace("connect ", "").TrimStart(' ');
                         string botName = test.Substring(0, test.IndexOf(" "));
                         if (connectedFurre == null)
-                            connectedFurre = new FURRE(botName);
+                            connectedFurre = new Furre(botName);
                         else
                             connectedFurre.Name = botName;
                     }
@@ -1391,7 +1391,7 @@ namespace Furcadia.Net.Proxy
                     {
                         string[] words = data.Split(' ');
                         if (connectedFurre == null)
-                            connectedFurre = new FURRE(words[2]);
+                            connectedFurre = new Furre(words[2]);
                         else
                             connectedFurre.Name = words[2];
                     }
@@ -1454,7 +1454,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         private void OnServerDataReceived(string data)
         {
-            player = new FURRE();
+            player = new Furre();
             bool handled = false;
             ParseServerData(data, handled);
 

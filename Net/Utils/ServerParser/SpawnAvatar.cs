@@ -22,7 +22,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// the Active Player
         /// </summary>
-        public FURRE player;
+        public Furre player;
 
         /// <summary>
         /// Spawing plags
@@ -60,19 +60,19 @@ namespace Furcadia.Net.Utils.ServerParser
             var ColTypePos = 12 + NameIdx;
             var ColorLength = (ServerInstruction[ColTypePos] == 'w') ? 16 : 14;
 
-            player = new FURRE(id, name);
+            player = new Furre(id, name);
             player.Position = Position;
             player.Direction = (av_DIR)FurreDirection;
             player.Pose = (FurrePose)FurrePose;
 
-            player.Color = new ColorString(ServerInstruction.Substring(ColTypePos, ColorLength));
+            player.FurreColors = new ColorString(ServerInstruction.Substring(ColTypePos, ColorLength));
 
             int FlagPos = ServerInstruction.Length - 6;
 
             ColTypePos += ColorLength;
             PlayerFlags = new CharacterFlags(ServerInstruction.Substring(ColTypePos, 1));
 
-            player.AFK = ConvertFromBase220(ServerInstruction.Substring(ColTypePos, 1));
+            player.AfkTime = ConvertFromBase220(ServerInstruction.Substring(ColTypePos, 1));
             //player.kittersize
 
             // reserverd for Future updates as Character Profiles come into existance

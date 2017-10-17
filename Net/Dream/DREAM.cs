@@ -25,7 +25,7 @@ namespace Furcadia.Net.Dream
         /// As of V31, Color code has changed.
         /// </para>
         /// </summary>
-        public FURREList FurreList;
+        public FurreList FurreList;
 
         #endregion Public Fields
 
@@ -45,7 +45,7 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public DREAM()
         {
-            FurreList = new FURREList();
+            FurreList = new FurreList();
         }
 
         #endregion Public Constructors

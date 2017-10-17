@@ -39,16 +39,16 @@ namespace Furcadia.Net.Utils.ServerParser
             //7:      additional(Message)
             //8:      Final(result)
 
-            player = new FURRE(DiceMatch.Groups[3].Value);
-            player.Message = DiceMatch.Groups[7].Value;
-            double num = 0;
-            double.TryParse(DiceMatch.Groups[4].Value, out num);
+            player = new Furre(DiceMatch.Groups[3].Value)
+            {
+                Message = DiceMatch.Groups[7].Value
+            };
+            double.TryParse(DiceMatch.Groups[4].Value, out double num);
             dice.DiceSides = num;
             num = 0;
             double.TryParse(DiceMatch.Groups[3].Value, out num);
             dice.DiceCount = num;
-            char cchar = '+';
-            char.TryParse(DiceMatch.Groups[6].Value, out cchar);
+            char.TryParse(DiceMatch.Groups[6].Value, out char cchar);
             dice.DiceCompnentMatch = cchar;
             num = 0.0;
             double.TryParse(DiceMatch.Groups[5].Value, out num);
