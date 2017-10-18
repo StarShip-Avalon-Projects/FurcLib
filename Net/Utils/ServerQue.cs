@@ -364,11 +364,9 @@ namespace Furcadia.Net.Utils
                         QueueTimer.Dispose();
                 }
 
-
                 disposedValue = true;
             }
         }
-
 
         #endregion IDisposable Support
 

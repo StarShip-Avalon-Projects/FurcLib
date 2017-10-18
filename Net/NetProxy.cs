@@ -437,17 +437,16 @@ namespace Furcadia.Net
             {
                 client.Close();
             }
-            if (listen != null )
+            if (listen != null)
             {
                 if (listen.Server.Connected)
                     listen.Server.Disconnect(true);
                 listen.Server.Close();
                 listen.Server.Dispose();
                 listen.Stop();
-               
+
                 listen = null;
             }
-
 
             GC.Collect();
             ClientDisConnected?.Invoke();
@@ -483,12 +482,12 @@ namespace Furcadia.Net
             try
             {
                 _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
-                if (listen == null )
+                if (listen == null)
                 {
                     // UAC Perms Needed to Create proxy.ini Win 7 Change your
                     // UAC Level or add file create Permissions to [%program
                     // files%/furcadia] Maybe Do this at install
-                  
+
                     int counter = 0;
                     while (!PortOpen(options.LocalhostPort))
                     {
@@ -514,13 +513,12 @@ namespace Furcadia.Net
 
                 //Run
 
-                    //check ProcessPath is not a directory
+                //check ProcessPath is not a directory
                 if (!Directory.Exists(options.FurcadiaInstallPath)) throw new NetProxyException("Process path not found.");
                 if (!File.Exists(Path.Combine(options.FurcadiaInstallPath, options.FurcadiaProcess))) throw new NetProxyException("Client executable '" + options.FurcadiaProcess + "' not found.");
                 furcProcess = new System.Diagnostics.Process
                 {
                     EnableRaisingEvents = true,
-
                 }; //= System.Diagnostics.Process.Start(Process,ProcessCMD );
                 furcProcess.StartInfo.FileName = options.FurcadiaProcess;
                 furcProcess.StartInfo.Arguments = options.CharacterIniFile;
@@ -649,7 +647,7 @@ namespace Furcadia.Net
                     settings.RestoreFurcadiaSettings(ref BackupSettings);
                 if (listen != null)
                 {
-                    listen.Server.DisconnectAsync( new SocketAsyncEventArgs());
+                    listen.Server.DisconnectAsync(new SocketAsyncEventArgs());
                     listen.Server.Close();
                     listen.Server.Dispose();
                     listen.Stop();
@@ -689,7 +687,6 @@ namespace Furcadia.Net
         /// </param>
         private void AsyncListener(IAsyncResult ar)
         {
-
             try
             {
                 try
@@ -719,7 +716,7 @@ namespace Furcadia.Net
             }
             catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
             finally { settings.RestoreFurcadiaSettings(ref BackupSettings); }
-            }
+        }
 
         private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
         {

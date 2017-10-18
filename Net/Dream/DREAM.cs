@@ -7,7 +7,7 @@ namespace Furcadia.Net.Dream
     /// Current Dream information
     /// </summary>
     [CLSCompliant(true)]
-    public class DREAM 
+    public class DREAM
     {
         #region Public Fields
 
@@ -129,6 +129,5 @@ namespace Furcadia.Net.Dream
         }
 
         #endregion Public Properties
-
     }
 }

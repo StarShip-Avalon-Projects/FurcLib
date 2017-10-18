@@ -65,7 +65,6 @@ namespace Furcadia.Net.Dream
         public Furre(int FurreID) : this()
         {
             _ID = FurreID;
-
         }
 
         /// <summary>
@@ -76,7 +75,6 @@ namespace Furcadia.Net.Dream
         public Furre(string Name) : this()
         {
             name = Name;
-
         }
 
         /// <summary>
@@ -89,7 +87,6 @@ namespace Furcadia.Net.Dream
         {
             _ID = FurreID;
             name = Name;
-
         }
 
         #endregion Public Constructors

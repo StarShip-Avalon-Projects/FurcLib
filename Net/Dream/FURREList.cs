@@ -354,13 +354,10 @@ namespace Furcadia.Net.Dream
             fList.RemoveAt(index);
         }
 
-
         IEnumerator<Furre> IEnumerable<Furre>.GetEnumerator()
         {
             return fList.GetEnumerator();
         }
-
- 
 
         #endregion IDisposable Support
     }

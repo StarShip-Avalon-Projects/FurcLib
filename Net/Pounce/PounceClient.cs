@@ -9,7 +9,7 @@ namespace Furcadia.Net.Pounce
     /// Generic Class to use the Pounce server
     /// </summary>
     /// TODO: Read default lists(Furres, Dreams, Channels) from Furcadia Online.ini
-      public class PounceClient : PounceConnection, IDisposable
+    public class PounceClient : PounceConnection, IDisposable
     {
         #region Public Constructors
 

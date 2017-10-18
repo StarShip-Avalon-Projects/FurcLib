@@ -10,9 +10,10 @@ namespace Furcadia.Net.Web
     /// <summary>
     /// Basic Webpage Task interface.
     /// </summary>
-    public sealed class NetWeb 
+    public sealed class NetWeb
     {
-        Uri Url;
+        private Uri Url;
+
         /// <summary>
         /// Initialize the Class with a default URL
         /// </summary>
@@ -78,7 +79,7 @@ namespace Furcadia.Net.Web
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public async Task<List<string>> PostData()
@@ -89,8 +90,5 @@ namespace Furcadia.Net.Web
      GetWebPageAsync(Url, progressIndicator, cts.Token), cts.Token);
             return result;
         }
-
-
-
     }
 }

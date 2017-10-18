@@ -122,7 +122,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (serverconnectphase == ConnectionPhase.Init )
+            if (serverconnectphase == ConnectionPhase.Init)
             {
                 serverconnectphase = ConnectionPhase.Connecting;
                 clientconnectionphase = ConnectionPhase.Connecting;
@@ -927,7 +927,7 @@ namespace Furcadia.Net.Proxy
                     //    //string[] tokens = data.Split(sep, 3);
                     //    //sErrorMessage = tokens[2];
                     //}
-                    //else 
+                    //else
                     if (data.StartsWith("]]"))
                     {
                         Disconnect();
@@ -937,7 +937,7 @@ namespace Furcadia.Net.Proxy
                         //We've connected to Furcadia
                         //TODO: Stop the reconnection manager
                         serverconnectphase = ConnectionPhase.Connected;
-                       
+
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
                     }
                     break;
@@ -977,7 +977,6 @@ namespace Furcadia.Net.Proxy
                         {
                             player = Dream.FurreList.GetFurreByID(Player.FurreID);
                         }
-
 
                         if (InDream)
                         {
@@ -1518,7 +1517,6 @@ namespace Furcadia.Net.Proxy
             if (disposing)
             {
                 handle.Dispose();
-               
             }
             base.Dispose();
             // Free any unmanaged objects here.

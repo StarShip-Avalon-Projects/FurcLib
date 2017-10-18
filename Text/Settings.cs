@@ -23,14 +23,13 @@ namespace Furcadia.Text
     {
         #region Public Constructors
 
-
         /// <summary>
         /// </summary>
         /// <param name="options">Pxoxy Options</param>
         public Settings(ProxyOptions options)
         {
             Keys = new string[9] { "UseProxyOrFirewall", "ProxyHost", "ProxyPort", "SessionCloseCheck", "ProxyHostType", "ProxyCustomType", "ProxyCustomData", "ProxyApplyToFs", "UseTls" };
-            values = new string[9] { "Yes", options.ProxyHost,options.LocalhostPort.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
+            values = new string[9] { "Yes", options.ProxyHost, options.LocalhostPort.ToString(), "no", "0", "0", "CONNECT %host% %port%", "no", "no" };
         }
 
         #endregion Public Constructors

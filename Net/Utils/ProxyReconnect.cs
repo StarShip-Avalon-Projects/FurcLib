@@ -194,18 +194,17 @@ namespace Furcadia.Net.Utils
 
         private bool disposedValue = false; // To detect redundant calls
 
-            /// <summary>
-            /// destructor
-            /// </summary>
+        /// <summary>
+        /// destructor
+        /// </summary>
         public void Dispose()
-       {
+        {
             // Do not change this code. Put cleanup code in Dispose(bool
             // disposing) above.
             Dispose(true);
-
         }
 
-       /// <summary>
+        /// <summary>
         /// Implement IDisposable pattern
         /// </summary>
         /// <param name="disposing"></param>
@@ -224,7 +223,6 @@ namespace Furcadia.Net.Utils
                 disposedValue = true;
             }
         }
-
 
         #endregion IDisposable Support
 
