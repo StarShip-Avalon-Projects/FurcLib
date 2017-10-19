@@ -174,6 +174,21 @@ namespace Furcadia.Net.Dream
         }
 
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="FurreName"></param>
+        /// <returns></returns>
+        public bool Contains(string FurreName)
+        {
+            foreach (Furre fur in fList)
+            {
+                if (fur.ShortName == Furcadia.Util.FurcadiaShortName(FurreName))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="Furre">
         /// </param>
@@ -354,13 +369,10 @@ namespace Furcadia.Net.Dream
             fList.RemoveAt(index);
         }
 
-
         IEnumerator<Furre> IEnumerable<Furre>.GetEnumerator()
         {
             return fList.GetEnumerator();
         }
-
- 
 
         #endregion IDisposable Support
     }
