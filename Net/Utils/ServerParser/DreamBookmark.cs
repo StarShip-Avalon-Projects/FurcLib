@@ -48,7 +48,7 @@
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
             dreamURL = ServerInstruction.Substring(3);
-            type = int.Parse(ServerInstruction.Substring(2, 1));
+            type = ServerInstruction[2];
         }
 
         #endregion Public Constructors
