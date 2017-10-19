@@ -48,7 +48,7 @@ namespace Furcadia.Movement
         /// <param name="flags">
         /// Base220 String
         /// </param>
-        public CharacterFlags(string flags)
+        public CharacterFlags(char flags)
         {
             characterFlags = ConvertFromBase220(flags);
         }

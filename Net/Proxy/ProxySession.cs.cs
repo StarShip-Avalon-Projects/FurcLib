@@ -90,6 +90,7 @@ namespace Furcadia.Net.Proxy
 
         private void Initilize()
         {
+            connectedFurre = new Furre();
             serverconnectphase = ConnectionPhase.Init;
             clientconnectionphase = ConnectionPhase.Init;
 
@@ -155,46 +156,6 @@ namespace Furcadia.Net.Proxy
         #region Connected Furre
 
         private Furre connectedFurre;
-
-        /// <summary>
-        /// Connected Characters Furcadia ID
-        /// </summary>
-        [Legacy]
-        public int ConnectedCharacterFurcadiaID
-        {
-            get
-            {
-                if (connectedFurre == null)
-                    return -1;
-                return connectedFurre.FurreID;
-            }
-            //set
-            //{
-            //    if (connectedFurre == null)
-            //        connectedFurre = new Furre(value);
-            //    connectedFurre.ID = value;
-            //}
-        }
-
-        /// <summary>
-        /// Our Connected Character name
-        /// </summary>
-        [Legacy]
-        public string ConnectedCharacterName
-        {
-            get
-            {
-                if (connectedFurre == null)
-                    return null;
-                return connectedFurre.Name;
-            }
-            //set
-            //{
-            //    if (connectedFurre == null)
-            //        connectedFurre = new Furre(value);
-            //    connectedFurre.Name = value;
-            //}
-        }
 
         /// <summary>
         /// Connected Furre (Who we are)
@@ -943,20 +904,18 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case ConnectionPhase.Connected:
-
+                    // Look instruction
                     if (data.StartsWith("]f") & InDream == true)
                     {
-                        short length = 14;
                         if (Look)
                         {
                             LookQue.Enqueue(data.Substring(2));
                         }
                         else
                         {
-                            length = ColorString.ColorStringSize;
                             // player = NameToFurre(data.Remove(0, length +
                             // 2)); If player.ID = 0 Then Exit Sub
-                            player.FurreColors = new ColorString(data.Substring(2, length));
+                            player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
                             if (IsConnectedCharacter)
                                 Look = false;
                             if (Dream.FurreList.Contains(player))
@@ -969,15 +928,15 @@ namespace Furcadia.Net.Proxy
                         var FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
                         Dream.FurreList.Add(player);
-                        if (IsConnectedCharacter && !dream.FurreList.Contains(player))
+                        if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
+                        {
+                            Dream.FurreList.Add(FurreSpawn.player);
+                        }
+                        player = Dream.FurreList.GetFurreByID(Player.FurreID);
+                        if (IsConnectedCharacter)
                         {
                             connectedFurre = player;
                         }
-                        if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
-                        {
-                            player = Dream.FurreList.GetFurreByID(Player.FurreID);
-                        }
-
                         if (InDream)
                         {
                             if (ProcessServerInstruction != null)
@@ -1118,7 +1077,6 @@ namespace Furcadia.Net.Proxy
 #endif
                         inDream = false;
                         dream.FurreList.Clear();
-                        dream.FurreList.Add(connectedFurre);
                         // RaiseEvent UpDateDreamList("")
 
                         //;{mapfile}	Load a local map (one in the furcadia folder)
@@ -1171,9 +1129,9 @@ namespace Furcadia.Net.Proxy
                     // Credits Artex, FTR
                     else if (data.StartsWith("]B"))
                     {
-                        int ID = int.Parse(data.Substring(2, data.Length - connectedFurre.Name.Length - 3));
-                        if (ConnectedCharacterFurcadiaID < 1)
-                            connectedFurre = Dream.FurreList.GetFurreByID(ID);
+                        int ID = int.Parse(data.Substring(2, data.Length -
+                            connectedFurre.Name.Length - 3));
+                        connectedFurre.FurreID = ID;
 
                         ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
                             new ParseServerArgs(ServerInstructionType.SetOwnId, serverconnectphase));
@@ -1233,8 +1191,6 @@ namespace Furcadia.Net.Proxy
                         {
                             //Using Furclib ServQue
                             ThroatTired = true;
-
-                            //(0:92) When the bot detects the "Your throat is tired. Please wait a few seconds" message,
                         }
                         try
                         {
@@ -1251,9 +1207,7 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case ConnectionPhase.Disconnected:
-                    // Do nothing - we're disconnected...
-                    break;
-
+                // Do nothing - we're disconnected...
                 default:
                     break;
             }
@@ -1381,18 +1335,12 @@ namespace Furcadia.Net.Proxy
                     {
                         string test = data.Replace("connect ", "").TrimStart(' ');
                         string botName = test.Substring(0, test.IndexOf(" "));
-                        if (connectedFurre == null)
-                            connectedFurre = new Furre(botName);
-                        else
-                            connectedFurre.Name = botName;
+                        connectedFurre = new Furre(botName);
                     }
                     else if (data.ToLower().StartsWith("account"))
                     {
                         string[] words = data.Split(' ');
-                        if (connectedFurre == null)
-                            connectedFurre = new Furre(words[2]);
-                        else
-                            connectedFurre.Name = words[2];
+                        connectedFurre = new Furre(words[2]);
                     }
                     if (data == "vascodagama")
                     {

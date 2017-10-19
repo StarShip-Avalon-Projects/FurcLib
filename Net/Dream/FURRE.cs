@@ -56,6 +56,7 @@ namespace Furcadia.Net.Dream
             LastPosition = new FurrePosition();
             _LastStat = -1;
             name = "Unknown";
+            _ID = -1;
         }
 
         /// <summary>
@@ -391,7 +392,11 @@ namespace Furcadia.Net.Dream
         /// </returns>
         public static bool operator !=(Furre a, Furre b)
         {
-            return !(a == b);
+            if (ReferenceEquals(a, b))
+            {
+                return false;
+            }
+            return !a.Equals(b);
         }
 
         /// <summary>
@@ -409,11 +414,7 @@ namespace Furcadia.Net.Dream
                 return true;
             }
 
-            if ((object)a == null || (object)b == null)
-                return false;
-            if (string.IsNullOrEmpty(a.ShortName) || string.IsNullOrEmpty(a.ShortName))
-                return a.FurreID == b.FurreID;
-            return a.ShortName == b.ShortName;
+            return a.Equals(b);
         }
 
         /// <summary>
@@ -429,7 +430,8 @@ namespace Furcadia.Net.Dream
             if (obj.GetType() == typeof(Furre))
             {
                 Furre ob = (Furre)obj;
-                if (!string.IsNullOrEmpty(ShortName))
+
+                if (FurreID == -1 || ob.FurreID == -1)
                     return ob.ShortName == ShortName;
                 return ob.FurreID == FurreID;
             }

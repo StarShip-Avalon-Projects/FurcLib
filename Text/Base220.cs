@@ -291,6 +291,28 @@ namespace Furcadia.Text
 
         /// <summary>
         /// </summary>
+        /// <param name="b220chr">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static int ConvertFromBase220(char b220chr)
+        {
+            int num = 0;
+            int mod = 1;
+            if (b220chr == '\0')
+                return 0;
+            // Conversion
+            for (int i = 0; i < 1; i++)
+            {
+                num += (b220chr - CHAR_OFFSET) * mod;
+                mod *= 220;
+            }
+
+            return num;
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="num">
         /// </param>
         /// <returns>

@@ -1,4 +1,5 @@
-﻿using Furcadia.Movement;
+﻿using Furcadia.Drawing;
+using Furcadia.Movement;
 using Furcadia.Net.Dream;
 using static Furcadia.Net.Dream.Avatar;
 using static Furcadia.Text.Base220;
@@ -22,12 +23,14 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// the Active Player
         /// </summary>
-        public Furre player;
+        public Furre player
+        { get; internal set; }
 
         /// <summary>
         /// Spawing plags
         /// </summary>
-        public CharacterFlags PlayerFlags;
+        public CharacterFlags PlayerFlags
+        { get; internal set; }
 
         #endregion Protected Fields
 
@@ -40,39 +43,26 @@ namespace Furcadia.Net.Utils.ServerParser
         public SpawnAvatar(string ServerInstruction) : base(ServerInstruction)
         {
             //Update What type we are
-            if (ServerInstruction.StartsWith("<"))
-                base.instructionType = ServerInstructionType.SpawnAvatar;
+            if (ServerInstruction[0] == '<')
+                instructionType = ServerInstructionType.SpawnAvatar;
 
-            //FUID Furre ID 4 Base220 bytes
-            var id = ConvertFromBase220(ServerInstruction.Substring(1, 4));
+            string PosX = ServerInstruction.Substring(5, 2);
+            string PosY = ServerInstruction.Substring(7, 2);
 
-            var PosX = ServerInstruction.Substring(5, 2);
-            var PosY = ServerInstruction.Substring(7, 2);
-            var Position = new Drawing.FurrePosition(PosX, PosY);
+            int ColTypePos = (ServerInstruction[ConvertFromBase220(ServerInstruction[11])] == 'w') ? 16 : 14;
 
-            var FurreDirection = ConvertFromBase220(ServerInstruction.Substring(9, 1));
-            var FurrePose = ConvertFromBase220(ServerInstruction.Substring(10, 1));
-            var NameIdx = ConvertFromBase220(ServerInstruction.Substring(11, 1));
-            var NameLength = NameIdx + 12;
+            PlayerFlags = new CharacterFlags(ServerInstruction[ColTypePos]);
 
-            var name = ServerInstruction.Substring(12, NameIdx);
+            player = new Furre(ConvertFromBase220(ServerInstruction.Substring(1, 4)))
+            {
+                Name = ServerInstruction.Substring(12, ConvertFromBase220(ServerInstruction[11])),
+                Position = new FurrePosition(PosX, PosY),
+                Direction = (av_DIR)ConvertFromBase220(ServerInstruction.Substring(9, 1)),
+                Pose = (FurrePose)ConvertFromBase220(ServerInstruction.Substring(10, 1)),
+                AfkTime = ConvertFromBase220(ServerInstruction.Substring(ColTypePos + 1, 4)),
+                FurreColors = new ColorString(ServerInstruction.Substring(ColTypePos, (ServerInstruction[ColTypePos] == 'w') ? 16 : 14))
+            };
 
-            var ColTypePos = 12 + NameIdx;
-            var ColorLength = (ServerInstruction[ColTypePos] == 'w') ? 16 : 14;
-
-            player = new Furre(id, name);
-            player.Position = Position;
-            player.Direction = (av_DIR)FurreDirection;
-            player.Pose = (FurrePose)FurrePose;
-
-            player.FurreColors = new ColorString(ServerInstruction.Substring(ColTypePos, ColorLength));
-
-            int FlagPos = ServerInstruction.Length - 6;
-
-            ColTypePos += ColorLength;
-            PlayerFlags = new CharacterFlags(ServerInstruction.Substring(ColTypePos, 1));
-
-            player.AfkTime = ConvertFromBase220(ServerInstruction.Substring(ColTypePos, 1));
             //player.kittersize
 
             // reserverd for Future updates as Character Profiles come into existance
