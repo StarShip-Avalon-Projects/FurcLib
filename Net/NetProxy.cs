@@ -77,7 +77,7 @@ namespace Furcadia.Net
         /// </summary>
         private static TcpClient LightBringer;
 
-        private IPEndPoint _endpoint;
+        private IPEndPoint IpEndPoint;
 
         private string[] BackupSettings;
         //NetworkStream stream;
@@ -390,7 +390,7 @@ namespace Furcadia.Net
                 {
                     if (client != null)
                     {
-                        return client.Connected;
+                        return client.Connected && client.Client.Connected;
                     }
                 }
                 catch
@@ -406,12 +406,9 @@ namespace Furcadia.Net
         {
             get
             {
-                try
-                {
-                    if (LightBringer != null)
-                        return LightBringer.Connected;
-                }
-                catch { }
+                if (LightBringer != null)
+                    return (LightBringer.Connected && LightBringer.Client.Connected);
+
                 return false;
             }
         }
@@ -439,16 +436,9 @@ namespace Furcadia.Net
             }
             if (listen != null)
             {
-                if (listen.Server.Connected)
-                    listen.Server.Disconnect(true);
-                listen.Server.Close();
-                listen.Server.Dispose();
                 listen.Stop();
-
-                listen = null;
             }
 
-            GC.Collect();
             ClientDisConnected?.Invoke();
         }
 
@@ -481,7 +471,7 @@ namespace Furcadia.Net
             //    throw new Proxy.CharacterNotFoundException("Character.ini not specified");
             try
             {
-                _endpoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
+                IpEndPoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
                 if (listen == null)
                 {
                     // UAC Perms Needed to Create proxy.ini Win 7 Change your
@@ -499,9 +489,9 @@ namespace Furcadia.Net
                     try
                     {
                         listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
-                        if (listen.Server.Connected)
-                            listen.Server.Disconnect(true);
                         listen.Start();
+                        LightBringer = new TcpClient();
+                        LightBringer.Connect(IpEndPoint);
                         listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                     }
                     catch (SocketException se)
@@ -528,11 +518,15 @@ namespace Furcadia.Net
                 furcProcess.Exited += delegate
                 {
                     ClientDisConnected?.Invoke();
-                    ClientExited?.Invoke();
+                    //  ClientExited?.Invoke();
                 };
                 processID = furcProcess.Id;
             }
-            catch (Exception e) { if (Error != null) Error(e, this, "Connect()"); else throw e; }
+            catch (Exception e)
+            {
+                if (Error != null) Error(e, this, "Connect()");
+                else throw e;
+            }
         }
 
         /// <summary>
@@ -542,11 +536,10 @@ namespace Furcadia.Net
         {
             ClientDisconnect();
 
-            if (LightBringer != null && LightBringer.Connected == true)
+            if (IsServerConnected)
             {
                 LightBringer.Close();
             }
-            ServerDisConnected?.Invoke();
         }
 
         /// <summary>
@@ -645,13 +638,13 @@ namespace Furcadia.Net
                 //
                 if (BackupSettings != null)
                     settings.RestoreFurcadiaSettings(ref BackupSettings);
-                if (listen != null)
-                {
-                    listen.Server.DisconnectAsync(new SocketAsyncEventArgs());
-                    listen.Server.Close();
-                    listen.Server.Dispose();
-                    listen.Stop();
-                }
+                //if (listen != null)
+                //{
+                //    listen.Server.Disconnect(false);
+                //    listen.Server.Close();
+                //    listen.Server.Dispose();
+                //    listen.Stop();
+                //}
                 if (client != null && client.Connected == true)
                 {
                     client.Close();
@@ -687,6 +680,8 @@ namespace Furcadia.Net
         /// </param>
         private void AsyncListener(IAsyncResult ar)
         {
+            listen = (TcpListener)ar.AsyncState;
+
             try
             {
                 try
@@ -697,25 +692,22 @@ namespace Furcadia.Net
                 {
                     if (se.ErrorCode > 0) throw se;
                 }
-                catch (Exception Ex)
-                {
-                    throw new NetProxyException("NetProxy Error: ", Ex);
-                }
                 //listen.Stop();
                 // Connects to the server
-                LightBringer = new TcpClient();
-                LightBringer.Connect(_endpoint);
+
                 if (!LightBringer.Connected) throw new NetProxyException("There was a problem connecting to the server.");
                 try
                 {
                     client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
                     LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
                 }
-                catch { return; }
+                catch (Exception ex) { throw ex; }
                 Connected?.Invoke();
             }
-            catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
+            catch (Exception e) { }
             finally { settings.RestoreFurcadiaSettings(ref BackupSettings); }
+            //else
+            //    throw new Exception("Client Socket is not connected");
         }
 
         private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
@@ -747,76 +739,77 @@ namespace Furcadia.Net
         /// </param>
         private void GetClientData(IAsyncResult ar)
         {
-            lock (ClientDataObject)
+            client = (TcpClient)ar.AsyncState;
+
+            if (!IsClientConnected)
             {
-                if (!IsClientConnected)
-                {
-                    ClientDisConnected?.Invoke();
-                    return;
-                }
-                try
-                {
-                    int read = 0;
+                ClientDisConnected?.Invoke();
+                return;
+            }
+            try
+            {
+                int read = 0;
 
-                    read = client.GetStream().EndRead(ar);
-                    int currStart = 0;
-                    int currEnd = -1;
+                read = client.GetStream().EndRead(ar);
+                int currStart = 0;
+                int currEnd = -1;
 
-                    for (int i = 0; i < read; i++)
+                for (int i = 0; i < read; i++)
+                {
+                    if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
                     {
-                        if (i < BUFFER_CAP && clientBuffer[i] == 10)//'\n'
+                        // Set the end of the data
+                        currEnd = i;
+
+                        // If we have left overs from previous runs:
+                        if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
                         {
-                            // Set the end of the data
-                            currEnd = i;
+                            // Allocate enough space for the joined buffer
+                            byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
 
-                            // If we have left overs from previous runs:
-                            if (ClientLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
-                            {
-                                // Allocate enough space for the joined buffer
-                                byte[] joinedData = new byte[ClientLeftOversSize + (currEnd - currStart + 1)];
+                            // And add the current read as well
+                            Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
 
-                                // And add the current read as well
-                                Array.Copy(ClientLeftOvers, 0, joinedData, 0, ClientLeftOversSize);
+                            // Get the leftover from the previous read
+                            Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
 
-                                // Get the leftover from the previous read
-                                Array.Copy(clientBuffer, currStart, joinedData, ClientLeftOversSize, (currEnd - currStart + 1));
+                            ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
+                           0, joinedData.Length)); //Mark that we don't have any
+                                                   // leftovers anymore
 
-                                ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                               0, joinedData.Length)); //Mark that we don't have any
-                                                       // leftovers anymore
-
-                                // Mark that we don't have any leftovers anymore
-                                ClientLeftOversSize = 0;
-                            }
-                            else
-                            {
-                                ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
-                                currStart, currEnd - currStart));
-                            }
-
-                            // Set the new start - after our delimiter
-                            currStart = i + 1;
+                            // Mark that we don't have any leftovers anymore
+                            ClientLeftOversSize = 0;
                         }
-                    }
-                    // See if we still have any leftovers
-                    if (currStart < read)
-                    {
-                        //ClientLeftOvers = new byte[read - currStart];
+                        else
+                        {
+                            ClientData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(clientBuffer,
+                            currStart, currEnd - currStart));
+                        }
 
-                        Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
-                        ClientLeftOversSize = read - currStart;
-                    }
-
-                    if (IsClientConnected)
-                    {
-                        client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+                        // Set the new start - after our delimiter
+                        currStart = i + 1;
                     }
                 }
-                catch (Exception ex) //Catch any unknown exception and close the connection gracefully
+                // See if we still have any leftovers
+                if (currStart < read)
                 {
-                    Error?.Invoke(ex, this, ex.Message);
-                    ClientDisConnected?.Invoke();
+                    //ClientLeftOvers = new byte[read - currStart];
+
+                    Array.Copy(clientBuffer, currStart, ClientLeftOvers, 0, read - currStart);
+                    ClientLeftOversSize = read - currStart;
                 }
+
+                if (IsClientConnected)
+                {
+                    client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+                }
+                else
+                    ClientDisConnected?.Invoke();
+            }
+            catch (Exception ex) //Catch any unknown exception and close the connection gracefully
+            {
+                Error?.Invoke(ex, this, ex.Message);
+                ClientDisConnected?.Invoke();
             }
         }
 
@@ -827,73 +820,74 @@ namespace Furcadia.Net
         /// </param>
         private void GetServerData(IAsyncResult ar)
         {
-            if (!IsServerConnected)
-            {
-                ServerDisConnected?.Invoke();
-                return;
-            }
-            try
-            {
-                int read = 0;
+            LightBringer = (TcpClient)ar.AsyncState;
 
-                read = LightBringer.GetStream().EndRead(ar);
-                int currStart = 0;
-                int currEnd = -1;
+            if (LightBringer.Client.Connected)
 
-                for (int i = 0; i < read; i++)
+                try
                 {
-                    if (i < BUFFER_CAP && serverBuffer[i] == 10)
+                    int read = 0;
+                    // TcpClient GameServer = listener.EndAcceptTcpClient(ar);
+                    read = LightBringer.GetStream().EndRead(ar);
+                    int currStart = 0;
+                    int currEnd = -1;
+
+                    for (int i = 0; i < read; i++)
                     {
-                        // Set the end of the data
-                        currEnd = i;
-
-                        // If we have left overs from previous runs:
-                        if (ServerLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                        if (i < BUFFER_CAP && serverBuffer[i] == 10)
                         {
-                            // Allocate enough space for the joined buffer
-                            byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
+                            // Set the end of the data
+                            currEnd = i;
 
-                            // And add the current read as well
-                            Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
+                            // If we have left overs from previous runs:
+                            if (ServerLeftOversSize != 0) //&& (currEnd - currStart + 1) > 0)
+                            {
+                                // Allocate enough space for the joined buffer
+                                byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
 
-                            // Get the leftover from the previous read
-                            Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
+                                // And add the current read as well
+                                Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
 
-                            // Now handle it string test =
-                            ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                                         currStart, joinedData.Length));
-                            ServerLeftOversSize = 0;
+                                // Get the leftover from the previous read
+                                Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
+
+                                // Now handle it string test =
+                                ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
+                                             currStart, joinedData.Length));
+                                ServerLeftOversSize = 0;
+                            }
+                            else
+                            {
+                                ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
+                                 currStart, currEnd - currStart));
+
+                                // Handle the data, from the start to the end,
+                                // between delimiter
+                            }
+                            // Set the new start - after our delimiter
+                            currStart = i + 1;
                         }
-                        else
-                        {
-                            ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
-                             currStart, currEnd - currStart));
-
-                            // Handle the data, from the start to the end,
-                            // between delimiter
-                        }
-                        // Set the new start - after our delimiter
-                        currStart = i + 1;
                     }
-                }
 
-                // See if we still have any leftovers
-                if (currStart < read)
+                    // See if we still have any leftovers
+                    if (currStart < read)
+                    {
+                        // ServerLeftOvers = new byte[read - currStart];
+
+                        Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
+                        ServerLeftOversSize = read - currStart;
+                    }
+
+                    if (IsServerConnected)
+                        LightBringer.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), LightBringer);
+                }
+                catch (Exception ex) //Catch any unknown exception and close the connection gracefully
                 {
-                    // ServerLeftOvers = new byte[read - currStart];
-
-                    Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
-                    ServerLeftOversSize = read - currStart;
+                    Error?.Invoke(ex, this, ex.Message);
+                    ServerDisConnected?.Invoke();
                 }
-
-                if (IsServerConnected)
-                    LightBringer.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), LightBringer);
-            }
-            catch (Exception ex) //Catch any unknown exception and close the connection gracefully
-            {
-                Error?.Invoke(ex, this, ex.Message);
+            else
                 ServerDisConnected?.Invoke();
-            }
         }
 
         #endregion Private Methods

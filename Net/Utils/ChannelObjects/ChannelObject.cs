@@ -22,6 +22,8 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         internal Furre player;
 
+        internal Match FontColorRegexMatch;
+
         #endregion Internal Fields
 
         #region Public Constructors
@@ -34,7 +36,8 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             if (ServerInstruction[0] == '(')
                 instructionType = ServerInstructionType.DisplayText;
-
+            FontColorRegexMatch = FontColorRegex.Match(RawInstruction);
+            channelText = FontColorRegexMatch.Groups[9].Value;
             player = new Furre();
         }
 
@@ -53,15 +56,17 @@ namespace Furcadia.Net.Utils.ServerParser
             { channel = value; }
         }
 
+        private string channelText;
+
         /// <summary>
         /// Raw unformatted channel text
         /// </summary>
         public string ChannelText
         {
+            set
+            { channelText = value; }
             get
-            {
-                return Regex.Match(RawInstruction, EntryFilter).Groups[2].Value; ;
-            }
+            { return channelText; }
         }
 
         /// <summary>
@@ -69,7 +74,10 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public string DynamicChannel
         {
-            get { return Regex.Match(RawInstruction, ChannelNameFilter).Groups[1].Value; }
+            get
+            {
+                return FontColorRegexMatch.Groups[3].Value;
+            }
         }
 
         /// <summary>
@@ -79,9 +87,7 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                string Text = ChannelText;
-                SystemFshIcon(ref Text, "[$1]");
-                return Text;
+                return ChannelText;
             }
         }
 

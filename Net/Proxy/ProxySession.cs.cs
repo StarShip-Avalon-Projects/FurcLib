@@ -74,18 +74,10 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Disconnect()
         {
+            //  serverconnectphase = ConnectionPhase.Disconnectng;
+            //  if (IsClientConnected) clientconnectionphase = ConnectionPhase.Disconnectng;
+            base.SendToServer("quit");
             base.Disconnect();
-
-            if (serverconnectphase == ConnectionPhase.Disconnected)
-            {
-                serverconnectphase = ConnectionPhase.Init;
-                ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
-            }
-            if (clientconnectionphase == ConnectionPhase.Disconnected)
-            {
-                clientconnectionphase = ConnectionPhase.Init;
-                ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
-            }
         }
 
         private void Initilize()
@@ -108,10 +100,10 @@ namespace Furcadia.Net.Proxy
             // }
             ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
             dream = new DREAM();
-            BadgeTag = new Queue<string>(50);
+            //BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
-            SpeciesTag = new Queue<string>(50);
-            BanishString = new List<string>(50);
+            //          SpeciesTag = new Queue<string>(50);
+            //          BanishString = new List<string>(50);
         }
 
         #endregion "Constructors"
@@ -123,12 +115,13 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (serverconnectphase == ConnectionPhase.Init)
+            if (serverconnectphase == ConnectionPhase.Init && clientconnectionphase == ConnectionPhase.Init)
             {
                 serverconnectphase = ConnectionPhase.Connecting;
                 clientconnectionphase = ConnectionPhase.Connecting;
                 base.Connect();
             }
+            else throw new NetProxyException("Faile To Connect to server");
         }
 
         #endregion Public Methods
@@ -188,20 +181,24 @@ namespace Furcadia.Net.Proxy
 
         private string channel;
         private object ChannelLock = new object();
-
+        private Options.ProxySessionOptions options;
         private ConnectionPhase clientconnectionphase;
         private object clientlock = new object();
         private object DataReceived = new object();
         private bool disposed = false;
         private DREAM dream;
+        private Furre player;
         private string errorMsg = "";
         private short errorNum = 0;
         private bool hasShare;
         private bool inDream = false;
         private bool Look;
         private Queue<string> LookQue;
-        private Options.ProxySessionOptions options;
-        private Furre player;
+        //private Queue<string> SpeciesTag;
+        ///// <summary>
+        ///// Beekin Badge
+        ///// </summary>
+        //private Queue<string> BadgeTag;
 
         /// <summary>
         /// Manage out Auto reconnects
@@ -215,8 +212,6 @@ namespace Furcadia.Net.Proxy
         /// </para>
         /// </summary>
         private Utils.ServerQue ServerBalancer;
-
-        private Queue<string> SpeciesTag;
 
         #endregion Private Fields
 
@@ -344,11 +339,6 @@ namespace Furcadia.Net.Proxy
         #endregion Server Queue Manager
 
         private ConnectionPhase serverconnectphase;
-
-        /// <summary>
-        /// Beekin Badge
-        /// </summary>
-        public Queue<string> BadgeTag { get; set; }
 
         /// <summary>
         /// Current Name for Banish Operations
@@ -495,26 +485,41 @@ namespace Furcadia.Net.Proxy
         public virtual void ParseServerChannel(string data, bool Handled)
         {
             //TODO: needs to move and re factored to ServerParser Class
-
+            ChannelObject chanObject;
+            ParseChannelArgs args;
             data = data.Remove(0, 1);
-            string Color = null;
-            Regex NameRegex = new Regex(NameFilter, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+            var FontColorRegexMatch = FontColorRegex.Match(data);
+            var DescTagRegexMatch = DescTagRegex.Match(data);
+            if (DescTagRegexMatch.Success)
+            {
+                if (DescTagRegexMatch.Groups[1].Value == "fsh://system.fsh:86")
+                {
+                    chanObject = new ChannelObject(data)
+                    {
+                        Player = player,
+                        Channel = "@emit",
+                        ChannelText = DescTagRegexMatch.Groups[5].Value,
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
+
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
+            }
+            var Color = FontColorRegexMatch.Groups[1].Value;
             try
             {
-                Color = Regex.Match(data, EntryFilter).Groups[1].Value;
-                string User = null;
                 if (NameRegex.Match(data).Success)
                 {
-                    User = NameRegex.Match(data).Groups[1].Value;
-                    player = dream.FurreList.GerFurreByName(User);
+                    player = dream.FurreList.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
                 }
 
                 string Text = NameRegex.Replace(data, "$2");
-                Regex ChannelRegEx = new Regex(ChannelNameFilter);
-                if (ChannelRegEx.Match(data).Success)
-                {
-                    channel = ChannelRegEx.Match(data).Groups[1].Value;
-                }
+                //  Regex ChannelRegEx = new Regex(ChannelNameFilter);
+                var channel = FontColorRegexMatch.Groups[1].Value;
                 if (!Handled)
                 {
                     Regex DescRegex = new Regex(DescFilter);
@@ -527,20 +532,18 @@ namespace Furcadia.Net.Proxy
                         {
                             player.FurreColors = new ColorString(LookQue.Dequeue());
                         }
-                        if (BadgeTag.Count > 0)
-                        {
-                            player.BeekinBadge = BadgeTag.Dequeue(); ;
-                        }
-                        else if (!string.IsNullOrEmpty(player.BeekinBadge))
-                        {
-                            player.BeekinBadge = "";
-                        }
+                        //if (BadgeTag.Count > 0)
+                        //{
+                        //    player.BeekinBadge = BadgeTag.Dequeue(); ;
+                        //}
+                        //else if (!string.IsNullOrEmpty(player.BeekinBadge))
+                        //{
+                        //    player.BeekinBadge = "";
+                        //}
                         Look = false;
                     }
 
-                    Text = ChannelRegEx.Replace(data, "[$1]");
-                    bool HasFurcIcon = SystemFshIcon(ref Text, string.Empty);
-                    player.Message = Text;
+                    player.Message = FontColorRegexMatch.Groups[9].Value;
                 }
 
                 errorMsg = "";
@@ -601,67 +604,60 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "bcast")
                 {
-                    string AdRegEx = "<channel name='(.*)' />";
+                    //                    string AdRegEx = "<channel name='(.*)' />";
 
-                    string chan = Regex.Match(data, AdRegEx).Groups[1].Value;
-                    string u;
-                    switch (chan)
-                    {
-                        case "@advertisements":
+                    //                    string chan = Regex.Match(data, AdRegEx).Groups[1].Value;
+                    //                    string u;
+                    //                    switch (chan)
+                    //                    {
+                    //                        case "@advertisements":
 
-                            AdRegEx = "\\[(.*?)\\] (.*?)</font>";
-                            string adMessage = Regex.Match(data, AdRegEx).Groups[2].Value;
+                    //                            AdRegEx = "\\[(.*?)\\] (.*?)</font>";
+                    //                            string adMessage = Regex.Match(data, AdRegEx).Groups[2].Value;
 
-                            break;
+                    //                            break;
 
-                        case "@bcast":
+                    //                        case "@bcast":
 
-                            u = Regex.Match(data, "<channel name='@(.*?)' />(.*?)</font>").Groups[2].Value;
+                    //                            u = Regex.Match(data, "<channel name='@(.*?)' />(.*?)</font>").Groups[2].Value;
 
-                            break;
+                    //                            break;
 
-                        case "@announcements":
+                    //                        case "@announcements":
 
-                            u = Regex.Match(data, "<channel name='@(.*?)' />(.*?)</font>").Groups[2].Value;
+                    //                            u = Regex.Match(data, "<channel name='@(.*?)' />(.*?)</font>").Groups[2].Value;
 
-                            break;
+                    //                            break;
 
-                        default:
-#if DEBUG
-                            Console.WriteLine("Unknown ");
-                            Console.WriteLine("BCAST:" + data);
-#endif
-                            break;
-                    }
+                    //                        default:
+                    //#if DEBUG
+                    //                            Console.WriteLine("Unknown ");
+                    //                            Console.WriteLine("BCAST:" + data);
+                    //#endif
+                    //                            break;
+                    //                    }
                 }
                 else if (Color == "myspeech")
                 {
                     Regex t = new Regex(YouSayFilter);
-                    string u = t.Match(data).Groups[1].Value;
-                    Text = t.Match(data).Groups[2].Value;
-
-                    player.Message = Text;
+                    player.Message = t.Match(data).Groups[2].Value;
                 }
-                else if (!string.IsNullOrEmpty(User)
-                    & string.IsNullOrEmpty(Channel) &
+                else if (string.IsNullOrEmpty(Channel) &
                     string.IsNullOrEmpty(Color) &
                     Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
                     Match tt = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.IgnoreCase);
-                    Regex t = new Regex(NameFilter);
 
                     if (!tt.Success)
                     {
-                        Text = t.Replace(data, "");
-                        Text = Text.Remove(0, 2);
-
-                        if (SpeciesTag.Count > 0)
-                        {
-                            //player.Color = SpeciesTag.Dequeue();
-                            if (Dream.FurreList.Contains(player))
-                                Dream.FurreList[player] = player;
-                        }
+                        Regex SayRegex = new Regex(NameFilter + ": (.*)", RegexOptions.Compiled);
+                        player.Message = SayRegex.Match(data).Groups[3].Value;
                         channel = "say";
+                        //if (SpeciesTag.Count > 0)
+                        //{
+                        // TODO: Plug in Species Tags
+                        //   player.
+                        //}
                     }
                     else
                     {
@@ -680,14 +676,14 @@ namespace Furcadia.Net.Proxy
                     {
                         player = dream.FurreList.GerFurreByName(WhisperIncoming.Match(data).Groups[2].Value);
                         player.Message = WhisperIncoming.Match(data).Groups[5].Value;
-                        if (BadgeTag.Count > 0)
-                        {
-                            player.BeekinBadge = BadgeTag.Dequeue();
-                        }
-                        else
-                        {
-                            player.BeekinBadge = "";
-                        }
+                        //if (BadgeTag.Count > 0)
+                        //{
+                        //    player.BeekinBadge = BadgeTag.Dequeue();
+                        //}
+                        //else
+                        //{
+                        //    player.BeekinBadge = "";
+                        //}
                     }
                     else if (WhisperOutgoing.Match(data).Success)
                     {
@@ -702,24 +698,19 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "trade")
                 {
+                    //TODO: Verify Trade System is correct
                     channel = "trade";
-                    string TextStr = Regex.Match(data, "\\s<name (.*?)</name>").Groups[0].Value;
-                    Text = Text.Substring(6);
-                    if (!string.IsNullOrEmpty(User))
-                        Text = " " + User + Text.Replace(TextStr, "");
-                    player.Message = Text;
+                    player.Message = FontColorRegex.Match(data).Groups[4].Value;
                 }
                 else if (Color == "emote")
                 {
                     channel = "emote";
-                    // ''EMOTE
-                    if (SpeciesTag.Count > 0)
-                    {
-                        player.FurreColors = new ColorString(SpeciesTag.Dequeue());
-                    }
-                    Regex usr = new Regex(NameFilter);
-                    System.Text.RegularExpressions.Match n = usr.Match(Text);
-                    Text = usr.Replace(Text, string.Empty);
+                    //// ''EMOTE
+                    //if (SpeciesTag.Count > 0)
+                    //{
+                    //    player.FurreColors = new ColorString(SpeciesTag.Dequeue());
+                    //}
+                    Text = NameRegex.Replace(Text, string.Empty);
                 }
                 else if (Color == "notify")
                 {
@@ -821,14 +812,14 @@ namespace Furcadia.Net.Proxy
             else
                 targetChannel = channel;
 
-            ChannelObject chanObject = new ChannelObject(data)
+            chanObject = new ChannelObject(data)
             {
                 Player = player,
                 Channel = targetChannel,
                 InstructionType = ServerInstructionType.DisplayText
             };
 
-            ParseChannelArgs args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+            args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
 
             ProcessServerChannelData?.Invoke(chanObject, args);
         }
@@ -904,6 +895,8 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case ConnectionPhase.Connected:
+                    if (string.IsNullOrEmpty(data))
+                        return;
                     // Look instruction
                     if (data.StartsWith("]f") & InDream == true)
                     {
@@ -918,12 +911,12 @@ namespace Furcadia.Net.Proxy
                             player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
                             if (IsConnectedCharacter)
                                 Look = false;
-                            if (Dream.FurreList.Contains(player))
-                                Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
+                            //if (Dream.FurreList.Contains(player))
+                            //    Dream.FurreList[Dream.FurreList.IndexOf(player)] = player;
                         }
                     }
                     //Spawn Avatar
-                    else if (data.StartsWith("<"))
+                    else if (data[0] == '<')
                     {
                         var FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
@@ -947,7 +940,7 @@ namespace Furcadia.Net.Proxy
                         }
                     }
                     //Remove Furre
-                    else if (data.StartsWith(")") || data.StartsWith(" "))
+                    else if (data[0] == ')' || data[0] == ' ')
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         Dream.FurreList.Remove(RemoveFurre.AvatarID);
@@ -963,7 +956,7 @@ namespace Furcadia.Net.Proxy
                         }
                     }
                     //Animated Move
-                    else if (data.StartsWith("/"))
+                    else if (data[0] == '/')
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
                         player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
@@ -982,11 +975,11 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Visible = false;
                         }
-                        if (Dream.FurreList.Contains(player))
-                            Dream.FurreList[player] = player;
+                        //if (Dream.FurreList.Contains(player))
+                        //    Dream.FurreList[player] = player;
                     }
                     // Move Avatar
-                    else if (data.StartsWith("A"))
+                    else if (data[0] == 'A')
                     {
                         int id = ConvertFromBase220(data.Substring(1, 4));
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
@@ -1010,7 +1003,7 @@ namespace Furcadia.Net.Proxy
                         }
                     }
                     //Update ColorString
-                    else if (data.StartsWith("B"))
+                    else if (data[0] == 'B')
                     {
                         //fuid 4 b220 bytes
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
@@ -1026,29 +1019,29 @@ namespace Furcadia.Net.Proxy
                         }
                     }
                     //Hide Avatar
-                    else if (data.StartsWith("C") != false)
+                    else if (data[0] == 'C')
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
                         player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
                         player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
                         player.Visible = false;
-                        if (Dream.FurreList.Contains(player))
-                        {
-                            Dream.FurreList[player] = player;
-                        }
+                        //if (Dream.FurreList.Contains(player))
+                        //{
+                        //    Dream.FurreList[player] = player;
+                        //}
                         //Display Disconnection Dialog
                     }
                     // Species Tags
                     else if (data.StartsWith("]-"))
                     {
-                        if (data.StartsWith("]-#A"))
-                        {
-                            SpeciesTag.Enqueue(data.Substring(4));
-                        }
-                        else if (data.StartsWith("]-#B"))
-                        {
-                            BadgeTag.Enqueue(data.Substring(2));
-                        }
+                        //if (data.StartsWith("]-#A"))
+                        //{
+                        //    SpeciesTag.Enqueue(data.Substring(4));
+                        //}
+                        //else if (data.StartsWith("]-#B"))
+                        //{
+                        //    BadgeTag.Enqueue(data.Substring(2));
+                        //}
 
                         //DS Variables
                     }
@@ -1174,7 +1167,7 @@ namespace Furcadia.Net.Proxy
                                     hasShare = true;
                                 }
                             }
-                            var bookmark = new DreamBookmark(data);
+                            DreamBookmark bookmark = new DreamBookmark(data);
                             ProcessServerInstruction?.Invoke(bookmark,
                                 new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));
                         }
@@ -1207,6 +1200,11 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case ConnectionPhase.Disconnected:
+                    {
+                        ServerStatusChanged?.Invoke(null,
+                                    new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
+                        break;
+                    }
                 // Do nothing - we're disconnected...
                 default:
                     break;
@@ -1441,6 +1439,7 @@ namespace Furcadia.Net.Proxy
 
         private void OnServerDisconnected()
         {
+            base.Disconnect();
             serverconnectphase = ConnectionPhase.Disconnected;
             ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
         }
@@ -1465,8 +1464,9 @@ namespace Furcadia.Net.Proxy
             if (disposing)
             {
                 handle.Dispose();
+                base.Dispose();
             }
-            base.Dispose();
+
             // Free any unmanaged objects here.
             disposed = true;
         }

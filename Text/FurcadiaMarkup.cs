@@ -5,7 +5,7 @@ namespace Furcadia.Text
     /// <summary>
     /// Furcadia Markup Language (FML) REGEX
     /// </summary>
-    public class FurcadiaMarkup
+    public sealed class FurcadiaMarkup
     {
         #region Public Methods
 
@@ -34,24 +34,15 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Format Text string
+        /// Strip a string from all Furcadia Markup
         /// </summary>
-        /// <param name="serverData">
-        /// Raw server data string
-        /// </param>
-        /// <param name="replaceText">
-        /// Reg ex supported text replacement
-        /// </param>
-        /// <returns>
-        /// True on a successful match
-        /// </returns>
-        public static bool SystemFshIcon(ref string serverData, string replaceText)
+        /// <param name="Text">string to process</param>
+        /// <returns></returns>
+        public static string StripFurcadiaMarkup(string Text)
         {
-            Regex IconRegex = new Regex(Iconfilter);
-            Match IconMatch = IconRegex.Match(serverData);
-            serverData = IconRegex.Replace(serverData, replaceText);
-
-            return IconMatch.Success;
+            var r = new Regex("<(.*?)>");
+            Text = r.Replace(Text, string.Empty);
+            return Text.Replace("|", " ").ToLower();
         }
 
         #endregion Public Methods
@@ -79,17 +70,22 @@ namespace Furcadia.Text
         public const string DiceFilter = "^<font color='roll'><img src='fsh://system.fsh:101' alt='@roll' />" + ChannelNameFilter + " <name shortname='([^ ]+)'>([^ ]+)</name> rolls (\\d+)d(\\d+)((-|\\+)\\d+)? ?(.*) & gets (\\d+)\\.</font>$";
 
         /// <summary>
+        /// <para/>
+        /// font = 1
+        /// <para/>
+        /// system.fhs =2
+        /// <para/>
+        /// system alt = 3
+        /// <para/>
+        /// Channel Name = 4
+        /// <para/>
+        /// Text = 5
         /// </summary>
-        public const string EntryFilter = "^<font color='([^']*?)'>(.*?)</font>$";
+        public const string FontChannelFilter = "^<font color='([^']*?)'>(" + Iconfilter + ")?" + "(" + ChannelNameFilter + ")?(.*?)</font>$";
 
         /// <summary>
         /// </summary>
-        public const string Iconfilter = "<img src='fsh://system.fsh:([^']*)'(.*?)/>";
-
-        /// <summary>
-        /// HTML images filter
-        /// </summary>
-        public const string ImgTagFilter = "<img src='|\"(.*?)'|\" alt='|\"(.*?)'|\" />";
+        public const string Iconfilter = "<img src='(fsh://system.fsh:([^']*))' (alt='(.*?)' )?/>";
 
         /// <summary>
         /// </summary>
@@ -110,6 +106,21 @@ namespace Furcadia.Text
         public const string YouSayFilter = "You ([\\x21-\\x3B\\=\\x3F-\\x7E]+), \"([^']*)\"";
 
         #endregion Public Fields
+
+        /// <summary>
+        /// Filter the Name Markup
+        /// </summary>
+        public static Regex NameRegex = new Regex(NameFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Filter paragraph(?) text
+        /// </summary>
+        public static Regex FontColorRegex = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        /// <summary>
+        /// Pesky Desc tags filter
+        /// </summary>
+        public static Regex DescTagRegex = new Regex(Iconfilter + "(.*)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         #region Public Constructors
 

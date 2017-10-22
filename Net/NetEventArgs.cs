@@ -51,6 +51,11 @@ namespace Furcadia.Net
         Connected,
 
         /// <summary>
+        /// Dropping connection
+        /// </summary>
+        Disconnectng,
+
+        /// <summary>
         /// Connection lost
         /// </summary>
         Disconnected,
