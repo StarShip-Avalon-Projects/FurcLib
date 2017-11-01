@@ -482,7 +482,7 @@ namespace Furcadia.Net.Proxy
         /// FTR http://ftr.icerealm.org/ref-instructions/
         /// </para>
         /// </remarks>
-        public virtual void ParseServerChannel(string data, bool Handled)
+        public void ParseServerChannel(string data, bool Handled)
         {
             //TODO: needs to move and re factored to ServerParser Class
             ChannelObject chanObject;
@@ -845,7 +845,7 @@ namespace Furcadia.Net.Proxy
         /// FTR http://ftr.icerealm.org/ref-instructions/
         /// </para>
         /// </remarks>
-        public virtual void ParseServerData(string data, bool Handled)
+        public void ParseServerData(string data, bool Handled)
         {
             switch (serverconnectphase)
             {
@@ -1226,7 +1226,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="data">
         /// Raw Client to Server instruction
         /// </param>
-        public virtual void SendFormattedTextToServer(ref string data)
+        public void SendFormattedTextToServer(ref string data)
         {
             if (data.StartsWith("banish "))
             {
