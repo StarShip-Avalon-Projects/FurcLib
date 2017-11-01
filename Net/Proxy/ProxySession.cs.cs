@@ -76,7 +76,7 @@ namespace Furcadia.Net.Proxy
         {
             //  serverconnectphase = ConnectionPhase.Disconnectng;
             //  if (IsClientConnected) clientconnectionphase = ConnectionPhase.Disconnectng;
-            base.SendToServer("quit");
+            // base.SendToServer("quit");
             base.Disconnect();
         }
 
