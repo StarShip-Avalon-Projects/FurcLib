@@ -103,6 +103,15 @@ namespace Furcadia.Net
         private ProxyOptions options;
 
         /// <summary>
+        /// connection options
+        /// </summary>
+        public virtual ProxyOptions Options
+        {
+            get { return options; }
+            set { options = value; }
+        }
+
+        /// <summary>
         /// Process IP for Furcadia.exe
         /// </summary>
         private int processID;
@@ -313,24 +322,9 @@ namespace Furcadia.Net
         protected internal event ActionDelegate ClientDisConnected;
 
         /// <summary>
-        /// This is triggered when the user has exited/log-off Furcadia and
-        /// the Furcadia client is closed.
-        /// </summary>
-        protected internal event ActionDelegate ClientExited;
-
-        //public delegate void ErrorEventHandler(Exception e);
-        /// <summary>
         ///This is triggered when the Client and/or Server have connected to TCP stream
         /// </summary>
         protected internal event ActionDelegate Connected;
-
-        //#pragma warning disable CS0067 // The event 'NetProxy.ServerData' is never used
-        //        /// <summary>
-        //        /// This is triggered when the Server sends data to the client.
-        //        /// Expects a return Value
-        //        /// </summary>
-        //        protected internal virtual event DataEventHandler ServerData;
-        //#pragma warning restore CS0067 // The event 'NetProxy.ServerData' is never used
 
         #endregion Protected Internal Events
 
@@ -470,8 +464,6 @@ namespace Furcadia.Net
         /// </summary>
         public virtual void Connect()
         {
-            //if (string.IsNullOrEmpty(options.CharacterIniFile))
-            //    throw new Proxy.CharacterNotFoundException("Character.ini not specified");
             try
             {
                 IpEndPoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
@@ -491,7 +483,8 @@ namespace Furcadia.Net
                 }
                 try
                 {
-                    listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
+                    if (listen == null)
+                        listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
                     listen.Start();
                     LightBringer = new TcpClient();
                     LightBringer.Connect(IpEndPoint);
@@ -501,8 +494,6 @@ namespace Furcadia.Net
                 {
                     throw new NetProxyException("there is a problem with the Proxy server", se);
                 }
-                //}
-                //else throw new NetProxyException("Proxy Server is not null");
 
                 //Run
 
@@ -641,13 +632,6 @@ namespace Furcadia.Net
                 //
                 if (BackupSettings != null)
                     settings.RestoreFurcadiaSettings(ref BackupSettings);
-                //if (listen != null)
-                //{
-                //    listen.Server.Disconnect(false);
-                //    listen.Server.Close();
-                //    listen.Server.Dispose();
-                //    listen.Stop();
-                //}
                 if (client != null && client.Connected == true)
                 {
                     client.Close();
@@ -707,8 +691,11 @@ namespace Furcadia.Net
                 catch (Exception ex) { throw ex; }
                 Connected?.Invoke();
             }
-            catch (Exception e) { }
-            finally { settings.RestoreFurcadiaSettings(ref BackupSettings); }
+            catch { }
+            finally
+            {
+                settings.RestoreFurcadiaSettings(ref BackupSettings);
+            }
             //else
             //    throw new Exception("Client Socket is not connected");
         }
