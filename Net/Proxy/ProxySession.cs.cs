@@ -1,6 +1,7 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
 using Furcadia.Net.Dream;
+using Furcadia.Net.Options;
 using Furcadia.Net.Utils.ServerParser;
 using Microsoft.Win32.SafeHandles;
 using System;
@@ -45,6 +46,22 @@ namespace Furcadia.Net.Proxy
     /// </summary>
     public class ProxySession : NetProxy, IDisposable
     {
+        /// <summary>
+        /// connection options
+        /// </summary>
+        public override ProxyOptions Options
+        {
+            get
+            {
+                return options;
+            }
+            set
+            {
+                base.Options = value;
+                options = (ProxySessionOptions)value;
+            }
+        }
+
         #region "Constructors"
 
         // Instantiate a SafeHandle instance.
@@ -115,13 +132,17 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (serverconnectphase == ConnectionPhase.Init && clientconnectionphase == ConnectionPhase.Init)
+            if ((serverconnectphase == ConnectionPhase.Init && clientconnectionphase == ConnectionPhase.Init)
+                || (serverconnectphase == ConnectionPhase.Disconnected && clientconnectionphase == ConnectionPhase.Disconnected))
             {
                 serverconnectphase = ConnectionPhase.Connecting;
                 clientconnectionphase = ConnectionPhase.Connecting;
                 base.Connect();
             }
-            else throw new NetProxyException("Faile To Connect to server");
+            else if (serverconnectphase != ConnectionPhase.Init)
+                throw new NetProxyException("Server Connect phase " + serverconnectphase.ToString());
+            else if (clientconnectionphase != ConnectionPhase.Init)
+                throw new NetProxyException("Client Connect phase " + clientconnectionphase.ToString());
         }
 
         #endregion Public Methods

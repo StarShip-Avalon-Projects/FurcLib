@@ -406,9 +406,12 @@ namespace Furcadia.Net
         {
             get
             {
-                if (LightBringer != null)
-                    return (LightBringer.Connected && LightBringer.Client.Connected);
-
+                try
+                {
+                    if (LightBringer != null)
+                        return (LightBringer.Connected && LightBringer.Client.Connected);
+                }
+                catch { }
                 return false;
             }
         }
@@ -472,34 +475,34 @@ namespace Furcadia.Net
             try
             {
                 IpEndPoint = ConverHostToIP(options.GameServerHost, options.GameServerPort);
-                if (listen == null)
-                {
-                    // UAC Perms Needed to Create proxy.ini Win 7 Change your
-                    // UAC Level or add file create Permissions to [%program
-                    // files%/furcadia] Maybe Do this at install
+                //if (listen == null)
+                //{
+                // UAC Perms Needed to Create proxy.ini Win 7 Change your
+                // UAC Level or add file create Permissions to [%program
+                // files%/furcadia] Maybe Do this at install
 
-                    int counter = 0;
-                    while (!PortOpen(options.LocalhostPort))
-                    {
-                        options.LocalhostPort++;
-                        counter++;
-                        if (counter == 100)
-                            throw new NetProxyException("Could not fine available localhost port");
-                    }
-                    try
-                    {
-                        listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
-                        listen.Start();
-                        LightBringer = new TcpClient();
-                        LightBringer.Connect(IpEndPoint);
-                        listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
-                    }
-                    catch (SocketException se)
-                    {
-                        throw new NetProxyException("there is a problem with the Proxy server", se);
-                    }
+                int counter = 0;
+                while (!PortOpen(options.LocalhostPort))
+                {
+                    options.LocalhostPort++;
+                    counter++;
+                    if (counter == 100)
+                        throw new NetProxyException("Could not fine available localhost port");
                 }
-                else throw new NetProxyException("Proxy Server is not null");
+                try
+                {
+                    listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
+                    listen.Start();
+                    LightBringer = new TcpClient();
+                    LightBringer.Connect(IpEndPoint);
+                    listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
+                }
+                catch (SocketException se)
+                {
+                    throw new NetProxyException("there is a problem with the Proxy server", se);
+                }
+                //}
+                //else throw new NetProxyException("Proxy Server is not null");
 
                 //Run
 
