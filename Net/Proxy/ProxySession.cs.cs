@@ -21,7 +21,6 @@ using System.Text.RegularExpressions;
 
 using static Furcadia.Drawing.VisibleArea;
 using static Furcadia.Movement.CharacterFlags;
-using static Furcadia.Text.Base220;
 using static Furcadia.Text.FurcadiaMarkup;
 using static Furcadia.Util;
 
@@ -139,9 +138,9 @@ namespace Furcadia.Net.Proxy
                 clientconnectionphase = ConnectionPhase.Connecting;
                 base.Connect();
             }
-            else if (serverconnectphase != ConnectionPhase.Init)
+            else if (serverconnectphase != ConnectionPhase.Init && serverconnectphase != ConnectionPhase.Disconnected)
                 throw new NetProxyException("Server Connect phase " + serverconnectphase.ToString());
-            else if (clientconnectionphase != ConnectionPhase.Init)
+            else if (clientconnectionphase != ConnectionPhase.Init && clientconnectionphase != ConnectionPhase.Disconnected)
                 throw new NetProxyException("Client Connect phase " + clientconnectionphase.ToString());
         }
 
@@ -941,11 +940,14 @@ namespace Furcadia.Net.Proxy
                     {
                         var FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
+
                         Dream.FurreList.Add(player);
+                        //if not have new avatar flag
                         if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                         {
-                            Dream.FurreList.Add(FurreSpawn.player);
+                            Dream.FurreList.IndexOf(FurreSpawn.player);
                         }
+
                         player = Dream.FurreList.GetFurreByID(Player.FurreID);
                         if (IsConnectedCharacter)
                         {
@@ -953,11 +955,12 @@ namespace Furcadia.Net.Proxy
                         }
                         if (InDream)
                         {
-                            if (ProcessServerInstruction != null)
-                            {
-                                ProcessServerInstruction.Invoke(FurreSpawn,
-                                new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
-                            }
+                            if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
+                                if (ProcessServerInstruction != null)
+                                {
+                                    ProcessServerInstruction.Invoke(FurreSpawn,
+                                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                                }
                         }
                     }
                     //Remove Furre
@@ -980,8 +983,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == '/')
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position = new FurrePosition(data.Substring(5, 4));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
                         connectedFurre = Dream.FurreList[connectedFurre];
@@ -1002,10 +1004,8 @@ namespace Furcadia.Net.Proxy
                     // Move Avatar
                     else if (data[0] == 'A')
                     {
-                        int id = ConvertFromBase220(data.Substring(1, 4));
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position = new FurrePosition(data.Substring(5, 4));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
 
@@ -1043,8 +1043,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'C')
                     {
                         player = Dream.FurreList.GetFurreByID(data.Substring(1, 4));
-                        player.Position.X = ConvertFromBase220(data.Substring(5, 2)) * 2;
-                        player.Position.Y = ConvertFromBase220(data.Substring(7, 2));
+                        player.Position = new FurrePosition(data.Substring(5, 4));
                         player.Visible = false;
                         //if (Dream.FurreList.Contains(player))
                         //{
@@ -1084,7 +1083,7 @@ namespace Furcadia.Net.Proxy
                     }
 
                     //Disconnection Error
-                    else if (data.StartsWith("["))
+                    else if (data[0] == '[')
                     {
 #if DEBUG
                         Console.WriteLine("Disconnection Dialog:" + data);
@@ -1198,7 +1197,7 @@ namespace Furcadia.Net.Proxy
                     }
 
                     //Process Channels Seperatly
-                    else if (data.StartsWith("("))
+                    else if (data[0] == '(')
                     {
                         channel = "";
                         if (ThroatTired == false & data.StartsWith("(<font color='warning'>Your throat is tired. Try again in a few seconds.</font>"))
@@ -1209,6 +1208,7 @@ namespace Furcadia.Net.Proxy
                         try
                         {
                             ParseServerChannel(data, Handled);
+                            return;
                         }
                         catch (Exception ex)
                         {
@@ -1302,22 +1302,22 @@ namespace Furcadia.Net.Proxy
                 return;
             //Clean Text input to match Client
             string result = "";
-            switch (arg.Substring(0, 1))
+            switch (arg[0])
             {
-                case "`":
+                case '`':
                     result = arg.Remove(0, 1);
                     break;
 
-                case "/":
+                case '/':
                     result = "wh " + arg.Substring(1);
                     break;
 
-                case ":":
+                case ':':
                     result = arg;
 
                     break;
 
-                case "-":
+                case '-':
                     result = arg;
 
                     break;

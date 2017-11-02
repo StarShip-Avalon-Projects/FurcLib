@@ -1,4 +1,5 @@
-﻿using static Furcadia.Text.Base220;
+﻿using System;
+using static Furcadia.Text.Base220;
 
 namespace Furcadia.Drawing
 {
@@ -7,14 +8,23 @@ namespace Furcadia.Drawing
     /// </summary>
     public class FurrePosition
     {
-        #region Public Constructors
-
-        /// <summary>
-        /// Default Constructor
-        /// </summary>
         public FurrePosition()
         {
         }
+
+        /// <summary>
+        /// Tak a B220 encoded string representing the x,y coordinates and convert them to Furcadia (X,Y) Coordinates
+        /// </summary>
+        /// <param name="b220Encoded">4 byte string</param>
+        public FurrePosition(string b220Encoded)
+        {
+            if (b220Encoded.Length < 4)
+                throw new ArgumentOutOfRangeException("Not enough bytes to process");
+            X = ConvertFromBase220(b220Encoded.Substring(0, 2)) * 2;
+            Y = ConvertFromBase220(b220Encoded.Substring(2, 2));
+        }
+
+        #region Public Constructors
 
         /// <summary>
         /// Furre Position using Base 220 Corrdinates
@@ -42,18 +52,8 @@ namespace Furcadia.Drawing
         /// </param>
         public FurrePosition(int X, int Y)
         {
-            this.Y = this.Y;
-            this.X = this.X;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Position">
-        /// </param>
-        public FurrePosition(FurrePosition Position)
-        {
-            X = Position.X;
-            Y = Position.Y;
+            this.Y = Y;
+            this.X = X;
         }
 
         #endregion Public Constructors
