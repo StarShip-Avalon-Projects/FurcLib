@@ -28,7 +28,7 @@ namespace Furcadia
         {
             if (string.IsNullOrEmpty(name))
                 return null;
-            return Regex.Replace(name.ToLower(), "[^a-z0-9\0x0020_.;&|]+", string.Empty, RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+            return Regex.Replace(name.ToLower(), "[^a-z0-9\0x0020_.;&\\|]+", string.Empty, RegexOptions.CultureInvariant | RegexOptions.Compiled).Replace("|", string.Empty);
         }
 
         #endregion Public Methods

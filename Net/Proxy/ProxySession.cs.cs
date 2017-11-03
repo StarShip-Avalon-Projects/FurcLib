@@ -98,7 +98,6 @@ namespace Furcadia.Net.Proxy
 
         private void Initilize()
         {
-            connectedFurre = new Furre();
             serverconnectphase = ConnectionPhase.Init;
             clientconnectionphase = ConnectionPhase.Init;
 
@@ -115,7 +114,11 @@ namespace Furcadia.Net.Proxy
             //ClientExited += onClientExited;
             // }
             ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
+
             dream = new DREAM();
+            connectedFurre = new Furre();
+            player = new Furre();
+
             //BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
             //          SpeciesTag = new Queue<string>(50);
@@ -188,6 +191,7 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
+                var test = player == connectedFurre;
                 return player == connectedFurre;
             }
         }
@@ -511,6 +515,11 @@ namespace Furcadia.Net.Proxy
 
             var FontColorRegexMatch = FontColorRegex.Match(data);
             var DescTagRegexMatch = DescTagRegex.Match(data);
+            if (NameRegex.Match(data).Success)
+                player = dream.FurreList.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
+            else if (data.StartsWith("<font color='shout'>You shout,"))
+                player = dream.FurreList[connectedFurre];
+
             if (DescTagRegexMatch.Success)
             {
                 if (DescTagRegexMatch.Groups[1].Value == "fsh://system.fsh:86")
@@ -532,11 +541,6 @@ namespace Furcadia.Net.Proxy
             var Color = FontColorRegexMatch.Groups[1].Value;
             try
             {
-                if (NameRegex.Match(data).Success)
-                {
-                    player = dream.FurreList.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
-                }
-
                 string Text = NameRegex.Replace(data, "$2");
                 //  Regex ChannelRegEx = new Regex(ChannelNameFilter);
                 var channel = FontColorRegexMatch.Groups[1].Value;
@@ -747,11 +751,13 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "emote")
                 {
+                    player.Message = NameRegex.Replace(data, "");
+
                     chanObject = new ChannelObject(data)
                     {
                         Player = player,
-                        Channel = FontColorRegexMatch.Groups[0].Value,
-                        ChannelText = FontColorRegexMatch.Groups[8].Value,
+                        Channel = Color,
+                        ChannelText = NameRegex.Replace(data, "$2"),
                         InstructionType = ServerInstructionType.DisplayText
                     };
 
@@ -852,8 +858,8 @@ namespace Furcadia.Net.Proxy
                 SendError(ex, this, "");
             }
 
-            if (Dream.FurreList.Contains(player))
-                Dream.FurreList[player] = player;
+            //if (Dream.FurreList.Contains(player))
+            //    Dream.FurreList[player] = player;
             string targetChannel;
             if (string.IsNullOrEmpty(channel))
                 targetChannel = Color;
@@ -864,6 +870,7 @@ namespace Furcadia.Net.Proxy
             {
                 Player = player,
                 Channel = targetChannel,
+                ChannelText = player.Message,
                 InstructionType = ServerInstructionType.DisplayText
             };
 

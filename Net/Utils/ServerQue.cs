@@ -213,10 +213,21 @@ namespace Furcadia.Net.Utils
                 return;
             // if (string.IsNullOrEmpty(data)) return;
             ServerStack.Enqueue(data);
-            if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
+            if (!noendurance)
             {
-                double t = 0;
-                QueueTick(ref t);
+                if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
+                {
+                    double t = 200;
+                    QueueTick(ref t);
+                }
+            }
+            else
+            {
+                if (g_mass + MASS_SPEECH <= MASS_NOENDURANCE)
+                {
+                    double t = 0;
+                    QueueTick(ref t);
+                }
             }
         }
 

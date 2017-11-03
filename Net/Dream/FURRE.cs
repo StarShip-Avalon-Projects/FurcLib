@@ -430,10 +430,11 @@ namespace Furcadia.Net.Dream
             if (obj.GetType() == typeof(Furre))
             {
                 Furre ob = (Furre)obj;
-
-                if (FurreID == -1 || ob.FurreID == -1)
-                    return ob.ShortName == ShortName;
-                return ob.FurreID == FurreID;
+                if (string.IsNullOrEmpty(ShortName) || string.IsNullOrEmpty(ob.ShortName))
+                    return ob.FurreID == FurreID;
+                if (ob.ShortName == "unknown" || ShortName == "unknown")
+                    return false;
+                return ob.ShortName == ShortName;
             }
             return base.Equals(obj);
         }
