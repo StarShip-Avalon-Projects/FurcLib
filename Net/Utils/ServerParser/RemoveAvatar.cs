@@ -28,7 +28,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         public RemoveAvatar(string ServerInstruction) : base(ServerInstruction)
         {
-            if (ServerInstruction.StartsWith(")"))
+            if (ServerInstruction[0] == ')')
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
                 AvatarID = ConvertFromBase220(ServerInstruction.Substring(1, 4));

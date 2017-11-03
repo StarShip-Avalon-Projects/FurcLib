@@ -39,9 +39,8 @@
         /// <param name="ServerInstruction">
         /// Raw server instruction from the game server
         /// </param>
-        public LoadDream(string ServerInstruction) : base(ServerInstruction)
+        public LoadDream(string ServerInstruction) : this()
         {
-            base.InstructionType = ServerInstructionType.LoadDreamEvent;
             string[] Options = ServerInstruction.Substring(3).Split(' ');
             if (Options.Length >= 2)
             {
@@ -50,8 +49,6 @@
             }
             if (Options.Length == 4)
                 mode = Options[4];
-            else
-                mode = "legacy";
         }
 
         #endregion Public Constructors

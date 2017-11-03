@@ -547,20 +547,25 @@ namespace Furcadia.Net.Proxy
                     {
                         player = dream.FurreList.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
                         player.FurreDescription = DescRegex.Match(data).Groups[2].Value;
-                        // player = NameToFurre(DescName);
+
                         if (LookQue.Count > 0)
                         {
                             player.FurreColors = new ColorString(LookQue.Dequeue());
                         }
-                        //if (BadgeTag.Count > 0)
-                        //{
-                        //    player.BeekinBadge = BadgeTag.Dequeue(); ;
-                        //}
-                        //else if (!string.IsNullOrEmpty(player.BeekinBadge))
-                        //{
-                        //    player.BeekinBadge = "";
-                        //}
-                        Look = false;
+                        player.Message = null;
+
+                        chanObject = new ChannelObject(data)
+                        {
+                            Player = player,
+                            Channel = "desc",
+                            ChannelText = DescRegex.Match(data).Groups[2].Value,
+                            InstructionType = ServerInstructionType.DisplayText
+                        };
+
+                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+
+                        ProcessServerChannelData?.Invoke(chanObject, args);
+                        return;
                     }
 
                     player.Message = FontColorRegexMatch.Groups[9].Value;
@@ -666,23 +671,41 @@ namespace Furcadia.Net.Proxy
                     string.IsNullOrEmpty(Color) &
                     Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
-                    Match tt = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.IgnoreCase);
+                    var DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.IgnoreCase);
 
-                    if (!tt.Success)
+                    if (!DescMatch.Success)
                     {
                         Regex SayRegex = new Regex(NameFilter + ": (.*)", RegexOptions.Compiled);
                         player.Message = SayRegex.Match(data).Groups[3].Value;
-                        channel = "say";
-                        //if (SpeciesTag.Count > 0)
-                        //{
-                        // TODO: Plug in Species Tags
-                        //   player.
-                        //}
+
+                        chanObject = new ChannelObject(data)
+                        {
+                            Player = player,
+                            Channel = "say",
+                            ChannelText = Player.Name + " says " + SayRegex.Match(data).Groups[3].Value + "\"",
+                            InstructionType = ServerInstructionType.DisplayText
+                        };
+
+                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+
+                        ProcessServerChannelData?.Invoke(chanObject, args);
+                        return;
                     }
-                    else
+                    else // You see [FURRE]
                     {
-                        //sndDisplay("You See '" & User & "'")
-                        Look = true;
+                        player.Message = null;
+                        chanObject = new ChannelObject(data)
+                        {
+                            Player = player,
+                            Channel = "desc",
+                            ChannelText = "(You see " + Player.Name + ")",
+                            InstructionType = ServerInstructionType.DisplayText
+                        };
+
+                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+
+                        ProcessServerChannelData?.Invoke(chanObject, args);
+                        return;
                     }
                 }
                 else if (Color == "whisper")
@@ -724,13 +747,18 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "emote")
                 {
-                    channel = "emote";
-                    //// ''EMOTE
-                    //if (SpeciesTag.Count > 0)
-                    //{
-                    //    player.FurreColors = new ColorString(SpeciesTag.Dequeue());
-                    //}
-                    Text = NameRegex.Replace(Text, string.Empty);
+                    chanObject = new ChannelObject(data)
+                    {
+                        Player = player,
+                        Channel = FontColorRegexMatch.Groups[0].Value,
+                        ChannelText = FontColorRegexMatch.Groups[8].Value,
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
+
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (Color == "notify")
                 {
@@ -1191,9 +1219,6 @@ namespace Furcadia.Net.Proxy
                             ProcessServerInstruction?.Invoke(bookmark,
                                 new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));
                         }
-#if DEBUG
-                        Console.WriteLine(data);
-#endif
                     }
 
                     //Process Channels Seperatly
