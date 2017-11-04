@@ -122,17 +122,12 @@ namespace Furcadia.Net.Utils
 
         #endregion Public Constructors
 
-        #region Internal Fields
-
-        internal const int MASS_NOENDURANCE = 2048;
-
-        #endregion Internal Fields
-
         #region Private Fields
 
-        private const int MASS_CRITICAL = 2046;
-        private const int MASS_DECAYPS = 400;
-        private const int MASS_DEFAULT = 80;
+        private const int MASS_CRITICAL = 1024;
+        private const int MASS_NOENDURANCE = 2048;
+        private const int MASS_DECAYPS = 300;
+        private const int MASS_DEFAULT = 120;
         private const int MASS_SPEECH = 1000;
         private double g_mass = 0;
 
@@ -217,7 +212,8 @@ namespace Furcadia.Net.Utils
             {
                 if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
                 {
-                    double t = 200;
+                    g_mass += MASS_CRITICAL;
+                    double t = 0;
                     QueueTick(ref t);
                 }
             }
@@ -301,7 +297,7 @@ namespace Furcadia.Net.Utils
                 if (noendurance)
                 {
                     /* just send everything right away */
-                    while (ServerStack.Count > 0 & g_mass <= MASS_CRITICAL)
+                    while (ServerStack.Count > 0 & g_mass <= MASS_NOENDURANCE)
                     {
                         g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
                         OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
