@@ -317,8 +317,6 @@ namespace Furcadia.Net.Dream
 
         #region IDisposable Support
 
-        private bool disposedValue = false; // To detect redundant calls
-
         /// <summary>
         /// </summary>
         /// <param name="array">

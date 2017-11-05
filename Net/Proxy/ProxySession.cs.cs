@@ -567,7 +567,7 @@ namespace Furcadia.Net.Proxy
                         };
 
                         args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
-
+                        args.Channel = "desc";
                         ProcessServerChannelData?.Invoke(chanObject, args);
                         return;
                     }
