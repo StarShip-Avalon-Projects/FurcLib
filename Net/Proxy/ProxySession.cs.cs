@@ -171,12 +171,12 @@ namespace Furcadia.Net.Proxy
 
         #region Connected Furre
 
-        private Furre connectedFurre;
+        private static Furre connectedFurre;
 
         /// <summary>
         /// Connected Furre (Who we are)
         /// </summary>
-        public Furre ConnectedFurre
+        public static Furre ConnectedFurre
         {
             get
             {
@@ -191,7 +191,6 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                var test = player == connectedFurre;
                 return player == connectedFurre;
             }
         }
