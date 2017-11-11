@@ -176,7 +176,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Connected Furre (Who we are)
         /// </summary>
-        public static Furre ConnectedFurre
+        public Furre ConnectedFurre
         {
             get
             {
