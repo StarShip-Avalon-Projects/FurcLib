@@ -100,14 +100,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyFileVersion1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyFileVersion.t4</DependentUpon>
-    </Compile>
-    <Compile Include="AssemblyInfoersion1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyInfoersion.t4</DependentUpon>
+    </Compile>
+    <Compile Include="AssemblyInfoersionCS1.cs">
+      <DependentUpon>AssemblyInfoersionCS.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Extentions\ObjectExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
@@ -215,17 +215,17 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="AssemblyInfoersion.t4">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AssemblyInfoersion1.cs</LastGenOutput>
-    </None>
-    <Content Include="FurcLib LGPLv3.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="AssemblyFileVersion.t4">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyFileVersion1.cs</LastGenOutput>
     </None>
+    <None Include="AssemblyInfoersionCS.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfoersionCS1.cs</LastGenOutput>
+    </None>
+    <Content Include="FurcLib LGPLv3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="FurcLib Change Log.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

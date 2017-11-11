@@ -6,18 +6,19 @@
 	DateTime time = DateTime.Now;
 	string format = "MMdd";
 	string CurrentDate = time.ToString(format);
+	string AssembleyFileVersion = Host.ResolvePath("AssemblyInfoVersion.txt");
 	try
 	{
 		//If we cannot find the file, the revision number is set to zero,
 		//so even if the file doesn't exists the generation will run anyway.
 		//NOTE: we suppose we're not messing with the generated file
 		 
-		using (StreamReader f = new StreamReader(this.Host.ResolvePath("AssemblyInfoersion1.cs")))
+		using (StreamReader f = new StreamReader(AssembleyFileVersion))
 	   {
 			//We're reading the previous revision number; in order to make the
 			//code as simple as we can, we're just going to rewrite it on the first row, commented.
 			//This is not elegant, but it's simple enough and quite effective.
-			string s  = f.ReadLine().Replace("//","");
+			string s  = f.ReadLine();
 		   Int32.TryParse(s, out revisionNumber) ;
 
 		revisionNumber++;
@@ -29,6 +30,10 @@
 	  {   
 		revisionNumber = 0 ;
 	}
+	using (StreamWriter Sw = new StreamWriter(AssembleyFileVersion))
+	{
+		Sw.WriteLine(revisionNumber.ToString());
+	}
 #>
 //<#=revisionNumber.ToString()#>
 // 
@@ -37,5 +42,5 @@
 // 
 using System.Reflection;
 
-[assembly: AssemblyInformationalVersion("7.0Alpha <#=revisionNumber.ToString()#>")]
+[assembly: AssemblyInformationalVersion("2.19.PreAlpha <#=revisionNumber.ToString()#>")]
 
