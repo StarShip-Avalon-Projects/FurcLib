@@ -32,14 +32,8 @@ namespace Furcadia.Net
     /// </summary>
     /// <remarks>
     /// </remarks>
-    public class NetProxy : IDisposable
+    public class NetProxy
     {
-        // Flag: Has Dispose already been called?
-        private bool disposed = false;
-
-        // Instantiate a SafeHandle instance.
-        private SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
-
         #region Private Fields
 
         // private SslStream ServerSslStream;
@@ -603,52 +597,7 @@ namespace Furcadia.Net
 
         #endregion Public Methods
 
-        #region Protected Methods
 
-        /// <summary>
-        /// Public implementation of Dispose pattern callable by consumers.
-        /// </summary>
-        public virtual void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        //
-
-        /// <summary>
-        /// Protected implementation of Dispose pattern.
-        /// </summary>
-        /// <param name="disposing">
-        /// </param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-            if (disposing)
-            {
-                handle.Dispose();
-                // Free any other managed objects here.
-                //
-                if (BackupSettings != null)
-                    settings.RestoreFurcadiaSettings(ref BackupSettings);
-                if (client != null && client.Connected == true)
-                {
-                    client.Close();
-                    client = null;
-                }
-                if (LightBringer != null && LightBringer.Connected == true)
-                {
-                    LightBringer.Close();
-                    LightBringer = null;
-                }
-            }
-            // Free any unmanaged objects here.
-            //
-            disposed = true;
-        }
-
-        #endregion Protected Methods
 
         #region Private Methods
 

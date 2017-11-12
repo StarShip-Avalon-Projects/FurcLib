@@ -121,6 +121,7 @@ namespace Furcadia.Net.Proxy
 
             //BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
+
             //          SpeciesTag = new Queue<string>(50);
             //          BanishString = new List<string>(50);
         }
@@ -469,7 +470,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// implementation of Dispose pattern callable by consumers.
         /// </summary>
-        public override void Dispose()
+        public virtual void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -1450,14 +1451,14 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="disposing">
         /// </param>
-        protected override void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (disposed)
                 return;
 
             if (disposing)
             {
-                base.Dispose();
+                ServerBalancer.Dispose();
             }
 
             // Free any unmanaged objects here.
