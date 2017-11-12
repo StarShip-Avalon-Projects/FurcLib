@@ -1457,7 +1457,6 @@ namespace Furcadia.Net.Proxy
 
             if (disposing)
             {
-                handle.Dispose();
                 base.Dispose();
             }
 
