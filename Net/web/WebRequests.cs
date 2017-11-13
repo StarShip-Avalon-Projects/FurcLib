@@ -6,7 +6,7 @@ using System.Web;
 namespace Furcadia.Net.Web
 
 {
-    public class AccountLogin
+    public class WebRequests
     {
         #region Private Fields
 
