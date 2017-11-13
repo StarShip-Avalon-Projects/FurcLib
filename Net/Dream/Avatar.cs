@@ -5,10 +5,12 @@ using System.Reflection;
 
 namespace Furcadia.Net.Dream
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar'
-
+    /// <summary>
+    /// Legacy Furre Avatar information
+    /// </summary>
+    [Legacy]
     public class Avatar
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar'
+
     {
         #region Private Fields
 

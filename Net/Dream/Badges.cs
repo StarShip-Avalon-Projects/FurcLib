@@ -10,7 +10,7 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 
-namespace Furcadia
+namespace Furcadia.Net.Dream
 {
     /// <summary>
     /// Beekin Badges
