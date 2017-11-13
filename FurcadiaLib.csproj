@@ -112,6 +112,7 @@
     <Compile Include="Extentions\ObjectExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Net\web\AccountLogin.cs" />
     <Compile Include="Net\Dream\Avatar.cs" />
     <Compile Include="Net\Dream\Badges.cs" />
     <Compile Include="IO\IniFile.cs" />
