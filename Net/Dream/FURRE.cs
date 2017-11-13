@@ -31,16 +31,13 @@ namespace Furcadia.Net.Dream
         private int _LastStat;
         private int _level;
         private string _Message;
-        private string name;
-
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
-
         private string _tag;
         private bool _Visible;
         private bool _WasVisible;
-
         private FurrePosition Location;
+        private string name;
         private FurrePosition SourceLocation;
 
         #endregion Private Fields
@@ -122,29 +119,6 @@ namespace Furcadia.Net.Dream
         }
 
         /// <summary>
-        /// Furcadia Color Code (v31c)
-        /// </summary>
-        public ColorString FurreColors
-        {
-            //TODO: Move section to a Costume Sub Class
-            // Furcadia now supports Costumes through Online FurEd
-            get { return _Color; }
-            set
-            {
-                _Color = value;
-            }
-        }
-
-        /// <summary>
-        /// Furcadia Description
-        /// </summary>
-        public string FurreDescription
-        {
-            get { return _Desc; }
-            set { _Desc = value; }
-        }
-
-        /// <summary>
         /// </summary>
         public av_DIR Direction
         {
@@ -152,10 +126,11 @@ namespace Furcadia.Net.Dream
             set { direction = value; }
         }
 
+        /// <summary>
+        /// Legacy DS Species
+        /// </summary>
         [Obsolete]
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Furre.DSSpecies'
         public int DSSpecies
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Furre.DSSpecies'
         {
             get { return FurreColors.Species; }
         }
@@ -183,27 +158,26 @@ namespace Furcadia.Net.Dream
         }
 
         /// <summary>
+        /// Furcadia Color Code (v31c)
         /// </summary>
-        [Obsolete]
-        public int Gender
+        public ColorString FurreColors
         {
-            get { return FurreColors.Gender; }
+            //TODO: Move section to a Costume Sub Class
+            // Furcadia now supports Costumes through Online FurEd
+            get { return _Color; }
+            set
+            {
+                _Color = value;
+            }
         }
 
-        ///// <summary>
-        ///// </summary>
-        //public Avatar.Frame FrameInfo
-        //{
-        //    get
-        //    {
-        //        return Avatar.SpecNum(shape);
-        //    }
-        //}
         /// <summary>
+        /// Furcadia Description
         /// </summary>
-        public int Group
+        public string FurreDescription
         {
-            get { return _group; }
+            get { return _Desc; }
+            set { _Desc = value; }
         }
 
         /// <summary>
@@ -213,6 +187,21 @@ namespace Furcadia.Net.Dream
         {
             get { return _ID; }
             set { _ID = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Obsolete]
+        public int Gender
+        {
+            get { return FurreColors.Gender; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public int Group
+        {
+            get { return _group; }
         }
 
         /// <summary>
