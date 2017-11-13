@@ -34,28 +34,21 @@ namespace Furcadia.Net.Web
         /// <returns>
         /// Furcadia Account information including Characters and thier costumes
         /// </returns>
-        public static string getFurcadiaCharacters(string u, string p, string k, string LoginUrl)
+        public static string SendPostRequest(string PostData, string url)
         {
             var message = new StringBuilder();
-            var LoginWebRequest = (HttpWebRequest)WebRequest.Create(LoginUrl);
+            var LoginWebRequest = (HttpWebRequest)WebRequest.Create(url);
             var postData = new StringBuilder();
             var PostDataEncoding = Encoding.GetEncoding(1252);
 
-            string SilverMonkeyUserAgent = "Silver Monkey Bot Client";
-
-            postData.AppendFormat("{0}={1}", HttpUtility.UrlEncode("u"), HttpUtility.UrlEncode(u));
-            postData.AppendFormat("&{0}={1}", HttpUtility.UrlEncode("p"), HttpUtility.UrlEncode(p));
-            postData.AppendFormat("&{0}={1}", HttpUtility.UrlEncode("k"), HttpUtility.UrlEncode(k));
-            postData.AppendFormat("&{0}={1}", HttpUtility.UrlEncode("v"), HttpUtility.UrlEncode("31_0_aft"));
-
             message.AppendLine("postData:");
-            message.AppendLine(postData.ToString());
+            message.AppendLine(PostData);
 
             byte[] PostArray = PostDataEncoding.GetBytes(postData.ToString());
 
             // *** Set any header related and operational properties
             LoginWebRequest.Method = "POST";
-            LoginWebRequest.UserAgent = SilverMonkeyUserAgent;
+            LoginWebRequest.UserAgent = "FurcaddiaFramework";
             LoginWebRequest.ContentType = "application/x-www-form-urlencoded";
 
             // Is this how we handle PostData KeyValues?

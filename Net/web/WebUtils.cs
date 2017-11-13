@@ -20,6 +20,7 @@ namespace Furcadia.Net.Web
                     , HttpUtility.UrlEncode(var.Name)
                     , HttpUtility.UrlEncode(var.Value.ToString())
                     ));
+            return string.Join("&", vars.ToArray());
         }
     }
 }
