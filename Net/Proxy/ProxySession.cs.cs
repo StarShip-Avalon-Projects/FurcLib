@@ -578,8 +578,15 @@ namespace Furcadia.Net.Proxy
                         ProcessServerChannelData?.Invoke(chanObject, args);
                         return;
                     }
-
-                    player.Message = FontColorRegexMatch.Groups[9].Value;
+                    Regex ShoutrRexex = new Regex(@"<font color='shout'>(.*)shouts:(.*?)</font>");
+                    // string s = Regex.Replace(data, "[~#%&*{}/<>?|\"-]+", "");
+                    if (ShoutrRexex.Match(data).Success)
+                    {
+                        var s = ShoutrRexex.Match(data).Groups[2].Value;
+                        player.Message = ShoutrRexex.Match(data).Groups[2].Value;
+                    }
+                    else
+                        player.Message = FontColorRegexMatch.Groups[9].Value;
                 }
 
                 errorMsg = "";
