@@ -25,7 +25,13 @@ namespace Furcadia.Net.Dream
         /// As of V31, Color code has changed.
         /// </para>
         /// </summary>
-        public FurreList FurreList;
+        public FurreList Furres
+        {
+            get { return furres; }
+            set { furres = value; }
+        }
+
+        private FurreList furres;
 
         #endregion Public Fields
 
@@ -45,7 +51,7 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public DREAM()
         {
-            FurreList = new FurreList();
+            furres = new FurreList();
         }
 
         #endregion Public Constructors
@@ -127,6 +133,47 @@ namespace Furcadia.Net.Dream
             get { return _URL; }
             set { _URL = value; }
         }
+
+        ///// <summary>
+        /////
+        ///// </summary>
+        ///// <param name="dreamA"></param>
+        ///// <param name="DreamB"></param>
+        ///// <returns></returns>
+        //public static bool operator ==(DREAM dreamA, DREAM dreamB)
+        //{
+        //    if (dreamB == null || dreamA == null)
+        //        return false;
+        //    return dreamA.Equals(dreamB);
+        //}
+
+        ///// <summary>
+        /////
+        ///// </summary>
+        ///// <param name="dreamA"></param>
+        ///// <param name="DreamB"></param>
+        ///// <returns></returns>
+        //public static bool operator !=(DREAM dreamA, DREAM DreamB)
+        //{
+        //    if (DreamB == null)
+        //    {
+        //        return false;
+        //    }
+
+        //    return dreamA.ShortName != DreamB.ShortName;
+        //}
+
+        ///// <summary>
+        /////
+        ///// </summary>
+        ///// <param name="other"></param>
+        ///// <returns></returns>
+        //public bool Equals(DREAM other)
+        //{
+        //    if (other == null)
+        //        return false;
+        //    return ShortName == other.ShortName;
+        //}
 
         #endregion Public Properties
     }
