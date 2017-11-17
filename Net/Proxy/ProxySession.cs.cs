@@ -531,6 +531,19 @@ namespace Furcadia.Net.Proxy
             {
                 if (DescTagRegexMatch.Groups[1].Value == "fsh://system.fsh:86")
                 {
+                    var LineCountRegex = "<img src='fsh://system.fsh:86' /> Lines of DragonSpeak: ([0-9]+)";
+                    var LineCount = new Regex(LineCountRegex);
+                    if (LineCount.Match(data).Success)
+                        Dream.Lines = int.Parse(LineCount.Match(data).Groups[1].Value);
+                    LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
+                    LineCount = new Regex(LineCountRegex);
+                    if (LineCount.Match(data).Success)
+                        Dream.Rating = LineCount.Match(data).Groups[1].Value;
+                    //LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
+                    //LineCount = new Regex(LineCountRegex);
+                    //if (LineCount.Match(data).Success)
+                    //    Dream.Title = LineCount.Match(data).Groups[1].Value;
+
                     chanObject = new ChannelObject(data)
                     {
                         Player = player,

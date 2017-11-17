@@ -8,7 +8,6 @@
 
 using Furcadia.Net.Options;
 using Furcadia.Text;
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -16,7 +15,6 @@ using System.IO;
 //using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using static Furcadia.Net.Utils.Utilities;
 
 namespace Furcadia.Net
@@ -348,6 +346,7 @@ namespace Furcadia.Net
         #region Public Properties
 
         /// <summary>
+        /// Buffer Size
         /// </summary>
         public int BufferCapacity
         {
@@ -358,6 +357,9 @@ namespace Furcadia.Net
         }
 
         /// <summary>
+        /// Encodig
+        /// <para/>
+        /// DEFAULT: Windows 1252
         /// </summary>
         public int EncoderPage
         {
@@ -376,7 +378,7 @@ namespace Furcadia.Net
             {
                 try
                 {
-                    if (client != null)
+                    if (client != null && client.Client != null)
                     {
                         return client.Connected && client.Client.Connected;
                     }
@@ -396,7 +398,7 @@ namespace Furcadia.Net
             {
                 try
                 {
-                    if (LightBringer != null)
+                    if (LightBringer != null && LightBringer.Client != null)
                         return (LightBringer.Connected && LightBringer.Client.Connected);
                 }
                 catch { }
@@ -596,8 +598,6 @@ namespace Furcadia.Net
         }
 
         #endregion Public Methods
-
-
 
         #region Private Methods
 

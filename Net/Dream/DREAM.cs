@@ -40,7 +40,9 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// private variables
         /// </summary>
-        private string _Name, _Title, _Lines, _Rating, _URL, _Owner;
+        private string _Name, _Title, _Rating, _URL, _Owner;
+
+        private int _Lines;
 
         #endregion Private Fields
 
@@ -72,7 +74,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// Number of DS Lines
         /// </summary>
-        public string Lines
+        public int Lines
         {
             get { return _Lines; }
             set { _Lines = value; }
@@ -102,6 +104,14 @@ namespace Furcadia.Net.Dream
         {
             get { return _Owner; }
             set { _Owner = value; }
+        }
+
+        /// <summary>
+        /// Dreams uploader character
+        /// </summary>
+        public string OwnerShortName
+        {
+            get { return FurcadiaShortName(_Owner); }
         }
 
         /// <summary>
