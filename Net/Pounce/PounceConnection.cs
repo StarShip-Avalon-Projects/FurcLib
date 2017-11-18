@@ -29,7 +29,7 @@ namespace Furcadia.Net.Pounce
         #region Public Properties
 
         /// <summary>
-        /// Set the Encoder to win 1252 encoding
+        /// Set the Encoder to Windows 1252 encoding
         /// </summary>
         public static int EncoderPage
         {
@@ -100,7 +100,7 @@ namespace Furcadia.Net.Pounce
         /// <summary>
         /// Default URL "http://on.furcadia.com/q/
         /// </summary>
-        private string _url = string.Format("http://{0}/q/", FurcadiaUtilities.PounceServerHost);
+        private string _url = $"{FurcadiaUtilities.PounceServerHost}";
 
         #endregion Private Fields
 

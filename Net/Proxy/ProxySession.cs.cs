@@ -439,7 +439,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Current Triggering player
         /// </summary>
-        public Furre Player
+        public IFurre Player
         {
             get { return player; }
         }
@@ -523,9 +523,9 @@ namespace Furcadia.Net.Proxy
             var FontColorRegexMatch = FontColorRegex.Match(data);
             var DescTagRegexMatch = DescTagRegex.Match(data);
             if (NameRegex.Match(data).Success)
-                player = dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
+                player = (Furre)dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
             else if (data.StartsWith("<font color='shout'>You shout,"))
-                player = dream.Furres[connectedFurre];
+                player = (Furre)dream.Furres[connectedFurre];
 
             if (DescTagRegexMatch.Success)
             {
@@ -569,7 +569,7 @@ namespace Furcadia.Net.Proxy
                     Regex DescRegex = new Regex(DescFilter);
                     if (DescRegex.Match(data).Success)
                     {
-                        player = dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
+                        player = (Furre)dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
                         player.FurreDescription = DescRegex.Match(data).Groups[2].Value;
 
                         if (LookQue.Count > 0)
@@ -713,12 +713,12 @@ namespace Furcadia.Net.Proxy
                     // string WhisperFrom = WhisperIncoming.Match(data).Captures[1].Value;
                     if (WhisperIncoming.Match(data).Success)
                     {
-                        player = dream.Furres.GerFurreByName(WhisperIncoming.Match(data).Groups[2].Value);
+                        player = (Furre)dream.Furres.GerFurreByName(WhisperIncoming.Match(data).Groups[2].Value);
                         player.Message = WhisperIncoming.Match(data).Groups[5].Value;
                     }
                     else if (WhisperOutgoing.Match(data).Success)
                     {
-                        player = dream.Furres.GerFurreByName(WhisperOutgoing.Match(data).Groups[4].Value);
+                        player = (Furre)dream.Furres.GerFurreByName(WhisperOutgoing.Match(data).Groups[4].Value);
                         player.Message = WhisperOutgoing.Match(data).Groups[5].Value;
                     }
                 }
@@ -959,7 +959,7 @@ namespace Furcadia.Net.Proxy
                             Dream.Furres.IndexOf(FurreSpawn.player);
                         }
 
-                        player = Dream.Furres.GetFurreByID(Player.FurreID);
+                        player = (Furre)Dream.Furres.GetFurreByID(Player.FurreID);
                         if (IsConnectedCharacter()) // Keep connectedFurre upto date
                         {
                             connectedFurre = player;
@@ -993,11 +993,11 @@ namespace Furcadia.Net.Proxy
                     //Animated Move
                     else if (data[0] == '/')
                     {
-                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = (Furre)Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
                         // player.Shape =
                         // ConvertFromBase220(data.Substring(9, 2));
-                        connectedFurre = Dream.Furres[connectedFurre];
+                        connectedFurre = (Furre)Dream.Furres[connectedFurre];
                         ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
                         if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <= player.Position.Y &
                             VisableRectangle.height >= player.Position.Y & VisableRectangle.length >=
@@ -1013,10 +1013,10 @@ namespace Furcadia.Net.Proxy
                     // Move Avatar
                     else if (data[0] == 'A')
                     {
-                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = (Furre)Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
 
-                        connectedFurre = Dream.Furres[connectedFurre];
+                        connectedFurre = (Furre)Dream.Furres[connectedFurre];
                         ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
 
                         if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <=
@@ -1034,7 +1034,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'B')
                     {
                         //fuid 4 b220 bytes
-                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = (Furre)Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
 
                         if (InDream)
@@ -1049,7 +1049,7 @@ namespace Furcadia.Net.Proxy
                     //Hide Avatar
                     else if (data[0] == 'C')
                     {
-                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = (Furre)Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
                         player.Visible = false;
                     }

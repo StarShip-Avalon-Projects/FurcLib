@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Pounce
 {
@@ -98,7 +97,7 @@ namespace Furcadia.Net.Pounce
                 {
                     if (!string.IsNullOrEmpty(Furre.Name))
                     {
-                        AddFriend(FurcadiaShortName(Furre.Name));
+                        AddFriend(Furre.ShortName);
                     }
                 }
                 ConnectAsync();
@@ -138,44 +137,4 @@ namespace Furcadia.Net.Pounce
     }
 
     #endregion Private Methods
-
-    #region Public Classes
-
-    /// <summary>
-    /// </summary>
-    public class PounceFurre
-    {
-        #region "Public Fields"
-
-        private bool online;
-
-        private bool wasOnline;
-
-        /// <summary>
-        /// Furre Name
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Furre Currently online
-        /// </summary>
-        public bool Online
-        {
-            get { return online; }
-            set { online = value; }
-        }
-
-        /// <summary>
-        /// Furre Previous Online State
-        /// </summary>
-        public bool WasOnline
-        {
-            get { return wasOnline; }
-            set { wasOnline = value; }
-        }
-
-        #endregion "Public Fields"
-    }
-
-    #endregion Public Classes
 }

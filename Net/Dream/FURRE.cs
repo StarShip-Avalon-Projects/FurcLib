@@ -7,9 +7,32 @@ using static Furcadia.Util;
 namespace Furcadia.Net.Dream
 {
     /// <summary>
+    /// Furre Class Interface
+    /// </summary>
+    public interface IFurre
+    {
+        /// <summary>
+        /// implements the Furre;s Name Property
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
+        /// implements the Furre;s Name Property
+        /// </summary>
+        string ShortName { get; }
+
+        /// <summary>
+        /// Implements the FurreID or unique furre identifyer
+        /// </summary>
+        int FurreID { get; set; }
+
+        string Message { get; set; }
+    }
+
+    /// <summary>
     /// Class for Proxies and bots to use Furrre Data provided by the game server.
     /// </summary>
-    public class Furre
+    public class Furre : IFurre, IEquatable<IFurre>
     {
         #region Private Fields
 
@@ -379,7 +402,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public static bool operator !=(Furre a, Furre b)
+        public static bool operator !=(Furre a, IFurre b)
         {
             if (ReferenceEquals(a, b))
             {
@@ -396,7 +419,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public static bool operator ==(Furre a, Furre b)
+        public static bool operator ==(Furre a, IFurre b)
         {
             if (ReferenceEquals(a, b))
             {
@@ -404,6 +427,16 @@ namespace Furcadia.Net.Dream
             }
 
             return a.Equals(b);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IFurre other)
+        {
+            return other.ShortName == ShortName;
         }
 
         /// <summary>
@@ -416,9 +449,9 @@ namespace Furcadia.Net.Dream
         {
             if (obj == null)
                 return false;
-            if (obj.GetType() == typeof(Furre))
+            if (obj.GetType() == typeof(IFurre))
             {
-                Furre ob = (Furre)obj;
+                IFurre ob = (IFurre)obj;
                 if (string.IsNullOrEmpty(ShortName) || string.IsNullOrEmpty(ob.ShortName))
                     return ob.FurreID == FurreID;
                 if (ob.ShortName == "unknown" || ShortName == "unknown")
@@ -452,7 +485,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public int ToFurcadiaID(Func<Furre, int> format)
+        public int ToFurcadiaID(Func<IFurre, int> format)
         {
             if (format != null)
                 return format(this);
@@ -474,7 +507,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public string ToString(Func<Furre, string> format)
+        public string ToString(Func<IFurre, string> format)
         {
             if (format != null)
                 return format(this);
