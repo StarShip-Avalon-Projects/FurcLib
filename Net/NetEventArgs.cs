@@ -83,29 +83,42 @@ namespace Furcadia.Net
         /// <summary>
         /// Spawns a new Furre in the dream furre list because they have
         /// joing the Dream we're in
-        /// <para>
+        /// <para/>
         /// '&lt;' + user id + x + y + shape number + name + color code +
         /// flag + linefeed
-        /// </para>
+        /// <para/>
+        /// sender object is Type SpawnAvatar()
         /// </summary>
         SpawnAvatar,
 
         /// <summary>
         /// Remove the Avatar from the Dream Furre list because they have
         /// left the dream
-        /// <para>
+        /// <para/>
         /// ')' + user id + linefeed
-        /// </para>
+        /// <para/>
+        /// Source: Furcatia Technical Resources
+        /// <para/>
+        /// sender object is Type RemoveAvatar()
         /// </summary>
         RemoveAvatar,
 
         /// <summary>
+        /// Hide Avatar from display (Invisible?)
+        /// </summary>
+        HideAvatar,
+
+        /// <summary>
         /// Move and animate the Active Furre to the next location
+        /// <para/>
+        /// sender object is Type Furre()
         /// </summary>
         AnimatedMoveAvatar,
 
         /// <summary>
         /// Move the current active furre to the next locatiomn
+        /// <para/>
+        /// sender object is Type Furre
         /// </summary>
         MoveAvatar,
 
@@ -166,7 +179,14 @@ namespace Furcadia.Net
         ///  Dream Book Mark
         ///  <para/>Triggers Pounce to add the dream to the list marked temporary
         /// </summary>
-        BookmarkDream
+        BookmarkDream,
+
+        /// <summary>
+        /// received after a look at furre command
+        /// <para/>
+        /// sender object is Type Furre
+        /// </summary>
+        LookResponse
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// 4 byte Base220 string
         /// </para>
         /// </summary>
-        public int AvatarID;
+        public int FurreId;
 
         #endregion Public Fields
 
@@ -31,7 +31,7 @@ namespace Furcadia.Net.Utils.ServerParser
             if (ServerInstruction[0] == ')')
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
-                AvatarID = ConvertFromBase220(ServerInstruction.Substring(1, 4));
+                FurreId = ConvertFromBase220(ServerInstruction.Substring(1, 4));
         }
 
         #endregion Public Constructors
