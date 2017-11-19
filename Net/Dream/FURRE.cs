@@ -426,7 +426,7 @@ namespace Furcadia.Net.Dream
                 return true;
             }
 
-            return a.Equals(b);
+            return a.Equals((object)b);
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace Furcadia.Net.Dream
         /// <returns></returns>
         public bool Equals(IFurre other)
         {
-            return other.ShortName == ShortName;
+            return Equals((object)other);
         }
 
         /// <summary>
@@ -449,9 +449,9 @@ namespace Furcadia.Net.Dream
         {
             if (obj == null)
                 return false;
-            if (obj.GetType() == typeof(IFurre))
+            if (obj.GetType() == typeof(Furre))
             {
-                IFurre ob = (IFurre)obj;
+                var ob = (Furre)obj;
                 if (string.IsNullOrEmpty(ShortName) || string.IsNullOrEmpty(ob.ShortName))
                     return ob.FurreID == FurreID;
                 if (ob.ShortName == "unknown" || ShortName == "unknown")

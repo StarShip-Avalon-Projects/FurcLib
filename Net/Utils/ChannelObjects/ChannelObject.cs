@@ -20,7 +20,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        internal Furre player;
+        internal IFurre player;
 
         internal Match FontColorRegexMatch;
 
@@ -94,7 +94,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        public Furre Player
+        public IFurre Player
         {
             get { return player; }
             set { player = value; }

@@ -13,13 +13,13 @@ namespace Furcadia.Net.Dream
     /// Select a Furre by Item as well as index
     /// </para>
     /// </summary>
-    public class FurreList : IList<IFurre>, ICollection
+    public class FurreList : IList<Furre>, ICollection
     {
         #region Protected Internal Fields
 
         /// <summary>
         /// </summary>
-        static protected internal IList<IFurre> fList;
+        static protected internal IList<Furre> fList;
 
         #endregion Protected Internal Fields
 
@@ -29,7 +29,7 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public FurreList()
         {
-            fList = new List<IFurre>(100);
+            fList = new List<Furre>(100);
         }
 
         #endregion Public Constructors
@@ -80,7 +80,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// Convert Furre List to <see cref=" IList"/>
         /// </summary>
-        public IList<IFurre> ToIList
+        public IList<Furre> ToIList
         {
             get
             {
@@ -94,7 +94,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public IFurre this[int index]
+        public Furre this[int index]
         {
             get
             {
@@ -118,7 +118,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public IFurre this[IFurre fur]
+        public Furre this[Furre fur]
         {
             get
             {
@@ -143,7 +143,7 @@ namespace Furcadia.Net.Dream
         /// </summary>
         /// <param name="Furre">
         /// </param>
-        public void Add(IFurre Furre)
+        public void Add(Furre Furre)
         {
             if (!fList.Contains(Furre))
                 fList.Add(Furre);
@@ -166,7 +166,7 @@ namespace Furcadia.Net.Dream
         /// </returns>
         public bool Contains(int FurreID)
         {
-            foreach (IFurre fur in fList)
+            foreach (var fur in fList)
             {
                 if (fur.FurreID == FurreID)
                     return true;
@@ -181,7 +181,7 @@ namespace Furcadia.Net.Dream
         /// <returns></returns>
         public bool Contains(string FurreName)
         {
-            foreach (IFurre fur in fList)
+            foreach (var fur in fList)
             {
                 if (fur.ShortName == FurcadiaShortName(FurreName))
                     return true;
@@ -195,9 +195,9 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public bool Contains(IFurre Furre)
+        public bool Contains(Furre Furre)
         {
-            foreach (IFurre fur in fList)
+            foreach (var fur in fList)
             {
                 if (fur == Furre)
                     return true;
@@ -222,16 +222,18 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public IFurre GerFurreByName(string sname)
+        public Furre GerFurreByName(string sname)
         {
-            foreach (IFurre Character in fList)
+            if (string.IsNullOrEmpty(sname))
+                throw new ArgumentNullException(sname);
+            foreach (var Character in fList)
             {
                 if (Character.ShortName == FurcadiaShortName(sname))
                 {
                     return Character;
                 }
             }
-            return new Furre();
+            return new Furre(sname);
         }
 
         /// <summary>
@@ -251,9 +253,9 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public IFurre GetFurreByID(string FurreID)
+        public Furre GetFurreByID(Base220 FurreID)
         {
-            foreach (IFurre Furre in fList)
+            foreach (var Furre in fList)
             {
                 if (Furre.FurreID == Base220.ConvertFromBase220(FurreID))
                     return Furre;
@@ -270,9 +272,9 @@ namespace Furcadia.Net.Dream
         /// <returns>
         /// Furre
         /// </returns>
-        public IFurre GetFurreByID(int FurreID)
+        public Furre GetFurreByID(int FurreID)
         {
-            foreach (IFurre Furre in fList)
+            foreach (var Furre in fList)
             {
                 if (Furre.FurreID == FurreID)
                     return Furre;
@@ -286,7 +288,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public int IndexOf(IFurre Furre)
+        public int IndexOf(Furre Furre)
         {
             return fList.IndexOf(Furre);
         }
@@ -300,8 +302,8 @@ namespace Furcadia.Net.Dream
         {
             lock (RemoveLock)
             {
-                IFurre F = null;
-                foreach (IFurre Fur in fList)
+                Furre F = null;
+                foreach (var Fur in fList)
                 {
                     if (Fur.FurreID == FurreID)
                     {
@@ -324,7 +326,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <param name="arrayIndex">
         /// </param>
-        public void CopyTo(IFurre[] array, int arrayIndex)
+        public void CopyTo(Furre[] array, int arrayIndex)
         {
             fList.CopyTo(array, arrayIndex);
         }
@@ -335,7 +337,7 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <param name="item">
         /// </param>
-        public void Insert(int index, IFurre item)
+        public void Insert(int index, Furre item)
         {
             fList.Insert(index, item);
         }
@@ -346,9 +348,9 @@ namespace Furcadia.Net.Dream
         /// </param>
         /// <returns>
         /// </returns>
-        public bool Remove(IFurre item)
+        public bool Remove(Furre item)
         {
-            foreach (IFurre Furre in fList)
+            foreach (var Furre in fList)
             {
                 if (Furre.FurreID == item.FurreID)
                 {
@@ -368,7 +370,7 @@ namespace Furcadia.Net.Dream
             fList.RemoveAt(index);
         }
 
-        IEnumerator<IFurre> IEnumerable<IFurre>.GetEnumerator()
+        IEnumerator<Furre> IEnumerable<Furre>.GetEnumerator()
         {
             return fList.GetEnumerator();
         }

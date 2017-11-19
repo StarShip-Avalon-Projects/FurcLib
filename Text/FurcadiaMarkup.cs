@@ -85,7 +85,7 @@ namespace Furcadia.Text
 
         /// <summary>
         /// </summary>
-        public const string Iconfilter = "<img src='(fsh://system.fsh:([^']*))' (alt='(.*?)' )?/>";
+        public const string Iconfilter = "<img src='(fsh://system.fsh:([^']*)|http://apollo.furcadia.com/cache/(.*?))' (alt='(.*?)' )?/>";
 
         /// <summary>
         /// </summary>
