@@ -968,6 +968,8 @@ namespace Furcadia.Net.Proxy
                             player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
                             if (IsConnectedCharacter())
                                 Look = false;
+                            ProcessServerInstruction.Invoke(player,
+                                   new ParseServerArgs(ServerInstructionType.LookResponse, serverconnectphase));
                         }
                     }
                     //Spawn Avatar
@@ -1003,7 +1005,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == ')' || data[0] == ' ')
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
-                        Dream.Furres.Remove(RemoveFurre.AvatarID);
+                        Dream.Furres.Remove(RemoveFurre.FurreId);
 
                         if (InDream)
                         {
@@ -1032,6 +1034,9 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Visible = false;
                         }
+                        ProcessServerInstruction.Invoke(player,
+                             new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, serverconnectphase));
+                        return;
                     }
                     // Move Avatar
                     else if (data[0] == 'A')
@@ -1052,6 +1057,9 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Visible = false;
                         }
+                        ProcessServerInstruction.Invoke(player,
+                              new ParseServerArgs(ServerInstructionType.MoveAvatar, serverconnectphase));
+                        return;
                     }
                     //Update ColorString
                     else if (data[0] == 'B')
@@ -1072,24 +1080,24 @@ namespace Furcadia.Net.Proxy
                     //Hide Avatar
                     else if (data[0] == 'C')
                     {
-                        player = (Furre)Dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
                         player.Visible = false;
                     }
                     // Species Tags
-                    else if (data.StartsWith("]-"))
-                    {
-                        //if (data.StartsWith("]-#A"))
-                        //{
-                        //    SpeciesTag.Enqueue(data.Substring(4));
-                        //}
-                        //else if (data.StartsWith("]-#B"))
-                        //{
-                        //    BadgeTag.Enqueue(data.Substring(2));
-                        //}
+                    //  else if (data.StartsWith("]-"))
+                    //  {
+                    //if (data.StartsWith("]-#A"))
+                    //{
+                    //    SpeciesTag.Enqueue(data.Substring(4));
+                    //}
+                    //else if (data.StartsWith("]-#B"))
+                    //{
+                    //    BadgeTag.Enqueue(data.Substring(2));
+                    //}
 
-                        //DS Variables
-                    }
+                    //DS Variables
+                    //  }
 
                     //Popup Dialogs!
                     else if (data.StartsWith("]#"))
@@ -1222,16 +1230,8 @@ namespace Furcadia.Net.Proxy
                             //Using Furclib ServQue
                             ThroatTired = true;
                         }
-                        try
-                        {
-                            ParseServerChannel(data, Handled);
-                            return;
-                        }
-                        catch (Exception ex)
-                        {
-                            SendError(ex, this, "");
-                        }
-
+                        // Send the Data to Channel Parser
+                        ParseServerChannel(data, Handled);
                         return;
                     }
 
