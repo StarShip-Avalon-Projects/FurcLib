@@ -1,4 +1,5 @@
-﻿using static Furcadia.Text.Base220;
+﻿using Furcadia.Net.Dream;
+using static Furcadia.Text.Base220;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -17,6 +18,8 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public int FurreId;
 
+        public Furre Player;
+
         #endregion Public Fields
 
         #region Public Constructors
@@ -32,6 +35,7 @@ namespace Furcadia.Net.Utils.ServerParser
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
                 FurreId = ConvertFromBase220(ServerInstruction.Substring(1, 4));
+            Player = new Furre(FurreId);
         }
 
         #endregion Public Constructors
