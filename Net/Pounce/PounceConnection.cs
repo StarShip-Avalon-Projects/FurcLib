@@ -14,7 +14,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Pounce
 {
@@ -185,7 +184,7 @@ namespace Furcadia.Net.Pounce
         /// </returns>
         public bool AddFriend(string name)
         {
-            name = FurcadiaShortName(name);
+            name = name.ToFurcadiaShortName();
             if (IsValidAlphaNumeric(name))
             {
                 if (_friends.Contains(name) == false)
@@ -255,7 +254,7 @@ namespace Furcadia.Net.Pounce
         /// </returns>
         public bool RemoveFriend(string name)
         {
-            name = FurcadiaShortName(name);
+            name = name.ToFurcadiaShortName();
             if (_friends.Contains(name))
             {
                 _friends.Remove(name);

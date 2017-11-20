@@ -2,7 +2,6 @@
 using Furcadia.Movement;
 using System;
 using static Furcadia.Net.Dream.Avatar;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Dream
 {
@@ -321,7 +320,7 @@ namespace Furcadia.Net.Dream
         {
             get
             {
-                return FurcadiaShortName(name);
+                return name.ToFurcadiaShortName();
             }
         }
 

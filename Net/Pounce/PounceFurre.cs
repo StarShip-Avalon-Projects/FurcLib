@@ -1,5 +1,4 @@
 ﻿using Furcadia.Net.Dream;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Pounce
 {
@@ -19,7 +18,7 @@ namespace Furcadia.Net.Pounce
         /// </summary>
         public string Name { get; set; }
 
-        public string ShortName { get { return FurcadiaShortName(Name); } }
+        public string ShortName { get { return Name.ToFurcadiaShortName(); } }
         public int FurreID { get; set; }
         public string Message { get; set; }
 

@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Dream
 {
@@ -183,7 +182,7 @@ namespace Furcadia.Net.Dream
         {
             foreach (var fur in fList)
             {
-                if (fur.ShortName == FurcadiaShortName(FurreName))
+                if (fur.ShortName == FurreName.ToFurcadiaShortName())
                     return true;
             }
             return false;
@@ -228,7 +227,7 @@ namespace Furcadia.Net.Dream
                 throw new ArgumentNullException(sname);
             foreach (var Character in fList)
             {
-                if (Character.ShortName == FurcadiaShortName(sname))
+                if (Character.ShortName == sname.ToFurcadiaShortName())
                 {
                     return Character;
                 }

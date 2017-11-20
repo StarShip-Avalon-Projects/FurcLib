@@ -22,7 +22,6 @@ using System.Text.RegularExpressions;
 using static Furcadia.Drawing.VisibleArea;
 using static Furcadia.Movement.CharacterFlags;
 using static Furcadia.Text.FurcadiaMarkup;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Proxy
 {
@@ -653,7 +652,7 @@ namespace Furcadia.Net.Proxy
                     {
                         Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.");
                         string m = t.Match(Text).Groups[1].Value;
-                        if (FurcadiaShortName(m) == ConnectedFurre.ShortName)
+                        if (m.ToFurcadiaShortName() == ConnectedFurre.ShortName)
                         {
                             NoEndurance = true;
                         }
@@ -790,7 +789,7 @@ namespace Furcadia.Net.Proxy
                         int I;
                         for (I = 0; I <= BanishString.Count - 1; I++)
                         {
-                            if (FurcadiaShortName(BanishString[I]) == FurcadiaShortName(NameStr))
+                            if (BanishString[I].ToFurcadiaShortName() == NameStr.ToFurcadiaShortName())
                             {
                                 found = true;
                                 break;
@@ -1034,7 +1033,11 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Visible = false;
                         }
-                        ProcessServerInstruction.Invoke(player,
+                        var FurreMoved = new MoveFurre(data)
+                        {
+                            Player = player
+                        };
+                        ProcessServerInstruction.Invoke(FurreMoved,
                              new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, serverconnectphase));
                         return;
                     }
@@ -1057,7 +1060,11 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Visible = false;
                         }
-                        ProcessServerInstruction.Invoke(player,
+                        var FurreMoved = new MoveFurre(data)
+                        {
+                            Player = player
+                        };
+                        ProcessServerInstruction.Invoke(FurreMoved,
                               new ParseServerArgs(ServerInstructionType.MoveAvatar, serverconnectphase));
                         return;
                     }
@@ -1201,7 +1208,7 @@ namespace Furcadia.Net.Proxy
                             {
                                 string NameStr = dname.Substring(0, dname.IndexOf(":"));
                                 Dream.Owner = NameStr;
-                                if (FurcadiaShortName(NameStr) == connectedFurre.ShortName)
+                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
                                 {
                                     hasShare = true;
                                 }
@@ -1210,7 +1217,7 @@ namespace Furcadia.Net.Proxy
                             {
                                 string NameStr = dname.Substring(0, dname.IndexOf("/"));
                                 Dream.Owner = NameStr;
-                                if (FurcadiaShortName(NameStr) == connectedFurre.ShortName)
+                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
                                 {
                                     hasShare = true;
                                 }

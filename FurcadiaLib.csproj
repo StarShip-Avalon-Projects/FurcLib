@@ -141,6 +141,7 @@
     <Compile Include="Net\Utils\ChannelObjects\DiceRolls.cs" />
     <Compile Include="Net\Utils\ServerParser\DreamBookmark.cs" />
     <Compile Include="Net\Utils\ServerParser\LoadDream.cs" />
+    <Compile Include="Net\Utils\ServerParser\MoveFurre.cs" />
     <Compile Include="Net\Utils\ServerParser\RemoveAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\SpawnAvatar.cs" />
     <Compile Include="Net\Utils\ServerParser\UpdateColorString.cs" />
@@ -191,7 +192,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Text\Settings.cs" />
-    <Compile Include="Movement\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Text\Character.cs" />
   </ItemGroup>

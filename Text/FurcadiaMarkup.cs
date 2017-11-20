@@ -38,12 +38,6 @@ namespace Furcadia.Text
         /// </summary>
         /// <param name="Text">string to process</param>
         /// <returns></returns>
-        public static string StripFurcadiaMarkup(string Text)
-        {
-            var r = new Regex("<(.*?)>");
-            Text = r.Replace(Text, string.Empty);
-            return Text.Replace("|", " ").ToLower();
-        }
 
         #endregion Public Methods
 

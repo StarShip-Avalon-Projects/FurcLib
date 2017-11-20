@@ -1,5 +1,4 @@
 ﻿using System;
-using static Furcadia.Util;
 
 namespace Furcadia.Net.Dream
 {
@@ -40,7 +39,7 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// private variables
         /// </summary>
-        private string _Name, _Title, _Rating, _URL, _Owner;
+        private string name, _Title, _Rating, _URL, owner;
 
         private int _Lines;
 
@@ -85,8 +84,8 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public string Name
         {
-            get { return _Name; }
-            set { _Name = value; }
+            get { return name; }
+            set { name = value; }
         }
 
         /// <summary>
@@ -94,7 +93,7 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public string ShortName
         {
-            get { return FurcadiaShortName(_Name); }
+            get { return name.ToFurcadiaShortName(); }
         }
 
         /// <summary>
@@ -102,8 +101,8 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public string Owner
         {
-            get { return _Owner; }
-            set { _Owner = value; }
+            get { return owner; }
+            set { owner = value; }
         }
 
         /// <summary>
@@ -111,7 +110,7 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public string OwnerShortName
         {
-            get { return FurcadiaShortName(_Owner); }
+            get { return owner.ToFurcadiaShortName(); }
         }
 
         /// <summary>
