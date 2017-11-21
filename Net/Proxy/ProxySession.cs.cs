@@ -515,7 +515,7 @@ namespace Furcadia.Net.Proxy
         public void ParseServerChannel(string data, bool Handled)
         {
             //TODO: needs to move and re factored to ServerParser Class
-            ChannelObject chanObject;
+            ChannelObject chanObject = new ChannelObject(data);
             ParseChannelArgs args;
             data = data.Remove(0, 1);
 
@@ -600,6 +600,7 @@ namespace Furcadia.Net.Proxy
                     }
                     else
                         ActivePlayer.Message = FontColorRegexMatch.Groups[9].Value;
+                    player = ActivePlayer;
                 }
 
                 errorMsg = "";
@@ -661,7 +662,20 @@ namespace Furcadia.Net.Proxy
                 else if (Color == "myspeech")
                 {
                     Regex t = new Regex(YouSayFilter);
-                    player.Message = t.Match(data).Groups[2].Value;
+                    connectedFurre.Message = t.Match(data).Groups[2].Value;
+
+                    chanObject = new ChannelObject(data)
+                    {
+                        Player = ConnectedFurre,
+                        Channel = Color,
+                        ChannelText = $"You say \" {t.Match(data).Groups[2].Value} \"",
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
+
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (string.IsNullOrEmpty(Channel) &
                     string.IsNullOrEmpty(Color) &
@@ -672,13 +686,13 @@ namespace Furcadia.Net.Proxy
                     if (!DescMatch.Success)
                     {
                         Regex SayRegex = new Regex(NameFilter + ": (.*)", RegexOptions.Compiled);
-                        player.Message = SayRegex.Match(data).Groups[3].Value;
-
+                        ActivePlayer.Message = SayRegex.Match(data).Groups[3].Value;
+                        player = ActivePlayer;
                         chanObject = new ChannelObject(data)
                         {
-                            Player = ActivePlayer,
+                            Player = player,
                             Channel = "say",
-                            ChannelText = Player.Name + " says " + SayRegex.Match(data).Groups[3].Value + "\"",
+                            ChannelText = $"{player.Name} says {SayRegex.Match(data).Groups[3].Value}",
                             InstructionType = ServerInstructionType.DisplayText
                         };
 
@@ -690,11 +704,12 @@ namespace Furcadia.Net.Proxy
                     else // You see [FURRE]
                     {
                         ActivePlayer.Message = null;
+                        player = ActivePlayer;
                         chanObject = new ChannelObject(data)
                         {
-                            Player = ActivePlayer,
+                            Player = player,
                             Channel = "desc",
-                            ChannelText = "(You see " + Player.Name + ")",
+                            ChannelText = $"(You see { player.Name})",
                             InstructionType = ServerInstructionType.DisplayText
                         };
 
@@ -716,19 +731,28 @@ namespace Furcadia.Net.Proxy
                     {
                         ActivePlayer = dream.Furres.GerFurreByName(WhisperMatches.Groups[2].Value);
                         ActivePlayer.Message = WhisperMatches.Groups[5].Value;
+                        player = ActivePlayer;
+                        chanObject = new ChannelObject(data)
+                        {
+                            Channel = "@whisper",
+                            Player = player,
+                            ChannelText = $"{player.Name} whispers \"{player.Message}\" to you."
+                        };
                     }
                     WhisperMatches = WhisperOutgoing.Match(data);
                     if (WhisperMatches.Success)
                     {
                         ActivePlayer = dream.Furres.GerFurreByName(WhisperMatches.Groups[2].Value);
                         ActivePlayer.Message = WhisperMatches.Groups[6].Value;
+                        player = ActivePlayer;
+                        chanObject = new ChannelObject(data)
+                        {
+                            Channel = "@whisper",
+                            Player = player,
+                            ChannelText = $"You whisper \"{player.Message} to {player.Name}"
+                        };
                     }
 
-                    chanObject = new ChannelObject(data)
-                    {
-                        Channel = "@whisper",
-                        Player = ActivePlayer
-                    };
                     args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
@@ -744,14 +768,15 @@ namespace Furcadia.Net.Proxy
                     //TODO: Verify Trade System is correct
                     channel = "trade";
                     ActivePlayer.Message = FontColorRegex.Match(data).Groups[4].Value;
+                    player = ActivePlayer;
                 }
                 else if (Color == "emote")
                 {
                     ActivePlayer.Message = NameRegex.Replace(data, "");
-
+                    player = ActivePlayer;
                     chanObject = new ChannelObject(data)
                     {
-                        Player = ActivePlayer,
+                        Player = player,
                         Channel = Color,
                         ChannelText = NameRegex.Replace(data, "$2"),
                         InstructionType = ServerInstructionType.DisplayText
@@ -785,11 +810,12 @@ namespace Furcadia.Net.Proxy
                         Regex t = new Regex("The banishment of player (.*?) has ended.");
                         NameStr = t.Match(data).Groups[1].Value;
                         ActivePlayer = new Furre(NameStr);
+                        player = ActivePlayer;
                         bool found = false;
                         int I;
                         for (I = 0; I <= BanishString.Count - 1; I++)
                         {
-                            if (BanishString[I].ToFurcadiaShortName() == NameStr.ToFurcadiaShortName())
+                            if (BanishString[I].ToFurcadiaShortName() == player.ShortName)
                             {
                                 found = true;
                                 break;
@@ -847,6 +873,7 @@ namespace Furcadia.Net.Proxy
                     {
                         ActivePlayer.Message = "You eat a cookie." + EatCookie.Replace(data, "");
                     }
+                    player = ActivePlayer;
                 }
                 else //Dynamic Channels
                 {
@@ -871,7 +898,7 @@ namespace Furcadia.Net.Proxy
             else
                 targetChannel = channel;
 
-            if (ActivePlayer.FurreID != -1)
+            if (ActivePlayer.ShortName != "unknown")
                 player = ActivePlayer;
 
             chanObject = new ChannelObject(data)
