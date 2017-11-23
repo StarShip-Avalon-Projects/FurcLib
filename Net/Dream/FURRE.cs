@@ -453,8 +453,6 @@ namespace Furcadia.Net.Dream
                 var ob = (Furre)obj;
                 if (string.IsNullOrEmpty(ShortName) || string.IsNullOrEmpty(ob.ShortName))
                     return ob.FurreID == FurreID;
-                if (ob.ShortName == "unknown" || ShortName == "unknown")
-                    return false;
                 return ob.ShortName == ShortName;
             }
             return base.Equals(obj);
