@@ -593,13 +593,13 @@ namespace Furcadia.Net.Proxy
                         ProcessServerChannelData?.Invoke(chanObject, args);
                         return;
                     }
-                    Regex ShoutrRegex = new Regex(@"<font color='(shout)'>(.*)shouts:(.*?)</font>");
+                    Regex ShoutRegex = new Regex(@"<font color='(shout)'>\{S\} " + NameFilter + "(.*)shouts: (.*?)</font>");
                     Regex YouShoutRegex = new Regex("<font color='(shout)'>You shout, \"(.*?)\"</font>");
-                    var ShoutMatch = ShoutrRegex.Match(data);
+                    var ShoutMatch = ShoutRegex.Match(data);
                     if (ShoutMatch.Success)
                     {
                         ActivePlayer = dream.Furres.GerFurreByName(ShoutMatch.Groups[2].Value);
-                        ActivePlayer.Message = ShoutMatch.Groups[2].Value;
+                        ActivePlayer.Message = ShoutMatch.Groups[5].Value;
                         player = ActivePlayer;
                         chanObject = new ChannelObject(data)
                         {
