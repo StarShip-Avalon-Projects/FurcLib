@@ -52,7 +52,7 @@ namespace Furcadia.Net.Dream
         private int _ID;
         private int _LastStat;
         private int _level;
-        private string _Message;
+        private string message;
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
         private string _tag;
@@ -254,8 +254,8 @@ namespace Furcadia.Net.Dream
         /// </summary>
         public string Message
         {
-            get { return _Message; }
-            set { _Message = value; }
+            get { return message; }
+            set { message = value; }
         }
 
         /// <summary>

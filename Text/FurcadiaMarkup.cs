@@ -83,12 +83,12 @@ namespace Furcadia.Text
 
         /// <summary>
         /// </summary>
-        public const string NameFilter = "<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") ?>(.{2,64})\\</name\\>";
+        public const string NameFilter = "<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") ?>(.{2,64})</name>";
 
         /// <summary>
         /// Whispers Name
         /// </summary>
-        public const string RegExName = "<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") forced(=('forced'|\"forced\"))? src=('whisper-to'|\"whisper-to\")\\>";
+        public const string RegExName = "^<font color=('(whisper)'|\"(whisper)\")>\\[You whisper \"(.*?)\" to<name shortname='(.*?)' forced(=('forced')|(\"forced\")?) src='whisper-to'>(.*?)</name>\\. \\]</font>$";
 
         /// <summary>
         /// Regex for working with HTML URLS

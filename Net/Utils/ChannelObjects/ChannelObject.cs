@@ -20,7 +20,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        internal IFurre player;
+        internal Furre player;
 
         internal Match FontColorRegexMatch;
 
@@ -37,7 +37,7 @@ namespace Furcadia.Net.Utils.ServerParser
             if (ServerInstruction[0] == '(')
                 instructionType = ServerInstructionType.DisplayText;
             FontColorRegexMatch = FontColorRegex.Match(RawInstruction);
-            channelText = FontColorRegexMatch.Groups[9].Value;
+            channelText = ServerInstruction.ToStrippedFurcadiaMarkupString();
             player = new Furre();
         }
 
@@ -63,8 +63,8 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public string ChannelText
         {
-            set
-            { channelText = value; }
+            //set
+            //{ channelText = value; }
             get
             { return channelText; }
         }
@@ -94,7 +94,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        public IFurre Player
+        public Furre Player
         {
             get { return player; }
             set { player = value; }
