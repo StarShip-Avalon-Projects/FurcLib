@@ -182,7 +182,7 @@
     <Compile Include="Drawing\Helper.cs" />
     <Compile Include="Movement\ColorString.cs" />
     <Compile Include="Text\FurcadiaMarkup.cs" />
-    <Compile Include="Text\FurcIni.cs" />
+    <Compile Include="Text\FurcadiaSettingsUtiliies.cs" />
     <Compile Include="Text\IniParser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\RegistryExplorer.cs" />

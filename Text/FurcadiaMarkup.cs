@@ -88,7 +88,7 @@ namespace Furcadia.Text
         /// <summary>
         /// Whispers Name
         /// </summary>
-        public const string RegExName = "^<font color=('(whisper)'|\"(whisper)\")>\\[You whisper \"(.*?)\" to<name shortname='(.*?)' forced(=('forced')|(\"forced\")?) src='whisper-to'>(.*?)</name>\\. \\]</font>$";
+        public const string RegExName = "^<font color=('(whisper)'|\"(whisper)\")>\\[ You whisper \"(.*?)\" to <name shortname='(.*?)' forced(=('forced')|(\"forced\")?) src='whisper-to'>(.*?)</name>\\. \\]</font>$";
 
         /// <summary>
         /// Regex for working with HTML URLS

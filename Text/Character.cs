@@ -67,7 +67,7 @@ namespace Furcadia.Text
             Character newToon = new Character();
             try
             {
-                System.Collections.Hashtable iniData = Settings.Load(iniFile);
+                System.Collections.Hashtable iniData = FurcadiaSettingsUtiliies.Load(iniFile);
                 newToon.Name = (string)iniData["Name"];
                 newToon.Description = (string)iniData["Desc"];
                 newToon.ColorString = (string)iniData["Color"];

@@ -123,8 +123,8 @@ namespace Furcadia.Net.DirectConnection
             FurcPath = new Paths();
             string SetPath = FurcPath.SettingsPath;
             string SetFile = "settings.ini";
-            string[] sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
-            int port = Convert.ToInt32(FurcIni.GetUserSetting("PreferredServerPort", sett));
+            string[] sett = FurcadiaSettingsUtiliies.LoadFurcadiaSettings(SetPath, SetFile);
+            int port = Convert.ToInt32(FurcadiaSettingsUtiliies.GetUserSetting("PreferredServerPort", sett));
             try
             {
                 _endpoint = new IPEndPoint(Dns.GetHostEntry(FurcadiaUtilities.GameServerHost).AddressList[0], port);
