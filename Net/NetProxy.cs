@@ -71,7 +71,6 @@ namespace Furcadia.Net
 
         private IPEndPoint IpEndPoint;
 
-        private string[] BackupSettings;
         //NetworkStream stream;
 
         private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
@@ -157,9 +156,9 @@ namespace Furcadia.Net
         {
             settings = new Text.Settings(options);
             SetPath = options.FurcadiaFilePaths.SettingsPath;
-            sett = FurcIni.LoadFurcadiaSettings(SetPath, SetFile);
+            sett = FurcadiaSettingsUtiliies.ReadSettingIni(Path.Combine(SetPath, SetFile));
             if (options.GameServerPort == 0)
-                options.GameServerPort = int.Parse(FurcIni.GetUserSetting("PreferredServerPort", sett));
+                options.GameServerPort = int.Parse(FurcadiaSettingsUtiliies.GetUserSetting("PreferredServerPort", sett));
         }
 
         /// <summary>
@@ -205,7 +204,7 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="Options">
         /// </param>
-        public NetProxy(ref Options.ProxyOptions Options)
+        public NetProxy(ProxyOptions Options)
         {
             FurcadiaUtilities = new Utils.Utilities();
             options = Options;
@@ -249,17 +248,6 @@ namespace Furcadia.Net
             {
                 LocalhostPort = lport,
             };
-            SetFurcadiaSettings();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="Options"></param>
-        public NetProxy(ref ProxySessionOptions Options)
-        {
-            FurcadiaUtilities = new Utils.Utilities();
-            options = Options;
             SetFurcadiaSettings();
         }
 
@@ -372,15 +360,18 @@ namespace Furcadia.Net
         /// <summary>
         /// Check the connection Status of the Furcadia Client
         /// </summary>
-        public bool IsClientConnected
+        public bool IsClientSocketConnected
         {
             get
             {
                 try
                 {
-                    if (client != null && client.Client != null)
+                    if (client != null)
                     {
-                        return client.Connected && client.Client.Connected;
+                        if (client.Client != null)
+                            return client.Client.Connected;
+                        else
+                            return client.Connected;
                     }
                 }
                 catch
@@ -392,7 +383,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Check our connection status to the game server
         /// </summary>
-        public bool IsServerConnected
+        public bool IsServerSocketConnected
         {
             get
             {
@@ -423,9 +414,10 @@ namespace Furcadia.Net
         /// </summary>
         public void ClientDisconnect()
         {
-            if (client != null && client.Connected == true)
+            if (IsClientSocketConnected)
             {
                 client.Close();
+                client.Dispose();
             }
             if (listen != null)
             {
@@ -440,19 +432,22 @@ namespace Furcadia.Net
         /// </summary>
         public void CloseClient()
         {
-            try
-
+            //ClientDisconnect();
+            if (furcProcess == null)
+                furcProcess = Process.GetProcessById(processID);
+            if (furcProcess != null)
             {
-                //ClientDisconnect();
-                if (furcProcess == null)
-                    furcProcess = Process.GetProcessById(processID);
-                if (furcProcess != null)
+                furcProcess.CloseMainWindow();
+                furcProcess.WaitForExit(500);
+                if (furcProcess.HasExited)
                 {
-                    furcProcess.CloseMainWindow();
-                    //furcProcess.Dispose();
+                    furcProcess.Close();
                 }
+                else furcProcess.Kill();
+                furcProcess.Dispose();
+                if (IsClientSocketConnected)
+                    client.Close();
             }
-            catch (Exception e) { Error?.Invoke(e, this, "CloseClient()"); }
         }
 
         /// <summary>
@@ -503,13 +498,13 @@ namespace Furcadia.Net
                 furcProcess.StartInfo.FileName = options.FurcadiaProcess;
                 furcProcess.StartInfo.Arguments = options.CharacterIniFile;
                 furcProcess.StartInfo.WorkingDirectory = options.FurcadiaInstallPath;
-                BackupSettings = settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
-                furcProcess.Start();
+                settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
                 furcProcess.Exited += delegate
                 {
                     ClientDisConnected?.Invoke();
                     //  ClientExited?.Invoke();
                 };
+                furcProcess.Start();
                 processID = furcProcess.Id;
             }
             catch (Exception e)
@@ -526,10 +521,11 @@ namespace Furcadia.Net
         {
             ClientDisconnect();
 
-            if (IsServerConnected)
+            if (IsServerSocketConnected)
             {
                 LightBringer.Close();
             }
+            settings.RestoreFurcadiaSettings();
         }
 
         /// <summary>
@@ -578,7 +574,7 @@ namespace Furcadia.Net
             //    return;
             if (!message.EndsWith(string.Format("{0}", '\n')))
                 message += '\n';
-            if (!IsServerConnected)
+            if (!IsServerSocketConnected)
                 return;
             try
             {
@@ -589,7 +585,7 @@ namespace Furcadia.Net
             {
                 Error?.Invoke(e, this, "SendServer");
                 ServerDisConnected?.Invoke();
-                if (IsClientConnected)
+                if (IsClientSocketConnected)
                 {
                     client.Close();
                     ClientDisConnected?.Invoke();
@@ -640,10 +636,10 @@ namespace Furcadia.Net
                 catch (Exception ex) { throw ex; }
                 Connected?.Invoke();
             }
-            catch { }
+            catch { throw; }
             finally
             {
-                settings.RestoreFurcadiaSettings(ref BackupSettings);
+                settings.RestoreFurcadiaSettings();
             }
             //else
             //    throw new Exception("Client Socket is not connected");
@@ -680,7 +676,7 @@ namespace Furcadia.Net
         {
             client = (TcpClient)ar.AsyncState;
 
-            if (!IsClientConnected)
+            if (!IsClientSocketConnected)
             {
                 ClientDisConnected?.Invoke();
                 return;
@@ -738,7 +734,7 @@ namespace Furcadia.Net
                     ClientLeftOversSize = read - currStart;
                 }
 
-                if (IsClientConnected)
+                if (IsClientSocketConnected)
                 {
                     client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
                 }
@@ -817,7 +813,7 @@ namespace Furcadia.Net
                         ServerLeftOversSize = read - currStart;
                     }
 
-                    if (IsServerConnected)
+                    if (IsServerSocketConnected)
                         LightBringer.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), LightBringer);
                 }
                 catch (Exception ex) //Catch any unknown exception and close the connection gracefully

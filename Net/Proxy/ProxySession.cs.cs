@@ -79,7 +79,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="Options">
         /// ProxySession Options
         /// </param>
-        public ProxySession(ref Options.ProxySessionOptions Options) : base(ref Options)
+        public ProxySession(Options.ProxySessionOptions Options) : base(Options)
         {
             options = Options;
             Initilize();
@@ -107,12 +107,11 @@ namespace Furcadia.Net.Proxy
             base.ServerData2 += OnServerDataReceived;
             Connected += OnServerConnected;
             ServerDisConnected += OnServerDisconnected;
-            // if (!options.Standalone) {
+
             base.ClientData2 += OnClientDataReceived;
             ClientDisConnected += OnClientDisconnected;
             Connected += OnClientConnected;
-            //ClientExited += onClientExited;
-            // }
+
             ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
 
             dream = new DREAM();
@@ -764,9 +763,9 @@ namespace Furcadia.Net.Proxy
                     channel = "whisper";
                     Regex WhisperIncoming = new Regex("^\\<font color=('(whisper)'|\"(whisper)\")\\>\\[ \\<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") src=('whisper-from'|\"whisper-from\")\\>(?<name>.{2,64})\\</name\\> whispers, \"(?<msg>.+)\" to you\\. \\]\\</font\\>$", RegexOptions.IgnoreCase);
                     Regex WhisperOutgoing = new Regex(RegExName);
-                    var WhisperMatches = WhisperIncoming.Match(data);
+
                     //'WHISPER
-                    // string WhisperFrom = WhisperIncoming.Match(data).Captures[1].Value;
+                    var WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
                     {
                         ActivePlayer = dream.Furres.GerFurreByName(WhisperMatches.Groups[4].Value);
@@ -794,7 +793,7 @@ namespace Furcadia.Net.Proxy
 
                     args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
                     {
-                        Channel = WhisperMatches.Groups[2].Value
+                        Channel = Color
                     };
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
@@ -815,12 +814,13 @@ namespace Furcadia.Net.Proxy
                 {
                     var EmoteRegex = new Regex("<font color='(.*?)'><name shortname='(.*?)'>(.*?)</name> (.*?)</font>");
                     var EmoteMatch = EmoteRegex.Match(data);
+                    ActivePlayer = dream.Furres.GerFurreByName(EmoteMatch.Groups[2].Value);
                     ActivePlayer.Message = EmoteMatch.Groups[4].Value;
                     player = ActivePlayer;
                     chanObject = new ChannelObject(data)
                     {
                         Player = player,
-                        Channel = Color,
+                        Channel = EmoteMatch.Groups[1].Value,
                         //  ChannelText = NameRegex.Replace(data, "$2"),
                         InstructionType = ServerInstructionType.DisplayText
                     };
@@ -947,7 +947,7 @@ namespace Furcadia.Net.Proxy
             };
 
             args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
-            args.Channel = FontColorRegexMatch.Groups[7].Value;
+            args.Channel = FontColorRegexMatch.Groups[9].Value;
             ProcessServerChannelData?.Invoke(chanObject, args);
         }
 
@@ -991,7 +991,7 @@ namespace Furcadia.Net.Proxy
                         // Standalone / account Send(String.Format("connect
                         // {0} {1}\n", sUsername, sPassword));
 
-                        if (IsClientConnected)
+                        if (IsClientSocketConnected)
                         {
                             clientconnectionphase = ConnectionPhase.Auth;
                             ClientStatusChanged?.Invoke(data, new NetClientEventArgs(clientconnectionphase));
@@ -1219,7 +1219,7 @@ namespace Furcadia.Net.Proxy
                                new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
-                        if (!IsClientConnected && StandAlone)
+                        if (!IsClientSocketConnected && StandAlone)
                         {
                             SendToServer("vasecodegamma");
                             inDream = true;
@@ -1360,7 +1360,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public override void SendToClient(string data)
         {
-            if (IsClientConnected && clientconnectionphase != ConnectionPhase.Disconnected)
+            if (IsClientSocketConnected && clientconnectionphase != ConnectionPhase.Disconnected)
                 base.SendToClient(data);
         }
 
@@ -1455,6 +1455,7 @@ namespace Furcadia.Net.Proxy
                         ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
                         if (options.Standalone)
                         {
+                            Logger.Debug<ProxySession>("Closing Client");
                             CloseClient();
                         }
                     }
@@ -1474,12 +1475,13 @@ namespace Furcadia.Net.Proxy
                         ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
                         if (options.Standalone)
                         {
+                            Logger.Debug<ProxySession>("Closing Client");
                             ClientDisconnect();
                         }
                         else
                             Disconnect();
                     }
-                    if (IsClientConnected)
+                    if (IsClientSocketConnected)
                         ClientData2?.Invoke(data);
                     break;
 
