@@ -418,6 +418,7 @@ namespace Furcadia.Net
             {
                 client.Close();
                 client.Dispose();
+                settings.RestoreFurcadiaSettings();
             }
             if (listen != null)
             {
@@ -525,7 +526,6 @@ namespace Furcadia.Net
             {
                 LightBringer.Close();
             }
-            settings.RestoreFurcadiaSettings();
         }
 
         /// <summary>

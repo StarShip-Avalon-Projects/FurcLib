@@ -231,6 +231,8 @@ namespace Furcadia.Net.Proxy
         ///// </summary>
         //private Queue<string> BadgeTag;
 
+        private RegexOptions ChannelOptions = RegexOptions.Compiled | RegexOptions.CultureInvariant;
+
         /// <summary>
         /// Manage out Auto reconnects
         /// </summary>
@@ -516,12 +518,13 @@ namespace Furcadia.Net.Proxy
         public void ParseServerChannel(string data, bool Handled)
         {
             //TODO: needs to move and re factored to ServerParser Class
-            ChannelObject chanObject = new ChannelObject(data);
+            ChannelObject chanObject;
             ParseChannelArgs args;
             Logger.Debug<ProxySession>(data);
+            Regex FontColorRegex = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
             var FontColorRegexMatch = FontColorRegex.Match(data);
             var DescTagRegexMatch = DescTagRegex.Match(data);
-            var ActivePlayer = new Furre();
+            var ActivePlayer = new Furre("Furcadia game server");
             if (NameRegex.Match(data).Success)
                 ActivePlayer = dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
 
@@ -545,8 +548,6 @@ namespace Furcadia.Net.Proxy
                     chanObject = new ChannelObject(data)
                     {
                         Player = ActivePlayer,
-                        Channel = "@emit",
-                        // ChannelText = DescTagRegexMatch.Groups[6].Value,
                         InstructionType = ServerInstructionType.DisplayText
                     };
 
@@ -562,83 +563,71 @@ namespace Furcadia.Net.Proxy
             try
             {
                 string Text = NameRegex.Replace(data, "$2");
-                //  Regex ChannelRegEx = new Regex(ChannelNameFilter);
-                var channel = FontColorRegexMatch.Groups[1].Value;
-                if (!Handled)
+
+                Regex DescRegex = new Regex(DescFilter, ChannelOptions);
+                if (DescRegex.Match(data).Success)
                 {
-                    Regex DescRegex = new Regex(DescFilter);
-                    if (DescRegex.Match(data).Success)
+                    ActivePlayer = dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
+                    ActivePlayer.FurreDescription = DescRegex.Match(data).Groups[2].Value;
+
+                    if (LookQue.Count > 0)
                     {
-                        ActivePlayer = dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
-                        ActivePlayer.FurreDescription = DescRegex.Match(data).Groups[2].Value;
-
-                        if (LookQue.Count > 0)
-                        {
-                            ActivePlayer.FurreColors = new ColorString(LookQue.Dequeue());
-                        }
-                        player = ActivePlayer;
-                        chanObject = new ChannelObject(data)
-                        {
-                            Player = player,
-                            Channel = "desc",
-                            //   ChannelText = DescRegex.Match(data).Groups[2].Value,
-                            InstructionType = ServerInstructionType.DisplayText
-                        };
-
-                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
-                        {
-                            Channel = "desc"
-                        };
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
+                        ActivePlayer.FurreColors = new ColorString(LookQue.Dequeue());
                     }
-                    Regex ShoutRegex = new Regex(@"<font color='(shout)'>\{S\} " + NameFilter + "(.*)shouts: (.*?)</font>");
-                    Regex YouShoutRegex = new Regex("<font color='(shout)'>You shout, \"(.*?)\"</font>");
-                    var ShoutMatch = ShoutRegex.Match(data);
-                    if (ShoutMatch.Success)
+                    player = ActivePlayer;
+                    chanObject = new ChannelObject(data)
                     {
-                        ActivePlayer = dream.Furres.GerFurreByName(ShoutMatch.Groups[2].Value);
-                        ActivePlayer.Message = ShoutMatch.Groups[5].Value;
-                        player = ActivePlayer;
-                        chanObject = new ChannelObject(data)
-                        {
-                            Player = player,
-                            Channel = ShoutMatch.Groups[1].Value,
-                            //   ChannelText = DescRegex.Match(data).Groups[2].Value,
-                            InstructionType = ServerInstructionType.DisplayText
-                        };
+                        Player = player,
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
 
-                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
-                        {
-                            Channel = ShoutMatch.Groups[1].Value
-                        };
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
-                    }
-                    ShoutMatch = YouShoutRegex.Match(data);
-                    if (ShoutMatch.Success)
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
                     {
-                        connectedFurre.Message = ShoutMatch.Groups[2].Value;
-                        player = connectedFurre;
-                        chanObject = new ChannelObject(data)
-                        {
-                            Player = player,
-                            Channel = ShoutMatch.Groups[1].Value,
-                            //   ChannelText = DescRegex.Match(data).Groups[2].Value,
-                            InstructionType = ServerInstructionType.DisplayText
-                        };
-
-                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
-                        {
-                            Channel = ShoutMatch.Groups[1].Value
-                        };
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
-                    }
+                        Channel = "desc"
+                    };
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
+                Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
 
-                errorMsg = "";
-                errorNum = 0;
+                var ShoutMatch = ShoutRegex.Match(data);
+                if (ShoutMatch.Success)
+                {
+                    ActivePlayer = dream.Furres.GerFurreByName(ShoutMatch.Groups[4].Value);
+                    ActivePlayer.Message = ShoutMatch.Groups[7].Value;
+                    player = ActivePlayer;
+                    chanObject = new ChannelObject(data)
+                    {
+                        Player = player,
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
+
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
+                    {
+                        Channel = ShoutMatch.Groups[2].Value
+                    };
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
+                ShoutRegex = new Regex(YouShoutFilter, ChannelOptions);
+                ShoutMatch = ShoutRegex.Match(data);
+                if (ShoutMatch.Success)
+                {
+                    connectedFurre.Message = ShoutMatch.Groups[4].Value;
+                    player = connectedFurre;
+                    chanObject = new ChannelObject(data)
+                    {
+                        Player = player,
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
+
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
+                    {
+                        Channel = ShoutMatch.Groups[2].Value
+                    };
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
 
                 if (Color == "success")
                 {
@@ -701,8 +690,6 @@ namespace Furcadia.Net.Proxy
                     chanObject = new ChannelObject(data)
                     {
                         Player = ConnectedFurre,
-                        Channel = Color,
-                        //  ChannelText = $"You say \" {t.Match(data).Groups[2].Value} \"",
                         InstructionType = ServerInstructionType.DisplayText
                     };
 
@@ -713,9 +700,8 @@ namespace Furcadia.Net.Proxy
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
                 }
-                else if (string.IsNullOrEmpty(Channel) &
-                    string.IsNullOrEmpty(Color) &
-                    Regex.Match(data, NameFilter).Groups[2].Value != "forced")
+                else if (string.IsNullOrEmpty(Color) &
+                           Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
                     var DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.IgnoreCase);
 
@@ -728,8 +714,6 @@ namespace Furcadia.Net.Proxy
                         chanObject = new ChannelObject(data)
                         {
                             Player = player,
-                            Channel = "say",
-                            //    ChannelText = $"{player.Name} says {SayRegex.Match(data).Groups[3].Value}",
                             InstructionType = ServerInstructionType.DisplayText
                         };
 
@@ -747,8 +731,6 @@ namespace Furcadia.Net.Proxy
                         chanObject = new ChannelObject(data)
                         {
                             Player = player,
-                            Channel = "desc",
-                            //   ChannelText = $"(You see { player.Name})",
                             InstructionType = ServerInstructionType.DisplayText
                         };
 
@@ -761,9 +743,7 @@ namespace Furcadia.Net.Proxy
                 else if (Color == "whisper")
                 {
                     channel = "whisper";
-                    Regex WhisperIncoming = new Regex("^\\<font color=('(whisper)'|\"(whisper)\")\\>\\[ \\<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") src=('whisper-from'|\"whisper-from\")\\>(?<name>.{2,64})\\</name\\> whispers, \"(?<msg>.+)\" to you\\. \\]\\</font\\>$", RegexOptions.IgnoreCase);
-                    Regex WhisperOutgoing = new Regex(RegExName);
-
+                    Regex WhisperIncoming = new Regex(WhisperRegex, ChannelOptions);
                     //'WHISPER
                     var WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
@@ -773,35 +753,32 @@ namespace Furcadia.Net.Proxy
                         player = ActivePlayer;
                         chanObject = new ChannelObject(data)
                         {
-                            Channel = WhisperMatches.Groups[2].Value,
                             Player = player,
-                            //   ChannelText = $"{player.Name} whispers \"{player.Message}\" to you."
                         };
+                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
+                        {
+                            Channel = WhisperMatches.Groups[2].Value
+                        };
+                        ProcessServerChannelData?.Invoke(chanObject, args);
+                        return;
                     }
-                    WhisperMatches = WhisperOutgoing.Match(data);
+                    WhisperIncoming = new Regex(YouWhisperRegex, ChannelOptions);
+                    WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
                     {
                         connectedFurre.Message = WhisperMatches.Groups[4].Value;
                         player = connectedFurre;
                         chanObject = new ChannelObject(data)
                         {
-                            Channel = WhisperMatches.Groups[2].Value,
                             Player = player,
-                            //    ChannelText = $"You whisper \"{player.Message} to {player.Name}"
                         };
+                        args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
+                        {
+                            Channel = WhisperMatches.Groups[2].Value
+                        };
+                        ProcessServerChannelData?.Invoke(chanObject, args);
+                        return;
                     }
-
-                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
-                    {
-                        Channel = Color
-                    };
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
-                }
-                else if (Color == "warning")
-                {
-                    errorMsg = Text;
-                    errorNum = 1;
                 }
                 else if (Color == "trade")
                 {
@@ -812,7 +789,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "emote")
                 {
-                    var EmoteRegex = new Regex("<font color='(.*?)'><name shortname='(.*?)'>(.*?)</name> (.*?)</font>");
+                    var EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
                     var EmoteMatch = EmoteRegex.Match(data);
                     ActivePlayer = dream.Furres.GerFurreByName(EmoteMatch.Groups[2].Value);
                     ActivePlayer.Message = EmoteMatch.Groups[4].Value;
@@ -820,8 +797,6 @@ namespace Furcadia.Net.Proxy
                     chanObject = new ChannelObject(data)
                     {
                         Player = player,
-                        Channel = EmoteMatch.Groups[1].Value,
-                        //  ChannelText = NameRegex.Replace(data, "$2"),
                         InstructionType = ServerInstructionType.DisplayText
                     };
 
@@ -913,7 +888,7 @@ namespace Furcadia.Net.Proxy
 
                     // TODO: Check Cookie handler for this
 
-                    Regex EatCookie = new Regex(Regex.Escape("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.") + "(.*?)");
+                    Regex EatCookie = new Regex("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.(.*?)", ChannelOptions);
                     if (EatCookie.Match(data).Success)
                     {
                         connectedFurre.Message = "You eat a cookie." + EatCookie.Replace(data, "");
@@ -935,14 +910,13 @@ namespace Furcadia.Net.Proxy
                 SendError(ex, this, "");
             }
 
+            if (string.IsNullOrWhiteSpace(ActivePlayer.Message))
+                ActivePlayer.Message = FontColorRegexMatch.Groups[10].Value.Substring(1);
             player = ActivePlayer;
-            player.Message = FontColorRegexMatch.Groups[10].Value.Substring(1);
 
             chanObject = new ChannelObject(data)
             {
                 Player = player,
-                Channel = FontColorRegexMatch.Groups[9].Value,
-                //    ChannelText = data.ToStrippedFurcadiaMarkupString(),
                 InstructionType = ServerInstructionType.DisplayText
             };
 
@@ -1335,7 +1309,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="data">
         /// Raw Client to Server instruction
         /// </param>
-        public void SendFormattedTextToServer(ref string data)
+        public void SendFormattedTextToServer(string data)
         {
             if (data.StartsWith("banish "))
             {
