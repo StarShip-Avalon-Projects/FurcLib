@@ -55,6 +55,8 @@ namespace Furcadia.Text
         /// </summary>
         public const string CookieToMeREGEX = "<name shortname='(.*?)'>(.*?)</name> just gave you";
 
+        public const string YouEatCookieFilter = "<img src='fsh://system.fsh:90' alt='@cookie' /><channel name = '@cookie' /> You eat a cookie.(.*?)";
+
         /// <summary>
         /// </summary>
         public const string DescFilter = "<desc shortname='([^']*)' />(.*)";
@@ -88,7 +90,21 @@ namespace Furcadia.Text
         /// <summary>
         /// Whispers Name
         /// </summary>
-        public const string RegExName = "^<font color=('(whisper)'|\"(whisper)\")>\\[ You whisper \"(.*?)\" to <name shortname='(.*?)' forced(=('forced')|(\"forced\")?) src='whisper-to'>(.*?)</name>\\. \\]</font>$";
+        public const string YouWhisperRegex = "^<font color=('(whisper)'|\"(whisper)\")>\\[ ?You whisper \"(.*?)\" to ?<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") forced(=('forced')|(\"forced\")?) src='whisper-to'>(.*?)</name>\\. \\]</font>$";
+
+        public const string YouShoutFilter = "<font color=('(shout)'|\"(shout)\")>You shout, \"(.*?)\"</font>";
+
+        /// <summary>
+        ///
+        /// </summary>
+        public const string WhisperRegex = "^\\<font color=('(whisper)'|\"(whisper)\")\\>\\[ \\<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") src=('whisper-from'|\"whisper-from\")\\>(.{2,64})\\</name\\> whispers, \"(?<msg>.+)\" to you\\. \\]\\</font\\>$";
+
+        public const string ShoutRegexFilter = "<font color=('(shout)'|\"(shout)\")>\\{S\\} <name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\")>(.{2,64})</name>(.*)shouts: (.*?)</font>";
+
+        /// <summary>
+        ///
+        /// </summary>
+        public const string EmoteRegexFilter = "<font color='(.*?)'><name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\")>(.{2,64})</name> (.*?)</font>";
 
         /// <summary>
         /// Regex for working with HTML URLS
@@ -105,11 +121,6 @@ namespace Furcadia.Text
         /// Filter the Name Markup
         /// </summary>
         public static Regex NameRegex = new Regex(NameFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-        /// <summary>
-        /// Filter paragraph(?) text
-        /// </summary>
-        public static Regex FontColorRegex = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         /// Pesky Desc tags filter

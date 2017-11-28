@@ -9,12 +9,6 @@ namespace Furcadia.Net.Utils.ServerParser
     /// </summary>
     public class ChannelObject : BaseServerInstruction
     {
-        #region Private Fields
-
-        private string channel;
-
-        #endregion Private Fields
-
         #region Internal Fields
 
         /// <summary>
@@ -36,7 +30,7 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             if (ServerInstruction[0] == '(')
                 instructionType = ServerInstructionType.DisplayText;
-            FontColorRegexMatch = FontColorRegex.Match(RawInstruction);
+            FontColorRegexMatch = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant).Match(RawInstruction);
             channelText = ServerInstruction.ToStrippedFurcadiaMarkupString();
             player = new Furre();
         }
@@ -44,17 +38,6 @@ namespace Furcadia.Net.Utils.ServerParser
         #endregion Public Constructors
 
         #region Public Properties
-
-        /// <summary>
-        /// Channel Name
-        /// </summary>
-        public string Channel
-        {
-            get
-            { return channel; }
-            set
-            { channel = value; }
-        }
 
         private string channelText;
 
