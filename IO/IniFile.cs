@@ -1,7 +1,6 @@
 ﻿using Furcadia.Logging;
 using System;
 using System.Collections;
-using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -145,66 +144,68 @@ namespace Furcadia.IO
             }
             // Clear the object...
             IniSection tempsection = null;
-            StreamReader oReader = new StreamReader(sFileName);
-            Regex regexcomment = new Regex("^([\\s]*#.*|*;.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
+
+            Regex regexcomment = new Regex("^([\\s]*#.*|;.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
             // Broken but left for history
             //Dim regexsection As New Regex("\[[\s]*([^\[\s].*[^\s\]])[\s]*\]", (RegexOptions.Singleline Or RegexOptions.IgnoreCase))
             Regex regexsection = new Regex("^[\\s]*\\[[\\s]*([^\\[\\s].*[^\\s\\]])[\\s]*\\][\\s]*$", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
             Regex regexkey = new Regex("^\\s*([^=]*)[^=]*=(.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
-            while (!oReader.EndOfStream)
+
+            using (var oReader = new StreamReader(sFileName))
             {
-                string line = oReader.ReadLine();
-                if (line != string.Empty)
+                while (!oReader.EndOfStream)
                 {
-                    Match m = null;
-                    if (regexcomment.Match(line).Success)
+                    string line = oReader.ReadLine();
+                    if (line != string.Empty)
                     {
-                        m = regexcomment.Match(line);
-
-                        Logger.Debug<IniFile>($"Skipping Comment: {m.Groups[0].Value}");
-                    }
-                    else if (regexsection.Match(line).Success)
-                    {
-                        m = regexsection.Match(line);
-
-                        if (m.Groups[1].Value.ToLower() == "code")
+                        Match m = null;
+                        if (regexcomment.Match(line).Success)
                         {
-                            Logger.Debug<IniFile>($"Copying Code Section [{m.Groups[1].Value}]");
+                            m = regexcomment.Match(line);
 
-                            _code = oReader.ReadToEnd();
+                            Logger.Debug<IniFile>($"Skipping Comment: {m.Groups[0].Value}");
+                        }
+                        else if (regexsection.Match(line).Success)
+                        {
+                            m = regexsection.Match(line);
+
+                            if (m.Groups[1].Value.ToLower() == "code")
+                            {
+                                Logger.Debug<IniFile>($"Copying Code Section [{m.Groups[1].Value}]");
+
+                                _code = oReader.ReadToEnd();
+                            }
+                            else
+                            {
+                                Logger.Debug<IniFile>($"Adding section [{m.Groups[1].Value}]");
+
+                                tempsection = AddSection(m.Groups[1].Value);
+                            }
+                        }
+                        else if (regexkey.Match(line).Success && tempsection != null)
+                        {
+                            m = regexkey.Match(line);
+                            Logger.Debug<IniFile>($"Adding Key [{m.Groups[1].Value}]=[{m.Groups[2].Value}]");
+                            tempsection.AddKey(m.Groups[1].Value).Value = m.Groups[2].Value;
+                        }
+                        else if (tempsection != null)
+                        {
+                            // Handle Key without value
+
+                            Logger.Debug<IniFile>($"Adding Key [{line}]");
+
+                            tempsection.AddKey(line);
                         }
                         else
                         {
-                            Logger.Debug<IniFile>($"Adding section [{m.Groups[1].Value}]");
+                            // This should not occur unless the tempsection is
+                            // not created yet...
 
-                            tempsection = AddSection(m.Groups[1].Value);
+                            Logger.Debug<IniFile>($"Skipping unknown type of data: {line}");
                         }
-                    }
-                    else if (regexkey.Match(line).Success && tempsection != null)
-                    {
-                        m = regexkey.Match(line);
-                        //TODO: Check for Key name bug here
-                        Logger.Debug<IniFile>($"Adding Key [{m.Groups[1].Value}]=[{m.Groups[2].Value}]");
-                        tempsection.AddKey(m.Groups[2].Value).Value = m.Groups[2].Value;
-                    }
-                    else if (tempsection != null)
-                    {
-                        // Handle Key without value
-
-                        Logger.Debug<IniFile>($"Adding Key [{line}]");
-
-                        tempsection.AddKey(line);
-                    }
-                    else
-                    {
-                        // This should not occur unless the tempsection is
-                        // not created yet...
-
-                        Logger.Debug<IniFile>($"Skipping unknown type of data: {line}");
                     }
                 }
             }
-            oReader.Close();
         }
 
         /// <summary>
@@ -314,30 +315,30 @@ namespace Furcadia.IO
         /// <param name="sFileName">Name of the s file.</param>
         public void Save(string sFileName)
         {
-            StreamWriter oWriter = new StreamWriter(sFileName, false);
-
-            foreach (IniSection s in Sections)
+            using (var oWriter = new StreamWriter(sFileName, false))
             {
-                Logger.Debug<IniFile>($"Writing Section: [{s.Name}]");
-
-                oWriter.WriteLine($"[{s.Name}]");
-                foreach (IniSection.IniKey k in s.Keys)
+                foreach (IniSection s in Sections)
                 {
-                    if (!string.IsNullOrWhiteSpace(k.Value))
-                    {
-                        Logger.Debug<IniFile>($"Writing Key: {k.Name}={k.Value}");
+                    Logger.Debug<IniFile>($"Writing Section: [{s.Name}]");
 
-                        oWriter.WriteLine($"{k.Name}={k.Value}");
-                    }
-                    else
+                    oWriter.WriteLine($"[{s.Name}]");
+                    foreach (IniSection.IniKey k in s.Keys)
                     {
-                        Logger.Debug<IniFile>($"Writing Key: {k.Name}");
+                        if (!string.IsNullOrWhiteSpace(k.Value))
+                        {
+                            Logger.Debug<IniFile>($"Writing Key: {k.Name}={k.Value}");
 
-                        oWriter.WriteLine($"Writing Key: {k.Name}");
+                            oWriter.WriteLine($"{k.Name}={k.Value}");
+                        }
+                        else
+                        {
+                            Logger.Debug<IniFile>($"Writing Key: {k.Name}");
+
+                            oWriter.WriteLine($"Writing Key: {k.Name}");
+                        }
                     }
                 }
             }
-            oWriter.Close();
         }
 
         /// <summary>
