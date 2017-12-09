@@ -244,6 +244,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="FurcadiaFrameWork.pfx" />
+    <None Include="LICENSE" />
     <None Include="localdir.ini" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
