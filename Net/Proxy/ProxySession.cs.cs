@@ -106,10 +106,10 @@ namespace Furcadia.Net.Proxy
 
             base.ServerData2 += OnServerDataReceived;
             Connected += OnServerConnected;
-            ServerDisConnected += OnServerDisconnected;
+            ServerDisconnected += OnServerDisconnected;
 
             base.ClientData2 += OnClientDataReceived;
-            ClientDisConnected += OnClientDisconnected;
+            ClientDisconnected += OnClientDisconnected;
             Connected += OnClientConnected;
 
             ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
@@ -134,17 +134,15 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if ((serverconnectphase == ConnectionPhase.Init && clientconnectionphase == ConnectionPhase.Init)
-                || (serverconnectphase == ConnectionPhase.Disconnected && clientconnectionphase == ConnectionPhase.Disconnected))
-            {
-                serverconnectphase = ConnectionPhase.Connecting;
-                clientconnectionphase = ConnectionPhase.Connecting;
-                base.Connect();
-            }
-            else if (serverconnectphase != ConnectionPhase.Init && serverconnectphase != ConnectionPhase.Disconnected)
-                throw new NetProxyException("Server Connect phase " + serverconnectphase.ToString());
+            if (base.IsServerSocketConnected)
+                throw new NetProxyException("Server is already connected");
+            if (serverconnectphase != ConnectionPhase.Init && serverconnectphase != ConnectionPhase.Disconnected)
+                throw new NetProxyException($"Server Connect phase {serverconnectphase.ToString()}");
             else if (clientconnectionphase != ConnectionPhase.Init && clientconnectionphase != ConnectionPhase.Disconnected)
-                throw new NetProxyException("Client Connect phase " + clientconnectionphase.ToString());
+                throw new NetProxyException($"Client Connect phase {clientconnectionphase.ToString()}");
+            serverconnectphase = ConnectionPhase.Connecting;
+            clientconnectionphase = ConnectionPhase.Connecting;
+            base.Connect();
         }
 
         #endregion Public Methods
