@@ -1304,7 +1304,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="data">
         /// Raw Client to Server instruction
         /// </param>
-        public void SendFormattedTextToServer(string data)
+        public virtual void SendFormattedTextToServer(string data)
         {
             if (data.StartsWith("banish "))
             {
