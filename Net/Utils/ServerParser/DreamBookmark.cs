@@ -2,25 +2,6 @@
 
 namespace Furcadia.Net.Utils.ServerParser
 {
-    //      if (dname.Contains(":"))
-    //                            {
-    //                                string NameStr = dname.Substring(0, dname.IndexOf(":"));
-    //    Dream.Owner = NameStr;
-    //                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
-    //                                {
-    //                                    hasShare = true;
-    //                                }
-    //                            }
-    //                            else if (dname.EndsWith("/") && !dname.Contains(":"))
-    //                            {
-    //                                string NameStr = dname.Substring(0, dname.IndexOf("/"));
-    //Dream.Owner = NameStr;
-    //                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
-    //                                {
-    //                                    hasShare = true;
-    //                                }
-    //                            }
-
     /// <summary>
     /// Triggered when the connection enters a new dream.
     /// <para>
@@ -44,6 +25,7 @@ namespace Furcadia.Net.Utils.ServerParser
 
         private int type;
         private string dreamURL;
+        private string dreamOwner;
 
         #endregion Private Fields
 
@@ -70,6 +52,16 @@ namespace Furcadia.Net.Utils.ServerParser
             base.instructionType = ServerInstructionType.BookmarkDream;
             dreamURL = ServerInstruction.Substring(3);
             type = ServerInstruction[2];
+            if (ServerInstruction.Contains(":"))
+            {
+                string NameStr = ServerInstruction.Substring(0, ServerInstruction.IndexOf(":"));
+                dreamOwner = NameStr;
+            }
+            else if (ServerInstruction.EndsWith("/") && !ServerInstruction.Contains(":"))
+            {
+                string NameStr = ServerInstruction.Substring(0, ServerInstruction.IndexOf("/"));
+                dreamOwner = NameStr;
+            }
         }
 
         #endregion Public Constructors
@@ -84,6 +76,20 @@ namespace Furcadia.Net.Utils.ServerParser
             get
             {
                 return dreamURL;
+            }
+        }
+
+        /// <summary>
+        /// Gets the dream owner.
+        /// </summary>
+        /// <value>
+        /// The dream owner.
+        /// </value>
+        public string DreamOwner
+        {
+            get
+            {
+                return dreamOwner;
             }
         }
 

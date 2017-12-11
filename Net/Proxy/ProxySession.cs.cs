@@ -379,8 +379,12 @@ namespace Furcadia.Net.Proxy
         public string BanishName { get { return banishName; } private set { banishName = value; } }
 
         /// <summary>
+        /// Gets the banish list.
         /// </summary>
-        public List<string> BanishString { get { return banishString; } private set { banishString = value; } }
+        /// <value>
+        /// The banish list.
+        /// </value>
+        public List<string> BanishList { get { return banishString; } private set { banishString = value; } }
 
         /// <summary>
         /// Channel name?
@@ -642,13 +646,13 @@ namespace Furcadia.Net.Proxy
                         Regex t = new Regex("(.*?) has been banished from your dreams.");
                         BanishName = t.Match(Text).Groups[1].Value;
 
-                        BanishString.Add(BanishName);
+                        BanishList.Add(BanishName);
                     }
                     else if (Text == "You have canceled all banishments from your dreams.")
                     {
                         //banish-off-all (active list)
                         //Success: You have canceled all banishments from your dreams.
-                        BanishString.Clear();
+                        BanishList.Clear();
                         channel = "banish";
                     }
                     else if (Text.EndsWith(" has been temporarily banished from your dreams."))
@@ -660,7 +664,7 @@ namespace Furcadia.Net.Proxy
                         BanishName = t.Match(Text).Groups[1].Value;
 
                         // MainMSEngine.PageExecute(61)
-                        BanishString.Add(BanishName);
+                        BanishList.Add(BanishName);
                         channel = "banish";
                     }
                     else if (Text == "Control of this dream is now being shared with you.")
@@ -818,11 +822,11 @@ namespace Furcadia.Net.Proxy
                         //Banish-List
                         //[notify> players banished from your dreams:
                         //`(0:54) When the bot sees the banish list
-                        BanishString.Clear();
+                        BanishList.Clear();
                         string[] tmp = Text.Substring(35).Split(',');
                         foreach (string t in tmp)
                         {
-                            BanishString.Add(t);
+                            BanishList.Add(t);
                         }
                     }
                     else if (Text.StartsWith("The banishment of player "))
@@ -836,16 +840,16 @@ namespace Furcadia.Net.Proxy
                         player = ActivePlayer;
                         bool found = false;
                         int I;
-                        for (I = 0; I <= BanishString.Count - 1; I++)
+                        for (I = 0; I <= BanishList.Count - 1; I++)
                         {
-                            if (BanishString[I].ToFurcadiaShortName() == player.ShortName)
+                            if (BanishList[I].ToFurcadiaShortName() == player.ShortName)
                             {
                                 found = true;
                                 break;
                             }
                         }
                         if (found)
-                            BanishString.RemoveAt(I);
+                            BanishList.RemoveAt(I);
                     }
                 }
                 else if (Color == "error")
@@ -875,7 +879,7 @@ namespace Furcadia.Net.Proxy
                         //banish-off-all (empty List)
                         //Error:>> You have not banished anyone.
 
-                        BanishString.Clear();
+                        BanishList.Clear();
                     }
                 }
                 else if (data.StartsWith("Communication"))
@@ -1242,8 +1246,7 @@ namespace Furcadia.Net.Proxy
                         {
                             DreamBookmark bookmark = new DreamBookmark(data);
 
-                            dream.URL = bookmark.DreamUrl;
-                            dream.Name = bookmark.Name;
+                            dream.BookMark = bookmark;
 
                             ProcessServerInstruction?.Invoke(bookmark,
                                 new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));

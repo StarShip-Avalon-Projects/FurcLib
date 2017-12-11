@@ -3,6 +3,9 @@ using Furcadia.Net.Utils.ServerParser;
 
 namespace Furcadia.Net.DreamInfo
 {
+    /// <summary>
+    ///
+    /// </summary>
     public interface IDream
     {
         /// <summary>
@@ -22,7 +25,7 @@ namespace Furcadia.Net.DreamInfo
         string Name { get; set; }
 
         /// <summary>
-        /// Name of the dream
+        /// Short name of the dream
         /// </summary>
         string ShortName
         {
@@ -36,7 +39,50 @@ namespace Furcadia.Net.DreamInfo
     [CLSCompliant(true)]
     public class Dream : IDream
     {
-        #region Public Fields
+        #region Private Fields
+
+        private string mode;
+
+        private string fileName;
+
+        /// <summary>
+        /// private variables
+        /// </summary>
+        private string name, _Title, _Rating, _URL, owner;
+
+        private int _Lines;
+
+        private FurreList furres;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dream"/> class.
+        /// </summary>
+        public Dream()
+        {
+            furres = new FurreList();
+            mode = "legacy";
+        }
+
+        /// <summary>
+        /// List of Furres in the dream.
+        /// </summary>
+        public Dream(LoadDream loadDream)
+        {
+            furres = new FurreList();
+            mode = "legacy";
+            if (loadDream.IsModern)
+                mode = "modern";
+
+            fileName = loadDream.Name;
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
 
         /// <summary>
         /// Dream List Furcadia requires Clients to handle thier own Dream
@@ -58,67 +104,16 @@ namespace Furcadia.Net.DreamInfo
             set { furres = value; }
         }
 
-        private FurreList furres;
-
-        #endregion Public Fields
-
-        #region Private Fields
-
         /// <summary>
-        /// private variables
-        /// </summary>
-        private string name, _Title, _Rating, _URL, owner;
-
-        private int _Lines;
-
-        #endregion Private Fields
-
-        #region Public Constructors
-
-        /// <summary>
-        /// List of Furres in the dream.
-        /// </summary>
-        public Dream(LoadDream loadDream)
-        {
-            furres = new FurreList();
-            mode = "legacy";
-            if (loadDream.IsModern)
-                mode = "modern";
-
-            name = loadDream.Name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Dream"/> class.
-        /// </summary>
-        public Dream()
-        {
-            furres = new FurreList();
-            mode = "legacy";
-        }
-
-        #endregion Public Constructors
-
-        #region Public Properties
-
-        private string mode;
-
-        /// <summary>
-        /// Gets or sets the mode.
+        /// File name for the dream cache stored on disk
         /// </summary>
         /// <value>
-        /// The mode.
+        /// The name of the file.
         /// </value>
-        public string Mode
+        public string FileName
         {
-            get
-            {
-                return mode;
-            }
-            set
-            {
-                mode = value;
-            }
+            get { return fileName; }
+            set { fileName = value; }
         }
 
         /// <summary>
@@ -127,6 +122,24 @@ namespace Furcadia.Net.DreamInfo
         public bool IsModern
         {
             get { return mode == "modern"; }
+        }
+
+        /// <summary>
+        /// Gets or sets the book make.
+        /// </summary>
+        /// <value>
+        /// The book make.
+        /// </value>
+        public DreamBookmark BookMark
+        {
+            set
+            {
+                if (value.IsModern)
+                    mode = "modern";
+                name = value.Name;
+                _URL = value.DreamUrl;
+                owner = value.DreamOwner;
+            }
         }
 
         /// <summary>
@@ -202,6 +215,10 @@ namespace Furcadia.Net.DreamInfo
             set { _URL = value; }
         }
 
+        #endregion Public Properties
+
+        #region Public Operators
+
         /// <summary>
         ///
         /// </summary>
@@ -236,13 +253,28 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(IDream other)
+        public override bool Equals(object other)
         {
             if (other == null)
                 return false;
-            return ShortName == other.ShortName;
+            if (other is IFurre fur)
+            {
+                return ShortName == fur.ShortName;
+            }
+            return false;
         }
 
-        #endregion Public Properties
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return ShortName.GetHashCode();
+        }
+
+        #endregion Public Operators
     }
 }
