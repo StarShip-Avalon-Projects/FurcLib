@@ -1,7 +1,7 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Logging;
 using Furcadia.Movement;
-using Furcadia.Net.Dream;
+using Furcadia.Net.DreamInfo;
 using Furcadia.Net.Options;
 using Furcadia.Net.Utils.ServerParser;
 using Microsoft.Win32.SafeHandles;
@@ -114,7 +114,7 @@ namespace Furcadia.Net.Proxy
 
             ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
 
-            dream = new DREAM();
+            dream = new DreamInfo.Dream();
             connectedFurre = new Furre();
             player = new Furre();
 
@@ -215,12 +215,11 @@ namespace Furcadia.Net.Proxy
         private object clientlock = new object();
         private object DataReceived = new object();
         private bool disposed = false;
-        private DREAM dream;
+        private DreamInfo.Dream dream;
         private Furre player;
         private string errorMsg = "";
         private short errorNum = 0;
         private bool hasShare;
-        private bool inDream = false;
         private bool Look;
         private Queue<string> LookQue;
         //private Queue<string> SpeciesTag;
@@ -413,7 +412,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Current Dream Information with Furre List
         /// </summary>
-        public DREAM Dream
+        public Dream Dream
         {
             get { return dream; }
             set { dream = value; }
@@ -434,7 +433,13 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        public bool InDream { get { return inDream; } }
+        public bool InDream
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(dream.ShortName);
+            }
+        }
 
         /// <summary>
         /// Current Triggering player
@@ -1003,7 +1008,11 @@ namespace Furcadia.Net.Proxy
                             player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
                             if (IsConnectedCharacter())
                                 Look = false;
-                            ProcessServerInstruction.Invoke(player,
+                            var Instruction = new UpdateColorString(ref player, data)
+                            {
+                                InstructionType = ServerInstructionType.LookResponse
+                            };
+                            ProcessServerInstruction.Invoke(Instruction,
                                    new ParseServerArgs(ServerInstructionType.LookResponse, serverconnectphase));
                         }
                     }
@@ -1161,7 +1170,7 @@ namespace Furcadia.Net.Proxy
 #if DEBUG
                         Console.WriteLine("Disconnection Dialog:" + data);
 #endif
-                        inDream = false;
+
                         dream.Furres.Clear();
 
                         //;{mapfile}	Load a local map (one in the furcadia folder)
@@ -1173,16 +1182,14 @@ namespace Furcadia.Net.Proxy
 
                     //Dream Load ]q
                     //vasecodegamma
-                    //
                     else if (data.StartsWith("]q"))
                     {
                         //Set defaults (should move to some where else?
                         hasShare = false;
                         NoEndurance = false;
-                        Dream.Furres.Clear();
-                        inDream = false;
 
                         LoadDream loadDream = new LoadDream(data);
+                        Dream = new Dream(loadDream);
                         if (ProcessServerInstruction != null)
                             ProcessServerInstruction.Invoke(loadDream,
                                new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
@@ -1191,8 +1198,8 @@ namespace Furcadia.Net.Proxy
                         if (!IsClientSocketConnected && StandAlone)
                         {
                             SendToServer("vasecodegamma");
-                            inDream = true;
                         }
+                        return;
                     }
                     // ]z UID[*]
                     // Unique User ID
@@ -1231,34 +1238,17 @@ namespace Furcadia.Net.Proxy
                     // Credits FTR
                     else if (data.StartsWith("]C"))
                     {
-                        inDream = true;
                         if (data.StartsWith("]C0") || data.StartsWith("]C1"))
                         {
-                            string dname = data.Substring(10);
-                            Dream.Name = dname;
-                            Dream.URL = data.Substring(3);
-                            if (dname.Contains(":"))
-                            {
-                                string NameStr = dname.Substring(0, dname.IndexOf(":"));
-                                Dream.Owner = NameStr;
-                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
-                                {
-                                    hasShare = true;
-                                }
-                            }
-                            else if (dname.EndsWith("/") && !dname.Contains(":"))
-                            {
-                                string NameStr = dname.Substring(0, dname.IndexOf("/"));
-                                Dream.Owner = NameStr;
-                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
-                                {
-                                    hasShare = true;
-                                }
-                            }
                             DreamBookmark bookmark = new DreamBookmark(data);
+
+                            dream.URL = bookmark.DreamUrl;
+                            dream.Name = bookmark.Name;
+
                             ProcessServerInstruction?.Invoke(bookmark,
                                 new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));
                         }
+                        return;
                     }
 
                     //Process Channels Seperatly

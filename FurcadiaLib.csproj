@@ -112,6 +112,8 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Extentions\ArrayExtensions.cs" />
+    <Compile Include="Extentions\ExceptionExtensions.cs" />
     <Compile Include="Extentions\ObjectExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />

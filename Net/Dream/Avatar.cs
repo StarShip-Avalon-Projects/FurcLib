@@ -3,7 +3,7 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 
-namespace Furcadia.Net.Dream
+namespace Furcadia.Net.DreamInfo
 {
     /// <summary>
     /// Legacy Furre Avatar information

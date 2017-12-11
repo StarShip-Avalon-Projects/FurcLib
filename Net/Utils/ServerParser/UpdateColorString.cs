@@ -1,5 +1,5 @@
 ﻿using Furcadia.Movement;
-using Furcadia.Net.Dream;
+using Furcadia.Net.DreamInfo;
 
 namespace Furcadia.Net.Utils.ServerParser
 {

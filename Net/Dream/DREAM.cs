@@ -1,12 +1,40 @@
 ﻿using System;
+using Furcadia.Net.Utils.ServerParser;
 
-namespace Furcadia.Net.Dream
+namespace Furcadia.Net.DreamInfo
 {
+    public interface IDream
+    {
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is modern.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is modern; otherwise, <c>false</c>.
+        /// </value>
+        bool IsModern { get; }
+
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
+        string Name { get; set; }
+
+        /// <summary>
+        /// Name of the dream
+        /// </summary>
+        string ShortName
+        {
+            get;
+        }
+    }
+
     /// <summary>
     /// Current Dream information
     /// </summary>
     [CLSCompliant(true)]
-    public class DREAM
+    public class Dream : IDream
     {
         #region Public Fields
 
@@ -50,24 +78,55 @@ namespace Furcadia.Net.Dream
         /// <summary>
         /// List of Furres in the dream.
         /// </summary>
-        public DREAM()
+        public Dream(LoadDream loadDream)
         {
             furres = new FurreList();
+            mode = "legacy";
+            if (loadDream.IsModern)
+                mode = "modern";
+
+            name = loadDream.Name;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dream"/> class.
+        /// </summary>
+        public Dream()
+        {
+            furres = new FurreList();
+            mode = "legacy";
         }
 
         #endregion Public Constructors
 
         #region Public Properties
 
-        private bool isModern;
+        private string mode;
+
+        /// <summary>
+        /// Gets or sets the mode.
+        /// </summary>
+        /// <value>
+        /// The mode.
+        /// </value>
+        public string Mode
+        {
+            get
+            {
+                return mode;
+            }
+            set
+            {
+                mode = value;
+            }
+        }
 
         /// <summary>
         /// Is this dream Modern Mode?
         /// </summary>
         public bool IsModern
         {
-            get { return isModern; }
-            set { isModern = value; }
+            get { return mode == "modern"; }
         }
 
         /// <summary>
@@ -143,46 +202,46 @@ namespace Furcadia.Net.Dream
             set { _URL = value; }
         }
 
-        ///// <summary>
-        /////
-        ///// </summary>
-        ///// <param name="dreamA"></param>
-        ///// <param name="DreamB"></param>
-        ///// <returns></returns>
-        //public static bool operator ==(DREAM dreamA, DREAM dreamB)
-        //{
-        //    if (dreamB == null || dreamA == null)
-        //        return false;
-        //    return dreamA.Equals(dreamB);
-        //}
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="dreamA"></param>
+        /// <param name="dreamB"></param>
+        /// <returns></returns>
+        public static bool operator ==(Dream dreamA, IDream dreamB)
+        {
+            if (dreamB == null || dreamA == null)
+                return false;
+            return dreamA.Equals(dreamB);
+        }
 
-        ///// <summary>
-        /////
-        ///// </summary>
-        ///// <param name="dreamA"></param>
-        ///// <param name="DreamB"></param>
-        ///// <returns></returns>
-        //public static bool operator !=(DREAM dreamA, DREAM DreamB)
-        //{
-        //    if (DreamB == null)
-        //    {
-        //        return false;
-        //    }
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="dreamA"></param>
+        /// <param name="DreamB"></param>
+        /// <returns></returns>
+        public static bool operator !=(Dream dreamA, IDream DreamB)
+        {
+            if (DreamB == null)
+            {
+                return false;
+            }
 
-        //    return dreamA.ShortName != DreamB.ShortName;
-        //}
+            return dreamA.ShortName != DreamB.ShortName;
+        }
 
-        ///// <summary>
-        /////
-        ///// </summary>
-        ///// <param name="other"></param>
-        ///// <returns></returns>
-        //public bool Equals(DREAM other)
-        //{
-        //    if (other == null)
-        //        return false;
-        //    return ShortName == other.ShortName;
-        //}
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IDream other)
+        {
+            if (other == null)
+                return false;
+            return ShortName == other.ShortName;
+        }
 
         #endregion Public Properties
     }

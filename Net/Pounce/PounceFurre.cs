@@ -1,4 +1,4 @@
-﻿using Furcadia.Net.Dream;
+﻿using Furcadia.Net.DreamInfo;
 
 namespace Furcadia.Net.Pounce
 {

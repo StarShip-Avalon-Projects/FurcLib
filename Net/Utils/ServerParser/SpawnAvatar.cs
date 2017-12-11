@@ -1,7 +1,7 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
-using Furcadia.Net.Dream;
-using static Furcadia.Net.Dream.Avatar;
+using Furcadia.Net.DreamInfo;
+using static Furcadia.Net.DreamInfo.Avatar;
 using static Furcadia.Text.Base220;
 
 namespace Furcadia.Net.Utils.ServerParser

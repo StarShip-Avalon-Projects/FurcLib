@@ -2,10 +2,14 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
+using System.Text;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Furcadia.Logging;
+using Furcadia.Extensions;
 
 #endregion Usings
 
@@ -103,7 +107,7 @@ namespace Furcadia.Logging
         /// </returns>
         public override int GetHashCode()
         {
-            return message.GetHashCode();
+            return curThread.ManagedThreadId + message.GetHashCode();
         }
 
         /// <summary>
@@ -135,6 +139,7 @@ namespace Furcadia.Logging
         private static ILogOutput _logOutput;
         internal static readonly ConcurrentList<LogMessage> history = new ConcurrentList<LogMessage>();
         internal static readonly ConcurrentQueue<LogMessage> queue = new ConcurrentQueue<LogMessage>();
+        private static readonly ConcurrentList<Type> disabledTypes = new ConcurrentList<Type>();
         private static LogMessageComparer comparer = new LogMessageComparer();
         private static object syncObj = new object();
         private static bool _infoEnabled = true;
@@ -159,10 +164,12 @@ namespace Furcadia.Logging
 
 #if DEBUG
             _debugEnabled = true;
+            LogCallingMethod = true;
 #else
             _debugEnabled = false; // can be set via property
+            LogCallingMethod = false;
 #endif
-            singleThreaded = false;
+            singleThreaded = true;
 
             Initialize();
         }
@@ -182,8 +189,10 @@ namespace Furcadia.Logging
                     }
                 }
             }, cancelToken.Token, TaskCreationOptions.LongRunning);
-            logTask.Start();
+            if (!singleThreaded) logTask.Start();
         }
+
+        public static bool LogCallingMethod { get; set; }
 
         public static bool InfoEnabled
         {
@@ -259,24 +268,47 @@ namespace Furcadia.Logging
             set
             {
                 singleThreaded = value;
-                if (singleThreaded) cancelToken.Cancel(false);
+                if (singleThreaded) cancelToken.Cancel();
                 else
                 {
-                    if (logTask.Status == TaskStatus.Running ||
-                        logTask.Status == TaskStatus.WaitingForActivation ||
-                        logTask.Status == TaskStatus.WaitingToRun ||
-                        !logTask.IsCompleted)
-                    {
-                        try
-                        {
-                            logTask.Wait(100);
-                        }
-                        catch { /* fuck me */ }
+                    if (logTask.Status == TaskStatus.Running)
                         return;
-                    }
+                    cancelToken.Dispose();
+                    cancelToken = new CancellationTokenSource();
                     logTask.Start();
                 }
             }
+        }
+
+        /// <summary>
+        /// Disables logging for the specified type.
+        /// </summary>
+        /// <typeparam name="T">the type</typeparam>
+        public static void Disable<T>()
+        {
+            if (!disabledTypes.Contains(typeof(T)))
+                disabledTypes.Add(typeof(T));
+        }
+
+        /// <summary>
+        /// Disables logging for the specified type.
+        /// </summary>
+        /// <typeparam name="T">the type</typeparam>
+        public static void Enable<T>()
+        {
+            if (!disabledTypes.Contains(typeof(T)))
+                disabledTypes.Remove(typeof(T));
+        }
+
+        private static bool TypeCheck(Type type, out string typeName)
+        {
+            if (disabledTypes.Contains(type))
+            {
+                typeName = null;
+                return false;
+            }
+            typeName = type.Name;
+            return true;
         }
 
         private static void Log(LogMessage? msg)
@@ -406,88 +438,48 @@ namespace Furcadia.Logging
             return false;
         }
 
-        public static void Debug(object msg)
+        public static void Debug(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(LogMessage.From(Level.Debug, msg != null ? msg.ToString() : "null", MessagesExpire));
+            Log(LogMessage.From(Level.Debug, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
-        public static void Debug<T>(object msg)
+        public static void Debug<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(LogMessage.From(Level.Debug, typeof(T).Name + ": " + msg, MessagesExpire));
+            if (TypeCheck(typeof(T), out string typeName))
+                Log(LogMessage.From(Level.Debug, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
-        public static void DebugFormat(string format, params object[] args)
+        public static void Info(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(
-                LogMessage.From(Level.Debug, (String.IsNullOrEmpty(format) ? String.Join("\t", args) : String.Format(format, args)), MessagesExpire));
+            Log(LogMessage.From(Level.Info, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
-        public static void DebugFormat<T>(string format, params object[] args)
+        public static void Info<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(
-                LogMessage.From(Level.Debug, typeof(T).Name + ": " + (String.IsNullOrEmpty(format) ? String.Join("\t", args) : String.Format(format, args)), MessagesExpire));
+            if (TypeCheck(typeof(T), out string typeName))
+                Log(LogMessage.From(Level.Info, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
-        public static void Info(object msg)
+        public static void Error(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(LogMessage.From(Level.Info, msg != null ? msg.ToString() : "null", MessagesExpire));
+            Log(LogMessage.From(Level.Error, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
-        public static void Info<T>(object msg)
+        public static void Error<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(LogMessage.From(Level.Info, typeof(T).Name + ": " + msg, MessagesExpire));
+            if (TypeCheck(typeof(T), out string typeName))
+                Log(LogMessage.From(Level.Error, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
-        public static void InfoFormat(string format, params object[] args)
+        public static void Warn(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(
-                LogMessage.From(Level.Info, String.IsNullOrEmpty(format) ? String.Join("\t", args) : String.Format(format, args), MessagesExpire));
+            Log(LogMessage.From(Level.Warning, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
-        public static void InfoFormat<T>(string format, params object[] args)
+        public static void Warn<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            Log(
-                LogMessage.From(Level.Info, typeof(T).Name + ": " + (String.IsNullOrEmpty(format) ? String.Join("\t", args) : String.Format(format, args)), MessagesExpire));
-        }
-
-        public static void Error(object msg)
-        {
-            Log(LogMessage.From(Level.Error, msg != null ? msg.ToString() : "null", MessagesExpire));
-        }
-
-        public static void Error<T>(object msg)
-        {
-            Log(LogMessage.From(Level.Error, typeof(T).Name + ": " + msg, MessagesExpire));
-        }
-
-        public static void ErrorFormat(string format, params object[] args)
-        {
-            Log(LogMessage.From(Level.Error, String.Format(format, args), MessagesExpire));
-        }
-
-        public static void ErrorFormat<T>(string format, params object[] args)
-        {
-            Log(LogMessage.From(Level.Error, typeof(T).Name + ": " + String.Format(format, args), MessagesExpire));
-        }
-
-        public static void Warn(object msg)
-        {
-            Log(LogMessage.From(Level.Warning, msg != null ? msg.ToString() : "null", MessagesExpire));
-        }
-
-        public static void Warn<T>(object msg)
-        {
-            Log(LogMessage.From(Level.Warning, typeof(T).Name + ": " + msg, MessagesExpire));
-        }
-
-        public static void WarnFormat(string format, params object[] args)
-        {
-            Log(LogMessage.From(Level.Warning, String.Format(format, args), MessagesExpire));
-        }
-
-        public static void WarnFormat<T>(string format, params object[] args)
-        {
-            Log(LogMessage.From(Level.Warning, typeof(T).Name + ": " + String.Format(format, args), MessagesExpire));
+            if (TypeCheck(typeof(T), out string typeName))
+                Log(LogMessage.From(Level.Warning, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
     }
 }

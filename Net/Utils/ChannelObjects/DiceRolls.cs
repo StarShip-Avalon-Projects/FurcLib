@@ -1,4 +1,4 @@
-﻿using Furcadia.Net.Dream;
+﻿using Furcadia.Net.DreamInfo;
 using Furcadia.Net.Utils.ServerObjects;
 using System.Text.RegularExpressions;
 using static Furcadia.Text.FurcadiaMarkup;

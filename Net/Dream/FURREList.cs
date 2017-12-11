@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Furcadia.Net.Dream
+namespace Furcadia.Net.DreamInfo
 {
     /// <summary>
     /// Furre List information for a Furcadia Dream

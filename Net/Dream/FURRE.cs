@@ -1,9 +1,9 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
 using System;
-using static Furcadia.Net.Dream.Avatar;
+using static Furcadia.Net.DreamInfo.Avatar;
 
-namespace Furcadia.Net.Dream
+namespace Furcadia.Net.DreamInfo
 {
     /// <summary>
     /// Furre Class Interface

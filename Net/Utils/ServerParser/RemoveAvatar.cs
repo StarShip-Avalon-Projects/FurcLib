@@ -1,4 +1,4 @@
-﻿using Furcadia.Net.Dream;
+﻿using Furcadia.Net.DreamInfo;
 using static Furcadia.Text.Base220;
 
 namespace Furcadia.Net.Utils.ServerParser

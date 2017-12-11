@@ -1,5 +1,26 @@
-﻿namespace Furcadia.Net.Utils.ServerParser
+﻿using Furcadia.Net.DreamInfo;
+
+namespace Furcadia.Net.Utils.ServerParser
 {
+    //      if (dname.Contains(":"))
+    //                            {
+    //                                string NameStr = dname.Substring(0, dname.IndexOf(":"));
+    //    Dream.Owner = NameStr;
+    //                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
+    //                                {
+    //                                    hasShare = true;
+    //                                }
+    //                            }
+    //                            else if (dname.EndsWith("/") && !dname.Contains(":"))
+    //                            {
+    //                                string NameStr = dname.Substring(0, dname.IndexOf("/"));
+    //Dream.Owner = NameStr;
+    //                                if (NameStr.ToFurcadiaShortName() == connectedFurre.ShortName)
+    //                                {
+    //                                    hasShare = true;
+    //                                }
+    //                            }
+
     /// <summary>
     /// Triggered when the connection enters a new dream.
     /// <para>
@@ -17,7 +38,7 @@
     ///<para>DreamUrl = "furc://uploadername:dreamname/entrycode "</para>
     /// Credits FTR
     /// </remarks>
-    public class DreamBookmark : BaseServerInstruction
+    public class DreamBookmark : BaseServerInstruction, IDream
     {
         #region Private Fields
 
@@ -75,6 +96,25 @@
         public int DreamType
         {
             get { return type; }
+        }
+
+        public bool IsModern => throw new System.NotImplementedException();
+
+        public string Name
+        {
+            get
+            {
+                return dreamURL.Substring(3);
+            }
+            set => throw new System.NotImplementedException();
+        }
+
+        public string ShortName
+        {
+            get
+            {
+                return Name.ToFurcadiaShortName();
+            }
         }
 
         #endregion Public Properties

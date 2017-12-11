@@ -71,6 +71,11 @@ public static class StringExtensions
         }
     }
 
+    public static bool IsNullOrBlank(this string str)
+    {
+        return string.IsNullOrEmpty(str) || (str.Length == 1 && str[0] == ' ');
+    }
+
     public static string ToFurcadiaShortName(this string name)
     {
         if (string.IsNullOrEmpty(name))

@@ -1,4 +1,6 @@
-﻿namespace Furcadia.Net.Utils.ServerParser
+﻿using Furcadia.Net.DreamInfo;
+
+namespace Furcadia.Net.Utils.ServerParser
 {
     /// <summary>
     /// Triggered when the connection enters a new dream.
@@ -39,7 +41,7 @@
         /// <param name="ServerInstruction">
         /// Raw server instruction from the game server
         /// </param>
-        public LoadDream(string ServerInstruction) : this()
+        public LoadDream(string ServerInstruction) : base(ServerInstruction)
         {
             string[] Options = ServerInstruction.Substring(3).Split(' ');
             if (Options.Length >= 2)
@@ -58,11 +60,26 @@
         /// <summary>
         /// td or permanent map name
         /// </summary>
-        public string DreamName
+        public string Name
         {
             get
             {
                 return dreamName;
+            }
+            set
+            {
+                dreamName = value;
+            }
+        }
+
+        /// <summary>
+        /// Furcadia shortname of the dream
+        /// </summary>
+        public string ShortName
+        {
+            get
+            {
+                return dreamName.ToFurcadiaShortName();
             }
         }
 

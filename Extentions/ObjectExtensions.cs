@@ -1,17 +1,65 @@
-﻿using System;
+﻿using Furcadia.Logging;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Furcadia.Extensions
 {
     public static class ObjectExtensions
     {
-        public static T As<T>(this object obj)
+        public static long AsInt64(this object obj, long @default = -1L)
         {
-            if (obj == null) return default(T);
+            if (obj == null) return @default;
             try
             {
-                return (T)Convert.ChangeType(obj, typeof(T));
+                return Convert.ToInt64(obj);
             }
-            catch { return default(T); }
+            catch (Exception ex) { return @default; }
+        }
+
+        public static short AsInt16(this object obj, short @default = -1)
+        {
+            if (obj == null) return @default;
+            try
+            {
+                return Convert.ToInt16(obj);
+            }
+            catch (Exception ex) { return @default; }
+        }
+
+        public static int AsInt32(this object obj, int @default = -1)
+        {
+            if (obj == null) return @default;
+            try
+            {
+                return Convert.ToInt32(obj);
+            }
+            catch (Exception ex) { return @default; }
+        }
+
+        public static double AsDouble(this object obj, double @default = -1d)
+        {
+            if (obj == null) return @default;
+            if (obj is double) return (double)obj;
+            try
+            {
+                return Convert.ToDouble(obj);
+            }
+            catch (Exception ex) { return @default; }
+        }
+
+        public static string AsString(this object obj, string @default = null)
+        {
+            if (obj == null) return @default;
+            if (obj is string) return (string)obj;
+            try
+            {
+                return Convert.ToString(obj);
+            }
+            catch (Exception ex) { return @default; }
         }
     }
 }
