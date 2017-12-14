@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -75,5 +76,13 @@ namespace Furcadia.Net.Utils.ServerParser
         }
 
         #endregion Public Properties
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($" Server Instruction Type: '{InstructionType}'");
+            sb.AppendLine($"Raw Server Instruction: '{rawInstruction}'");
+            return sb.ToString();
+        }
     }
 }

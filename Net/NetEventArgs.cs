@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Furcadia.Net
 {
@@ -465,6 +466,13 @@ namespace Furcadia.Net
         {
             serverinstruction = ServerInstruction;
             serverConnectedPhase = phase;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Instruction '{serverinstruction}' : Phase: '{serverConnectedPhase}'");
+            return sb.ToString();
         }
 
         #endregion Public Constructors

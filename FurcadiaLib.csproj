@@ -79,7 +79,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>FurcadiaFrameWork.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>FurcLibSNK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -185,7 +185,6 @@
     <Compile Include="Drawing\Helper.cs" />
     <Compile Include="Movement\ColorString.cs" />
     <Compile Include="Text\FurcadiaMarkup.cs" />
-    <Compile Include="Text\FurcadiaSettingsUtiliies.cs" />
     <Compile Include="Text\IniParser.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="IO\RegistryExplorer.cs" />
@@ -200,7 +199,8 @@
     </Compile>
     <Compile Include="Text\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Text\Character.cs" />
+    <None Include="FurcLibSNK.snk" />
+    <None Include="Text\Character.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

@@ -18,7 +18,20 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public int FurreId;
 
-        public Furre Player;
+        /// <summary>
+        /// Triggering furre being removed
+        /// </summary>
+        /// <value>
+        /// Triggering furre.
+        /// </value>
+        public Furre Player
+        {
+            get
+            { return player; }
+            set { player = value; }
+        }
+
+        private Furre player = null;
 
         #endregion Public Fields
 
@@ -35,7 +48,6 @@ namespace Furcadia.Net.Utils.ServerParser
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
                 FurreId = ConvertFromBase220(ServerInstruction.Substring(1, 4));
-            Player = new Furre(FurreId);
         }
 
         #endregion Public Constructors

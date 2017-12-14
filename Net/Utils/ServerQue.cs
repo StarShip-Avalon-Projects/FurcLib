@@ -204,6 +204,7 @@ namespace Furcadia.Net.Utils
         /// </param>
         public void SendToServer(ref string data)
         {
+            Logging.Logger.Debug<ServerQue>(data);
             if (string.IsNullOrEmpty(data))
                 return;
             // if (string.IsNullOrEmpty(data)) return;

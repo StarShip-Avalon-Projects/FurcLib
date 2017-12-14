@@ -23,14 +23,6 @@ namespace Furcadia.Net.DreamInfo
         /// The name.
         /// </value>
         string Name { get; set; }
-
-        /// <summary>
-        /// Short name of the dream
-        /// </summary>
-        string ShortName
-        {
-            get;
-        }
     }
 
     /// <summary>
@@ -68,16 +60,18 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// List of Furres in the dream.
+        /// Loads the specified dream information from a <see cref="LoadDream"/> event.
         /// </summary>
-        public Dream(LoadDream loadDream)
+        /// <param name="DreamInfo">The dream information.</param>
+        public void Load(LoadDream DreamInfo)
         {
-            furres = new FurreList();
             mode = "legacy";
-            if (loadDream.IsModern)
+            if (DreamInfo.IsModern)
                 mode = "modern";
 
-            fileName = loadDream.Name;
+            fileName = DreamInfo.CacheFileName;
+            if (DreamInfo.IsPermanent)
+                name = fileName.Substring(2);
         }
 
         #endregion Public Constructors
@@ -134,8 +128,7 @@ namespace Furcadia.Net.DreamInfo
         {
             set
             {
-                if (value.IsModern)
-                    mode = "modern";
+                //Modern should be set bu this point
                 name = value.Name;
                 _URL = value.DreamUrl;
                 owner = value.DreamOwner;
@@ -245,7 +238,7 @@ namespace Furcadia.Net.DreamInfo
                 return false;
             }
 
-            return dreamA.ShortName != DreamB.ShortName;
+            return dreamA.ShortName != DreamB.Name.ToFurcadiaShortName();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using Furcadia.Net.DreamInfo;
+using System.Text;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -26,6 +27,7 @@ namespace Furcadia.Net.Utils.ServerParser
         private int type;
         private string dreamURL;
         private string dreamOwner;
+        private string title;
 
         #endregion Private Fields
 
@@ -51,16 +53,27 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
             dreamURL = ServerInstruction.Substring(3);
-            type = ServerInstruction[2];
-            if (ServerInstruction.Contains(":"))
+            type = int.Parse(ServerInstruction[2].ToString());
+            var dreamOwnerLengeth = dreamURL.Length - dreamURL.IndexOf("/", 6);
+            string NameStr = null;
+            if (dreamURL.Substring(6).EndsWith("/"))
+                dreamOwnerLengeth -= 1;
+            else
+                dreamOwnerLengeth -= dreamURL.IndexOf(":", 6);
+            NameStr = ServerInstruction.Substring(10, dreamOwnerLengeth);
+            dreamOwner = NameStr;
+
+            if (ServerInstruction.Substring(10).Contains(":"))
             {
-                string NameStr = ServerInstruction.Substring(0, ServerInstruction.IndexOf(":"));
-                dreamOwner = NameStr;
+                NameStr = ServerInstruction.Substring(10,
+                   ServerInstruction.IndexOf(":", 10));
+                title = NameStr;
             }
-            else if (ServerInstruction.EndsWith("/") && !ServerInstruction.Contains(":"))
+            else if (ServerInstruction.EndsWith("/") &&
+                !ServerInstruction.Substring(10).Contains(":"))
             {
-                string NameStr = ServerInstruction.Substring(0, ServerInstruction.IndexOf("/"));
-                dreamOwner = NameStr;
+                NameStr = ServerInstruction.Substring(10, ServerInstruction.Length - 10);
+                title = NameStr;
             }
         }
 
@@ -94,6 +107,17 @@ namespace Furcadia.Net.Utils.ServerParser
         }
 
         /// <summary>
+        /// Dream title
+        /// </summary>
+        /// <value>
+        /// The title.
+        /// </value>
+        public string Title
+        {
+            get { return title; }
+        }
+
+        /// <summary>
         /// Dream Type
         /// <para> Type 0 = Temporary</para>
         /// Type 1 = Regular
@@ -106,23 +130,30 @@ namespace Furcadia.Net.Utils.ServerParser
 
         public bool IsModern => throw new System.NotImplementedException();
 
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
+        /// <exception cref="System.NotImplementedException"></exception>
         public string Name
         {
             get
             {
-                return dreamURL.Substring(3);
+                return $"{dreamOwner}:{title}";
             }
             set => throw new System.NotImplementedException();
         }
 
-        public string ShortName
-        {
-            get
-            {
-                return Name.ToFurcadiaShortName();
-            }
-        }
-
         #endregion Public Properties
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append(base.ToString());
+            sb.AppendLine($"DreamOwner: '{DreamOwner}' Title: '{title}' DreamUrl: '{DreamUrl}'");
+            return base.ToString();
+        }
     }
 }

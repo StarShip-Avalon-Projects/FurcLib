@@ -27,6 +27,12 @@ namespace Furcadia.Net.DirectConnection
 
         #endregion Protected Internal Fields
 
+        #region Private Fields
+
+        private Text.Settings DefaultSettings;
+
+        #endregion Private Fields
+
         #region Event Handling
 
         /// <summary>
@@ -122,9 +128,8 @@ namespace Furcadia.Net.DirectConnection
         {
             FurcPath = new Paths();
             string SetPath = FurcPath.SettingsPath;
-            string SetFile = "settings.ini";
-            string[] sett = FurcadiaSettingsUtiliies.LoadFurcadiaSettings(SetPath, SetFile);
-            int port = Convert.ToInt32(FurcadiaSettingsUtiliies.GetUserSetting("PreferredServerPort", sett));
+            DefaultSettings.LoadFurcadiaSettings(SetPath);
+            int port = Convert.ToInt32(DefaultSettings.GetUserSetting("PreferredServerPort"));
             try
             {
                 _endpoint = new IPEndPoint(Dns.GetHostEntry(FurcadiaUtilities.GameServerHost).AddressList[0], port);

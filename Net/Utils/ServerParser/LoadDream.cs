@@ -1,4 +1,5 @@
 ﻿using Furcadia.Net.DreamInfo;
+using System.Text;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -17,7 +18,7 @@ namespace Furcadia.Net.Utils.ServerParser
         #region Private Fields
 
         private string crc;
-        private string dreamName;
+        private string fileName;
         private string mode;
 
         #endregion Private Fields
@@ -30,7 +31,7 @@ namespace Furcadia.Net.Utils.ServerParser
         public LoadDream() : base()
         {
             base.InstructionType = ServerInstructionType.LoadDreamEvent;
-            dreamName = null;
+            fileName = null;
             crc = null;
             mode = "legacy";
         }
@@ -43,13 +44,14 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         public LoadDream(string ServerInstruction) : base(ServerInstruction)
         {
+            base.InstructionType = ServerInstructionType.LoadDreamEvent;
             string[] Options = ServerInstruction.Substring(3).Split(' ');
             if (Options.Length >= 2)
             {
-                dreamName = Options[0];
+                fileName = Options[0];
                 crc = Options[1];
             }
-            if (Options.Length == 4)
+            if (Options.Length == 5)
                 mode = Options[4];
         }
 
@@ -58,28 +60,17 @@ namespace Furcadia.Net.Utils.ServerParser
         #region Public Properties
 
         /// <summary>
-        /// td or permanent map name
+        /// td (Temporary Dream) or permanent map name
         /// </summary>
-        public string Name
+        public string CacheFileName
         {
             get
             {
-                return dreamName;
+                return fileName;
             }
             set
             {
-                dreamName = value;
-            }
-        }
-
-        /// <summary>
-        /// Furcadia shortname of the dream
-        /// </summary>
-        public string ShortName
-        {
-            get
-            {
-                return dreamName.ToFurcadiaShortName();
+                fileName = value;
             }
         }
 
@@ -101,10 +92,18 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                return dreamName.Substring(0, 2) == "pm";
+                return fileName.Substring(0, 2) == "pm";
             }
         }
 
         #endregion Public Properties
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append(base.ToString());
+            sb.AppendLine($"CacheFileName: '{fileName}' IsPermanent: '{IsPermanent}' IsModern: '{IsModern}'");
+            return sb.ToString();
+        }
     }
 }

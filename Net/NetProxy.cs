@@ -6,15 +6,16 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  */
 
+using Furcadia.Logging;
 using Furcadia.Net.Options;
-using Furcadia.Text;
 using System;
 using System.Diagnostics;
 using System.IO;
 
-//using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 using static Furcadia.Net.Utils.Utilities;
 
 namespace Furcadia.Net
@@ -30,7 +31,7 @@ namespace Furcadia.Net
     /// </summary>
     /// <remarks>
     /// </remarks>
-    public class NetProxy
+    public class NetProxy : IDisposable
     {
         #region Protected Internal Fields
 
@@ -42,11 +43,6 @@ namespace Furcadia.Net
         #endregion Protected Internal Fields
 
         #region Private Fields
-
-        /// <summary>
-        /// FurcadiaSettings File
-        /// </summary>
-        private const string SetFile = "settings.ini";
 
         /// <summary>
         /// Max buffer size
@@ -63,7 +59,8 @@ namespace Furcadia.Net
         /// </summary>
         private static TcpClient LightBringer;
 
-        private byte[] clientBuffer = new byte[BUFFER_CAP], serverBuffer = new byte[BUFFER_CAP];
+        private byte[] clientBuffer = new byte[BUFFER_CAP];
+        private byte[] serverBuffer = new byte[BUFFER_CAP];
 
         private object ClientBufferLock = new object();
 
@@ -83,28 +80,18 @@ namespace Furcadia.Net
 
         private ProxyOptions options;
 
-        /// <summary>
-        /// connection options
-        /// </summary>
-        public virtual ProxyOptions Options
-        {
-            get { return options; }
-            set { options = value; }
-        }
-
         private object ServerBufferLock = new object();
 
-        /// <summary>
-        /// Furcadia Settings File Path
-        /// </summary>
-        private string SetPath;
-
-        /// <summary>
-        /// Furcadia Settings for backup/restore
-        /// </summary>
-        private string[] sett;
-
         private Text.Settings settings;
+
+        private object ClientDataObject = new object();
+        private byte[] ClientLeftOvers = new byte[BUFFER_CAP];
+
+        private int ClientLeftOversSize = 0;
+
+        private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
+
+        private int ServerLeftOversSize = 0;
 
         #endregion Private Fields
 
@@ -115,13 +102,12 @@ namespace Furcadia.Net
         /// </summary>
         public NetProxy()
         {
-            FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions
+            options = new ProxyOptions
             {
                 LocalhostPort = 6700,
                 GameServerPort = 6500
             };
-            SetFurcadiaSettings();
+            Initialize();
         }
 
         /// <summary>
@@ -130,20 +116,11 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(ref int port)
         {
-            FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions
+            options = new ProxyOptions
             {
                 LocalhostPort = port,
             };
-        }
-
-        private void SetFurcadiaSettings()
-        {
-            settings = new Text.Settings(options);
-            SetPath = options.FurcadiaFilePaths.SettingsPath;
-            sett = FurcadiaSettingsUtiliies.ReadSettingIni(Path.Combine(SetPath, SetFile));
-            if (options.GameServerPort == 0)
-                options.GameServerPort = int.Parse(FurcadiaSettingsUtiliies.GetUserSetting("PreferredServerPort", sett));
+            Initialize();
         }
 
         /// <summary>
@@ -156,13 +133,12 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(ref int port, ref int lport)
         {
-            FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions
+            options = new ProxyOptions
             {
                 LocalhostPort = lport,
                 GameServerPort = port
             };
-            SetFurcadiaSettings();
+            Initialize();
         }
 
         /// <summary>
@@ -174,14 +150,13 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(string host, int port)
         {
-            FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions
+            options = new ProxyOptions
             {
                 GameServerPort = port,
                 LocalhostPort = 6700,
                 GameServerHost = host
             };
-            SetFurcadiaSettings();
+            Initialize();
         }
 
         /// <summary>
@@ -191,9 +166,8 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(ProxyOptions Options)
         {
-            FurcadiaUtilities = new Utils.Utilities();
             options = Options;
-            SetFurcadiaSettings();
+            Initialize();
         }
 
         /// <summary>
@@ -210,30 +184,19 @@ namespace Furcadia.Net
         /// </param>
         public NetProxy(string host, int port, int lport)
         {
-            FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions
+            options = new ProxyOptions
             {
                 LocalhostPort = lport,
                 GameServerHost = host,
                 GameServerPort = port
             };
-            SetFurcadiaSettings();
+            Initialize();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="endpoint">
-        /// </param>
-        /// <param name="lport">
-        /// </param>
-        public NetProxy(IPEndPoint endpoint, int lport)
+        private void Initialize()
         {
             FurcadiaUtilities = new Utils.Utilities();
-            options = new Options.ProxyOptions
-            {
-                LocalhostPort = lport,
-            };
-            SetFurcadiaSettings();
+            settings = new Text.Settings(options);
         }
 
         #endregion Public Constructors
@@ -293,12 +256,11 @@ namespace Furcadia.Net
         /// <summary>
         /// Occurs when the furcadia client exits.
         /// </summary>
-        protected internal event ActionDelegate ClientExited;
+        protected internal event EventHandler ClientExited;
 
-        /// <summary>
-        ///This is triggered when the Client and/or Server have connected to TCP stream
-        /// </summary>
-        protected internal event ActionDelegate Connected;
+        protected internal event ActionDelegate ClientConnected;
+
+        protected internal event ActionDelegate ServerConnected;
 
         #endregion Protected Internal Events
 
@@ -308,20 +270,6 @@ namespace Furcadia.Net
         /// This is triggered when a handled Exception is thrown.
         /// </summary>
         public event ErrorEventHandler Error;
-
-        /// <summary>
-        /// send errors to the error handler
-        /// </summary>
-        /// <param name="e"></param>
-        /// <param name="o"></param>
-        /// <param name="text"></param>
-        protected virtual void SendError(Exception e, object o, string text)
-        {
-            if (Error != null)
-                Error?.Invoke(e, o, text);
-            else
-                throw e;
-        }
 
         #endregion Protected Events
 
@@ -337,13 +285,25 @@ namespace Furcadia.Net
         {
             get
             {
-                try
-                {
-                    if (furcProcess != null)
-                        return !furcProcess.HasExited;
-                }
-                catch { }
+                if (FurcadiaProcessID != -1)
+                    return !furcProcess.HasExited;
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the furcadia process identifier.
+        /// </summary>
+        /// <value>
+        /// The furcadia process identifier.
+        /// </value>
+        public int FurcadiaProcessID
+        {
+            get
+            {
+                if (furcProcess == null)
+                    return -1;
+                return furcProcess.Id;
             }
         }
 
@@ -375,6 +335,15 @@ namespace Furcadia.Net
         }
 
         /// <summary>
+        /// connection options
+        /// </summary>
+        public virtual ProxyOptions Options
+        {
+            get { return options; }
+            set { options = value; }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether this instance is client socket connected.
         /// </summary>
         /// <value>
@@ -390,7 +359,6 @@ namespace Furcadia.Net
                     {
                         if (client.Client != null)
                             return client.Client.Connected;
-                        return client.Connected;
                     }
                 }
                 catch { }
@@ -411,7 +379,6 @@ namespace Furcadia.Net
                     {
                         if (LightBringer.Client != null)
                             return LightBringer.Client.Connected;
-                        return LightBringer.Connected;
                     }
                 }
                 catch { }
@@ -419,25 +386,23 @@ namespace Furcadia.Net
             }
         }
 
-        /// <summary>
-        /// Gets the furcadia process identifier.
-        /// </summary>
-        /// <value>
-        /// The furcadia process identifier.
-        /// </value>
-        public int FurcadiaProcessID
-        {
-            get
-            {
-                if (furcProcess == null)
-                    return -1;
-                return furcProcess.Id;
-            }
-        }
-
         #endregion Public Properties
 
         #region Public Methods
+
+        /// <summary>
+        /// send errors to the error handler
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="o"></param>
+        /// <param name="text"></param>
+        protected virtual void SendError(Exception e, object o, string text)
+        {
+            if (Error != null)
+                Error?.Invoke(e, o, text);
+            else
+                throw e;
+        }
 
         /// <summary>
         /// Disconnect from the Furcadia client
@@ -447,9 +412,6 @@ namespace Furcadia.Net
             if (IsClientSocketConnected)
             {
                 client.Close();
-                client.Dispose();
-                //TODO: Shouldn't settings be restored already?
-                settings.RestoreFurcadiaSettings();
             }
             if (listen != null)
             {
@@ -465,20 +427,12 @@ namespace Furcadia.Net
         /// <exception cref="System.InvalidOperationException"></exception>
         public void CloseClient()
         {
+            Logger.Debug<NetProxy>($"Client Closed: {furcProcess}");
             if (furcProcess == null)
                 throw new InvalidOperationException($"{furcProcess} cannot be null");
             if (furcProcess.HasExited)
                 return;
             furcProcess.CloseMainWindow();
-            furcProcess.WaitForExit(500);
-            if (furcProcess.HasExited)
-            {
-                furcProcess.Close();
-            }
-            else furcProcess.Kill();
-            furcProcess.Dispose();
-            if (IsClientSocketConnected)
-                client.Close();
         }
 
         /// <summary>
@@ -520,11 +474,13 @@ namespace Furcadia.Net
                 }
 
                 //Run
-
                 //check ProcessPath is not a directory
                 if (!Directory.Exists(options.FurcadiaInstallPath)) throw new NetProxyException("Process path not found.");
                 if (!File.Exists(Path.Combine(options.FurcadiaInstallPath, options.FurcadiaProcess))) throw new NetProxyException("Client executable '" + options.FurcadiaProcess + "' not found.");
-                var sInfo = new ProcessStartInfo
+                settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
+                Logger.Debug<NetProxy>("Start Furcadia");
+
+                var furcadiaProcessInfo = new ProcessStartInfo
                 {
                     FileName = options.FurcadiaProcess,
                     Arguments = options.CharacterIniFile,
@@ -533,13 +489,20 @@ namespace Furcadia.Net
                 furcProcess = new System.Diagnostics.Process
                 {
                     EnableRaisingEvents = true,
-                    StartInfo = sInfo
+                    StartInfo = furcadiaProcessInfo
                 };
 
-                settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
-                furcProcess.Exited += delegate
+                furcProcess.Exited += ClientExited;
+                furcProcess.Exited += (s, e) =>
                 {
-                    ClientExited?.Invoke();
+                    Logger.Debug<NetProxy>($"Furcadia Process Exited sender: {s} eventArgs: {e}");
+
+                    if (IsClientSocketConnected)
+                    {
+                        client.Close();
+                    }
+                    settings.RestoreFurcadiaSettings();
+                    furcProcess = null;
                 };
                 furcProcess.Start();
             }
@@ -549,6 +512,95 @@ namespace Furcadia.Net
                 if (Error != null) Error(e, this, "Connect()");
                 else throw e;
             }
+        }
+
+        /// <summary>
+        /// Connects the asynchronous.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NetProxyException">
+        /// Could not find available localhost port
+        /// or
+        /// there is a problem with the Proxy server
+        /// or
+        /// Process path not found.
+        /// or
+        /// Client executable '" + options.FurcadiaProcess + "' not found.
+        /// </exception>
+        public virtual async Task ConnectAsync()
+        {
+            try
+            {
+                int counter = 0;
+                while (!PortOpen(options.LocalhostPort))
+                {
+                    options.LocalhostPort++;
+                    counter++;
+                    if (counter == 100)
+                        throw new NetProxyException("Could not find available localhost port");
+                }
+                try
+                {
+                    if (listen == null)
+                        listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
+                    listen.Start();
+                    LightBringer = new TcpClient();
+                    LightBringer.Connect(options.GameServerHost, options.GameServerPort);
+                    listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
+                }
+                catch (SocketException se)
+                {
+                    throw new NetProxyException("there is a problem with the Proxy server", se);
+                }
+
+                //Run
+                //check ProcessPath is not a directory
+                if (!Directory.Exists(options.FurcadiaInstallPath)) throw new NetProxyException("Process path not found.");
+                if (!File.Exists(Path.Combine(options.FurcadiaInstallPath, options.FurcadiaProcess))) throw new NetProxyException("Client executable '" + options.FurcadiaProcess + "' not found.");
+                await settings.InitializeFurcadiaSettingsAsync(options.FurcadiaFilePaths.SettingsPath);
+                Logger.Debug<NetProxy>("Start Furcadia");
+                LaunchFurcadia().Wait();
+                settings.RestoreFurcadiaSettingsAsync().Wait();
+            }
+            catch (Exception e)
+            {
+                Logging.Logger.Error<NetProxy>(e);
+                if (Error != null) Error(e, this, "Connect()");
+                else throw e;
+            }
+        }
+
+        private async Task LaunchFurcadia()
+        {
+            var furcadiaProcessInfo = new ProcessStartInfo
+            {
+                FileName = options.FurcadiaProcess,
+                Arguments = options.CharacterIniFile,
+                WorkingDirectory = options.FurcadiaInstallPath
+            };
+            furcProcess = new System.Diagnostics.Process
+            {
+                EnableRaisingEvents = true,
+                StartInfo = furcadiaProcessInfo
+            };
+
+            furcProcess.Exited += ClientExited;
+            furcProcess.Exited += (s, e) =>
+            {
+                Logger.Debug<NetProxy>($"Furcadia Process Exited ");
+
+                if (IsClientSocketConnected)
+                {
+                    client.Close();
+                }
+                Task.Run(() => settings.RestoreFurcadiaSettings());
+                furcProcess = null;
+            };
+            await Task.Run(() =>
+            {
+                if (furcProcess.Start())
+                    Logger.Debug<NetProxy>($"Furcadia Process has Started ");
+            });
         }
 
         /// <summary>
@@ -630,15 +682,6 @@ namespace Furcadia.Net
 
         #region Private Methods
 
-        private object ClientDataObject = new object();
-        private byte[] ClientLeftOvers = new byte[BUFFER_CAP];
-
-        private int ClientLeftOversSize = 0;
-
-        private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
-
-        private int ServerLeftOversSize = 0;
-
         /// <summary>
         /// Asynchronouses the listener.
         /// </summary>
@@ -648,60 +691,33 @@ namespace Furcadia.Net
         {
             listen = (TcpListener)ar.AsyncState;
 
-            // we have connected
             try
             {
-                try
-                {
-                    client = listen.EndAcceptTcpClient(ar);
-                }
-                catch (SocketException se)
-                {
-                    if (se.ErrorCode > 0) throw se;
-                }
-                //listen.Stop();
-                // Connects to the server
-
-                if (!IsServerSocketConnected)
-                    throw new NetProxyException("Server is disconnected");
-                if (!IsClientSocketConnected)
-                    throw new NetProxyException("Client is Disconnected");
-                try
-                {
-                    client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
-                    LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
-                }
-                catch (Exception ex) { throw ex; }
-                Connected?.Invoke();
+                client = listen.EndAcceptTcpClient(ar);
             }
-            catch { throw; }
-            finally
+            catch (SocketException se)
             {
-                settings.RestoreFurcadiaSettings();
+                if (se.ErrorCode > 0) throw se;
             }
-        }
 
-        //private IPEndPoint ConverHostToIP(string HostName, int ServerPort)
-        //{
-        //    if (IPAddress.TryParse(HostName, out IPAddress IP))
-        //        try
-        //        {
-        //            return new IPEndPoint(IP, ServerPort);
-        //        }
-        //        catch { }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            return new IPEndPoint(Dns.GetHostEntry(HostName).AddressList[0], ServerPort);
-        //        }
-        //        catch
-        //        {
-        //            return new IPEndPoint(FurcadiaUtilities.GameServerIp, ServerPort);
-        //        }
-        //    }
-        //    return null;
-        //}
+            if (!IsServerSocketConnected)
+                throw new NetProxyException("Server is disconnected");
+            if (!IsClientSocketConnected)
+                throw new NetProxyException("Client is Disconnected");
+            try
+            {
+                client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
+                ClientConnected?.Invoke();
+            }
+            catch (Exception ex) { throw ex; }
+
+            try
+            {
+                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
+                ServerConnected?.Invoke();
+            }
+            catch (Exception ex) { throw ex; }
+        }
 
         /// <summary>
         /// handle the raw data coming from he Furcadia client
@@ -791,7 +807,7 @@ namespace Furcadia.Net
             LightBringer = (TcpClient)ar.AsyncState;
 
             if (LightBringer.Client.Connected)
-
+            {
                 try
                 {
                     int read = 0;
@@ -854,9 +870,52 @@ namespace Furcadia.Net
                     Error?.Invoke(ex, this, ex.Message);
                     ServerDisconnected?.Invoke();
                 }
+            }
             else
                 ServerDisconnected?.Invoke();
         }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+
+                    if (client != null) client.Dispose();
+                    if (LightBringer != null) LightBringer.Dispose();
+                    if (furcProcess != null) furcProcess.Dispose();
+                    if (listen != null) listen = null;
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~NetProxy() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public virtual void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+
+        #endregion IDisposable Support
 
         #endregion Private Methods
     }
