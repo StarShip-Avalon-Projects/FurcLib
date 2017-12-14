@@ -8,7 +8,6 @@
 using Furcadia.IO;
 using Furcadia.Net.Options;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -33,11 +32,6 @@ namespace Furcadia.Text
         /// RegEx for Setting.ini Key=Value pairs
         /// </summary>
         private static Regex regexkey = new Regex("^\\s*([^=\\s]*)[^=]*=(.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant));
-
-        /// <summary>
-        /// Bacup settings First Run.
-        /// </summary>
-        private List<String> backupSettings;
 
         private List<string> currentSettings;
 
@@ -141,7 +135,6 @@ namespace Furcadia.Text
         /// </summary>
         private void Initialize()
         {
-            backupSettings = new List<string>();
             currentSettings = new List<string>();
         }
 
@@ -160,16 +153,14 @@ namespace Furcadia.Text
                 sPath = FurcPath.SettingsPath;
             else
                 sPath = path;
-            List<string> FurcSettings = ReadSettingsIni(Path.Combine(sPath, settingsFile));
             var set = ReadSettingsIni(Path.Combine(sPath, settingsFile));
             currentSettings.AddRange(set);
-            backupSettings.AddRange(set);
             for (int Key = 0; Key < Keys.Count; Key++)
             {
-                SetUserSetting(Keys[Key], values[Key], ref FurcSettings);
+                SetUserSetting(Keys[Key], values[Key], ref set);
             }
             // Save settings.ini?
-            await Task.Run(() => SaveFurcadiaSettings(sPath, settingsFile, FurcSettings));
+            await Task.Run(() => SaveFurcadiaSettings(sPath, settingsFile, set));
         }
 
         /// <summary>
@@ -248,7 +239,9 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Backs up the current Furcadia Settings
+        /// Load Current Furcadia Settings
+        /// <para/>
+        /// No need to set the Settings, We just want to read them
         /// </summary>
         /// <param name="path">
         /// </param>
@@ -264,7 +257,7 @@ namespace Furcadia.Text
             List<string> SettingFile = new List<string>();
             try
             {
-                backupSettings.AddRange(ReadSettingsIni(Path.Combine(path, file)));
+                currentSettings.AddRange(ReadSettingsIni(Path.Combine(path, file)));
                 ReturnValue = true;
             }
             catch (Exception ex)
@@ -344,11 +337,11 @@ namespace Furcadia.Text
                     Match m = regexkey.Match(SettingFile[WiDx]);
                     if (regexkey.Match(SettingFile[WiDx]).Success && m.Groups[1].Value == WhichSetting)
                     {
-                        SettingFile[WiDx] = WhichSetting + " = " + WhichValue;
+                        SettingFile[WiDx] = $"{WhichSetting.Trim()} = {WhichValue.Trim()}";
                         return;
                     }
                 }
-            throw new Exception("Couldn't find setting" + WhichSetting + " to change.");
+            throw new Exception($"Couldn't find setting {WhichSetting} to change.");
         }
 
         /// <summary>
@@ -366,7 +359,7 @@ namespace Furcadia.Text
                 Match m = regexkey.Match(currentSettings[WiDx]);
                 if (regexkey.Match(currentSettings[WiDx]).Success && m.Groups[1].Value == WhichSetting)
                 {
-                    return m.Groups[2].Value;
+                    return m.Groups[2].Value.Trim();
                 }
             }
             throw new Exception("Couldn't find Furcadia setting(" + WhichSetting + ") to change.");
