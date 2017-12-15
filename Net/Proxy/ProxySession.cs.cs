@@ -77,10 +77,19 @@ namespace Furcadia.Net.Proxy
 
             base.ServerData2 += OnServerDataReceived;
             ServerConnected += OnServerConnected;
-            ServerDisconnected += OnServerDisconnected;
+            ServerDisconnected += () =>
+            {
+                //  base.Disconnect();
+                serverconnectphase = ConnectionPhase.Disconnected;
+                ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+            };
 
             base.ClientData2 += OnClientDataReceived;
-            ClientDisconnected += OnClientDisconnected;
+            ClientDisconnected += () =>
+            {
+                clientconnectionphase = ConnectionPhase.Disconnected;
+                ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+            };
             ClientConnected += OnClientConnected;
 
             ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
@@ -100,38 +109,14 @@ namespace Furcadia.Net.Proxy
         #region Public Methods
 
         /// <summary>
-        /// Connects the asynchronous.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NetProxyException">
-        /// Server is already connected
-        /// or
-        /// or
-        /// </exception>
-        public override async Task ConnectAsync()
-        {
-            if (base.IsServerSocketConnected)
-                throw new NetProxyException("Server is already connected");
-            if (serverconnectphase != ConnectionPhase.Init && serverconnectphase != ConnectionPhase.Disconnected)
-                throw new NetProxyException($"Server Connect phase {serverconnectphase.ToString()}");
-            else if (clientconnectionphase != ConnectionPhase.Init && clientconnectionphase != ConnectionPhase.Disconnected)
-                throw new NetProxyException($"Client Connect phase {clientconnectionphase.ToString()}");
-            serverconnectphase = ConnectionPhase.Connecting;
-            clientconnectionphase = ConnectionPhase.Connecting;
-            await base.ConnectAsync();
-        }
-
-        /// <summary>
         ///Connect the Proxy to the Furcadia  Game server
         /// </summary>
         public override void Connect()
         {
             if (base.IsServerSocketConnected)
                 throw new NetProxyException("Server is already connected");
-            if (serverconnectphase != ConnectionPhase.Init && serverconnectphase != ConnectionPhase.Disconnected)
-                throw new NetProxyException($"Server Connect phase {serverconnectphase.ToString()}");
-            else if (clientconnectionphase != ConnectionPhase.Init && clientconnectionphase != ConnectionPhase.Disconnected)
-                throw new NetProxyException($"Client Connect phase {clientconnectionphase.ToString()}");
+            if (base.IsClientSocketConnected)
+                throw new NetProxyException("Client is already connected");
             serverconnectphase = ConnectionPhase.Connecting;
             clientconnectionphase = ConnectionPhase.Connecting;
             base.Connect();
@@ -1208,7 +1193,7 @@ namespace Furcadia.Net.Proxy
                                new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
-                        if (!FurcadiaClientIsRunning)
+                        if (!IsFurcadiaClientIsRunning)
                         {
                             SendToServer("dreambookmark 0");
                         }
@@ -1430,7 +1415,7 @@ namespace Furcadia.Net.Proxy
                         if (options.Standalone)
                         {
                             CloseClient();
-                            if (!FurcadiaClientIsRunning)
+                            if (!IsFurcadiaClientIsRunning)
                             {
                                 SendToServer("vascodagama");
                                 SendToServer("dreambookmark 0");
@@ -1467,12 +1452,6 @@ namespace Furcadia.Net.Proxy
                     ClientData2?.Invoke(data);
                     break;
             }
-        }
-
-        private void OnClientDisconnected()
-        {
-            clientconnectionphase = ConnectionPhase.Disconnected;
-            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
         }
 
         private void OnServerConnected()
@@ -1524,13 +1503,6 @@ namespace Furcadia.Net.Proxy
         }
 
         #endregion "Popup Dialogs"
-
-        private void OnServerDisconnected()
-        {
-            base.Disconnect();
-            serverconnectphase = ConnectionPhase.Disconnected;
-            ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
-        }
 
         private void OnServerQueSent(object o, EventArgs e)
         {

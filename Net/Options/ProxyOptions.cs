@@ -1,4 +1,6 @@
-﻿namespace Furcadia.Net.Options
+﻿using System.IO;
+
+namespace Furcadia.Net.Options
 {
     /// <summary>
     /// Configuration options for NetProxy
@@ -114,6 +116,10 @@
             }
             set
             {
+                if (!Directory.Exists(value))
+                    throw new NetProxyException("Process path not found.");
+                if (!File.Exists(Path.Combine(value, "Furcadia.exe")))
+                    throw new NetProxyException($"Client executable '{Path.Combine(value, "Furcadia.exe")}' not found.");
                 FurcadiaFilePaths = new IO.Paths(value);
                 furcinstallpath = FurcadiaFilePaths.GetFurcadiaInstallPath();
             }
