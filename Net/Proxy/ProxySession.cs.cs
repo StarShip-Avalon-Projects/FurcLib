@@ -7,6 +7,7 @@ using Furcadia.Net.Utils.ServerParser;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -52,7 +53,6 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public ProxySession() : base()
         {
-            options = new Options.ProxySessionOptions();
             Initilize();
         }
 
@@ -61,14 +61,19 @@ namespace Furcadia.Net.Proxy
         /// <param name="Options">
         /// ProxySession Options
         /// </param>
-        public ProxySession(Options.ProxySessionOptions Options) : base(Options)
+        public ProxySession(Options.ProxyOptions Options) : base(Options)
         {
-            options = Options;
             Initilize();
         }
 
         private void Initilize()
         {
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Logger.Disable<ProxySession>();
+#else
+            Logger.Disable<ProxySession>();
+#endif
             serverconnectphase = ConnectionPhase.Init;
             clientconnectionphase = ConnectionPhase.Init;
 
@@ -92,7 +97,6 @@ namespace Furcadia.Net.Proxy
             };
             ClientConnected += OnClientConnected;
 
-            ReconnectionManager = new Utils.ProxyReconnect(options.ReconnectOptions);
             connectedFurre = new Furre();
             player = new Furre();
             dream = new Dream();
@@ -114,9 +118,9 @@ namespace Furcadia.Net.Proxy
         public override void Connect()
         {
             if (base.IsServerSocketConnected)
-                throw new NetProxyException("Server is already connected");
+                Disconnect();
             if (base.IsClientSocketConnected)
-                throw new NetProxyException("Client is already connected");
+                ClientDisconnect();
             serverconnectphase = ConnectionPhase.Connecting;
             clientconnectionphase = ConnectionPhase.Connecting;
             base.Connect();
@@ -135,22 +139,6 @@ namespace Furcadia.Net.Proxy
         #region Public Properties
 
         /// <summary>
-        /// connection options
-        /// </summary>
-        public override ProxyOptions Options
-        {
-            get
-            {
-                return options;
-            }
-            set
-            {
-                base.Options = value;
-                options = (ProxySessionOptions)value;
-            }
-        }
-
-        /// <summary>
         /// Allows the Furcadia Client to Disconnect from the session,
         /// allowing the session to remain connected to the game server
         /// </summary>
@@ -158,11 +146,11 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                return options.Standalone;
+                return Options.Standalone;
             }
             set
             {
-                options.Standalone = value;
+                Options.Standalone = value;
             }
         }
 
@@ -214,7 +202,6 @@ namespace Furcadia.Net.Proxy
 
         private string channel;
         private object ChannelLock = new object();
-        private Options.ProxySessionOptions options;
         private ConnectionPhase clientconnectionphase;
         private object clientlock = new object();
         private object DataReceived = new object();
@@ -233,11 +220,6 @@ namespace Furcadia.Net.Proxy
         //private Queue<string> BadgeTag;
 
         private RegexOptions ChannelOptions = RegexOptions.Compiled | RegexOptions.CultureInvariant;
-
-        /// <summary>
-        /// Manage out Auto reconnects
-        /// </summary>
-        private Utils.ProxyReconnect ReconnectionManager;
 
         /// <summary>
         /// Balance the out going load to server
@@ -908,7 +890,7 @@ namespace Furcadia.Net.Proxy
             }
             catch (Exception ex)
             {
-                SendError(ex, this, "");
+                SendError(ex, this);
             }
 
             if (string.IsNullOrWhiteSpace(ActivePlayer.Message))
@@ -1412,7 +1394,7 @@ namespace Furcadia.Net.Proxy
                     {
                         clientconnectionphase = ConnectionPhase.Connected;
                         ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
-                        if (options.Standalone)
+                        if (Options.Standalone)
                         {
                             CloseClient();
                             if (!IsFurcadiaClientIsRunning)
@@ -1436,7 +1418,7 @@ namespace Furcadia.Net.Proxy
                     {
                         clientconnectionphase = ConnectionPhase.Disconnected;
                         ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
-                        if (options.Standalone)
+                        if (Options.Standalone)
                         {
                             ClientDisconnect();
                         }
