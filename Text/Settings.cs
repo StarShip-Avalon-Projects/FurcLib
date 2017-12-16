@@ -6,9 +6,11 @@
 */
 
 using Furcadia.IO;
+using Furcadia.Logging;
 using Furcadia.Net.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -135,6 +137,12 @@ namespace Furcadia.Text
         /// </summary>
         private void Initialize()
         {
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Logger.Disable<Settings>();
+#else
+            Logger.Disable<Settings>();
+#endif
             currentSettings = new List<string>();
         }
 
@@ -337,11 +345,11 @@ namespace Furcadia.Text
                     Match m = regexkey.Match(SettingFile[WiDx]);
                     if (regexkey.Match(SettingFile[WiDx]).Success && m.Groups[1].Value == WhichSetting)
                     {
-                        SettingFile[WiDx] = $"{WhichSetting.Trim()} = {WhichValue.Trim()}";
+                        SettingFile[WiDx] = $"{WhichSetting} = {WhichValue}";
                         return;
                     }
                 }
-            throw new Exception($"Couldn't find setting {WhichSetting} to change.");
+            throw new ArgumentException($"Couldn't find setting {WhichSetting} to change.");
         }
 
         /// <summary>
@@ -362,7 +370,7 @@ namespace Furcadia.Text
                     return m.Groups[2].Value.Trim();
                 }
             }
-            throw new Exception("Couldn't find Furcadia setting(" + WhichSetting + ") to change.");
+            throw new ArgumentException("Couldn't find Furcadia setting(" + WhichSetting + ") to change.");
         }
 
         private static object ReadSettings = new object();

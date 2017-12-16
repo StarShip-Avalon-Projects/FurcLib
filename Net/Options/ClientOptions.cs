@@ -63,6 +63,16 @@
             gameserverhost = FurcadiaUtilities.GameServerHost;
         }
 
+        /// <summary>
+        /// </summary>
+        protected ClientOptions(string host, int port)
+        {
+            FurcadiaUtilities = new Utils.Utilities();
+            FurcadiaFilePaths = new IO.Paths();
+            gameserverport = port; // TODO: Settings Prefered Serve Port
+            gameserverhost = host;
+        }
+
         #endregion Public Constructors
     }
 }

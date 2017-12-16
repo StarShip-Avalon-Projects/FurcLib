@@ -37,7 +37,7 @@ namespace Furcadia.Net.Utils
         public static bool PortOpen(int port)
         {
             if (port == 0)
-                throw new ArgumentException("port  cannot be 0");
+                throw new ArgumentOutOfRangeException("port  cannot be 0");
             // Evaluate current system tcp connections. This is the same
             // information provided by the netstat command line application,
             // just in .Net strongly-typed object form. We will look through
