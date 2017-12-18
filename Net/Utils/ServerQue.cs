@@ -3,8 +3,10 @@
  * (March 2017, 0.1) Gerolkae, Initial creation
  */
 
+using Furcadia.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Furcadia.Net.Utils
@@ -19,110 +21,7 @@ namespace Furcadia.Net.Utils
     {
         #region Private Fields
 
-        private int pingdelaytime;
-
-        #endregion Private Fields
-
-        #region Public Properties
-
-        /// <summary>
-        /// Is the connect `noendurance enabled?
-        /// </summary>
-        public bool NoEndurance
-        {
-            get { return noendurance; }
-            set { noendurance = value; }
-        }
-
-        /// <summary>
-        /// Ping the server Time in Seconds
-        /// </summary>
-        public int PingDelayTime
-        {
-            get { return pingdelaytime; }
-            set
-            {
-                pingdelaytime = value;
-                NewPingTimer(value);
-            }
-        }
-
-        /// <summary>
-        /// If Proxy get "Your throat is tired" Pause for a number of seconds
-        /// <para>
-        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
-        /// </para>
-        /// </summary>
-        public bool ThroatTired
-        {
-            get { return throattired; }
-            set
-            {
-                throattired = value;
-                TroatTiredDelay = new Timer(TroatTiredDelayTick, null,
-                    TimeSpan.Zero, TimeSpan.FromSeconds(throattireddelaytime));
-            }
-        }
-
-        /// <summary>
-        /// When "Your throat is tired appears, Pause processing of client
-        /// to server instructions,
-        /// </summary>
-        public int ThroatTiredDelayTime
-        {
-            get { return throattireddelaytime; }
-            set { throattireddelaytime = value; }
-        }
-
-        /// <summary>
-        /// Set the Ping timer
-        /// </summary>
-        /// <param name="DelayTime">
-        /// Delay Time in Seconds
-        /// </param>
-        private void NewPingTimer(int DelayTime)
-        {
-            if (DelayTime > 0)
-                PingTimer = new Timer(PingTimerTick, null,
-                    TimeSpan.FromSeconds(DelayTime), TimeSpan.FromSeconds(DelayTime));
-            else if (PingTimer != null)
-                PingTimer.Dispose();
-        }
-
-        #endregion Public Properties
-
-        #region Public Constructors
-
-        /// <summary>
-        /// Constructor setting Defaults
-        /// </summary>
-        public ServerQue()
-        {
-            throattireddelaytime = 45;
-            QueueTimer = new System.Threading.Timer(ProcessQueue, null, 0, 200);
-            PingTimer = new Timer(PingTimerTick, null,
-                TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
-        }
-
-        /// <summary>
-        /// Queue Manager constructor
-        /// </summary>
-        /// <param name="ThroatTiredTime">
-        /// Delay time to pause for Throat Tired Syndrome
-        /// </param>
-        /// <param name="PingTimerTime">
-        /// Optional ping the game server time in seconds
-        /// </param>
-        public ServerQue(int ThroatTiredTime, int PingTimerTime = 30)
-        {
-            throattireddelaytime = ThroatTiredTime;
-            QueueTimer = new System.Threading.Timer(ProcessQueue, null, 0, 75);
-            NewPingTimer(PingTimerTime);
-        }
-
-        #endregion Public Constructors
-
-        #region Private Fields
+        private uint pingdelaytime;
 
         private const int MASS_CRITICAL = 1024;
         private const int MASS_NOENDURANCE = 2048;
@@ -131,12 +30,12 @@ namespace Furcadia.Net.Utils
         private const int MASS_SPEECH = 1000;
         private double g_mass = 0;
 
-        private System.Threading.Timer PingTimer;
+        private Timer PingTimer;
 
         /// <summary>
         /// Queue Processing timer.
         /// </summary>
-        private System.Threading.Timer QueueTimer;
+        private Timer QueueTimer;
 
         /// <summary>
         /// FIFO Stack of Server Instructions to process
@@ -146,27 +45,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// How long to wait till we resume processing the ServerStack?
         /// </summary>
-        private System.Threading.Timer TroatTiredDelay;
-
-        #endregion Private Fields
-
-        #region Public Delegates
-
-        /// <summary>
-        /// Event Handler to notify calling class data has been sent to the
-        /// game server
-        /// </summary>
-        /// <param name="message">
-        /// raw client to server instruction
-        /// </param>
-        /// <param name="args">
-        /// System.EventArgs. (Unused)
-        /// </param>
-        public delegate void SendServerEventHandler(string message, System.EventArgs args);
-
-        #endregion Public Delegates
-
-        #region Connection Timers
+        private Timer TroatTiredDelay;
 
         /// <summary>
         /// NoEndurance. Send data at the speed of the server
@@ -195,6 +74,154 @@ namespace Furcadia.Net.Utils
         /// ping interlock exchange
         /// </summary>
         private int usingPing = 0;
+
+        #endregion Private Fields
+
+        #region Public Properties
+
+        /// <summary>
+        /// Is the connect `noendurance enabled?
+        /// </summary>
+        public bool NoEndurance
+        {
+            get { return noendurance; }
+            set { noendurance = value; }
+        }
+
+        /// <summary>
+        /// Ping the server Time in Seconds
+        /// </summary>
+        public uint PingDelayTime
+        {
+            get { return pingdelaytime; }
+            set
+            {
+                pingdelaytime = value;
+                NewPingTimer(value);
+            }
+        }
+
+        /// <summary>
+        /// If Proxy get "Your throat is tired" Pause for a number of seconds
+        /// <para>
+        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
+        /// </para>
+        /// </summary>
+        public bool ThroatTired
+        {
+            get { return throattired; }
+            set
+            {
+                throattired = value;
+                TroatTiredDelay = new Timer(TroatTiredDelayTick,
+                    null,
+                    TimeSpan.Zero,
+                    TimeSpan.FromSeconds(throattireddelaytime)
+                    );
+            }
+        }
+
+        /// <summary>
+        /// When "Your throat is tired appears, Pause processing of client
+        /// to server instructions,
+        /// </summary>
+        public int ThroatTiredDelayTime
+        {
+            get { return throattireddelaytime; }
+            set { throattireddelaytime = value; }
+        }
+
+        /// <summary>
+        /// Set the Ping timer
+        /// </summary>
+        /// <param name="DelayTime">
+        /// Delay Time in Seconds
+        /// </param>
+        private void NewPingTimer(uint DelayTime)
+        {
+            if (PingTimer != null)
+                PingTimer.Dispose();
+            PingTimer = new Timer(PingTimerTick,
+                null,
+                TimeSpan.FromSeconds(DelayTime),
+                TimeSpan.FromSeconds(DelayTime)
+                );
+        }
+
+        #endregion Public Properties
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Constructor setting Defaults
+        /// </summary>
+        public ServerQue()
+        {
+            Initialize();
+            throattireddelaytime = 45;
+            QueueTimer = new Timer(ProcessQueue,
+                null,
+                0,
+                200
+                );
+            NewPingTimer(30);
+            PingTimer = new Timer(PingTimerTick,
+                null,
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromSeconds(30)
+                );
+        }
+
+        /// <summary>
+        /// Queue Manager constructor
+        /// </summary>
+        /// <param name="ThroatTiredTime">
+        /// Delay time to pause for Throat Tired Syndrome
+        /// </param>
+        /// <param name="PingTimerTime">
+        /// Optional ping the game server time in seconds
+        /// </param>
+        public ServerQue(int ThroatTiredTime, uint PingTimerTime = 30)
+        {
+            Initialize();
+            throattireddelaytime = ThroatTiredTime;
+            QueueTimer = new Timer(ProcessQueue,
+                null,
+                0,
+                75
+                );
+            NewPingTimer(PingTimerTime);
+        }
+
+        private void Initialize()
+        {
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Logger.Disable<ServerQue>();
+#else
+            Logger.Disable<NetProxy>();
+#endif
+        }
+
+        #endregion Public Constructors
+
+        #region Public Delegates
+
+        /// <summary>
+        /// Event Handler to notify calling class data has been sent to the
+        /// game server
+        /// </summary>
+        /// <param name="message">
+        /// raw client to server instruction
+        /// </param>
+        /// <param name="args">
+        /// System.EventArgs. (Unused)
+        /// </param>
+        public delegate void SendServerEventHandler(string message, EventArgs args);
+
+        #endregion Public Delegates
+
+        #region Connection Timers
 
         /// <summary>
         /// Incoming Messages for server processing

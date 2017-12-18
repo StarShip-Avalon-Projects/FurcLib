@@ -2,7 +2,6 @@
 using Furcadia.Logging;
 using Furcadia.Movement;
 using Furcadia.Net.DreamInfo;
-using Furcadia.Net.Options;
 using Furcadia.Net.Utils.ServerParser;
 using Microsoft.Win32.SafeHandles;
 using System;
@@ -10,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 //Furcadia Servver Parser
 //Event/Delegates for server instructions
@@ -51,9 +49,8 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        public ProxySession() : base()
+        public ProxySession() : this(new Options.ProxyOptions())
         {
-            Initilize();
         }
 
         /// <summary>
@@ -78,10 +75,10 @@ namespace Furcadia.Net.Proxy
             clientconnectionphase = ConnectionPhase.Init;
 
             ServerBalancer = new Utils.ServerQue();
-            ServerBalancer.OnServerSendMessage += OnServerQueSent;
+            ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
 
-            base.ServerData2 += OnServerDataReceived;
-            ServerConnected += OnServerConnected;
+            base.ServerData2 += (e) => OnServerDataReceived(e);
+            ServerConnected += () => OnServerConnected();
             ServerDisconnected += () =>
             {
                 //  base.Disconnect();
@@ -89,13 +86,13 @@ namespace Furcadia.Net.Proxy
                 ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
             };
 
-            base.ClientData2 += OnClientDataReceived;
+            base.ClientData2 += (e) => OnClientDataReceived(e);
             ClientDisconnected += () =>
             {
                 clientconnectionphase = ConnectionPhase.Disconnected;
                 ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
             };
-            ClientConnected += OnClientConnected;
+            ClientConnected += () => OnClientConnected();
 
             connectedFurre = new Furre();
             player = new Furre();
@@ -126,13 +123,13 @@ namespace Furcadia.Net.Proxy
             base.Connect();
         }
 
-        /// <summary>
-        /// Disconnect from Furcadia and notify delegates.
-        /// </summary>
-        public override void Disconnect()
-        {
-            base.Disconnect();
-        }
+        ///// <summary>
+        ///// Disconnect from Furcadia and notify delegates.
+        ///// </summary>
+        //public override void Disconnect()
+        //{
+        //    base.Disconnect();
+        //}
 
         #endregion Public Methods
 
