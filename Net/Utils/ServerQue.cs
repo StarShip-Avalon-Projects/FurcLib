@@ -229,7 +229,7 @@ namespace Furcadia.Net.Utils
         /// <param name="data">
         /// Raw Client to Server Instruction.
         /// </param>
-        public void SendToServer(ref string data)
+        public void SendToServer(string data)
         {
             Logging.Logger.Debug<ServerQue>(data);
             if (string.IsNullOrEmpty(data))
@@ -241,16 +241,14 @@ namespace Furcadia.Net.Utils
                 if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
                 {
                     g_mass += MASS_CRITICAL;
-                    double t = 0;
-                    QueueTick(ref t);
+                    QueueTick(0);
                 }
             }
             else
             {
                 if (g_mass + MASS_SPEECH <= MASS_NOENDURANCE)
                 {
-                    double t = 0;
-                    QueueTick(ref t);
+                    QueueTick(0);
                 }
             }
         }
@@ -276,7 +274,7 @@ namespace Furcadia.Net.Utils
         private void ProcessQueue(object state)
         {
             double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
-            QueueTick(ref seconds);
+            QueueTick(seconds);
             TickTime = DateTime.Now;
         }
 
@@ -300,7 +298,7 @@ namespace Furcadia.Net.Utils
         /// <param name="DelayTime">
         /// Delay Time in Milliseconds
         /// </param>
-        private void QueueTick(ref double DelayTime)
+        private void QueueTick(double DelayTime)
         {
             lock (QueLock)
             {

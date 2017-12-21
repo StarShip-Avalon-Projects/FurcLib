@@ -74,7 +74,7 @@ namespace Furcadia.Net.DirectConnection
         /// </param>
         public override void SendServer(string message)
         {
-            ServerBalancer.SendToServer(ref message);
+            ServerBalancer.SendToServer(message);
         }
 
         #endregion Public Methods

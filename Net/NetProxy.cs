@@ -316,6 +316,8 @@ namespace Furcadia.Net
             { return options; }
             set
             {
+                if (IsServerSocketConnected)
+                    throw new InvalidOperationException("NetProxy is alread connected");
                 options = value;
             }
         }
@@ -458,16 +460,17 @@ namespace Furcadia.Net
             if (listen != null)
             {
                 listen.Stop();
-                listen = null;
             }
-            if (client.Connected)
+            if (client != null && client.Client != null)
             {
-                client.Close();
-                client.Dispose();
+                if (client.Connected)
+                {
+                    client.Close();
+                }
+                if (IsFurcadiaClientIsRunning)
+                    CloseClient();
+                ClientDisconnected?.Invoke();
             }
-            if (IsFurcadiaClientIsRunning)
-                CloseClient();
-            ClientDisconnected?.Invoke();
         }
 
         /// <summary>
@@ -501,19 +504,18 @@ namespace Furcadia.Net
         private void EndConnect(IAsyncResult ar)
         {
             var state = (State)ar.AsyncState;
-            TcpClient client = state.Client;
+            TcpClient ThisClient = state.Client;
 
             try
             {
-                client.EndConnect(ar);
+                ThisClient.EndConnect(ar);
             }
             catch { }
 
-            if (client.Connected && state.Success)
+            if (ThisClient.Connected && state.Success)
                 return;
 
-            client.Close();
-            client.Dispose();
+            ThisClient.Close();
         }
 
         /// <summary>
@@ -646,7 +648,6 @@ namespace Furcadia.Net
             if (LightBringer.Connected)
             {
                 LightBringer.Close();
-                LightBringer.Dispose();
                 ServerDisconnected?.Invoke();
             }
         }

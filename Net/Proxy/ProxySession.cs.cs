@@ -1310,7 +1310,7 @@ namespace Furcadia.Net.Proxy
         public override void SendToServer(string message)
         {
             if (serverconnectphase != ConnectionPhase.Disconnected)
-                ServerBalancer.SendToServer(ref message);
+                ServerBalancer.SendToServer(message);
         }
 
         /// <summary>

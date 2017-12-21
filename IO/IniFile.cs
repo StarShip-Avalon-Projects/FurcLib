@@ -138,6 +138,8 @@ namespace Furcadia.IO
         /// <param name="bMerge">if set to <c>true</c> [b merge].</param>
         public void Load(string sFileName, bool bMerge = false)
         {
+            if (!File.Exists(sFileName))
+                throw new FileNotFoundException("Ini not fount", sFileName);
             if (!bMerge)
             {
                 RemoveAllSections();
@@ -149,7 +151,7 @@ namespace Furcadia.IO
             // Broken but left for history
             //Dim regexsection As New Regex("\[[\s]*([^\[\s].*[^\s\]])[\s]*\]", (RegexOptions.Singleline Or RegexOptions.IgnoreCase))
             Regex regexsection = new Regex("^[\\s]*\\[[\\s]*([^\\[\\s].*[^\\s\\]])[\\s]*\\][\\s]*$", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
-            Regex regexkey = new Regex("^\\s*([^=]*)[^=]*=(.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
+            Regex regexkey = new Regex("^\\s*([^=]*)[^=]*=\\s?\"?(.*)\"?", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
 
             using (var oReader = new StreamReader(sFileName))
             {
