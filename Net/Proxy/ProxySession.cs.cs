@@ -620,6 +620,7 @@ namespace Furcadia.Net.Proxy
                         BanishName = t.Match(Text).Groups[1].Value;
 
                         BanishList.Add(BanishName);
+                        channel = "banish";
                     }
                     else if (Text == "You have canceled all banishments from your dreams.")
                     {

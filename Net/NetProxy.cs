@@ -737,10 +737,6 @@ namespace Furcadia.Net
                 if (se.ErrorCode > 0) throw se;
             }
 
-            //if (!IsServerSocketConnected)
-            //    throw new NetProxyException("Server is disconnected");
-            //if (!IsClientSocketConnected)
-            //    throw new NetProxyException("Client is Disconnected");
             try
             {
                 client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
