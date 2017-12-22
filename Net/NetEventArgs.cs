@@ -227,6 +227,37 @@ namespace Furcadia.Net
     /// </summary>
     public class NetClientEventArgs : EventArgs
     {
+        #region Private Fields
+
+        private string message;
+
+        #endregion Private Fields
+
+        #region Public Properties
+
+        /// <summary>
+        /// Status of the Furcadia Client Connection
+        /// </summary>
+        public ConnectionPhase ConnectPhase
+        { get; private set; }
+
+        /// <summary>
+        /// optional string message
+        /// </summary>
+        public string ClientData
+        {
+            get
+            {
+                return message;
+            }
+            private set
+            {
+                message = value;
+            }
+        }
+
+        #endregion Public Properties
+
         #region Public Constructors
 
         /// <summary>
@@ -253,32 +284,6 @@ namespace Furcadia.Net
         }
 
         #endregion Public Constructors
-
-        #region Public Fields
-
-        /// <summary>
-        /// Status of the Furcadia Client Connection
-        /// </summary>
-        public ConnectionPhase ConnectPhase;
-
-        private string message;
-
-        /// <summary>
-        /// optional string message
-        /// </summary>
-        public string ClientData
-        {
-            get
-            {
-                return message;
-            }
-            set
-            {
-                message = value;
-            }
-        }
-
-        #endregion Public Fields
     }
 
     /// <summary>

@@ -27,13 +27,17 @@ namespace Furcadia.Text
         #region Private Feilds
 
         private object RestoreLock = new object();
+        private static object ReadSettings = new object();
+
+        private object ReadSettingLock = new object();
+
         private static object setUserSettings = new object();
         private ProxyOptions options;
 
         /// <summary>
         /// RegEx for Setting.ini Key=Value pairs
         /// </summary>
-        private static Regex regexkey = new Regex("^\\s*([^=\\s]*)[^=]*=(.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant));
+        private static Regex regexkey = new Regex("^\\s*([^=\\s]*)[^=]*=(.*)", (RegexOptions.Singleline | RegexOptions.IgnoreCase));
 
         private List<string> currentSettings;
 
@@ -297,32 +301,6 @@ namespace Furcadia.Text
             }
         }
 
-        ///// <summary>
-        ///// Loads an ini file and returns a key/value pair of values. (Note:
-        ///// It reads Key=Value pairs only.) (Add: Also the ini must be
-        ///// proper, one key/value per line. No section garbage.)
-        ///// </summary>
-        ///// <param name="file">
-        ///// </param>
-        ///// <returns>
-        ///// A new Hashtable, or a empty Hashtable on file not found.
-        ///// </returns>
-        //public static Hashtable Load(string file)
-        //{
-        //    Logging.Logger.Debug<Settings>(file);
-        //    Hashtable hashTable = new Hashtable();
-        //    List<string> lines = new List<string>();
-        //    lines.AddRange(ReadSettingsIni(file));
-        //    foreach (var line in lines)
-        //    {
-        //        //get key/value!
-
-        //        string[] key_value = line.Split(new char[] { '=' }, 1);
-        //        if (key_value.Length == 2) hashTable.Add(key_value[0], key_value[1]);
-        //    }
-        //    return hashTable;
-        //}
-
         #endregion Public Methods
 
         #region Private Methods
@@ -330,50 +308,51 @@ namespace Furcadia.Text
         /// <summary>
         /// sets feilds in the FurcSettings array
         /// </summary>
-        /// <param name="WhichSetting">
+        /// <param name="Setting">
         /// </param>
-        /// <param name="WhichValue">
+        /// <param name="Value">
         /// </param>
         /// <param name="SettingFile">
         /// </param>
-        private void SetUserSetting(string WhichSetting, string WhichValue, ref List<string> SettingFile)
+        private void SetUserSetting(string Setting, string Value, ref List<string> SettingFile)
         {
-            Logging.Logger.Debug<Settings>($"WhichSetting: '{WhichSetting}' WhichValue '{WhichValue}' SettingFile: '{SettingFile}'");
+            Logging.Logger.Debug<Settings>($"WhichSetting: '{Setting}' WhichValue '{Value}' SettingFile: '{SettingFile}'");
             lock (setUserSettings)
-                for (int WiDx = 1; WiDx < SettingFile.Count; WiDx++)
+                for (int i = 1; i < SettingFile.Count; i++)
                 {
-                    Match m = regexkey.Match(SettingFile[WiDx]);
-                    if (regexkey.Match(SettingFile[WiDx]).Success && m.Groups[1].Value == WhichSetting)
+                    Match SettingMatch = regexkey.Match(SettingFile[i]);
+                    if (regexkey.Match(SettingFile[i]).Success && SettingMatch.Groups[1].Value == Setting)
                     {
-                        SettingFile[WiDx] = $"{WhichSetting} = {WhichValue}";
+                        SettingFile[i] = $"{Setting} = {Value}";
                         return;
                     }
                 }
-            throw new ArgumentException($"Couldn't find setting {WhichSetting} to change.");
+            throw new ArgumentException($"Couldn't find setting {Setting} to change.");
         }
 
         /// <summary>
         /// Retrieves a field setting in the FurcSettings array
         /// </summary>
-        /// <param name="WhichSetting">The setting to retrieve</param>
+        /// <param name="Setting">The setting to retrieve</param>
         /// <param name="SettingFile">The setting file.</param>
         /// <returns></returns>
         /// <exception cref="Exception">Couldn't find Furcadia setting(" + WhichSetting + ") to change.</exception>
-        internal string GetUserSetting(string WhichSetting)
+        internal string GetUserSetting(string Setting)
         {
-            Logging.Logger.Debug<Settings>(WhichSetting);
-            for (var WiDx = 0; WiDx < currentSettings.Count; WiDx++)
+            lock (ReadSettingLock)
             {
-                Match m = regexkey.Match(currentSettings[WiDx]);
-                if (regexkey.Match(currentSettings[WiDx]).Success && m.Groups[1].Value == WhichSetting)
+                Logging.Logger.Debug<Settings>(Setting);
+                for (var i = 0; i < currentSettings.Count; i++)
                 {
-                    return m.Groups[2].Value.Trim();
+                    Match SettingMatch = regexkey.Match(currentSettings[i]);
+                    if (regexkey.Match(currentSettings[i]).Success && SettingMatch.Groups[1].Value == Setting)
+                    {
+                        return SettingMatch.Groups[2].Value.Trim();
+                    }
                 }
             }
-            throw new ArgumentException("Couldn't find Furcadia setting(" + WhichSetting + ") to change.");
+            throw new ArgumentException("Couldn't find Furcadia setting(" + Setting + ") to change.");
         }
-
-        private static object ReadSettings = new object();
 
         /// <summary>
         /// Read Furcadia settings from Furcadia install path.

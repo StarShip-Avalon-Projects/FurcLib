@@ -112,13 +112,13 @@ namespace Furcadia.Net
 
         /// <summary>
         /// </summary>
-        /// <param name="port">
+        /// <param name="LocalPort">
         /// </param>
-        public NetProxy(int port)
+        public NetProxy(int LocalPort)
         {
             options = new ProxyOptions
             {
-                LocalhostPort = port,
+                LocalhostPort = LocalPort,
             };
             Initialize();
         }
@@ -202,7 +202,6 @@ namespace Furcadia.Net
             Logger.Disable<NetProxy>();
 #endif
             FurcadiaUtilities = new Utils.Utilities();
-            settings = new Text.Settings(Options);
             ClientLaunched += () => LaunchFurcadia();
             SettingsRestore += () =>
             {
@@ -316,8 +315,8 @@ namespace Furcadia.Net
             { return options; }
             set
             {
-                if (IsServerSocketConnected)
-                    throw new InvalidOperationException("NetProxy is alread connected");
+                //if (IsServerSocketConnected)
+                //    throw new InvalidOperationException("NetProxy is alread connected");
                 options = value;
             }
         }
@@ -497,6 +496,11 @@ namespace Furcadia.Net
 
         private class State
         {
+            public State()
+            {
+                Success = true;
+            }
+
             public TcpClient Client { get; set; }
             public bool Success { get; set; }
         }
@@ -532,20 +536,22 @@ namespace Furcadia.Net
         /// </exception>
         public virtual void Connect()
         {
+            settings = new Text.Settings(options);
+            CurrentConnectionAttempt = 1;
+            LightBringer = new TcpClient();
+            var state = new State { Client = LightBringer, Success = true };
+            var sucess = false;
+            var MiliSecondTime = (int)TimeSpan.FromSeconds(options.ConnectionTimeOut).TotalMilliseconds;
             try
             {
                 try
                 {
-                    CurrentConnectionAttempt = 0;
-                    listen = new TcpListener(IPAddress.Any, Options.LocalhostPort);
+                    listen = new TcpListener(IPAddress.Any, options.LocalhostPort);
                     listen.Start();
-                    CurrentConnectionAttempt = 1;
+
                     //when the connection completes before the timeout it will cause a race
                     //we want EndConnect to always treat the connection as successful if it wins
-                    LightBringer = new TcpClient();
-                    var state = new State { Client = client, Success = true };
-                    var sucess = false;
-                    var MiliSecondTime = (int)TimeSpan.FromSeconds(options.ConnectionTimeOut).TotalMilliseconds;
+
                     Logger.Info($"Starting connection to Furcadia gameserver.");
                     while (!sucess)
                     {
@@ -589,7 +595,7 @@ namespace Furcadia.Net
 
                 //Run
                 // Set the Proxy/Firewall Settings
-                settings.InitializeFurcadiaSettings(Options.FurcadiaFilePaths.SettingsPath);
+                settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
                 Logger.Debug<NetProxy>("Start Furcadia");
                 // LaunchFurcadia
 
@@ -726,35 +732,42 @@ namespace Furcadia.Net
         /// <exception cref="NetProxyException">There was a problem connecting to the server.</exception>
         private void AsyncListener(IAsyncResult ar)
         {
-            listen = (TcpListener)ar.AsyncState;
-
             try
             {
-                client = listen.EndAcceptTcpClient(ar);
-            }
-            catch (SocketException se)
-            {
-                if (se.ErrorCode > 0) throw se;
-            }
+                listen = (TcpListener)ar.AsyncState;
 
-            try
-            {
-                client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
-                ClientConnected?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                SendError(ex, this);
-            }
+                try
+                {
+                    client = listen.EndAcceptTcpClient(ar);
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode > 0) throw se;
+                }
 
-            try
-            {
-                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
-                ServerConnected?.Invoke();
+                try
+                {
+                    client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
+                    ClientConnected?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    SendError(ex, this);
+                }
+
+                try
+                {
+                    LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
+                    ServerConnected?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    SendError(ex, this);
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                SendError(ex, this);
+                SendError(e, this);
             }
         }
 
