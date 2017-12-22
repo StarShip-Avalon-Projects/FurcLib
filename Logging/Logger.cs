@@ -2,14 +2,10 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Furcadia.Logging;
-using Furcadia.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
 
 #endregion Usings
 
@@ -35,16 +31,13 @@ namespace Furcadia.Logging
 
     public struct LogMessage
     {
-        public string message;
+        private string message;
         private readonly DateTime expires, timeStamp;
         private readonly Level level;
 
         private readonly Thread curThread;
 
-        private bool IsEmpty
-        {
-            get { return string.IsNullOrWhiteSpace(message); }
-        }
+        private bool IsEmpty => string.IsNullOrWhiteSpace(message);
 
         public bool IsSpam
         {
@@ -57,6 +50,8 @@ namespace Furcadia.Logging
         public Thread Thread => curThread;
 
         public DateTime TimeStamp => timeStamp;
+
+        public string Message { get => message; set => message = value; }
 
         private LogMessage(Level level, string msg, TimeSpan expireDuration)
         {
@@ -123,10 +118,10 @@ namespace Furcadia.Logging
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="String" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
@@ -134,6 +129,9 @@ namespace Furcadia.Logging
         }
     }
 
+    /// <summary>
+    /// Furcadia Logger
+    /// </summary>
     public static class Logger
     {
         private static ILogOutput _logOutput;
@@ -243,7 +241,7 @@ namespace Furcadia.Logging
         /// Sets the <see cref="ILogOutput"/>.
         /// </summary>
         /// <param name="output">The output.</param>
-        /// <exception cref="System.ArgumentNullException">output</exception>
+        /// <exception cref="ArgumentNullException">output</exception>
         public static ILogOutput LogOutput
         {
             get { return _logOutput; }
@@ -358,6 +356,12 @@ namespace Furcadia.Logging
             }
         }
 
+        /// <summary>
+        /// Asserts the specified cond.
+        /// </summary>
+        /// <param name="cond">if set to <c>true</c> [cond].</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Assert(bool cond, string failMsg)
         {
             if (!cond)

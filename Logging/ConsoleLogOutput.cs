@@ -23,7 +23,7 @@ namespace Furcadia.Logging
         protected LogMessage BuildMessage(ref LogMessage msg)
         {
             var level = msg.Level;
-            var text = msg.message;
+            var text = msg.Message;
             var sb = new StringBuilder();
             sb.Append('[')
               .Append(level.ToString().ToUpper())
@@ -34,17 +34,17 @@ namespace Furcadia.Logging
               .Append((msg.TimeStamp - Process.GetCurrentProcess().StartTime).ToString(@"hh\:mm\:ss\:fff"))
               .Append(" - ")
               .Append(text);
-            msg.message = sb.ToString();
+            msg.Message = sb.ToString();
             return msg;
         }
 
         public virtual void Log(LogMessage logMsg)
         {
-            if (logMsg.message == null)
+            if (logMsg.Message == null)
                 return;
 
             logMsg = BuildMessage(ref logMsg);
-            var msg = logMsg.message;
+            var msg = logMsg.Message;
             try
             {
                 ConsoleColor original = Console.ForegroundColor;

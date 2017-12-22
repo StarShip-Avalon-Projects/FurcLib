@@ -10,12 +10,10 @@ using Furcadia.Logging;
 using Furcadia.Net.Options;
 using System;
 using System.Diagnostics;
-using System.IO;
 
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 using static Furcadia.Net.Utils.Utilities;
 
 namespace Furcadia.Net
@@ -203,10 +201,50 @@ namespace Furcadia.Net
 #endif
             FurcadiaUtilities = new Utils.Utilities();
             settings = new Text.Settings(Options);
-            ClientLaunched += () => LaunchFurcadia();
+            ClientLaunched += () =>
+            {
+                var furcadiaProcessInfo = new ProcessStartInfo
+                {
+                    FileName = Options.FurcadiaProcess,
+                    Arguments = Options.CharacterIniFile,
+                    WorkingDirectory = Options.FurcadiaInstallPath
+                };
+                furcProcess = new System.Diagnostics.Process
+                {
+                    EnableRaisingEvents = true,
+                    StartInfo = furcadiaProcessInfo
+                };
+
+                furcProcess.Exited += ClientExited;
+                furcProcess.Exited += (s, e) =>
+                {
+                    Logger.Debug<NetProxy>($"Furcadia Process Exited ");
+
+                    if (IsClientSocketConnected)
+                    {
+                        client.Close();
+                    }
+                    settings.RestoreFurcadiaSettings();
+                    furcID = -1;
+                    furcProcess = null;
+                };
+                if (furcProcess.Start())
+                {
+                    Thread FixSettings = new Thread(() => SettingsRestore());
+                    FixSettings.Start();
+                    Logger.Debug<NetProxy>($"Furcadia Process has Started ");
+                    return furcProcess.Id;
+                }
+                else
+                {
+                    Thread FixSettings = new Thread(() => SettingsRestore());
+                    FixSettings.Start();
+                    return -1;
+                }
+            };
             SettingsRestore += () =>
             {
-                DateTime end = DateTime.Now + TimeSpan.FromSeconds(10);
+                DateTime end = DateTime.Now + TimeSpan.FromSeconds(5);
                 while (true)
                 {
                     Thread.Sleep(100);
@@ -537,8 +575,15 @@ namespace Furcadia.Net
                 try
                 {
                     CurrentConnectionAttempt = 0;
-                    listen = new TcpListener(IPAddress.Any, Options.LocalhostPort);
-                    listen.Start();
+                    Thread Thrd = new Thread(() =>
+                    {
+                        listen = new TcpListener(IPAddress.Any, Options.LocalhostPort)
+                        {
+                            ExclusiveAddressUse = true
+                        };
+                        listen.Start();
+                    });
+                    Thrd.Start();
                     CurrentConnectionAttempt = 1;
                     //when the connection completes before the timeout it will cause a race
                     //we want EndConnect to always treat the connection as successful if it wins
@@ -592,50 +637,15 @@ namespace Furcadia.Net
                 settings.InitializeFurcadiaSettings(Options.FurcadiaFilePaths.SettingsPath);
                 Logger.Debug<NetProxy>("Start Furcadia");
                 // LaunchFurcadia
+                Thread Furc = new Thread(() => furcID = ClientLaunched());
 
-                furcID = ClientLaunched();
-                SettingsRestore();
+                Furc.Start();
             }
             catch (Exception e)
             {
                 Logging.Logger.Error<NetProxy>(e);
                 SendError(e, this);
             }
-        }
-
-        private int LaunchFurcadia()
-        {
-            var furcadiaProcessInfo = new ProcessStartInfo
-            {
-                FileName = Options.FurcadiaProcess,
-                Arguments = Options.CharacterIniFile,
-                WorkingDirectory = Options.FurcadiaInstallPath
-            };
-            furcProcess = new System.Diagnostics.Process
-            {
-                EnableRaisingEvents = true,
-                StartInfo = furcadiaProcessInfo
-            };
-
-            furcProcess.Exited += ClientExited;
-            furcProcess.Exited += (s, e) =>
-            {
-                Logger.Debug<NetProxy>($"Furcadia Process Exited ");
-
-                if (IsClientSocketConnected)
-                {
-                    client.Close();
-                }
-                settings.RestoreFurcadiaSettings();
-                furcID = -1;
-                furcProcess = null;
-            };
-            if (furcProcess.Start())
-            {
-                Logger.Debug<NetProxy>($"Furcadia Process has Started ");
-                return furcProcess.Id;
-            }
-            return -1;
         }
 
         /// <summary>
