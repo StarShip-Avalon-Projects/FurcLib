@@ -52,7 +52,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Furcadia Client TCP Client
         /// </summary>
-        private static TcpClient client = new TcpClient();
+        private static TcpClient client;
 
         /// <summary>
         /// Furcadia Game server TCP Client
@@ -195,6 +195,7 @@ namespace Furcadia.Net
 
         private void Initialize()
         {
+            client = new TcpClient();
 #if DEBUG
             if (!Debugger.IsAttached)
                 Logger.Disable<NetProxy>();
@@ -569,7 +570,7 @@ namespace Furcadia.Net
                             break;
                         if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                         {
-                            Logger.Info($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
                         }
                         if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
                         {
@@ -582,15 +583,11 @@ namespace Furcadia.Net
 
                     listen.BeginAcceptTcpClient(new AsyncCallback(AsyncListener), listen);
                 }
-                catch (NetProxyException ne)
+                catch (Exception ne)
                 {
                     listen.Stop();
+                    ServerDisconnected?.Invoke();
                     throw ne;
-                }
-                catch (SocketException se)
-                {
-                    listen.Stop();
-                    throw se;
                 }
 
                 //Run
@@ -604,7 +601,7 @@ namespace Furcadia.Net
             }
             catch (Exception e)
             {
-                Logging.Logger.Error<NetProxy>(e);
+                Logger.Error<NetProxy>(e);
                 SendError(e, this);
             }
         }
@@ -617,7 +614,7 @@ namespace Furcadia.Net
                 Arguments = Options.CharacterIniFile,
                 WorkingDirectory = Options.FurcadiaInstallPath
             };
-            furcProcess = new System.Diagnostics.Process
+            furcProcess = new Process
             {
                 EnableRaisingEvents = true,
                 StartInfo = furcadiaProcessInfo
