@@ -1,5 +1,6 @@
 ﻿using Furcadia.Net.DreamInfo;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -24,8 +25,8 @@ namespace Furcadia.Net.Utils.ServerParser
     {
         #region Private Fields
 
+        private const string UrlRegex = @"furc://([.*?]?):?(.*?)/";
         private int type;
-        private string dreamURL;
         private string dreamOwner;
         private string title;
 
@@ -39,7 +40,6 @@ namespace Furcadia.Net.Utils.ServerParser
         public DreamBookmark() : base()
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
-            dreamURL = null;
             type = -1;
         }
 
@@ -52,29 +52,12 @@ namespace Furcadia.Net.Utils.ServerParser
         public DreamBookmark(string ServerInstruction) : base(ServerInstruction)
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
-            dreamURL = ServerInstruction.Substring(3);
             type = int.Parse(ServerInstruction[2].ToString());
-            var dreamOwnerLengeth = dreamURL.Length - dreamURL.IndexOf("/", 6);
-            string NameStr = null;
-            if (dreamURL.Substring(6).EndsWith("/"))
-                dreamOwnerLengeth -= 1;
-            else
-                dreamOwnerLengeth -= dreamURL.IndexOf(":", 6);
-            NameStr = ServerInstruction.Substring(10, dreamOwnerLengeth);
-            dreamOwner = NameStr;
+            var URLRegex = new Regex(UrlRegex, RegexOptions.None);
+            var UrlMatch = URLRegex.Match(RawInstruction);
 
-            if (ServerInstruction.Substring(10).Contains(":"))
-            {
-                NameStr = ServerInstruction.Substring(10,
-                   ServerInstruction.IndexOf(":", 10));
-                title = NameStr;
-            }
-            else if (ServerInstruction.EndsWith("/") &&
-                !ServerInstruction.Substring(10).Contains(":"))
-            {
-                NameStr = ServerInstruction.Substring(10, ServerInstruction.Length - 10);
-                title = NameStr;
-            }
+            dreamOwner = UrlMatch.Groups[1].Value;
+            title = UrlMatch.Groups[2].Value;
         }
 
         #endregion Public Constructors
@@ -88,7 +71,9 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                return dreamURL;
+                if (string.IsNullOrWhiteSpace(dreamOwner))
+                    return $"furc://{title}/";
+                return $"furc://{dreamOwner}:{title}/";
             }
         }
 
@@ -141,6 +126,8 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(dreamOwner))
+                    return $"{title}";
                 return $"{dreamOwner}:{title}";
             }
             set => throw new System.NotImplementedException();

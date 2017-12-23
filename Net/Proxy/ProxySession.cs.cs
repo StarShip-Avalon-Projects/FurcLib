@@ -65,6 +65,8 @@ namespace Furcadia.Net.Proxy
 
         private void Initilize()
         {
+            SpeciesTag = new Queue<string>();
+            BadgeTag = new Queue<string>();
 #if DEBUG
             if (!Debugger.IsAttached)
                 Logger.Disable<ProxySession>();
@@ -210,11 +212,12 @@ namespace Furcadia.Net.Proxy
         private bool hasShare;
         private bool Look;
         private Queue<string> LookQue;
-        //private Queue<string> SpeciesTag;
+        private Queue<string> SpeciesTag;
+
         ///// <summary>
         ///// Beekin Badge
         ///// </summary>
-        //private Queue<string> BadgeTag;
+        private Queue<string> BadgeTag;
 
         private RegexOptions ChannelOptions = RegexOptions.Compiled | RegexOptions.CultureInvariant;
 
@@ -1111,20 +1114,20 @@ namespace Furcadia.Net.Proxy
                         player.Position = new FurrePosition(data.Substring(5, 4));
                         player.Visible = false;
                     }
-                    // Species Tags
-                    //  else if (data.StartsWith("]-"))
-                    //  {
-                    //if (data.StartsWith("]-#A"))
-                    //{
-                    //    SpeciesTag.Enqueue(data.Substring(4));
-                    //}
-                    //else if (data.StartsWith("]-#B"))
-                    //{
-                    //    BadgeTag.Enqueue(data.Substring(2));
-                    //}
+                    //Species Tags
+                    else if (data.StartsWith("]-"))
+                    {
+                        if (data.StartsWith("]-#A"))
+                        {
+                            SpeciesTag.Enqueue(data.Substring(4));
+                        }
+                        else if (data.StartsWith("]-#B"))
+                        {
+                            BadgeTag.Enqueue(data.Substring(2));
+                        }
 
-                    //DS Variables
-                    //  }
+                        //DS Variables
+                    }
 
                     //Popup Dialogs!
                     else if (data.StartsWith("]#"))

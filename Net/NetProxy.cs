@@ -52,7 +52,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Furcadia Client TCP Client
         /// </summary>
-        private static TcpClient client = new TcpClient();
+        private static TcpClient client;
 
         /// <summary>
         /// Furcadia Game server TCP Client
@@ -195,6 +195,7 @@ namespace Furcadia.Net
 
         private void Initialize()
         {
+            client = new TcpClient();
 #if DEBUG
             if (!Debugger.IsAttached)
                 Logger.Disable<NetProxy>();
@@ -570,6 +571,7 @@ namespace Furcadia.Net
                         if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                         {
                             Logger.Info($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                            ServerDisconnected?.Invoke();
                         }
                         if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
                         {
@@ -585,6 +587,7 @@ namespace Furcadia.Net
                 catch (NetProxyException ne)
                 {
                     listen.Stop();
+                    ServerDisconnected?.Invoke();
                     throw ne;
                 }
                 catch (SocketException se)
@@ -604,7 +607,7 @@ namespace Furcadia.Net
             }
             catch (Exception e)
             {
-                Logging.Logger.Error<NetProxy>(e);
+                Logger.Error<NetProxy>(e);
                 SendError(e, this);
             }
         }
@@ -617,7 +620,7 @@ namespace Furcadia.Net
                 Arguments = Options.CharacterIniFile,
                 WorkingDirectory = Options.FurcadiaInstallPath
             };
-            furcProcess = new System.Diagnostics.Process
+            furcProcess = new Process
             {
                 EnableRaisingEvents = true,
                 StartInfo = furcadiaProcessInfo

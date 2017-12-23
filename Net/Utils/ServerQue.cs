@@ -25,7 +25,7 @@ namespace Furcadia.Net.Utils
 
         private const int MASS_CRITICAL = 1024;
         private const int MASS_NOENDURANCE = 2048;
-        private const int MASS_DECAYPS = 300;
+        private const int MASS_DECAYPS = 512;
         private const int MASS_DEFAULT = 120;
         private const int MASS_SPEECH = 1000;
         private double g_mass = 0;
