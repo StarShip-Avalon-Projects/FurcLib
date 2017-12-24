@@ -570,7 +570,8 @@ namespace Furcadia.Net
                             break;
                         if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                         {
-                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                             Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                            ServerDisconnected?.Invoke();
                         }
                         if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
                         {
@@ -590,6 +591,7 @@ namespace Furcadia.Net
                     throw ne;
                 }
 
+
                 //Run
                 // Set the Proxy/Firewall Settings
                 settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
@@ -601,7 +603,6 @@ namespace Furcadia.Net
             }
             catch (Exception e)
             {
-                Logger.Error<NetProxy>(e);
                 SendError(e, this);
             }
         }
