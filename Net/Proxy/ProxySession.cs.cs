@@ -870,8 +870,6 @@ namespace Furcadia.Net.Proxy
                     // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
                     //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
 
-                    // TODO: Check Cookie handler for this
-
                     Regex EatCookie = new Regex("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.(.*?)", ChannelOptions);
                     if (EatCookie.Match(data).Success)
                     {
@@ -966,7 +964,6 @@ namespace Furcadia.Net.Proxy
                     else if (data == "&&&&&&&&&&&&&")
                     {
                         //We've connected to Furcadia
-                        //TODO: Stop the reconnection manager
                         serverconnectphase = ConnectionPhase.Connected;
 
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));

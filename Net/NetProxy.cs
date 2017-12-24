@@ -570,7 +570,7 @@ namespace Furcadia.Net
                             break;
                         if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                         {
-                             Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
                             ServerDisconnected?.Invoke();
                         }
                         if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
@@ -590,7 +590,6 @@ namespace Furcadia.Net
                     ServerDisconnected?.Invoke();
                     throw ne;
                 }
-
 
                 //Run
                 // Set the Proxy/Firewall Settings
@@ -935,8 +934,6 @@ namespace Furcadia.Net
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
-
                     if (client != null) client.Dispose();
                     if (LightBringer != null) LightBringer.Dispose();
                     if (furcProcess != null) furcProcess.Dispose();
@@ -947,26 +944,15 @@ namespace Furcadia.Net
                     }
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
                 disposedValue = true;
             }
         }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~NetProxy() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
 
         // This code added to correctly implement the disposable pattern.
         public virtual void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
         }
 
         #endregion IDisposable Support
