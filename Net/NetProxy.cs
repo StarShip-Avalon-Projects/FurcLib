@@ -440,7 +440,6 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="e"></param>
         /// <param name="o"></param>
-        /// <param name="text"></param>
         protected virtual void SendError(Exception e, object o)
         {
             Logger.Error<NetProxy>($"{e} {o}");
@@ -695,8 +694,9 @@ namespace Furcadia.Net
         /// </param>
         public virtual void SendToServer(string message)
         {
-            if (!message.EndsWith(@"\n"))
-                message += '\n';
+            string replaceWith = "";
+            string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
+            message += '\n';
 
             if (!IsServerSocketConnected)
                 return;
