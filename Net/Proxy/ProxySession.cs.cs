@@ -992,7 +992,7 @@ namespace Furcadia.Net.Proxy
                             {
                                 InstructionType = ServerInstructionType.LookResponse
                             };
-                            ProcessServerInstruction.Invoke(Instruction,
+                            ProcessServerInstruction?.Invoke(Instruction,
                                    new ParseServerArgs(ServerInstructionType.LookResponse, serverconnectphase));
                         }
                     }
@@ -1018,7 +1018,7 @@ namespace Furcadia.Net.Proxy
                         if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                             if (ProcessServerInstruction != null)
                             {
-                                ProcessServerInstruction.Invoke(FurreSpawn,
+                                ProcessServerInstruction?.Invoke(FurreSpawn,
                                 new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
                             }
                     }
@@ -1033,7 +1033,7 @@ namespace Furcadia.Net.Proxy
                         if (ProcessServerInstruction != null)
                         {
                             Handled = true;
-                            ProcessServerInstruction.Invoke(RemoveFurre,
+                            ProcessServerInstruction?.Invoke(RemoveFurre,
                                 new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase));
                         }
                     }
@@ -1058,7 +1058,7 @@ namespace Furcadia.Net.Proxy
                         {
                             Player = player
                         };
-                        ProcessServerInstruction.Invoke(FurreMoved,
+                        ProcessServerInstruction?.Invoke(FurreMoved,
                              new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, serverconnectphase));
                         return;
                     }
@@ -1085,7 +1085,7 @@ namespace Furcadia.Net.Proxy
                         {
                             Player = player
                         };
-                        ProcessServerInstruction.Invoke(FurreMoved,
+                        ProcessServerInstruction?.Invoke(FurreMoved,
                               new ParseServerArgs(ServerInstructionType.MoveAvatar, serverconnectphase));
                         return;
                     }
@@ -1100,7 +1100,7 @@ namespace Furcadia.Net.Proxy
                         {
                             if (ProcessServerInstruction != null)
                             {
-                                ProcessServerInstruction.Invoke(ColorStringUpdate,
+                                ProcessServerInstruction?.Invoke(ColorStringUpdate,
                                 new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
                             }
                         }
@@ -1170,7 +1170,7 @@ namespace Furcadia.Net.Proxy
                         LoadDream loadDream = new LoadDream(data);
                         dream.Load(loadDream);
                         if (ProcessServerInstruction != null)
-                            ProcessServerInstruction.Invoke(loadDream,
+                            ProcessServerInstruction?.Invoke(loadDream,
                                new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
