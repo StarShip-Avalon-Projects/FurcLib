@@ -523,6 +523,7 @@ namespace Furcadia.Net.Proxy
                     LineCount = new Regex(LineCountRegex);
                     if (LineCount.Match(data).Success)
                         dream.Rating = LineCount.Match(data).Groups[1].Value;
+                    ActivePlayer.Message = DescTagRegexMatch.Groups[6].Value;
                     //LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
                     //LineCount = new Regex(LineCountRegex);
                     //if (LineCount.Match(data).Success)
