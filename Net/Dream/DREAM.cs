@@ -45,6 +45,7 @@ namespace Furcadia.Net.DreamInfo
         private int _Lines;
 
         private FurreList furres;
+        private bool isPermament;
 
         #endregion Private Fields
 
@@ -73,6 +74,7 @@ namespace Furcadia.Net.DreamInfo
             fileName = DreamInfo.CacheFileName;
             if (DreamInfo.IsPermanent)
                 _Title = fileName.Substring(2);
+            isPermament = DreamInfo.IsPermanent;
         }
 
         #endregion Public Constructors
@@ -117,6 +119,17 @@ namespace Furcadia.Net.DreamInfo
         public bool IsModern
         {
             get { return mode == "modern"; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this dream is permament.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this dream is permament; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsPermanent
+        {
+            get { return isPermament; }
         }
 
         /// <summary>
