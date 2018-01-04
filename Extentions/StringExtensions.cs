@@ -105,7 +105,7 @@ public static class StringExtensions
     {
         if (string.IsNullOrEmpty(name))
             return null;
-        return Regex.Replace(name.ToLower(), "[^a-z0-9\0x0020_.;&\\|]+", string.Empty, RegexOptions.CultureInvariant | RegexOptions.Compiled).Replace("|", string.Empty);
+        return Regex.Replace(name.ToLower(), "[^a-z0-9\0x0020_.;&\\\v]+", string.Empty, RegexOptions.CultureInvariant | RegexOptions.Compiled);
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public static class StringExtensions
     /// <returns></returns>
     public static string ToStrippedFurcadiaMarkupString(this string Text)
     {
-        var r = new Regex("<(.*?)>");
+        Regex r = new Regex("<(.*?)>", RegexOptions.Compiled);
         Text = r.Replace(Text, string.Empty);
         return Text.Replace("|", " ");
     }

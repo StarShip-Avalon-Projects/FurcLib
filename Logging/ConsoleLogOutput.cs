@@ -69,8 +69,8 @@ namespace Furcadia.Logging
             catch
             {
             }
-            if (Debugger.IsAttached)
-                Debug.WriteLine(msg);
+            //if (Debugger.IsAttached)
+            //    Debug.WriteLine(msg);
             Console.WriteLine(msg);
             try
             {

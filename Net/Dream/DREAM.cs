@@ -6,6 +6,7 @@ namespace Furcadia.Net.DreamInfo
     /// <summary>
     ///
     /// </summary>
+
     public interface IDream
     {
         /// <summary>
@@ -29,6 +30,7 @@ namespace Furcadia.Net.DreamInfo
     /// Current Dream information
     /// </summary>
     [CLSCompliant(true)]
+    [Serializable]
     public class Dream : IDream
     {
         #region Private Fields
@@ -40,7 +42,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// private variables
         /// </summary>
-        private string _Title, _Rating, _URL, owner;
+        private string _Title, _Rating, owner;
 
         private int _Lines;
 
@@ -97,7 +99,7 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public FurreList Furres
         {
-            get { return furres; }
+            get => furres;
             set { furres = value; }
         }
 
@@ -109,7 +111,7 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public string FileName
         {
-            get { return fileName; }
+            get => fileName;
             set { fileName = value; }
         }
 
@@ -118,7 +120,7 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public bool IsModern
         {
-            get { return mode == "modern"; }
+            get => mode == "modern";
         }
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public bool IsPermanent
         {
-            get { return isPermament; }
+            get => isPermament;
         }
 
         /// <summary>
@@ -144,7 +146,6 @@ namespace Furcadia.Net.DreamInfo
             {
                 //Modern should be set bu this point
                 _Title = value.Title;
-                _URL = value.DreamUrl;
                 owner = value.DreamOwner;
             }
         }
@@ -154,7 +155,7 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public int Lines
         {
-            get { return _Lines; }
+            get => _Lines;
             set { _Lines = value; }
         }
 
@@ -176,16 +177,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string DreamOwner
         {
-            get { return owner; }
+            get => owner;
             set { owner = value; }
-        }
-
-        /// <summary>
-        /// Dreams uploader character
-        /// </summary>
-        public string OwnerShortName
-        {
-            get { return owner.ToFurcadiaShortName(); }
         }
 
         /// <summary>
@@ -214,8 +207,14 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string URL
         {
-            get { return _URL; }
-            set { _URL = value; }
+            get
+            {
+                if (string.IsNullOrWhiteSpace(owner))
+                {
+                    return $"furc://{_Title}/";
+                }
+                return $"furc://{owner.ToFurcadiaShortName()}:{_Title}/";
+            }
         }
 
         #endregion Public Properties

@@ -225,6 +225,7 @@ namespace Furcadia.Net
     /// <summary>
     /// Client Status Event Arguments.
     /// </summary>
+    [Serializable]
     public class NetClientEventArgs : EventArgs
     {
         #region Private Fields
@@ -289,6 +290,7 @@ namespace Furcadia.Net
     /// <summary>
     /// Game Server Status Event Arguments
     /// </summary>
+    [Serializable]
     public class NetServerEventArgs : EventArgs
     {
         #region Public Constructors
@@ -346,6 +348,7 @@ namespace Furcadia.Net
     /// <summary>
     /// Parse Server Instruction set
     /// </summary>
+    [Serializable]
     public class ParseChannelArgs : ParseServerArgs
     {
         #region Private Fields
@@ -393,6 +396,7 @@ namespace Furcadia.Net
     /// <summary>
     /// Parse Server Instruction set
     /// </summary>
+    [Serializable]
     public class ParseServerArgs : EventArgs
     {
         #region Private Fields
@@ -473,6 +477,12 @@ namespace Furcadia.Net
             serverConnectedPhase = phase;
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             var sb = new StringBuilder();

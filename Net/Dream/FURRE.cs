@@ -31,6 +31,7 @@ namespace Furcadia.Net.DreamInfo
     /// <summary>
     /// Class for Proxies and bots to use Furrre Data provided by the game server.
     /// </summary>
+    [Serializable]
     public class Furre : IFurre, IEquatable<IFurre>
     {
         #region Private Fields
@@ -495,7 +496,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} - {1}", FurreID, Name);
+            return string.Format($"{FurreID} - {Name}");
         }
 
         /// <summary>
@@ -508,7 +509,7 @@ namespace Furcadia.Net.DreamInfo
         {
             if (format != null)
                 return format(this);
-            return this.ToString();
+            return ToString();
         }
 
         #endregion Public Methods

@@ -68,8 +68,8 @@ namespace Furcadia.Net.Proxy
             SpeciesTag = new Queue<string>();
             BadgeTag = new Queue<string>();
 #if DEBUG
-            if (!Debugger.IsAttached)
-                Logger.Disable<ProxySession>();
+            // if (!Debugger.IsAttached)
+            Logger.Disable<ProxySession>();
 #else
             Logger.Disable<ProxySession>();
 #endif
@@ -404,7 +404,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public Dream Dream
         {
-            get { return dream; }
+            get => dream;
         }
 
         /// <summary>
@@ -505,9 +505,9 @@ namespace Furcadia.Net.Proxy
             ParseChannelArgs args;
             Logger.Debug<ProxySession>(data);
             Regex FontColorRegex = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
-            var FontColorRegexMatch = FontColorRegex.Match(data);
-            var DescTagRegexMatch = DescTagRegex.Match(data);
-            var ActivePlayer = new Furre("Furcadia game server");
+            Match FontColorRegexMatch = FontColorRegex.Match(data);
+            Match DescTagRegexMatch = DescTagRegex.Match(data);
+            Furre ActivePlayer = new Furre("Furcadia game server");
             if (NameRegex.Match(data).Success)
                 ActivePlayer = dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
 
@@ -515,12 +515,12 @@ namespace Furcadia.Net.Proxy
             {
                 if (DescTagRegexMatch.Groups[1].Value == "fsh://system.fsh:86")
                 {
-                    var LineCountRegex = "<img src='fsh://system.fsh:86' /> Lines of DragonSpeak: ([0-9]+)";
-                    var LineCount = new Regex(LineCountRegex);
+                    string LineCountRegex = "<img src='fsh://system.fsh:86' /> Lines of DragonSpeak: ([0-9]+)";
+                    Regex LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
                     if (LineCount.Match(data).Success)
                         dream.Lines = int.Parse(LineCount.Match(data).Groups[1].Value);
                     LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
-                    LineCount = new Regex(LineCountRegex);
+                    LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
                     if (LineCount.Match(data).Success)
                         dream.Rating = LineCount.Match(data).Groups[1].Value;
                     ActivePlayer.Message = DescTagRegexMatch.Groups[6].Value;
@@ -543,7 +543,7 @@ namespace Furcadia.Net.Proxy
                     return;
                 }
             }
-            var Color = FontColorRegexMatch.Groups[1].Value;
+            string Color = FontColorRegexMatch.Groups[1].Value;
             try
             {
                 string Text = NameRegex.Replace(data, "$2");
@@ -574,7 +574,7 @@ namespace Furcadia.Net.Proxy
                 }
                 Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
 
-                var ShoutMatch = ShoutRegex.Match(data);
+                Match ShoutMatch = ShoutRegex.Match(data);
                 if (ShoutMatch.Success)
                 {
                     ActivePlayer = dream.Furres.GerFurreByName(ShoutMatch.Groups[4].Value);
@@ -620,7 +620,7 @@ namespace Furcadia.Net.Proxy
                         //banish <name> (online)
                         //Success: (.*?) has been banished from your dreams.
 
-                        Regex t = new Regex("(.*?) has been banished from your dreams.");
+                        Regex t = new Regex("(.*?) has been banished from your dreams.", RegexOptions.Compiled);
                         BanishName = t.Match(Text).Groups[1].Value;
 
                         BanishList.Add(BanishName);
@@ -638,7 +638,7 @@ namespace Furcadia.Net.Proxy
                         //tempbanish <name> (online)
                         //Success: (.*?) has been temporarily banished from your dreams.
 
-                        Regex t = new Regex("(.*?) has been temporarily banished from your dreams.");
+                        Regex t = new Regex("(.*?) has been temporarily banished from your dreams.", RegexOptions.Compiled);
                         BanishName = t.Match(Text).Groups[1].Value;
 
                         // MainMSEngine.PageExecute(61)
@@ -659,7 +659,7 @@ namespace Furcadia.Net.Proxy
                     }
                     else if (Text.StartsWith("The endurance limits of player "))
                     {
-                        Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.");
+                        Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.", RegexOptions.Compiled);
                         string m = t.Match(Text).Groups[1].Value;
                         if (m.ToFurcadiaShortName() == ConnectedFurre.ShortName)
                         {
@@ -688,12 +688,12 @@ namespace Furcadia.Net.Proxy
                 else if (string.IsNullOrEmpty(Color) &
                            Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
-                    var DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.IgnoreCase);
+                    Match DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                     if (!DescMatch.Success)
                     {
                         Regex SayRegex = new Regex($"{NameFilter}: (.*)");
-                        var SayMatch = SayRegex.Match(data);
+                        Match SayMatch = SayRegex.Match(data);
                         ActivePlayer.Message = SayRegex.Match(data).Groups[3].Value;
                         player = ActivePlayer;
                         chanObject = new ChannelObject(data)
@@ -730,7 +730,7 @@ namespace Furcadia.Net.Proxy
                     channel = "whisper";
                     Regex WhisperIncoming = new Regex(WhisperRegex, ChannelOptions);
                     //'WHISPER
-                    var WhisperMatches = WhisperIncoming.Match(data);
+                    Match WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
                     {
                         ActivePlayer = dream.Furres.GerFurreByName(WhisperMatches.Groups[4].Value);
@@ -774,8 +774,8 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (Color == "emote")
                 {
-                    var EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
-                    var EmoteMatch = EmoteRegex.Match(data);
+                    Regex EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
+                    Match EmoteMatch = EmoteRegex.Match(data);
                     ActivePlayer = dream.Furres.GerFurreByName(EmoteMatch.Groups[2].Value);
                     ActivePlayer.Message = EmoteMatch.Groups[4].Value;
                     player = ActivePlayer;
@@ -812,7 +812,7 @@ namespace Furcadia.Net.Proxy
                         //banish-off <name> (on list)
                         //[notify> The banishment of player (.*?) has ended.
 
-                        Regex t = new Regex("The banishment of player (.*?) has ended.");
+                        Regex t = new Regex("The banishment of player (.*?) has ended.", RegexOptions.Compiled);
                         NameStr = t.Match(data).Groups[1].Value;
                         ActivePlayer = new Furre(NameStr);
                         player = ActivePlayer;
@@ -842,7 +842,7 @@ namespace Furcadia.Net.Proxy
                         //Banish <name> (Not online)
                         //Error:>>  There are no Furres around right now with a name starting with (.*?) .
 
-                        Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .");
+                        Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
                         NameStr = t.Match(data).Groups[1].Value;
                     }
                     else if (Text == "Sorry, this player has not been banished from your dreams.")
@@ -903,8 +903,10 @@ namespace Furcadia.Net.Proxy
                 InstructionType = ServerInstructionType.DisplayText
             };
 
-            args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase);
-            args.Channel = FontColorRegexMatch.Groups[9].Value;
+            args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
+            {
+                Channel = FontColorRegexMatch.Groups[9].Value
+            };
             ProcessServerChannelData?.Invoke(chanObject, args);
         }
 
@@ -929,7 +931,7 @@ namespace Furcadia.Net.Proxy
         /// FTR http://ftr.icerealm.org/ref-instructions/
         /// </para>
         /// </remarks>
-        public void ParseServerData(string data, bool Handled)
+        public void ParseServerData(string data, ref bool Handled)
         {
             Logger.Debug<ProxySession>(data);
             switch (serverconnectphase)
@@ -938,7 +940,7 @@ namespace Furcadia.Net.Proxy
                     // SSL/TLS `starttls
                     if (data.StartsWith("]s"))
                     {
-                        Regex t = new Regex("\\]s(.+)1 (.*?) (.*?) 0", RegexOptions.IgnoreCase);
+                        Regex t = new Regex("\\]s(.+)1 (.*?) (.*?) 0", RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         System.Text.RegularExpressions.Match m = t.Match(data);
                     }
                     if (data == "Dragonroar")
@@ -988,7 +990,7 @@ namespace Furcadia.Net.Proxy
                             player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
                             if (IsConnectedCharacter())
                                 Look = false;
-                            var Instruction = new UpdateColorString(ref player, data)
+                            UpdateColorString Instruction = new UpdateColorString(ref player, data)
                             {
                                 InstructionType = ServerInstructionType.LookResponse
                             };
@@ -999,7 +1001,7 @@ namespace Furcadia.Net.Proxy
                     //Spawn Avatar
                     else if (data[0] == '<')
                     {
-                        var FurreSpawn = new SpawnAvatar(data);
+                        SpawnAvatar FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
 
                         dream.Furres.Add(player);
@@ -1081,7 +1083,7 @@ namespace Furcadia.Net.Proxy
                         {
                             player.Visible = false;
                         }
-                        var FurreMoved = new MoveFurre(data)
+                        MoveFurre FurreMoved = new MoveFurre(data)
                         {
                             Player = player
                         };
@@ -1131,7 +1133,7 @@ namespace Furcadia.Net.Proxy
                     else if (data.StartsWith("]#"))
                     {
                         //]#<idstring> <style 0-17> <message that might have spaces in>
-                        Regex repqq = new Regex("^\\]#(.*?) (\\d+) (.*?)$");
+                        Regex repqq = new Regex("^\\]#(.*?) (\\d+) (.*?)$", RegexOptions.Compiled);
                         Match m = repqq.Match(data);
                         Rep r = default(Rep);
                         r.ID = m.Groups[1].Value;
@@ -1449,7 +1451,7 @@ namespace Furcadia.Net.Proxy
         {
             player = new Furre();
             bool handled = false;
-            ParseServerData(data, handled);
+            ParseServerData(data, ref handled);
 
             if (!handled)
                 ServerData2?.Invoke(data);
