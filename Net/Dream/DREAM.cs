@@ -65,6 +65,7 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="DreamInfo">The dream information.</param>
         public void Load(LoadDream DreamInfo)
         {
+            furres.Clear();
             mode = "legacy";
             if (DreamInfo.IsModern)
                 mode = "modern";
