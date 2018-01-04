@@ -310,7 +310,7 @@ namespace Furcadia.Net
         /// <value>
         /// The options.
         /// </value>
-        public ProxyOptions Options
+        public virtual ProxyOptions Options
         {
             get
             { return options; }
