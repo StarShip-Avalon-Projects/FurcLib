@@ -22,7 +22,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The name.
         /// </value>
-        string Name { get; set; }
+        string Name { get; }
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// private variables
         /// </summary>
-        private string name, _Title, _Rating, _URL, owner;
+        private string _Title, _Rating, _URL, owner;
 
         private int _Lines;
 
@@ -72,7 +72,7 @@ namespace Furcadia.Net.DreamInfo
 
             fileName = DreamInfo.CacheFileName;
             if (DreamInfo.IsPermanent)
-                name = fileName.Substring(2);
+                _Title = fileName.Substring(2);
         }
 
         #endregion Public Constructors
@@ -130,7 +130,7 @@ namespace Furcadia.Net.DreamInfo
             set
             {
                 //Modern should be set bu this point
-                name = value.Name;
+                _Title = value.Title;
                 _URL = value.DreamUrl;
                 owner = value.DreamOwner;
             }
@@ -150,22 +150,18 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string Name
         {
-            get { return name; }
-            set { name = value; }
-        }
-
-        /// <summary>
-        /// Name of the dream
-        /// </summary>
-        public string ShortName
-        {
-            get { return name.ToFurcadiaShortName(); }
+            get
+            {
+                if (string.IsNullOrWhiteSpace(owner))
+                    return $"{_Title}";
+                return $"{owner}:{_Title}";
+            }
         }
 
         /// <summary>
         /// Dreams uploader character
         /// </summary>
-        public string Owner
+        public string DreamOwner
         {
             get { return owner; }
             set { owner = value; }
@@ -239,7 +235,7 @@ namespace Furcadia.Net.DreamInfo
                 return false;
             }
 
-            return dreamA.ShortName != DreamB.Name.ToFurcadiaShortName();
+            return dreamA.Name.ToLower() != DreamB.Name.ToLower();
         }
 
         /// <summary>
@@ -251,9 +247,9 @@ namespace Furcadia.Net.DreamInfo
         {
             if (other == null)
                 return false;
-            if (other is IFurre fur)
+            if (other is IDream dream)
             {
-                return ShortName == fur.ShortName;
+                return Name.ToLower() == dream.Name.ToLower();
             }
             return false;
         }
@@ -266,7 +262,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return ShortName.GetHashCode();
+            return Name.GetHashCode();
         }
 
         #endregion Public Operators

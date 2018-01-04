@@ -426,7 +426,7 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(dream.ShortName);
+                return !string.IsNullOrWhiteSpace(dream.Title);
             }
         }
 
