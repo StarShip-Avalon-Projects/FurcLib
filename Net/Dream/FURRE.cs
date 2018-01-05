@@ -370,25 +370,25 @@ namespace Furcadia.Net.DreamInfo
             get { return _WasVisible; }
         }
 
-        /// <summary>
-        /// the X Position the Furre is currently standing at
-        /// </summary>
-        [Obsolete("use Position as FurrePosition", false)]
-        public int X
-        {
-            get { return Position.X; }
-            set { Position.X = value; }
-        }
+        ///// <summary>
+        ///// the X Position the Furre is currently standing at
+        ///// </summary>
+        //[Obsolete("use Position as FurrePosition", false)]
+        //public int X
+        //{
+        //    get { return Position.X; }
+        //    set { Position.X = value; }
+        //}
 
-        /// <summary>
-        /// the Y Position the Furre Standing At
-        /// </summary>
-        [Obsolete("use Position as FurrePosition", false)]
-        public int Y
-        {
-            get { return Position.Y; }
-            set { Position.Y = value; }
-        }
+        ///// <summary>
+        ///// the Y Position the Furre Standing At
+        ///// </summary>
+        //[Obsolete("use Position as FurrePosition", false)]
+        //public int Y
+        //{
+        //    get { return Position.Y; }
+        //    set { Position.Y = value; }
+        //}
 
         #endregion Public Properties
 
@@ -404,11 +404,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public static bool operator !=(Furre a, IFurre b)
         {
-            if (ReferenceEquals(a, b))
-            {
-                return false;
-            }
-            return !a.Equals(b);
+            return !(a == b);
         }
 
         /// <summary>
@@ -421,12 +417,22 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public static bool operator ==(Furre a, IFurre b)
         {
-            if (ReferenceEquals(a, b))
+            // If left hand side is null...
+            if (a is null)
             {
-                return true;
+                // ...and right hand side is null...
+                if (b is null)
+                {
+                    //...both are null and are Equal.
+                    return true;
+                }
+
+                // ...right hand side is not null, therefore not Equal.
+                return false;
             }
 
-            return a.Equals((object)b);
+            // Return true if the fields match:
+            return a.Equals(b);
         }
 
         /// <summary>

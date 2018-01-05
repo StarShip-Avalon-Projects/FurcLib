@@ -478,16 +478,14 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="String" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            sb.AppendLine($"Instruction '{serverinstruction}' : Phase: '{serverConnectedPhase}'");
-            return sb.ToString();
+            return $"Instruction '{serverinstruction}' : Phase: '{serverConnectedPhase}'";
         }
 
         #endregion Public Constructors

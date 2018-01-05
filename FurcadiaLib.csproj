@@ -166,9 +166,9 @@
     <Compile Include="IO\FurcadiaNotFoundException.cs" />
     <Compile Include="Net\Utils\ServerQue.cs" />
     <Compile Include="IO\SubSystem\PhoenixSpeakParser.cs" />
-    <Compile Include="Net\Dream\DREAM.cs" />
-    <Compile Include="Net\Dream\FURRE.cs" />
-    <Compile Include="Net\Dream\FURREList.cs" />
+    <Compile Include="Net\Dream\Dream.cs" />
+    <Compile Include="Net\Dream\Furre.cs" />
+    <Compile Include="Net\Dream\FurreList.cs" />
     <Compile Include="Net\DirectConnection\ClientBase.cs" />
     <Compile Include="Net\Proxy\NetProxyException.cs" />
     <Compile Include="Net\Utils\Utilities.cs" />

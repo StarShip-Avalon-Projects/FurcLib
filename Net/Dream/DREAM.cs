@@ -30,7 +30,6 @@ namespace Furcadia.Net.DreamInfo
     /// Current Dream information
     /// </summary>
     [CLSCompliant(true)]
-    [Serializable]
     public class Dream : IDream
     {
         #region Private Fields
@@ -222,39 +221,43 @@ namespace Furcadia.Net.DreamInfo
         #region Public Operators
 
         /// <summary>
-        ///
+        /// Implements the operator ==.
         /// </summary>
-        /// <param name="dreamA"></param>
-        /// <param name="dreamB"></param>
-        /// <returns></returns>
+        /// <param name="dreamA">The dream a.</param>
+        /// <param name="dreamB">The dream b.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static bool operator ==(Dream dreamA, IDream dreamB)
         {
-            if (dreamB == null || dreamA == null)
-                return false;
+            if (ReferenceEquals(dreamA, null))
+            {
+                return ReferenceEquals(dreamB, null);
+            }
+
             return dreamA.Equals(dreamB);
         }
 
         /// <summary>
-        ///
+        /// Implements the operator !=.
         /// </summary>
-        /// <param name="dreamA"></param>
-        /// <param name="DreamB"></param>
-        /// <returns></returns>
+        /// <param name="dreamA">The dream a.</param>
+        /// <param name="DreamB">The dream b.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
         public static bool operator !=(Dream dreamA, IDream DreamB)
         {
-            if (DreamB == null)
-            {
-                return false;
-            }
-
-            return dreamA.Name.ToLower() != DreamB.Name.ToLower();
+            return !(dreamA == DreamB);
         }
 
         /// <summary>
-        ///
+        /// Determines whether the specified <see cref="Object" />, is equal to this instance.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <param name="other">The <see cref="Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object other)
         {
             if (other == null)
@@ -275,6 +278,17 @@ namespace Furcadia.Net.DreamInfo
         public override int GetHashCode()
         {
             return Name.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a <see cref="String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return Name;
         }
 
         #endregion Public Operators
