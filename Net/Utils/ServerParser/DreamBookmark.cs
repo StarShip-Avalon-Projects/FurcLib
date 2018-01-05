@@ -25,7 +25,7 @@ namespace Furcadia.Net.Utils.ServerParser
     {
         #region Private Fields
 
-        private const string UrlRegex = @"furc://([.*?]?):?(.*?)/";
+        private const string UrlRegex = @"furc://([a-z0-9]+)?:?([a-z0-9]+)/";
         private int type;
         private string dreamOwner;
         private string title;

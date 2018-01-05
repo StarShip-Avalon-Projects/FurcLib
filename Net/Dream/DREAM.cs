@@ -176,7 +176,10 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string DreamOwner
         {
-            get => owner;
+            get
+            {
+                return owner;
+            }
             set { owner = value; }
         }
 
