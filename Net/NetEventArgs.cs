@@ -187,7 +187,12 @@ namespace Furcadia.Net
         /// <para/>
         /// sender object is Type Furre
         /// </summary>
-        LookResponse
+        LookResponse,
+
+        /// <summary>
+        /// Entering a new dream
+        /// </summary>
+        EnterDream
     }
 
     /// <summary>

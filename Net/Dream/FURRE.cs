@@ -32,7 +32,7 @@ namespace Furcadia.Net.DreamInfo
     /// Class for Proxies and bots to use Furrre Data provided by the game server.
     /// </summary>
     [Serializable]
-    public class Furre : IFurre, IEquatable<IFurre>
+    public class Furre : IFurre
     {
         #region Private Fields
 
@@ -147,15 +147,6 @@ namespace Furcadia.Net.DreamInfo
         {
             get { return direction; }
             set { direction = value; }
-        }
-
-        /// <summary>
-        /// Legacy DS Species
-        /// </summary>
-        [Obsolete]
-        public int DSSpecies
-        {
-            get { return FurreColors.Species; }
         }
 
         /// <summary>
@@ -326,32 +317,6 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// the X Position the Furre moved from
-        /// <para>
-        /// Obsolete. Use LasPosition as FurrePosition
-        /// </para>
-        /// </summary>
-        [Obsolete("use LasPosition as FurrePosition", false)]
-        public int SourceX
-        {
-            get { return LastPosition.X; }
-            set { LastPosition.X = value; }
-        }
-
-        /// <summary>
-        /// the Y Position the Furre moved from
-        /// <para>
-        /// Obsolete. Use LasPosition as FurrePosition
-        /// </para>
-        /// </summary>
-        [Obsolete("use LasPosition as FurrePosition", false)]
-        public int SourceY
-        {
-            get { return LastPosition.Y; }
-            set { LastPosition.Y = value; }
-        }
-
-        /// <summary>
         /// </summary>
         public bool Visible
         {
@@ -436,16 +401,6 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        ///
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool Equals(IFurre other)
-        {
-            return Equals((object)other);
-        }
-
-        /// <summary>
         /// </summary>
         /// <param name="obj">
         /// </param>
@@ -455,12 +410,12 @@ namespace Furcadia.Net.DreamInfo
         {
             if (obj == null)
                 return false;
-            if (obj.GetType() == typeof(Furre))
+            if (this.GetType() != obj.GetType()) return false;
+            if (obj is IFurre)
             {
-                var ob = (Furre)obj;
-                if (string.IsNullOrEmpty(ShortName) || string.IsNullOrEmpty(ob.ShortName))
-                    return ob.FurreID == FurreID;
-                return ob.ShortName == ShortName;
+                if (ShortName != ((Furre)obj).ShortName)
+                    return ((Furre)obj).FurreID == FurreID;
+                return true;
             }
             return base.Equals(obj);
         }
@@ -471,7 +426,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return base.GetHashCode() ^ FurreID;
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
-﻿using Furcadia.Drawing;
-using Furcadia.Logging;
+﻿using Furcadia.Logging;
+using Furcadia.Drawing;
 using Furcadia.Movement;
 using Furcadia.Net.DreamInfo;
 using Furcadia.Net.Utils.ServerParser;
@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 //Event/Delegates for server instructions
 //call subsystem processor
 
-//dream info
+//Dream info
 //Furre info
 //Bot info
 
@@ -68,8 +68,8 @@ namespace Furcadia.Net.Proxy
             SpeciesTag = new Queue<string>();
             BadgeTag = new Queue<string>();
 #if DEBUG
-            // if (!Debugger.IsAttached)
-            Logger.Disable<ProxySession>();
+            if (!Debugger.IsAttached)
+                Logger.Disable<ProxySession>();
 #else
             Logger.Disable<ProxySession>();
 #endif
@@ -98,7 +98,7 @@ namespace Furcadia.Net.Proxy
 
             connectedFurre = new Furre();
             player = new Furre();
-            dream = new Dream();
+            Dream = new Dream();
 
             //BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
@@ -116,9 +116,9 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (base.IsServerSocketConnected)
+            if (IsServerSocketConnected)
                 Disconnect();
-            if (base.IsClientSocketConnected)
+            if (IsClientSocketConnected)
                 ClientDisconnect();
             serverconnectphase = ConnectionPhase.Connecting;
             clientconnectionphase = ConnectionPhase.Connecting;
@@ -205,7 +205,6 @@ namespace Furcadia.Net.Proxy
         private object clientlock = new object();
         private object DataReceived = new object();
         private bool disposed = false;
-        private static Dream dream;
         private Furre player;
         private string errorMsg = "";
         private short errorNum = 0;
@@ -404,7 +403,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public Dream Dream
         {
-            get => dream;
+            get; private set;
         }
 
         /// <summary>
@@ -426,7 +425,7 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(dream.Title);
+                return !string.IsNullOrWhiteSpace(Dream.Title);
             }
         }
 
@@ -509,7 +508,7 @@ namespace Furcadia.Net.Proxy
             Match DescTagRegexMatch = DescTagRegex.Match(data);
             Furre ActivePlayer = new Furre("Furcadia game server");
             if (NameRegex.Match(data).Success)
-                ActivePlayer = dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
+                ActivePlayer = Dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
 
             if (DescTagRegexMatch.Success)
             {
@@ -518,11 +517,17 @@ namespace Furcadia.Net.Proxy
                     string LineCountRegex = "<img src='fsh://system.fsh:86' /> Lines of DragonSpeak: ([0-9]+)";
                     Regex LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
                     if (LineCount.Match(data).Success)
-                        dream.Lines = int.Parse(LineCount.Match(data).Groups[1].Value);
+                    {
+                        Dream.Lines = int.Parse(LineCount.Match(data).Groups[1].Value);
+                        Logger.Debug<ProxySession>($"DS Lines set to {Dream.Lines}");
+                    }
                     LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
                     LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
                     if (LineCount.Match(data).Success)
-                        dream.Rating = LineCount.Match(data).Groups[1].Value;
+                    {
+                        Dream.Rating = LineCount.Match(data).Groups[1].Value;
+                        Logger.Debug<ProxySession>($"Dream Rating set to {Dream.Rating}");
+                    }
                     ActivePlayer.Message = DescTagRegexMatch.Groups[6].Value;
                     //LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
                     //LineCount = new Regex(LineCountRegex);
@@ -551,7 +556,7 @@ namespace Furcadia.Net.Proxy
                 Regex DescRegex = new Regex(DescFilter, ChannelOptions);
                 if (DescRegex.Match(data).Success)
                 {
-                    ActivePlayer = dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
+                    ActivePlayer = Dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
                     ActivePlayer.FurreDescription = DescRegex.Match(data).Groups[2].Value;
 
                     if (LookQue.Count > 0)
@@ -577,7 +582,7 @@ namespace Furcadia.Net.Proxy
                 Match ShoutMatch = ShoutRegex.Match(data);
                 if (ShoutMatch.Success)
                 {
-                    ActivePlayer = dream.Furres.GerFurreByName(ShoutMatch.Groups[4].Value);
+                    ActivePlayer = Dream.Furres.GerFurreByName(ShoutMatch.Groups[4].Value);
                     ActivePlayer.Message = ShoutMatch.Groups[7].Value;
                     player = ActivePlayer;
                     chanObject = new ChannelObject(data)
@@ -615,45 +620,45 @@ namespace Furcadia.Net.Proxy
 
                 if (Color == "success")
                 {
-                    if (Text.Contains(" has been banished from your dreams."))
+                    if (Text.Contains(" has been banished from your Dreams."))
                     {
                         //banish <name> (online)
-                        //Success: (.*?) has been banished from your dreams.
+                        //Success: (.*?) has been banished from your Dreams.
 
-                        Regex t = new Regex("(.*?) has been banished from your dreams.", RegexOptions.Compiled);
+                        Regex t = new Regex("(.*?) has been banished from your Dreams.", RegexOptions.Compiled);
                         BanishName = t.Match(Text).Groups[1].Value;
 
                         BanishList.Add(BanishName);
                         channel = "banish";
                     }
-                    else if (Text == "You have canceled all banishments from your dreams.")
+                    else if (Text == "You have canceled all banishments from your Dreams.")
                     {
                         //banish-off-all (active list)
-                        //Success: You have canceled all banishments from your dreams.
+                        //Success: You have canceled all banishments from your Dreams.
                         BanishList.Clear();
                         channel = "banish";
                     }
-                    else if (Text.EndsWith(" has been temporarily banished from your dreams."))
+                    else if (Text.EndsWith(" has been temporarily banished from your Dreams."))
                     {
                         //tempbanish <name> (online)
-                        //Success: (.*?) has been temporarily banished from your dreams.
+                        //Success: (.*?) has been temporarily banished from your Dreams.
 
-                        Regex t = new Regex("(.*?) has been temporarily banished from your dreams.", RegexOptions.Compiled);
+                        Regex t = new Regex("(.*?) has been temporarily banished from your Dreams.", RegexOptions.Compiled);
                         BanishName = t.Match(Text).Groups[1].Value;
 
                         // MainMSEngine.PageExecute(61)
                         BanishList.Add(BanishName);
                         channel = "banish";
                     }
-                    else if (Text == "Control of this dream is now being shared with you.")
+                    else if (Text == "Control of this Dream is now being shared with you.")
                     {
                         hasShare = true;
                     }
-                    else if (Text.EndsWith("is now sharing control of this dream with you."))
+                    else if (Text.EndsWith("is now sharing control of this Dream with you."))
                     {
                         hasShare = true;
                     }
-                    else if (Text.EndsWith("has stopped sharing control of this dream with you."))
+                    else if (Text.EndsWith("has stopped sharing control of this Dream with you."))
                     {
                         hasShare = false;
                     }
@@ -733,7 +738,7 @@ namespace Furcadia.Net.Proxy
                     Match WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
                     {
-                        ActivePlayer = dream.Furres.GerFurreByName(WhisperMatches.Groups[4].Value);
+                        ActivePlayer = Dream.Furres.GerFurreByName(WhisperMatches.Groups[4].Value);
                         ActivePlayer.Message = WhisperMatches.Groups[7].Value;
                         player = ActivePlayer;
                         chanObject = new ChannelObject(data)
@@ -776,7 +781,7 @@ namespace Furcadia.Net.Proxy
                 {
                     Regex EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
                     Match EmoteMatch = EmoteRegex.Match(data);
-                    ActivePlayer = dream.Furres.GerFurreByName(EmoteMatch.Groups[2].Value);
+                    ActivePlayer = Dream.Furres.GerFurreByName(EmoteMatch.Groups[2].Value);
                     ActivePlayer.Message = EmoteMatch.Groups[4].Value;
                     player = ActivePlayer;
                     chanObject = new ChannelObject(data)
@@ -795,10 +800,10 @@ namespace Furcadia.Net.Proxy
                 else if (Color == "notify")
                 {
                     string NameStr = "";
-                    if (Text.StartsWith("players banished from your dreams: "))
+                    if (Text.StartsWith("players banished from your Dreams: "))
                     {
                         //Banish-List
-                        //[notify> players banished from your dreams:
+                        //[notify> players banished from your Dreams:
                         //`(0:54) When the bot sees the banish list
                         BanishList.Clear();
                         string[] tmp = Text.Substring(35).Split(',');
@@ -845,10 +850,10 @@ namespace Furcadia.Net.Proxy
                         Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
                         NameStr = t.Match(data).Groups[1].Value;
                     }
-                    else if (Text == "Sorry, this player has not been banished from your dreams.")
+                    else if (Text == "Sorry, this player has not been banished from your Dreams.")
                     {
                         //banish-off <name> (not on list)
-                        //Error:>> Sorry, this player has not been banished from your dreams.
+                        //Error:>> Sorry, this player has not been banished from your Dreams.
 
                         NameStr = BanishName;
                     }
@@ -884,7 +889,7 @@ namespace Furcadia.Net.Proxy
                     if (NameRegex.Match(data).Success)
                     {
                         var name = NameRegex.Match(data).Groups[1].Value;
-                        player = dream.Furres.GerFurreByName(name);
+                        player = Dream.Furres.GerFurreByName(name);
                     }
                 }
             }
@@ -976,6 +981,16 @@ namespace Furcadia.Net.Proxy
                 case ConnectionPhase.Connected:
                     if (string.IsNullOrEmpty(data))
                         return;
+                    if (data == "]ccmarbled.pcx")
+                    {
+                        Dream = new Dream();
+                        var instruction = new BaseServerInstruction(data)
+                        {
+                            InstructionType = ServerInstructionType.EnterDream
+                        };
+                        ProcessServerInstruction?.Invoke(instruction,
+                                 new ParseServerArgs(ServerInstructionType.EnterDream, serverconnectphase));
+                    }
                     // Look instruction
                     if (data.StartsWith("]f") & InDream == true)
                     {
@@ -1004,12 +1019,12 @@ namespace Furcadia.Net.Proxy
                         SpawnAvatar FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
 
-                        dream.Furres.Add(player);
+                        Dream.Furres.Add(player);
 
                         //New furre Arrival to current Dream
                         if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                         {
-                            player = dream.Furres[dream.Furres.IndexOf(FurreSpawn.player)];
+                            player = Dream.Furres[Dream.Furres.IndexOf(FurreSpawn.player)];
                         }
 
                         if (IsConnectedCharacter(player)) // Keep connectedFurre upto date
@@ -1028,9 +1043,9 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == ')' || data[0] == ' ')
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
-                        RemoveFurre.Player = dream.Furres.GetFurreByID(RemoveFurre.FurreId);
+                        RemoveFurre.Player = Dream.Furres.GetFurreByID(RemoveFurre.FurreId);
 
-                        dream.Furres.Remove(RemoveFurre.FurreId);
+                        Dream.Furres.Remove(RemoveFurre.FurreId);
 
                         if (ProcessServerInstruction != null)
                         {
@@ -1042,9 +1057,9 @@ namespace Furcadia.Net.Proxy
                     //Animated Move
                     else if (data[0] == '/')
                     {
-                        player = dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
-                        connectedFurre = dream.Furres[connectedFurre];
+                        connectedFurre = Dream.Furres[connectedFurre];
                         ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
                         if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <= player.Position.Y &
                             VisableRectangle.height >= player.Position.Y & VisableRectangle.length >=
@@ -1067,10 +1082,10 @@ namespace Furcadia.Net.Proxy
                     // Move Avatar
                     else if (data[0] == 'A')
                     {
-                        player = dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
 
-                        connectedFurre = dream.Furres[connectedFurre];
+                        connectedFurre = Dream.Furres[connectedFurre];
                         ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
 
                         if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <=
@@ -1095,7 +1110,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'B')
                     {
                         //fuid 4 b220 bytes
-                        player = dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         UpdateColorString ColorStringUpdate = new UpdateColorString(ref player, data);
 
                         if (InDream)
@@ -1110,7 +1125,7 @@ namespace Furcadia.Net.Proxy
                     //Hide Avatar
                     else if (data[0] == 'C')
                     {
-                        player = dream.Furres.GetFurreByID(data.Substring(1, 4));
+                        player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         player.Position = new FurrePosition(data.Substring(5, 4));
                         player.Visible = false;
                     }
@@ -1152,7 +1167,7 @@ namespace Furcadia.Net.Proxy
                         Console.WriteLine("Disconnection Dialog:" + data);
 #endif
 
-                        dream.Furres.Clear();
+                        Dream.Furres.Clear();
 
                         //;{mapfile}	Load a local map (one in the furcadia folder)
                         //]q {name} {id}	Request to download a specific patch
@@ -1168,17 +1183,17 @@ namespace Furcadia.Net.Proxy
                         //Set defaults (should move to some where else?
                         hasShare = false;
                         NoEndurance = false;
-
                         LoadDream loadDream = new LoadDream(data);
-                        dream.Load(loadDream);
+                        Dream.Load(loadDream);
+                        Logger.Debug<ProxySession>($"Load Dream {loadDream}");
                         if (ProcessServerInstruction != null)
                             ProcessServerInstruction?.Invoke(loadDream,
                                new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
-                        if (!IsFurcadiaClientIsRunning)
+                        if (!FurcadiaClientIsRunning)
                         {
-                            SendToServer("dreambookmark 0");
+                            SendToServer("Dreambookmark 0");
                         }
                         return;
                     }
@@ -1194,7 +1209,7 @@ namespace Furcadia.Net.Proxy
                     // ]BUserID[*]
                     // Set Own ID
                     // This instruction informs the client of which user-name is it logged into. Knowing your
-                    // own UserID can help you find your own avatar within the dream.
+                    // own UserID can help you find your own avatar within the Dream.
                     // Credits Artex, FTR
                     else if (data.StartsWith("]B"))
                     {
@@ -1215,7 +1230,7 @@ namespace Furcadia.Net.Proxy
                     //]CBookmark Type[1]Dream URL[*]
                     // Type 0 = temporary
                     // Type 1 = Regular (per user requests)
-                    // DreamUrl = "furc://uploadername:dreamname/entrycode "
+                    // DreamUrl = "furc://uploadername:Dreamname/entrycode "
                     // Credits FTR
                     else if (data.StartsWith("]C"))
                     {
@@ -1223,8 +1238,8 @@ namespace Furcadia.Net.Proxy
                         {
                             DreamBookmark bookmark = new DreamBookmark(data);
 
-                            dream.BookMark = bookmark;
-
+                            Dream.BookMark = bookmark;
+                            Logger.Debug<ProxySession>($"Dream Bookmark: {bookmark}");
                             ProcessServerInstruction?.Invoke(bookmark,
                                 new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase));
                             return;
@@ -1398,10 +1413,10 @@ namespace Furcadia.Net.Proxy
                         if (Options.Standalone)
                         {
                             CloseClient();
-                            if (!IsFurcadiaClientIsRunning)
+                            if (!FurcadiaClientIsRunning)
                             {
                                 SendToServer("vascodagama");
-                                SendToServer("dreambookmark 0");
+                                SendToServer("Dreambookmark 0");
                             }
                         }
                     }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 
+// stolen I mean Borrowed from MonkeySpeak
 namespace Furcadia.Logging
 {
     internal class ConcurrentList<T> : IList<T>

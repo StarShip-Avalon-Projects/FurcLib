@@ -10,12 +10,10 @@ using Furcadia.Logging;
 using Furcadia.Net.Options;
 using System;
 using System.Diagnostics;
-using System.IO;
 
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 using static Furcadia.Net.Utils.Utilities;
 
 namespace Furcadia.Net
@@ -328,7 +326,7 @@ namespace Furcadia.Net
         /// <value>
         ///   <c>true</c> if [furcadia client is  a running process]; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFurcadiaClientIsRunning
+        public bool FurcadiaClientIsRunning
         {
             get
             {
@@ -360,7 +358,7 @@ namespace Furcadia.Net
             }
         }
 
-        private int furcID;
+        private static int furcID;
 
         /// <summary>
         /// Gets the buffer capacity.
@@ -466,7 +464,7 @@ namespace Furcadia.Net
                 {
                     client.Close();
                 }
-                if (IsFurcadiaClientIsRunning)
+                if (FurcadiaClientIsRunning)
                     CloseClient();
                 ClientDisconnected?.Invoke();
             }
@@ -595,8 +593,8 @@ namespace Furcadia.Net
                 settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
                 Logger.Debug<NetProxy>("Start Furcadia");
                 // LaunchFurcadia
-
-                furcID = ClientLaunched();
+                var FurcThread = new Thread(() => furcID = ClientLaunched());
+                FurcThread.Start();
                 SettingsRestore();
             }
             catch (Exception e)

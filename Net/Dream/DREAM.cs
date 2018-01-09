@@ -67,8 +67,6 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="DreamInfo">The dream information.</param>
         public void Load(LoadDream DreamInfo)
         {
-            furres.Clear();
-            mode = "legacy";
             if (DreamInfo.IsModern)
                 mode = "modern";
 
@@ -211,6 +209,8 @@ namespace Furcadia.Net.DreamInfo
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(owner) && string.IsNullOrWhiteSpace(_Title))
+                    return string.Empty;
                 if (string.IsNullOrWhiteSpace(owner))
                 {
                     return $"furc://{_Title}/";
@@ -261,11 +261,12 @@ namespace Furcadia.Net.DreamInfo
         /// <returns>
         ///   <c>true</c> if the specified <see cref="Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            if (other == null)
+            if (obj == null)
                 return false;
-            if (other is IDream dream)
+            if (this.GetType() != obj.GetType()) return false;
+            if (obj is IDream dream)
             {
                 return Name.ToLower() == dream.Name.ToLower();
             }
@@ -280,7 +281,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return _Title.GetHashCode() ^ owner.GetHashCode(); ;
         }
 
         /// <summary>

@@ -31,13 +31,16 @@ namespace Furcadia.Logging
 
     public struct LogMessage
     {
-        private string message;
+        public string message;
         private readonly DateTime expires, timeStamp;
         private readonly Level level;
 
         private readonly Thread curThread;
 
-        private bool IsEmpty => string.IsNullOrWhiteSpace(message);
+        private bool IsEmpty
+        {
+            get { return string.IsNullOrWhiteSpace(message); }
+        }
 
         public bool IsSpam
         {
@@ -51,12 +54,10 @@ namespace Furcadia.Logging
 
         public DateTime TimeStamp => timeStamp;
 
-        public string Message { get => message; set => message = value; }
-
         private LogMessage(Level level, string msg, TimeSpan expireDuration)
         {
             this.level = level;
-            message = msg;
+            message = string.IsNullOrEmpty(msg) ? string.Empty : msg;
             var now = DateTime.Now;
             expires = now.Add(expireDuration);
             timeStamp = now;
@@ -118,10 +119,10 @@ namespace Furcadia.Logging
         }
 
         /// <summary>
-        /// Returns a <see cref="String" /> that represents this instance.
+        /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="String" /> that represents this instance.
+        /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
@@ -129,9 +130,6 @@ namespace Furcadia.Logging
         }
     }
 
-    /// <summary>
-    /// Furcadia Logger
-    /// </summary>
     public static class Logger
     {
         private static ILogOutput _logOutput;
@@ -241,7 +239,7 @@ namespace Furcadia.Logging
         /// Sets the <see cref="ILogOutput"/>.
         /// </summary>
         /// <param name="output">The output.</param>
-        /// <exception cref="ArgumentNullException">output</exception>
+        /// <exception cref="System.ArgumentNullException">output</exception>
         public static ILogOutput LogOutput
         {
             get { return _logOutput; }
@@ -286,16 +284,6 @@ namespace Furcadia.Logging
         {
             if (!disabledTypes.Contains(typeof(T)))
                 disabledTypes.Add(typeof(T));
-        }
-
-        /// <summary>
-        /// Disables logging for the specified type.
-        /// </summary>
-        /// <typeparam name="T">the type</typeparam>
-        public static void Enable<T>()
-        {
-            if (!disabledTypes.Contains(typeof(T)))
-                disabledTypes.Remove(typeof(T));
         }
 
         private static bool TypeCheck(Type type, out string typeName)
@@ -356,12 +344,6 @@ namespace Furcadia.Logging
             }
         }
 
-        /// <summary>
-        /// Asserts the specified cond.
-        /// </summary>
-        /// <param name="cond">if set to <c>true</c> [cond].</param>
-        /// <param name="failMsg">The fail MSG.</param>
-        /// <returns></returns>
         public static bool Assert(bool cond, string failMsg)
         {
             if (!cond)
