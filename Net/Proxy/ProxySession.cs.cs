@@ -9,20 +9,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-
-//Furcadia Servver Parser
-//Event/Delegates for server instructions
-//call subsystem processor
-
-//Dream info
-//Furre info
-//Bot info
-
-//Furre Update events?
+using static Furcadia.Text.FurcadiaMarkup;
 
 using static Furcadia.Drawing.VisibleArea;
 using static Furcadia.Movement.CharacterFlags;
-using static Furcadia.Text.FurcadiaMarkup;
 
 namespace Furcadia.Net.Proxy
 {
@@ -45,6 +35,14 @@ namespace Furcadia.Net.Proxy
     /// </summary>
     public class ProxySession : NetProxy, IDisposable
     {
+        public ThroatTiredEnabled TroatTiredEventHandler;
+
+        /// <summary>
+        /// Throat Tired even handler
+        /// </summary>
+        /// <param name="enable">if set to <c>true</c> [enable].</param>
+        public delegate void ThroatTiredEnabled(bool enable);
+
         #region Public Constructors
 
         /// <summary>
@@ -78,7 +76,7 @@ namespace Furcadia.Net.Proxy
 
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
-
+            ServerBalancer.TroatTiredEventHandler += (e) => TroatTiredEventHandler(e);
             base.ServerData2 += (e) => OnServerDataReceived(e);
             ServerConnected += () => OnServerConnected();
             ServerDisconnected += () =>
@@ -499,7 +497,6 @@ namespace Furcadia.Net.Proxy
         /// </remarks>
         public void ParseServerChannel(string data, bool Handled)
         {
-            //TODO: needs to move and re factored to ServerParser Class
             ChannelObject chanObject;
             ParseChannelArgs args;
             Logger.Debug<ProxySession>(data);
@@ -508,7 +505,7 @@ namespace Furcadia.Net.Proxy
             Match DescTagRegexMatch = DescTagRegex.Match(data);
             Furre ActivePlayer = new Furre("Furcadia game server");
             if (NameRegex.Match(data).Success)
-                ActivePlayer = Dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[1].Value);
+                ActivePlayer = Dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[2].Value);
 
             if (DescTagRegexMatch.Success)
             {
@@ -577,12 +574,29 @@ namespace Furcadia.Net.Proxy
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
                 }
+                Match QueryMatch = QueryCommand.Match(data);
+                if (QueryMatch.Success)
+                {
+                    player = ActivePlayer;
+                    chanObject = new ChannelObject(data)
+                    {
+                        Player = player,
+                        InstructionType = ServerInstructionType.DisplayText
+                    };
+
+                    args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
+                    {
+                        Channel = QueryMatch.Groups[1].Value
+                    };
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
                 Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
 
                 Match ShoutMatch = ShoutRegex.Match(data);
                 if (ShoutMatch.Success)
                 {
-                    ActivePlayer = Dream.Furres.GerFurreByName(ShoutMatch.Groups[4].Value);
+                    ActivePlayer = Dream.Furres.GerFurreByName(ShoutMatch.Groups[5].Value);
                     ActivePlayer.Message = ShoutMatch.Groups[7].Value;
                     player = ActivePlayer;
                     chanObject = new ChannelObject(data)
@@ -697,7 +711,7 @@ namespace Furcadia.Net.Proxy
 
                     if (!DescMatch.Success)
                     {
-                        Regex SayRegex = new Regex($"{NameFilter}: (.*)");
+                        Regex SayRegex = new Regex($"{NameFilter}: (.*)", RegexOptions.Compiled);
                         Match SayMatch = SayRegex.Match(data);
                         ActivePlayer.Message = SayRegex.Match(data).Groups[3].Value;
                         player = ActivePlayer;
@@ -888,7 +902,7 @@ namespace Furcadia.Net.Proxy
                     channel = FontColorRegexMatch.Groups[8].Value;
                     if (NameRegex.Match(data).Success)
                     {
-                        var name = NameRegex.Match(data).Groups[1].Value;
+                        var name = NameRegex.Match(data).Groups[2].Value;
                         player = Dream.Furres.GerFurreByName(name);
                     }
                 }

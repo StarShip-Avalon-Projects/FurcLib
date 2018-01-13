@@ -19,18 +19,46 @@ namespace Furcadia.Net.Utils
     /// </summary>
     public class ServerQue : IDisposable
     {
+        #region Public Fields
+
+        /// <summary>
+        /// Notify subscribers were's sending an instruction to the games server
+        /// </summary>
+        public EventHandler OnServerSendMessage;
+
+        /// <summary>
+        /// The troat tired event handler
+        /// </summary>
+        public ThroatTiredEnabled TroatTiredEventHandler;
+
+        #endregion Public Fields
+
         #region Private Fields
+
+        private const int MASS_CRITICAL = 1024;
+
+        private const int MASS_DECAYPS = 512;
+
+        private const int MASS_DEFAULT = 120;
+
+        private const int MASS_NOENDURANCE = 2048;
+
+        private const int MASS_SPEECH = 1000;
+
+        private bool disposedValue = false;
+
+        private double g_mass = 0;
+
+        /// <summary>
+        /// NoEndurance. Send data at the speed of the server
+        /// </summary>
+        private bool noendurance;
 
         private uint pingdelaytime;
 
-        private const int MASS_CRITICAL = 1024;
-        private const int MASS_NOENDURANCE = 2048;
-        private const int MASS_DECAYPS = 512;
-        private const int MASS_DEFAULT = 120;
-        private const int MASS_SPEECH = 1000;
-        private double g_mass = 0;
-
         private Timer PingTimer;
+
+        private object QueLock = new object();
 
         /// <summary>
         /// Queue Processing timer.
@@ -41,18 +69,6 @@ namespace Furcadia.Net.Utils
         /// FIFO Stack of Server Instructions to process
         /// </summary>
         private Queue<string> ServerStack = new Queue<string>(500);
-
-        /// <summary>
-        /// How long to wait till we resume processing the ServerStack?
-        /// </summary>
-        private Timer TroatTiredDelay;
-
-        /// <summary>
-        /// NoEndurance. Send data at the speed of the server
-        /// </summary>
-        private bool noendurance;
-
-        private object QueLock = new object();
 
         /// <summary>
         /// Throat Tired System.
@@ -71,84 +87,16 @@ namespace Furcadia.Net.Utils
         private DateTime TickTime = DateTime.Now;
 
         /// <summary>
+        /// How long to wait till we resume processing the ServerStack?
+        /// </summary>
+        private Timer TroatTiredDelay;
+
+        /// <summary>
         /// ping interlock exchange
         /// </summary>
         private int usingPing = 0;
 
         #endregion Private Fields
-
-        #region Public Properties
-
-        /// <summary>
-        /// Is the connect `noendurance enabled?
-        /// </summary>
-        public bool NoEndurance
-        {
-            get { return noendurance; }
-            set { noendurance = value; }
-        }
-
-        /// <summary>
-        /// Ping the server Time in Seconds
-        /// </summary>
-        public uint PingDelayTime
-        {
-            get { return pingdelaytime; }
-            set
-            {
-                pingdelaytime = value;
-                NewPingTimer(value);
-            }
-        }
-
-        /// <summary>
-        /// If Proxy get "Your throat is tired" Pause for a number of seconds
-        /// <para>
-        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
-        /// </para>
-        /// </summary>
-        public bool ThroatTired
-        {
-            get { return throattired; }
-            set
-            {
-                throattired = value;
-                TroatTiredDelay = new Timer(TroatTiredDelayTick,
-                    null,
-                    TimeSpan.Zero,
-                    TimeSpan.FromSeconds(throattireddelaytime)
-                    );
-            }
-        }
-
-        /// <summary>
-        /// When "Your throat is tired appears, Pause processing of client
-        /// to server instructions,
-        /// </summary>
-        public int ThroatTiredDelayTime
-        {
-            get { return throattireddelaytime; }
-            set { throattireddelaytime = value; }
-        }
-
-        /// <summary>
-        /// Set the Ping timer
-        /// </summary>
-        /// <param name="DelayTime">
-        /// Delay Time in Seconds
-        /// </param>
-        private void NewPingTimer(uint DelayTime)
-        {
-            if (PingTimer != null)
-                PingTimer.Dispose();
-            PingTimer = new Timer(PingTimerTick,
-                null,
-                TimeSpan.FromSeconds(DelayTime),
-                TimeSpan.FromSeconds(DelayTime)
-                );
-        }
-
-        #endregion Public Properties
 
         #region Public Constructors
 
@@ -193,16 +141,6 @@ namespace Furcadia.Net.Utils
             NewPingTimer(PingTimerTime);
         }
 
-        private void Initialize()
-        {
-#if DEBUG
-            if (!Debugger.IsAttached)
-                Logger.Disable<ServerQue>();
-#else
-            Logger.Disable<NetProxy>();
-#endif
-        }
-
         #endregion Public Constructors
 
         #region Public Delegates
@@ -219,9 +157,107 @@ namespace Furcadia.Net.Utils
         /// </param>
         public delegate void SendServerEventHandler(string message, EventArgs args);
 
+        /// <summary>
+        /// Throat Tired even handler
+        /// </summary>
+        /// <param name="enable">if set to <c>true</c> [enable].</param>
+        public delegate void ThroatTiredEnabled(bool enable);
+
         #endregion Public Delegates
 
-        #region Connection Timers
+
+
+        #region Public Properties
+
+        /// <summary>
+        /// Is the connect `noendurance enabled?
+        /// </summary>
+        public bool NoEndurance
+        {
+            get { return noendurance; }
+            set { noendurance = value; }
+        }
+
+        /// <summary>
+        /// Ping the server Time in Seconds
+        /// </summary>
+        public uint PingDelayTime
+        {
+            get { return pingdelaytime; }
+            set
+            {
+                pingdelaytime = value;
+                NewPingTimer(value);
+            }
+        }
+
+        /// <summary>
+        /// If Proxy get "Your throat is tired" Pause for a number of seconds
+        /// <para>
+        /// When set, a <see cref="System.Threading.Timer"/> is created to make us wait till the time is clear to resume.
+        /// </para>
+        /// </summary>
+        public bool ThroatTired
+        {
+            get { return throattired; }
+            set
+            {
+                throattired = value;
+                TroatTiredDelay = new Timer(TroatTiredDelayTick,
+                    null,
+                    TimeSpan.Zero,
+                    TimeSpan.FromSeconds(throattireddelaytime)
+                    );
+                TroatTiredEventHandler?.Invoke(throattired);
+            }
+        }
+
+        /// <summary>
+        /// When "Your throat is tired appears, Pause processing of client
+        /// to server instructions,
+        /// </summary>
+        public int ThroatTiredDelayTime
+        {
+            get { return throattireddelaytime; }
+            set { throattireddelaytime = value; }
+        }
+
+        #endregion Public Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// This code added to correctly implement the disposable pattern.
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool
+            // disposing) above.
+            Dispose(true);
+        }
+
+        // To detect redundant calls
+        /// <summary>
+        /// </summary>
+        /// <param name="disposing">
+        /// </param>
+        public virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (TroatTiredDelay != null)
+                        TroatTiredDelay.Dispose();
+                    if (PingTimer != null)
+                        PingTimer.Dispose();
+                    if (QueueTimer != null)
+                        QueueTimer.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
 
         /// <summary>
         /// Incoming Messages for server processing
@@ -251,6 +287,37 @@ namespace Furcadia.Net.Utils
                     QueueTick(0);
                 }
             }
+        }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        private void Initialize()
+        {
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Logger.Disable<ServerQue>();
+#else
+            Logger.Disable<NetProxy>();
+#endif
+        }
+
+        /// <summary>
+        /// Set the Ping timer
+        /// </summary>
+        /// <param name="DelayTime">
+        /// Delay Time in Seconds
+        /// </param>
+        private void NewPingTimer(uint DelayTime)
+        {
+            if (PingTimer != null)
+                PingTimer.Dispose();
+            PingTimer = new Timer(PingTimerTick,
+                null,
+                TimeSpan.FromSeconds(DelayTime),
+                TimeSpan.FromSeconds(DelayTime)
+                );
         }
 
         /// <summary>
@@ -351,55 +418,9 @@ namespace Furcadia.Net.Utils
         {
             ThroatTired = false;
             TroatTiredDelay.Dispose();
+            TroatTiredEventHandler?.Invoke(throattired);
         }
 
-        #endregion Connection Timers
-
-        #region Protected Methods
-
-        /// <summary>
-        /// Notify subscribers were's sending an instruction to the games server
-        /// </summary>
-        public EventHandler OnServerSendMessage;
-
-        #region IDisposable Support
-
-        private bool disposedValue = false; // To detect redundant calls
-
-        /// <summary>
-        /// This code added to correctly implement the disposable pattern.
-        /// </summary>
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool
-            // disposing) above.
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="disposing">
-        /// </param>
-        public virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    if (TroatTiredDelay != null)
-                        TroatTiredDelay.Dispose();
-                    if (PingTimer != null)
-                        PingTimer.Dispose();
-                    if (QueueTimer != null)
-                        QueueTimer.Dispose();
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        #endregion IDisposable Support
-
-        #endregion Protected Methods
+        #endregion Private Methods
     }
 }

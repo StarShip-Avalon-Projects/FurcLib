@@ -127,6 +127,12 @@ namespace Furcadia.Text
         /// </summary>
         public static Regex DescTagRegex = new Regex(Iconfilter + "(.*)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+        /// <summary>
+        /// Queries (join, summon, lead follow, cuddle)
+        /// </summary>
+        // <font color='query'><name shortname=['\"](.^?)['\"]>(.^?)</name> (.^?), <a href='command://(.^?)'>click here</a> or type `(.^?) and press &lt;enter&gt;.</font>
+        public static Regex QueryCommand = new Regex("<font color=[\'|\\\"](.*?)['|\\\"]><name shortname=['|\\\"](.*?)[\'|\"]>(.*?)</name> (requests permission to (.*?) (.*?)), <a href=[\'|\"]command://(.*?)[\'|\"]>click here</a> or type (`.*?) and press &lt;enter&gt;.</font>", RegexOptions.Compiled);
+
         #region Public Constructors
 
         /// <summary>
