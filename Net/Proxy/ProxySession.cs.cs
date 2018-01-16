@@ -586,6 +586,7 @@ namespace Furcadia.Net.Proxy
 
                     args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
                     {
+                        ServerData = data,
                         Channel = QueryMatch.Groups[1].Value
                     };
                     ProcessServerChannelData?.Invoke(chanObject, args);
