@@ -399,10 +399,9 @@ namespace Furcadia.Net
             {
                 try
                 {
-                    if (client != null)
+                    if (client != null && client.Client != null)
                     {
-                        if (client.Client != null)
-                            return client.Client.Connected;
+                        return client.Connected;
                     }
                 }
                 catch { }
@@ -419,7 +418,7 @@ namespace Furcadia.Net
             {
                 try
                 {
-                    if (LightBringer != null)
+                    if (LightBringer != null && LightBringer.Client != null)
                     {
                         return LightBringer.Connected;
                     }
@@ -601,6 +600,11 @@ namespace Furcadia.Net
             {
                 SendError(e, this);
             }
+            finally
+            {
+                listen.Stop();
+                listen = null;
+            }
         }
 
         private int LaunchFurcadia()
@@ -658,8 +662,9 @@ namespace Furcadia.Net
         /// </param>
         public virtual void SendToClient(string message)
         {
-            if (!message.EndsWith(@"\n"))
-                message += '\n';
+            string replaceWith = "";
+            string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
+            message = removedBreaks + '\n';
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)
@@ -694,7 +699,7 @@ namespace Furcadia.Net
         {
             string replaceWith = "";
             string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
-            message += '\n';
+            message = removedBreaks + '\n';
 
             if (!IsServerSocketConnected)
                 return;
