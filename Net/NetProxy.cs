@@ -204,7 +204,7 @@ namespace Furcadia.Net
             ClientLaunched += () => LaunchFurcadia();
             SettingsRestore += () =>
             {
-                DateTime end = DateTime.Now + TimeSpan.FromSeconds(10);
+                DateTime end = DateTime.Now + TimeSpan.FromSeconds(20);
                 while (true)
                 {
                     Thread.Sleep(100);
@@ -592,8 +592,8 @@ namespace Furcadia.Net
                 settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
                 Logger.Debug<NetProxy>("Start Furcadia");
                 // LaunchFurcadia
-                var FurcThread = new Thread(() => furcID = ClientLaunched());
-                FurcThread.Start();
+                furcID = ClientLaunched();
+
                 SettingsRestore();
             }
             catch (Exception e)
@@ -665,6 +665,7 @@ namespace Furcadia.Net
             string replaceWith = "";
             string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
             message = removedBreaks + '\n';
+
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)
@@ -689,6 +690,12 @@ namespace Furcadia.Net
         public virtual void SendToServer(INetMessage message)
         {
             SendToServer(message.GetString());
+        }
+
+        private void SanatizeProtocolStrinng(ref string message)
+        {
+            message = message.Replace("\n", string.Empty).Replace("\r", string.Empty);
+            message += '\n';
         }
 
         /// <summary>
@@ -736,34 +743,13 @@ namespace Furcadia.Net
             {
                 listen = (TcpListener)ar.AsyncState;
 
-                try
-                {
-                    client = listen.EndAcceptTcpClient(ar);
-                }
-                catch (SocketException se)
-                {
-                    if (se.ErrorCode > 0) throw se;
-                }
+                client = listen.EndAcceptTcpClient(ar);
 
-                try
-                {
-                    client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
-                    ClientConnected?.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    SendError(ex, this);
-                }
+                client.GetStream().BeginRead(clientBuffer, 0, clientBuffer.Length, new AsyncCallback(GetClientData), client);
+                ClientConnected?.Invoke();
 
-                try
-                {
-                    LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
-                    ServerConnected?.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    SendError(ex, this);
-                }
+                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
+                ServerConnected?.Invoke();
             }
             catch (Exception e)
             {

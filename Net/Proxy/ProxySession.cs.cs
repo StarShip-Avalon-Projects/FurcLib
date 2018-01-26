@@ -1020,11 +1020,13 @@ namespace Furcadia.Net.Proxy
                             player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
                             if (IsConnectedCharacter())
                                 Look = false;
+
                             UpdateColorString Instruction = new UpdateColorString(ref player, data)
                             {
                                 InstructionType = ServerInstructionType.LookResponse
                             };
                             ProcessServerInstruction?.Invoke(Instruction,
+
                                    new ParseServerArgs(ServerInstructionType.LookResponse, serverconnectphase));
                         }
                     }
