@@ -75,6 +75,8 @@ namespace Furcadia.Text
         /// </summary>
         public Settings()
         {
+            //PreventRrated = No
+            //WarnWhenAccessing = Yes
             Initialize();
             options = new ProxyOptions();
             Keys = new List<string> {
@@ -86,7 +88,9 @@ namespace Furcadia.Text
                 "ProxyCustomType",
                 "ProxyCustomData",
                 "ProxyApplyToFs",
-                "UseTls"
+                "UseTls",
+                "PreventRrated",
+                "WarnWhenAccessing"
             };
             values = new List<string> {
                 "Yes",
@@ -96,6 +100,8 @@ namespace Furcadia.Text
                 "0",
                 "0",
                 "CONNECT %host% %port%",
+                "no",
+                "no",
                 "no",
                 "no"
             };
@@ -119,7 +125,9 @@ namespace Furcadia.Text
                 "ProxyCustomType",
                 "ProxyCustomData",
                 "ProxyApplyToFs",
-                "UseTls"
+                "UseTls",
+                "PreventRrated",
+                "WarnWhenAccessing"
             };
             values = new List<string> {
                 "Yes",
@@ -129,6 +137,8 @@ namespace Furcadia.Text
                 "0",
                 "0",
                 "CONNECT %host% %port%",
+                "no",
+                "no",
                 "no",
                 "no"
             };

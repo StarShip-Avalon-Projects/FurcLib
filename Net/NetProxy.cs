@@ -665,7 +665,7 @@ namespace Furcadia.Net
             string replaceWith = "";
             string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
             message = removedBreaks + '\n';
-
+            Logger.Debug<NetProxy>($"{message}");
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite == true && client.Connected == true)

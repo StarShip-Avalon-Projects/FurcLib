@@ -52,6 +52,9 @@ namespace Furcadia.Logging
                 switch (logMsg.Level)
                 {
                     case Level.Debug:
+                        color = ConsoleColor.Gray;
+                        break;
+
                     case Level.Warning:
                         color = ConsoleColor.Yellow;
                         break;
@@ -61,7 +64,7 @@ namespace Furcadia.Logging
                         break;
 
                     case Level.Info:
-                        color = ConsoleColor.White;
+                        color = ConsoleColor.Cyan;
                         break;
                 }
                 Console.ForegroundColor = color;

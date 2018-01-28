@@ -92,6 +92,8 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(fileName))
+                    return false;
                 return fileName.Substring(0, 2) == "pm";
             }
         }

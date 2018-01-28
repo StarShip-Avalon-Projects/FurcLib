@@ -1345,6 +1345,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public override void SendToServer(string message)
         {
+            Logger.Debug<ProxySession>(message);
             if (serverconnectphase != ConnectionPhase.Disconnected)
                 ServerBalancer.SendToServer(message);
         }
