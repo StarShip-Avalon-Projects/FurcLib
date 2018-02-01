@@ -2,10 +2,14 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Furcadia.Logging;
+using Furcadia.Extensions;
 
 #endregion Usings
 
@@ -29,7 +33,7 @@ namespace Furcadia.Logging
         }
     }
 
-    public struct LogMessage
+    public struct LogMessage : IEquatable<LogMessage>
     {
         public string message;
         private readonly DateTime expires, timeStamp;
@@ -96,17 +100,6 @@ namespace Furcadia.Logging
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
-        /// </returns>
-        public override int GetHashCode()
-        {
-            return curThread.ManagedThreadId + message.GetHashCode();
-        }
-
-        /// <summary>
         /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
@@ -115,7 +108,7 @@ namespace Furcadia.Logging
         /// </returns>
         public override bool Equals(object obj)
         {
-            return obj != null && obj is LogMessage && GetHashCode() == ((LogMessage)obj).GetHashCode();
+            return obj != null && obj is LogMessage lm && Equals(lm);
         }
 
         /// <summary>
@@ -127,6 +120,25 @@ namespace Furcadia.Logging
         public override string ToString()
         {
             return message;
+        }
+
+        public bool Equals(LogMessage other)
+        {
+            return message == other.message &&
+                   timeStamp == other.timeStamp &&
+                   level == other.level &&
+                   EqualityComparer<Thread>.Default.Equals(curThread, other.curThread);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -975352547;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(message);
+            hashCode = hashCode * -1521134295 + timeStamp.GetHashCode();
+            hashCode = hashCode * -1521134295 + level.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<Thread>.Default.GetHashCode(curThread);
+            return hashCode;
         }
     }
 
@@ -426,45 +438,49 @@ namespace Furcadia.Logging
 
         public static void Debug(object msg, [CallerMemberName]string memberName = "")
         {
+            if (!DebugEnabled) return;
             Log(LogMessage.From(Level.Debug, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
         public static void Debug<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            if (TypeCheck(typeof(T), out string typeName))
+            if (DebugEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Debug, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
         public static void Info(object msg, [CallerMemberName]string memberName = "")
         {
+            if (!InfoEnabled) return;
             Log(LogMessage.From(Level.Info, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
         public static void Info<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            if (TypeCheck(typeof(T), out string typeName))
+            if (InfoEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Info, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
         public static void Error(object msg, [CallerMemberName]string memberName = "")
         {
+            if (!ErrorEnabled) return;
             Log(LogMessage.From(Level.Error, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
         public static void Error<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            if (TypeCheck(typeof(T), out string typeName))
+            if (ErrorEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Error, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
         public static void Warn(object msg, [CallerMemberName]string memberName = "")
         {
+            if (!WarningEnabled) return;
             Log(LogMessage.From(Level.Warning, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
         public static void Warn<T>(object msg, [CallerMemberName]string memberName = "")
         {
-            if (TypeCheck(typeof(T), out string typeName))
+            if (WarningEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Warning, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
     }

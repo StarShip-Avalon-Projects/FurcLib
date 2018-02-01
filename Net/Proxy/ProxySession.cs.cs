@@ -66,8 +66,9 @@ namespace Furcadia.Net.Proxy
             SpeciesTag = new Queue<string>();
             BadgeTag = new Queue<string>();
 #if DEBUG
-            if (!Debugger.IsAttached)
-                Logger.Disable<ProxySession>();
+            Logger.Disable<NetProxy>();
+            // if (!Debugger.IsAttached)
+            // Logger.Disable<ProxySession>();
 #else
             Logger.Disable<ProxySession>();
 #endif
@@ -76,8 +77,8 @@ namespace Furcadia.Net.Proxy
 
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
-            ServerBalancer.TroatTiredEventHandler += (e) => TroatTiredEventHandler(e);
-            base.ServerData2 += (e) => OnServerDataReceived(e);
+            ServerBalancer.TroatTiredEventHandler += e => TroatTiredEventHandler(e);
+            base.ServerData2 += e => OnServerDataReceived(e);
             ServerConnected += () => OnServerConnected();
             ServerDisconnected += () =>
             {
@@ -86,7 +87,7 @@ namespace Furcadia.Net.Proxy
                 ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
             };
 
-            base.ClientData2 += (e) => OnClientDataReceived(e);
+            base.ClientData2 += e => ParseClientData(e);
             ClientDisconnected += () =>
             {
                 clientconnectionphase = ConnectionPhase.Disconnected;
@@ -115,9 +116,9 @@ namespace Furcadia.Net.Proxy
         public override void Connect()
         {
             if (IsServerSocketConnected)
-                Disconnect();
+                DisconnectServerAndClientStreams();
             if (IsClientSocketConnected)
-                ClientDisconnect();
+                DisconnectClientStream();
             serverconnectphase = ConnectionPhase.Connecting;
             clientconnectionphase = ConnectionPhase.Connecting;
             base.Connect();
@@ -423,16 +424,17 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(Dream.Title);
+                return !string.IsNullOrWhiteSpace(Dream.FileName);
             }
         }
 
         /// <summary>
         /// Current Triggering player
         /// </summary>
-        public IFurre Player
+        public Furre Player
         {
-            get { return player; }
+            get => player;
+            private set => player = value;
         }
 
         /// <summary>
@@ -621,7 +623,7 @@ namespace Furcadia.Net.Proxy
                     player = connectedFurre;
                     chanObject = new ChannelObject(data)
                     {
-                        Player = player,
+                        Player = connectedFurre,
                         InstructionType = ServerInstructionType.DisplayText
                     };
 
@@ -772,10 +774,10 @@ namespace Furcadia.Net.Proxy
                     if (WhisperMatches.Success)
                     {
                         connectedFurre.Message = WhisperMatches.Groups[4].Value;
-                        player = connectedFurre;
+                        Player = connectedFurre;
                         chanObject = new ChannelObject(data)
                         {
-                            Player = player,
+                            Player = connectedFurre,
                         };
                         args = new ParseChannelArgs(ServerInstructionType.DisplayText, serverconnectphase)
                         {
@@ -882,7 +884,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (data.StartsWith("Communication"))
                 {
-                    Disconnect();
+                    DisconnectServerAndClientStreams();
                 }
                 else if (channel == "@cookie")
                 {
@@ -982,7 +984,7 @@ namespace Furcadia.Net.Proxy
                 case ConnectionPhase.Auth:
                     if (data.StartsWith("]]"))
                     {
-                        Disconnect();
+                        DisconnectServerAndClientStreams();
                     }
                     else if (data == "&&&&&&&&&&&&&")
                     {
@@ -990,6 +992,11 @@ namespace Furcadia.Net.Proxy
                         serverconnectphase = ConnectionPhase.Connected;
 
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                        if (IsClientSocketConnected)
+                        {
+                            clientconnectionphase = ConnectionPhase.Connected;
+                            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+                        }
                     }
                     break;
 
@@ -1005,6 +1012,8 @@ namespace Furcadia.Net.Proxy
                         };
                         ProcessServerInstruction?.Invoke(instruction,
                                  new ParseServerArgs(ServerInstructionType.EnterDream, serverconnectphase));
+                        if (Options.Standalone)
+                            CloseFurcadiaClient();
                     }
                     // Look instruction
                     if (data.StartsWith("]f") & InDream == true)
@@ -1208,9 +1217,11 @@ namespace Furcadia.Net.Proxy
                                new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
-                        if (!FurcadiaClientIsRunning)
+
+                        if (Options.Standalone)
                         {
-                            SendToServer("Dreambookmark 0");
+                            SendToServer("vascodagama");
+                            SendToServer("dreambookmark 0");
                         }
                         return;
                     }
@@ -1403,7 +1414,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="data">
         /// </param>
-        private void OnClientDataReceived(string data)
+        private void ParseClientData(string data)
         {
             Logger.Debug<ProxySession>(data);
 
@@ -1424,20 +1435,7 @@ namespace Furcadia.Net.Proxy
                         string[] words = data.Split(' ');
                         connectedFurre = new Furre(words[2]);
                     }
-                    if (data == "vascodagama")
-                    {
-                        clientconnectionphase = ConnectionPhase.Connected;
-                        ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
-                        if (Options.Standalone)
-                        {
-                            CloseClient();
-                            if (!FurcadiaClientIsRunning)
-                            {
-                                SendToServer("vascodagama");
-                                SendToServer("Dreambookmark 0");
-                            }
-                        }
-                    }
+
                     ClientData2?.Invoke(data);
                     break;
 
@@ -1454,10 +1452,10 @@ namespace Furcadia.Net.Proxy
                         ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
                         if (Options.Standalone)
                         {
-                            ClientDisconnect();
+                            DisconnectClientStream();
                         }
                         else
-                            Disconnect();
+                            DisconnectServerAndClientStreams();
                     }
                     if (IsClientSocketConnected)
                         ClientData2?.Invoke(data);

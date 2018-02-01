@@ -101,7 +101,7 @@ namespace Furcadia.Net.Web
 
         public string Name { get; internal set; }
 
-        internal Variable(string name, bool constant = false)
+        public Variable(string name, bool constant = false)
         {
             IsConstant = constant;
             Name = name;

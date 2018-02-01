@@ -69,7 +69,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Furcadia Client Process
         /// </summary>
-        private static Process furcProcess;
+        private Process furcProcess;
 
         /// <summary>
         /// Allow Furcadia Client to connect to us
@@ -201,10 +201,10 @@ namespace Furcadia.Net
             Logger.Disable<NetProxy>();
 #endif
             FurcadiaUtilities = new Utils.Utilities();
-            ClientLaunched += () => LaunchFurcadia();
+            ClientLaunched += () => LaunchFurcadiaClient();
             SettingsRestore += () =>
             {
-                DateTime end = DateTime.Now + TimeSpan.FromSeconds(20);
+                DateTime end = DateTime.Now + TimeSpan.FromSeconds(Options.ResetSettingTime);
                 while (true)
                 {
                     Thread.Sleep(100);
@@ -439,19 +439,20 @@ namespace Furcadia.Net
         /// <param name="o"></param>
         protected virtual void SendError(Exception e, object o)
         {
-            Logger.Error<NetProxy>($"{e} {o}");
             if (Error != null)
             {
                 Error?.Invoke(e, o);
             }
             else
+            {
                 throw e;
+            }
         }
 
         /// <summary>
         /// Disconnect from the Furcadia client
         /// </summary>
-        public void ClientDisconnect()
+        public void DisconnectClientStream()
         {
             if (listen != null)
             {
@@ -464,7 +465,7 @@ namespace Furcadia.Net
                     client.Close();
                 }
                 if (FurcadiaClientIsRunning)
-                    CloseClient();
+                    CloseFurcadiaClient();
                 ClientDisconnected?.Invoke();
             }
         }
@@ -473,20 +474,28 @@ namespace Furcadia.Net
         ///  Disconnects the furcadia client and Closes the application
         /// </summary>
         /// <exception cref="System.InvalidOperationException"></exception>
-        public void CloseClient()
+        public void CloseFurcadiaClient()
         {
             if (FurcadiaProcessID > 0)
             {
-                furcProcess = Process.GetProcessById(furcID);
-                furcProcess.CloseMainWindow();
+                if (IsClientSocketConnected) DisconnectClientStream();
                 try
                 {
-                    furcProcess.Close();
+                    while (furcProcess != null && !furcProcess.HasExited)
+                    {
+                        var Furc = Process.GetProcessById(furcID);
+                        Furc.CloseMainWindow();
+                        Furc.Dispose();
+                    }
                 }
                 finally
                 {
-                    furcProcess.Dispose();
-                    furcProcess = null;
+                    if (furcProcess != null)
+                    {
+                        furcProcess.Dispose();
+                        furcProcess = null;
+                        furcID = -1;
+                    }
                 }
             }
         }
@@ -602,12 +611,15 @@ namespace Furcadia.Net
             }
             finally
             {
-                listen.Stop();
-                listen = null;
+                if (listen != null)
+                {
+                    listen.Stop();
+                    listen = null;
+                }
             }
         }
 
-        private int LaunchFurcadia()
+        private int LaunchFurcadiaClient()
         {
             var furcadiaProcessInfo = new ProcessStartInfo
             {
@@ -625,14 +637,8 @@ namespace Furcadia.Net
             furcProcess.Exited += (s, e) =>
             {
                 Logger.Debug<NetProxy>($"Furcadia Process Exited ");
-
-                if (IsClientSocketConnected)
-                {
-                    client.Close();
-                }
+                CloseFurcadiaClient();
                 settings.RestoreFurcadiaSettings();
-                furcID = -1;
-                furcProcess = null;
             };
             if (furcProcess.Start())
             {
@@ -645,9 +651,9 @@ namespace Furcadia.Net
         /// <summary>
         /// Disconnect from the Furcadia gameserver and Furcadia client
         /// </summary>
-        public virtual void Disconnect()
+        public virtual void DisconnectServerAndClientStreams()
         {
-            ClientDisconnect();
+            DisconnectClientStream();
 
             if (LightBringer.Connected)
             {

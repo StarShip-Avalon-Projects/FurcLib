@@ -10,7 +10,7 @@ namespace Furcadia.Logging
     /// <summary>
     /// Multi log output
     /// </summary>
-    /// <seealso cref="Monkeyspeak.Logging.ILogOutput" />
+    /// <seealso cref="Furcadia.Logging.ILogOutput" />
     public class MultiLogOutput : ILogOutput
     {
         private List<ILogOutput> outputs;

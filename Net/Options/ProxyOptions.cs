@@ -70,6 +70,23 @@ namespace Furcadia.Net.Options
             set { standalone = value; }
         }
 
+        private int resetSettingTime = 20;
+
+        /// <summary>
+        /// time delay to reset furcadia settings when
+        /// the furcadia client is launched.
+        /// </summary>
+        /// <value>
+        /// The reset time in seconds
+        /// <para/>
+        /// Defaults to 20 seconds;
+        /// </value>
+        public int ResetSettingTime
+        {
+            get { return resetSettingTime; }
+            set { resetSettingTime = value; }
+        }
+
         /// <summary>
         /// Character Ini file to connect to the Game server with
         /// </summary>

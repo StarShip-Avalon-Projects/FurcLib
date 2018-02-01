@@ -115,7 +115,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Logging\ConcurrentList.cs" />
     <Compile Include="Logging\ConsoleLogOutput.cs" />
-    <Compile Include="Logging\FileLogger.cs" />
+    <Compile Include="Logging\FileLogOutput.cs" />
     <Compile Include="Logging\ILogOutput.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\MutliLogOutput.cs" />

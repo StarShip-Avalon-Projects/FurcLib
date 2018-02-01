@@ -71,7 +71,7 @@ namespace Furcadia.Net.DreamInfo
                 mode = "modern";
 
             fileName = DreamInfo.CacheFileName;
-            if (DreamInfo.IsPermanent)
+            if (FileName.Length > 2)
                 _Title = fileName.Substring(2);
             isPermament = DreamInfo.IsPermanent;
         }
