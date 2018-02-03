@@ -13,26 +13,24 @@ namespace Furcadia.Net.Web
 
         #endregion Private Fields
 
+        private static string userAgent = "FurcaddiaFramework";
+
+        /// <summary>
+        /// Gets or sets the user agent.
+        /// </summary>
+        /// <value>
+        /// The user agent.
+        /// </value>
+        public static string UserAgent { get => userAgent; set => userAgent = value; }
+
         #region Public Methods
 
         /// <summary>
-        /// Retriev Account information from the Furcadia Log-On server
+        /// Sends the post data request to a web server.
         /// </summary>
-        /// <param name="u">
-        /// Account E-mail address
-        /// </param>
-        /// <param name="p">
-        /// Account Password
-        /// </param>
-        /// <param name="k">
-        /// API Key
-        /// </param>
-        /// <param name="LoginUrl">
-        /// Login Server URL
-        /// </param>
-        /// <returns>
-        /// Furcadia Account information including Characters and thier costumes
-        /// </returns>
+        /// <param name="PostData">The post data.</param>
+        /// <param name="url">The URL.</param>
+        /// <returns></returns>
         public static string SendPostRequest(string PostData, string url)
         {
             var message = new StringBuilder();
@@ -47,7 +45,7 @@ namespace Furcadia.Net.Web
 
             // *** Set any header related and operational properties
             LoginWebRequest.Method = "POST";
-            LoginWebRequest.UserAgent = "FurcaddiaFramework";
+            LoginWebRequest.UserAgent = UserAgent;
             LoginWebRequest.ContentType = "application/x-www-form-urlencoded";
 
             // Is this how we handle PostData KeyValues?

@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using static Furcadia.Net.Utils.Utilities;
+﻿using System.IO;
 
 namespace Furcadia.Net.Options
 {
@@ -12,15 +10,14 @@ namespace Furcadia.Net.Options
         #region Private Fields
 
         private string characterini;
+        private int connectionRetries;
+        private int connectionTimeOut;
         private string furcinstallpath;
 
         /// <summary>
         /// Furcadia Client Executable
         /// </summary>
         private string furcprocess;
-
-        private int connectionTimeOut;
-        private int connectionRetries;
 
         /// <summary>
         /// LocalHost port
@@ -29,9 +26,10 @@ namespace Furcadia.Net.Options
 
         private string proxyHost;
 
-        #endregion Private Fields
-
+        private int resetSettingTime = 20;
         private bool standalone;
+
+        #endregion Private Fields
 
         #region Public Constructors
 
@@ -50,42 +48,13 @@ namespace Furcadia.Net.Options
             connectionRetries = 5;
             proxyHost = "localhost";
             LocalhostPort = 6700;
+            GameServerPort = int.Parse(FurcadiaUtilities.GameServerPort);
             furcprocess = FurcadiaUtilities.DefaultClient;
         }
 
         #endregion Public Constructors
 
         #region Public Properties
-
-        /// <summary>
-        /// Allow the connection to stay open after the client drops?
-        /// </summary>
-        ///<remarks>
-        ///if standalone is enabled.. then we can skip, Furcadia Client Login
-        ///with Firewall/Proxy settings and manage the client triggers ourselves
-        /// </remarks>
-        public bool Standalone
-        {
-            get { return standalone; }
-            set { standalone = value; }
-        }
-
-        private int resetSettingTime = 20;
-
-        /// <summary>
-        /// time delay to reset furcadia settings when
-        /// the furcadia client is launched.
-        /// </summary>
-        /// <value>
-        /// The reset time in seconds
-        /// <para/>
-        /// Defaults to 20 seconds;
-        /// </value>
-        public int ResetSettingTime
-        {
-            get { return resetSettingTime; }
-            set { resetSettingTime = value; }
-        }
 
         /// <summary>
         /// Character Ini file to connect to the Game server with
@@ -109,33 +78,8 @@ namespace Furcadia.Net.Options
         /// </remarks>
         public string CharacterIniFile
         {
-            get { return characterini; }
-            set { characterini = value; }
-        }
-
-        /// <summary>
-        /// Host name or IP Address for the proxy server
-        /// <para/>
-        /// Defaults to "localhost'
-        /// </summary>
-        public string ProxyHost
-        {
-            get { return proxyHost; }
-            set { proxyHost = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the connection time out.
-        /// </summary>
-        /// <value>
-        /// Time out in seconds
-        /// <para/>
-        /// Default: 10 seconds
-        /// </value>
-        public int ConnectionTimeOut
-        {
-            get { return connectionTimeOut; }
-            set { connectionTimeOut = value; }
+            get => characterini;
+            set => characterini = value;
         }
 
         /// <summary>
@@ -148,8 +92,22 @@ namespace Furcadia.Net.Options
         /// </value>
         public int ConnectionRetries
         {
-            get { return connectionRetries; }
-            set { connectionRetries = value; }
+            get => connectionRetries;
+            set => connectionRetries = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the connection time out.
+        /// </summary>
+        /// <value>
+        /// Time out in seconds
+        /// <para/>
+        /// Default: 10 seconds
+        /// </value>
+        public int ConnectionTimeOut
+        {
+            get => connectionTimeOut;
+            set => connectionTimeOut = value;
         }
 
         /// <summary>
@@ -181,8 +139,8 @@ namespace Furcadia.Net.Options
         /// </summary>
         public string FurcadiaProcess
         {
-            get { return furcprocess; }
-            set { furcprocess = value; }
+            get => furcprocess;
+            set => furcprocess = value;
         }
 
         /// <summary>
@@ -190,13 +148,47 @@ namespace Furcadia.Net.Options
         /// </summary>
         public int LocalhostPort
         {
-            get { return localhostport; }
-            set
-            {
-                //if (!PortOpen(value))
-                //    throw new ArgumentException($"The Selected Prot {value} is not available");
-                localhostport = value;
-            }
+            get => localhostport;
+            set => localhostport = value;
+        }
+
+        /// <summary>
+        /// Host name or IP Address for the proxy server
+        /// <para/>
+        /// Defaults to "localhost'
+        /// </summary>
+        public string ProxyHost
+        {
+            get => proxyHost;
+            set => proxyHost = value;
+        }
+
+        /// <summary>
+        /// time delay to reset furcadia settings when
+        /// the furcadia client is launched.
+        /// </summary>
+        /// <value>
+        /// The reset time in seconds
+        /// <para/>
+        /// Defaults to 20 seconds;
+        /// </value>
+        public int ResetSettingTime
+        {
+            get => resetSettingTime;
+            set => resetSettingTime = value;
+        }
+
+        /// <summary>
+        /// Allow the connection to stay open after the client drops?
+        /// </summary>
+        ///<remarks>
+        ///if standalone is enabled.. then we can skip, Furcadia Client Login
+        ///with Firewall/Proxy settings and manage the client triggers ourselves
+        /// </remarks>
+        public bool Standalone
+        {
+            get => standalone;
+            set => standalone = value;
         }
 
         #endregion Public Properties

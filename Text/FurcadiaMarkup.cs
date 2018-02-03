@@ -55,13 +55,18 @@ namespace Furcadia.Text
         /// </summary>
         public const string CookieToMeREGEX = "<name shortname='(.*?)'>(.*?)</name> just gave you";
 
+        /// <summary>
+        /// You eat cookie filter
+        /// </summary>
         public const string YouEatCookieFilter = "<img src='fsh://system.fsh:90' alt='@cookie' /><channel name = '@cookie' /> You eat a cookie.(.*?)";
 
         /// <summary>
+        /// The desc filter
         /// </summary>
         public const string DescFilter = "<desc shortname='([^']*)' />(.*)";
 
         /// <summary>
+        /// The dice filter
         /// </summary>
         public const string DiceFilter = "^<font color='roll'><img src='fsh://system.fsh:101' alt='@roll' />" + ChannelNameFilter + " <name shortname='([^ ]+)'>([^ ]+)</name> rolls (\\d+)d(\\d+)((-|\\+)\\d+)? ?(.*) & gets (\\d+)\\.</font>$";
 
@@ -132,6 +137,16 @@ namespace Furcadia.Text
         /// </summary>
         // <font color='query'><name shortname=['\"](.^?)['\"]>(.^?)</name> (.^?), <a href='command://(.^?)'>click here</a> or type `(.^?) and press &lt;enter&gt;.</font>
         public static Regex QueryCommand = new Regex("<font color=[\'|\\\"](.*?)['|\\\"]><name shortname=['|\\\"](.*?)[\'|\"]>(.*?)</name> ((requests permission to|asks you to) (.*?) (.*?)), <a href=[\'|\"]command://(.*?)[\'|\"]>click here</a> or type (`.*?) and press &lt;enter&gt;.</font>", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Dream Urls
+        /// </summary>
+        public const string UrlRegex = @"furc://([0-9a-zA-Z /v]+)(:([0-9a-zA-Z /v]+))?/";
+
+        /// <summary>
+        /// Dream Url regex
+        /// </summary>
+        public static Regex URLRegex = new Regex(UrlRegex, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         #region Public Constructors
 

@@ -1,6 +1,7 @@
 ﻿using Furcadia.Net.DreamInfo;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Furcadia.Text.FurcadiaMarkup;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -25,7 +26,6 @@ namespace Furcadia.Net.Utils.ServerParser
     {
         #region Private Fields
 
-        private const string UrlRegex = @"furc://([a-z0-9]+)?:?([a-z0-9]+)/";
         private int type;
         private string dreamOwner;
         private string title;
@@ -53,11 +53,19 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
             type = int.Parse(ServerInstruction[2].ToString());
-            var URLRegex = new Regex(UrlRegex, RegexOptions.None);
+
             var UrlMatch = URLRegex.Match(RawInstruction);
 
-            dreamOwner = UrlMatch.Groups[1].Value;
-            title = UrlMatch.Groups[2].Value;
+            if (string.IsNullOrWhiteSpace(UrlMatch.Groups[2].Value))
+            {
+                dreamOwner = UrlMatch.Groups[1].Value;
+                //  = null;
+            }
+            else
+            {
+                dreamOwner = UrlMatch.Groups[1].Value;
+                title = UrlMatch.Groups[3].Value;
+            }
         }
 
         #endregion Public Constructors
@@ -71,9 +79,12 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(dreamOwner))
-                    return $"furc://{title}/";
-                return $"furc://{dreamOwner}:{title}/";
+                var sb = new StringBuilder("furc://");
+                sb.Append(dreamOwner.ToFurcadiaShortName());
+                if (string.IsNullOrWhiteSpace(title))
+                    sb.Append($":{title}");
+                sb.Append("/");
+                return sb.ToString();
             }
         }
 
@@ -126,9 +137,11 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(dreamOwner))
-                    return $"{title}";
-                return $"{dreamOwner}:{title}";
+                var sb = new StringBuilder();
+                sb.Append(dreamOwner.ToFurcadiaShortName());
+                if (string.IsNullOrWhiteSpace(title))
+                    sb.Append($":{title}");
+                return sb.ToString();
             }
             set => throw new System.NotImplementedException();
         }

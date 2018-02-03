@@ -8,14 +8,22 @@ namespace Furcadia.Net.Web
     /// </summary>
     public static class WebUtils
     {
+        /// <summary>
+        /// Preps the web data.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        /// <returns></returns>
+        // TODO: Convert to Monkeyspeak.IVariable
+        // Filter out the % prefix
+        // use Variable Table
         public static string PrepWebData(List<IVariable> list)
         {
             List<string> vars = new List<string>();
             foreach (var var in list)
-                vars.Add(string.Format("{0}={1}"
-                    , HttpUtility.UrlEncode(var.Name)
-                    , HttpUtility.UrlEncode(var.Value.ToString())
-                    ));
+            {
+                if (var.Value != null)
+                    vars.Add($"{HttpUtility.UrlEncode(var.Name)}={HttpUtility.UrlEncode(var.Value.ToString())}");
+            }
             return string.Join("&", vars.ToArray());
         }
     }

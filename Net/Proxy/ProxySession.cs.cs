@@ -80,19 +80,10 @@ namespace Furcadia.Net.Proxy
             ServerBalancer.TroatTiredEventHandler += e => TroatTiredEventHandler(e);
             base.ServerData2 += e => OnServerDataReceived(e);
             ServerConnected += () => OnServerConnected();
-            ServerDisconnected += () =>
-            {
-                //  base.Disconnect();
-                serverconnectphase = ConnectionPhase.Disconnected;
-                ServerStatusChanged?.Invoke(null, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
-            };
+            ServerDisconnected += () => OnServerDisonnected();
 
             base.ClientData2 += e => ParseClientData(e);
-            ClientDisconnected += () =>
-            {
-                clientconnectionphase = ConnectionPhase.Disconnected;
-                ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
-            };
+            ClientDisconnected += () => OnClientDisconnected();
             ClientConnected += () => OnClientConnected();
 
             connectedFurre = new Furre();
@@ -115,22 +106,20 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public override void Connect()
         {
-            if (IsServerSocketConnected)
-                DisconnectServerAndClientStreams();
-            if (IsClientSocketConnected)
-                DisconnectClientStream();
             serverconnectphase = ConnectionPhase.Connecting;
             clientconnectionphase = ConnectionPhase.Connecting;
             base.Connect();
         }
 
-        ///// <summary>
-        ///// Disconnect from Furcadia and notify delegates.
-        ///// </summary>
-        //public override void Disconnect()
-        //{
-        //    base.Disconnect();
-        //}
+        /// <summary>
+        /// Disconnect from Furcadia and notify delegates.
+        /// </summary>
+        public override void DisconnectServerAndClientStreams()
+        {
+            if (IsClientSocketConnected)
+                base.DisconnectClientStream();
+            base.DisconnectServerAndClientStreams();
+        }
 
         #endregion Public Methods
 
@@ -1409,6 +1398,12 @@ namespace Furcadia.Net.Proxy
             ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
         }
 
+        private void OnClientDisconnected()
+        {
+            clientconnectionphase = ConnectionPhase.Disconnected;
+            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+        }
+
         /// <summary>
         /// Client sent us some data, Let's deal with it
         /// </summary>
@@ -1471,6 +1466,12 @@ namespace Furcadia.Net.Proxy
         private void OnServerConnected()
         {
             serverconnectphase = ConnectionPhase.MOTD;
+            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+        }
+
+        private void OnServerDisonnected()
+        {
+            serverconnectphase = ConnectionPhase.Disconnected;
             ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
         }
 

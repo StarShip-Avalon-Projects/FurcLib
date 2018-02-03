@@ -71,12 +71,11 @@ namespace Furcadia.Net.Web
             }
         }
 
-        public static readonly IVariable NoValue = new Variable("%none", null, true);
+        public static readonly IVariable NoValue = new Variable("%none", null);
 
         public bool IsConstant
         {
-            get;
-            private set;
+            get => false;
         }
 
         private object value;
@@ -101,15 +100,13 @@ namespace Furcadia.Net.Web
 
         public string Name { get; internal set; }
 
-        public Variable(string name, bool constant = false)
+        public Variable(string name)
         {
-            IsConstant = constant;
             Name = name;
         }
 
-        internal Variable(string name, object value, bool constant = false)
+        public Variable(string name, object value)
         {
-            IsConstant = constant;
             Name = name;
             this.value = value;
         }
@@ -138,9 +135,9 @@ namespace Furcadia.Net.Web
         /// </summary>
         /// <param name="asConstant">Clone as Constant</param>
         /// <returns></returns>
-        public Variable Clone(bool asConstant = false)
+        public Variable Clone()
         {
-            return new Variable(Name, value, asConstant);
+            return new Variable(Name, value);
         }
 
         /// <summary>

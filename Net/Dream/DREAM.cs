@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Furcadia.Net.Utils.ServerParser;
 
 namespace Furcadia.Net.DreamInfo
@@ -9,6 +10,8 @@ namespace Furcadia.Net.DreamInfo
 
     public interface IDream
     {
+        #region Public Properties
+
         /// <summary>
         /// Gets or sets a value indicating whether this instance is modern.
         /// </summary>
@@ -24,6 +27,8 @@ namespace Furcadia.Net.DreamInfo
         /// The name.
         /// </value>
         string Name { get; }
+
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -34,19 +39,17 @@ namespace Furcadia.Net.DreamInfo
     {
         #region Private Fields
 
-        private string mode;
-
-        private string fileName;
+        private int _Lines;
 
         /// <summary>
         /// private variables
         /// </summary>
         private string _Title, _Rating, owner;
 
-        private int _Lines;
-
+        private string fileName;
         private FurreList furres;
         private bool isPermament;
+        private string mode;
 
         #endregion Private Fields
 
@@ -61,24 +64,46 @@ namespace Furcadia.Net.DreamInfo
             mode = "legacy";
         }
 
-        /// <summary>
-        /// Loads the specified dream information from a <see cref="LoadDream"/> event.
-        /// </summary>
-        /// <param name="DreamInfo">The dream information.</param>
-        public void Load(LoadDream DreamInfo)
-        {
-            if (DreamInfo.IsModern)
-                mode = "modern";
-
-            fileName = DreamInfo.CacheFileName;
-            if (FileName.Length > 2)
-                _Title = fileName.Substring(2);
-            isPermament = DreamInfo.IsPermanent;
-        }
-
         #endregion Public Constructors
 
         #region Public Properties
+
+        /// <summary>
+        /// Gets or sets the book make.
+        /// </summary>
+        /// <value>
+        /// The book make.
+        /// </value>
+        public DreamBookmark BookMark
+        {
+            set
+            {
+                //Modern should be set bu this point
+                _Title = value.Title;
+                owner = value.DreamOwner;
+            }
+        }
+
+        /// <summary>
+        /// Dreams uploader character
+        /// </summary>
+        public string DreamOwner
+        {
+            get => owner;
+            set => owner = value;
+        }
+
+        /// <summary>
+        /// File name for the dream cache stored on disk
+        /// </summary>
+        /// <value>
+        /// The name of the file.
+        /// </value>
+        public string FileName
+        {
+            get => fileName;
+            set => fileName = value;
+        }
 
         /// <summary>
         /// Dream List Furcadia requires Clients to handle thier own Dream
@@ -101,18 +126,6 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// File name for the dream cache stored on disk
-        /// </summary>
-        /// <value>
-        /// The name of the file.
-        /// </value>
-        public string FileName
-        {
-            get => fileName;
-            set { fileName = value; }
-        }
-
-        /// <summary>
         /// Is this dream Modern Mode?
         /// </summary>
         public bool IsModern
@@ -132,22 +145,6 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Gets or sets the book make.
-        /// </summary>
-        /// <value>
-        /// The book make.
-        /// </value>
-        public DreamBookmark BookMark
-        {
-            set
-            {
-                //Modern should be set bu this point
-                _Title = value.Title;
-                owner = value.DreamOwner;
-            }
-        }
-
-        /// <summary>
         /// Number of DS Lines
         /// </summary>
         public int Lines
@@ -163,22 +160,12 @@ namespace Furcadia.Net.DreamInfo
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(owner))
-                    return $"{_Title}";
-                return $"{owner}:{_Title}";
+                var sb = new StringBuilder();
+                sb.Append($"{owner}");
+                if (!string.IsNullOrWhiteSpace(_Title))
+                    sb.Append($":{_Title}");
+                return sb.ToString();
             }
-        }
-
-        /// <summary>
-        /// Dreams uploader character
-        /// </summary>
-        public string DreamOwner
-        {
-            get
-            {
-                return owner;
-            }
-            set { owner = value; }
         }
 
         /// <summary>
@@ -186,8 +173,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string Rating
         {
-            get { return _Rating; }
-            set { _Rating = value; }
+            get => _Rating;
+            set => _Rating = value;
         }
 
         /// <summary>
@@ -195,8 +182,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string Title
         {
-            get { return _Title; }
-            set { _Title = value; }
+            get => _Title;
+            set => _Title = value;
         }
 
         /// <summary>
@@ -211,35 +198,18 @@ namespace Furcadia.Net.DreamInfo
             {
                 if (string.IsNullOrWhiteSpace(owner) && string.IsNullOrWhiteSpace(_Title))
                     return string.Empty;
-                if (string.IsNullOrWhiteSpace(owner))
-                {
-                    return $"furc://{_Title}/";
-                }
-                return $"furc://{owner.ToFurcadiaShortName()}:{_Title}/";
+                var sb = new StringBuilder($"furc://");
+                sb.Append($"{ owner.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(_Title))
+                    sb.Append($":{_Title.ToFurcadiaShortName()}");
+                sb.Append("/");
+                return sb.ToString();
             }
         }
 
         #endregion Public Properties
 
-        #region Public Operators
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        /// <param name="dreamA">The dream a.</param>
-        /// <param name="dreamB">The dream b.</param>
-        /// <returns>
-        /// The result of the operator.
-        /// </returns>
-        public static bool operator ==(Dream dreamA, IDream dreamB)
-        {
-            if (ReferenceEquals(dreamA, null))
-            {
-                return ReferenceEquals(dreamB, null);
-            }
-
-            return dreamA.Equals(dreamB);
-        }
+        #region Public Methods
 
         /// <summary>
         /// Implements the operator !=.
@@ -255,17 +225,35 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="dreamA">The dream a.</param>
+        /// <param name="dreamB">The dream b.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(Dream dreamA, IDream dreamB)
+        {
+            if (dreamA is null)
+            {
+                return dreamB is null;
+            }
+
+            return dreamA.Equals(dreamB);
+        }
+
+        /// <summary>
         /// Determines whether the specified <see cref="Object" />, is equal to this instance.
         /// </summary>
-        /// <param name="other">The <see cref="Object" /> to compare with this instance.</param>
+        /// <param name="obj">The <see cref="Object" /> to compare with this instance.</param>
         /// <returns>
         ///   <c>true</c> if the specified <see cref="Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            if (this.GetType() != obj.GetType()) return false;
+            if (GetType() != obj.GetType()) return false;
             if (obj is IDream dream)
             {
                 return Name.ToLower() == dream.Name.ToLower();
@@ -285,6 +273,21 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Loads the specified dream information from a <see cref="LoadDream"/> event.
+        /// </summary>
+        /// <param name="DreamInfo">The dream information.</param>
+        public void Load(LoadDream DreamInfo)
+        {
+            if (DreamInfo.IsModern)
+                mode = "modern";
+
+            fileName = DreamInfo.CacheFileName;
+            if (FileName.Length > 2)
+                _Title = fileName.Substring(2);
+            isPermament = DreamInfo.IsPermanent;
+        }
+
+        /// <summary>
         /// Returns a <see cref="String" /> that represents this instance.
         /// </summary>
         /// <returns>
@@ -295,6 +298,6 @@ namespace Furcadia.Net.DreamInfo
             return Name;
         }
 
-        #endregion Public Operators
+        #endregion Public Methods
     }
 }

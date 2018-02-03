@@ -59,7 +59,7 @@
         {
             FurcadiaUtilities = new Utils.Utilities();
             FurcadiaFilePaths = new IO.Paths();
-            gameserverport = 6500; // TODO: Settings Prefered Serve Port
+            gameserverport = int.Parse(FurcadiaUtilities.GameServerPort);
             gameserverhost = FurcadiaUtilities.GameServerHost;
         }
 
