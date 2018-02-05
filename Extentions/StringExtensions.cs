@@ -115,6 +115,8 @@ public static class StringExtensions
     /// <returns></returns>
     public static string ToStrippedFurcadiaMarkupString(this string Text)
     {
+        if (string.IsNullOrWhiteSpace(Text))
+            return null;
         Regex r = new Regex("<(.*?)>", RegexOptions.Compiled);
         Text = r.Replace(Text, string.Empty);
         return Text.Replace("|", " ");

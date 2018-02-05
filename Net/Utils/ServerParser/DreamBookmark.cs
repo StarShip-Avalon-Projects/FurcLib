@@ -1,4 +1,6 @@
-﻿using Furcadia.Net.DreamInfo;
+﻿using Furcadia.Logging;
+using Furcadia.Net.DreamInfo;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using static Furcadia.Text.FurcadiaMarkup;
@@ -35,15 +37,6 @@ namespace Furcadia.Net.Utils.ServerParser
         #region Public Constructors
 
         /// <summary>
-        ///
-        /// </summary>
-        public DreamBookmark() : base()
-        {
-            base.instructionType = ServerInstructionType.BookmarkDream;
-            type = -1;
-        }
-
-        /// <summary>
         /// Constructor with Dream Data definitions
         /// </summary>
         /// <param name="ServerInstruction">
@@ -56,10 +49,10 @@ namespace Furcadia.Net.Utils.ServerParser
 
             var UrlMatch = URLRegex.Match(RawInstruction);
 
-            if (string.IsNullOrWhiteSpace(UrlMatch.Groups[2].Value))
+            if (string.IsNullOrWhiteSpace(UrlMatch.Groups[3].Value))
             {
                 dreamOwner = UrlMatch.Groups[1].Value;
-                //  = null;
+                title = null;
             }
             else
             {
@@ -79,11 +72,14 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(dreamOwner))
+                    throw new ArgumentException(dreamOwner);
                 var sb = new StringBuilder("furc://");
                 sb.Append(dreamOwner.ToFurcadiaShortName());
-                if (string.IsNullOrWhiteSpace(title))
-                    sb.Append($":{title}");
+                if (!string.IsNullOrWhiteSpace(title))
+                    sb.Append($":{title.ToStrippedFurcadiaMarkupString()}");
                 sb.Append("/");
+                Logger.Debug<DreamBookmark>(sb);
                 return sb.ToString();
             }
         }
@@ -96,10 +92,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </value>
         public string DreamOwner
         {
-            get
-            {
-                return dreamOwner;
-            }
+            get => dreamOwner;
         }
 
         /// <summary>
@@ -110,7 +103,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </value>
         public string Title
         {
-            get { return title; }
+            get => title;
         }
 
         /// <summary>
@@ -137,10 +130,13 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(dreamOwner))
+                    throw new ArgumentException(dreamOwner);
                 var sb = new StringBuilder();
                 sb.Append(dreamOwner.ToFurcadiaShortName());
-                if (string.IsNullOrWhiteSpace(title))
-                    sb.Append($":{title}");
+                if (!string.IsNullOrWhiteSpace(title))
+                    sb.Append($":{title.ToFurcadiaShortName()}");
+                Logger.Debug<DreamBookmark>(sb);
                 return sb.ToString();
             }
             set => throw new System.NotImplementedException();

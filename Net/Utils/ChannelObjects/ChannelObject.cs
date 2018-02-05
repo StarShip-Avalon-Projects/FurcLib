@@ -9,16 +9,15 @@ namespace Furcadia.Net.Utils.ServerParser
     /// </summary>
     public class ChannelObject : BaseServerInstruction
     {
-        #region Internal Fields
+        #region Private Fields
 
-        /// <summary>
-        /// Active Triggering avatar
-        /// </summary>
+        private Match FontColorRegexMatch;
+
         internal Furre player;
 
-        internal Match FontColorRegexMatch;
+        private string channelText;
 
-        #endregion Internal Fields
+        #endregion Private Fields
 
         #region Public Constructors
 
@@ -28,28 +27,34 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         public ChannelObject(string ServerInstruction) : base(ServerInstruction)
         {
-            if (ServerInstruction[0] == '(')
-                instructionType = ServerInstructionType.DisplayText;
+            instructionType = ServerInstructionType.DisplayText;
             FontColorRegexMatch = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant).Match(RawInstruction);
             channelText = ServerInstruction.ToStrippedFurcadiaMarkupString();
             player = new Furre();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="ServerInstruction">
+        /// </param>
+        public ChannelObject(string ServerInstruction, Furre Furr) : base(ServerInstruction)
+        {
+            instructionType = ServerInstructionType.DisplayText;
+            FontColorRegexMatch = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant).Match(RawInstruction);
+            channelText = ServerInstruction.ToStrippedFurcadiaMarkupString();
+            player = Furr;
         }
 
         #endregion Public Constructors
 
         #region Public Properties
 
-        private string channelText;
-
         /// <summary>
         /// Raw unformatted channel text
         /// </summary>
         public string ChannelText
         {
-            //set
-            //{ channelText = value; }
-            get
-            { return channelText; }
+            get => channelText;
         }
 
         /// <summary>
@@ -57,10 +62,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public string DynamicChannel
         {
-            get
-            {
-                return FontColorRegexMatch.Groups[3].Value;
-            }
+            get => FontColorRegexMatch.Groups[3].Value;
         }
 
         /// <summary>
@@ -68,10 +70,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public string FormattedChannelText
         {
-            get
-            {
-                return ChannelText;
-            }
+            get => ChannelText;
         }
 
         /// <summary>
@@ -79,8 +78,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public Furre Player
         {
-            get { return player; }
-            set { player = value; }
+            get => player;
         }
 
         #endregion Public Properties

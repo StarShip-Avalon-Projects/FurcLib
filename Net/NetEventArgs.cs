@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using static Furcadia.Text.FurcadiaMarkup;
 
 namespace Furcadia.Net
 {
@@ -200,6 +200,12 @@ namespace Furcadia.Net
     /// </summary>
     public class NetChannelEventArgs : NetServerEventArgs
     {
+        #region Private Fields
+
+        private string channel;
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         /// <summary>
@@ -212,8 +218,6 @@ namespace Furcadia.Net
         #endregion Public Constructors
 
         #region Public Properties
-
-        private string channel;
 
         /// <summary>
         /// Server Text Channel
@@ -238,31 +242,6 @@ namespace Furcadia.Net
         private string message;
 
         #endregion Private Fields
-
-        #region Public Properties
-
-        /// <summary>
-        /// Status of the Furcadia Client Connection
-        /// </summary>
-        public ConnectionPhase ConnectPhase
-        { get; private set; }
-
-        /// <summary>
-        /// optional string message
-        /// </summary>
-        public string ClientData
-        {
-            get
-            {
-                return message;
-            }
-            private set
-            {
-                message = value;
-            }
-        }
-
-        #endregion Public Properties
 
         #region Public Constructors
 
@@ -290,6 +269,31 @@ namespace Furcadia.Net
         }
 
         #endregion Public Constructors
+
+        #region Public Properties
+
+        /// <summary>
+        /// optional string message
+        /// </summary>
+        public string ClientData
+        {
+            get
+            {
+                return message;
+            }
+            private set
+            {
+                message = value;
+            }
+        }
+
+        /// <summary>
+        /// Status of the Furcadia Client Connection
+        /// </summary>
+        public ConnectionPhase ConnectPhase
+        { get; private set; }
+
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -298,6 +302,21 @@ namespace Furcadia.Net
     [Serializable]
     public class NetServerEventArgs : EventArgs
     {
+        #region Public Fields
+
+        /// <summary>
+        /// Status of the Server Connection
+        /// </summary>
+        public ConnectionPhase ConnectPhase;
+
+        #endregion Public Fields
+
+        #region Private Fields
+
+        private ServerInstructionType serverinstruction;
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         /// <summary>
@@ -316,10 +335,7 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// default Constructor
-        /// <para>
-        /// <see cref="ConnectionPhase.error"/> and <see cref="ServerInstructionType.Unknown"/>
-        /// </para>
+        /// Initializes a new instance of the <see cref="NetServerEventArgs"/> class.
         /// </summary>
         public NetServerEventArgs()
         {
@@ -327,27 +343,20 @@ namespace Furcadia.Net
             ConnectPhase = ConnectionPhase.error;
         }
 
+        #endregion Public Constructors
+
+        #region Public Properties
+
         /// <summary>
         /// Server to Client instructions
         /// </summary>
         public ServerInstructionType ServerInstruction
         {
-            get { return serverinstruction; }
-            set { serverinstruction = value; }
+            get => serverinstruction;
+            set => serverinstruction = value;
         }
 
-        #endregion Public Constructors
-
-        #region Public Fields
-
-        /// <summary>
-        /// Status of the Server Connection
-        /// </summary>
-        public ConnectionPhase ConnectPhase;
-
-        private ServerInstructionType serverinstruction;
-
-        #endregion Public Fields
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -365,17 +374,17 @@ namespace Furcadia.Net
         #region Public Constructors
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ParseChannelArgs"/> class.
         /// </summary>
-        /// <param name="ServerInstruction">
-        /// </param>
-        /// <param name="phase">
-        /// </param>
-        public ParseChannelArgs(ServerInstructionType ServerInstruction, ConnectionPhase phase) : base(ServerInstruction, phase)
+        /// <param name="ServerInstruction">The server instruction.</param>
+        public ParseChannelArgs(string ServerInstruction) : base(ServerInstructionType.DisplayText, ConnectionPhase.Connected)
         {
-            channel = "Unknown";
+            var m = ChannelRegex.Match(ServerInstruction);
+            channel = m.Groups[1].Value;
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ParseChannelArgs"/> class.
         /// </summary>
         public ParseChannelArgs() : base(ServerInstructionType.DisplayText, ConnectionPhase.Connected)
         {
@@ -399,8 +408,9 @@ namespace Furcadia.Net
     }
 
     /// <summary>
-    /// Parse Server Instruction set
+    ///
     /// </summary>
+    /// <seealso cref="System.EventArgs" />
     [Serializable]
     public class ParseServerArgs : EventArgs
     {
@@ -408,53 +418,11 @@ namespace Furcadia.Net
 
         private string message;
 
-        #endregion Private Fields
-
-        #region Public Properties
-
-        /// <summary>
-        /// optional string message
-        /// </summary>
-        public string ServerData
-        {
-            get
-            {
-                return message;
-            }
-            set
-            {
-                message = value;
-            }
-        }
-
-        #endregion Public Properties
-
-        #region Private Fields
-
         private ConnectionPhase serverConnectedPhase;
+
         private ServerInstructionType serverinstruction;
 
         #endregion Private Fields
-
-        #region Public Properties
-
-        /// <summary>
-        /// </summary>
-        public ConnectionPhase ServerConnectedPhase
-        {
-            get { return serverConnectedPhase; }
-        }
-
-        /// <summary>
-        /// Server to Client Instruction Type
-        /// </summary>
-        public ServerInstructionType ServerInstruction
-        {
-            get { return serverinstruction; }
-            set { serverinstruction = value; }
-        }
-
-        #endregion Public Properties
 
         #region Public Constructors
 
@@ -482,6 +450,45 @@ namespace Furcadia.Net
             serverConnectedPhase = phase;
         }
 
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        /// <summary>
+        /// </summary>
+        public ConnectionPhase ServerConnectedPhase
+        {
+            get { return serverConnectedPhase; }
+        }
+
+        /// <summary>
+        /// optional string message
+        /// </summary>
+        public string ServerData
+        {
+            get
+            {
+                return message;
+            }
+            set
+            {
+                message = value;
+            }
+        }
+
+        /// <summary>
+        /// Server to Client Instruction Type
+        /// </summary>
+        public ServerInstructionType ServerInstruction
+        {
+            get { return serverinstruction; }
+            set { serverinstruction = value; }
+        }
+
+        #endregion Public Properties
+
+        #region Public Methods
+
         /// <summary>
         /// Returns a <see cref="String" /> that represents this instance.
         /// </summary>
@@ -493,6 +500,6 @@ namespace Furcadia.Net
             return $"Instruction '{serverinstruction}' : Phase: '{serverConnectedPhase}'";
         }
 
-        #endregion Public Constructors
+        #endregion Public Methods
     }
 }

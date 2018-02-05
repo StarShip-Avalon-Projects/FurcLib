@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Furcadia.Logging;
 using Furcadia.Net.Utils.ServerParser;
 
 namespace Furcadia.Net.DreamInfo
@@ -44,7 +45,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// private variables
         /// </summary>
-        private string _Title, _Rating, owner;
+        private string dreamTitle, _Rating, dreamOwner;
 
         private string fileName;
         private FurreList furres;
@@ -78,9 +79,12 @@ namespace Furcadia.Net.DreamInfo
         {
             set
             {
+                if (string.IsNullOrWhiteSpace(value.DreamOwner))
+                    throw new ArgumentNullException(value.DreamOwner);
                 //Modern should be set bu this point
-                _Title = value.Title;
-                owner = value.DreamOwner;
+                dreamTitle = value.Title;
+                dreamOwner = value.DreamOwner;
+                Logger.Debug<Dream>(value);
             }
         }
 
@@ -89,8 +93,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string DreamOwner
         {
-            get => owner;
-            set => owner = value;
+            get => dreamOwner;
+            set => dreamOwner = value;
         }
 
         /// <summary>
@@ -150,7 +154,7 @@ namespace Furcadia.Net.DreamInfo
         public int Lines
         {
             get => _Lines;
-            set { _Lines = value; }
+            set => _Lines = value;
         }
 
         /// <summary>
@@ -160,10 +164,13 @@ namespace Furcadia.Net.DreamInfo
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
+                    return null;
                 var sb = new StringBuilder();
-                sb.Append($"{owner}");
-                if (!string.IsNullOrWhiteSpace(_Title))
-                    sb.Append($":{_Title}");
+                sb.Append($"{dreamOwner}");
+                if (!string.IsNullOrWhiteSpace(dreamTitle))
+                    sb.Append($":{dreamTitle}");
+                Logger.Debug<Dream>(sb);
                 return sb.ToString();
             }
         }
@@ -182,8 +189,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string Title
         {
-            get => _Title;
-            set => _Title = value;
+            get => dreamTitle;
+            set => dreamTitle = value;
         }
 
         /// <summary>
@@ -192,17 +199,20 @@ namespace Furcadia.Net.DreamInfo
         /// IE: 'fdl furc://DreamOwner:DreamTitle/EntryCode#
         /// </para>
         /// </summary>
-        public string URL
+        public string DreamUrl
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(owner) && string.IsNullOrWhiteSpace(_Title))
-                    return string.Empty;
+                if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
+                    return null;
+                if (string.IsNullOrWhiteSpace(dreamOwner))
+                    throw new ArgumentException(dreamOwner);
                 var sb = new StringBuilder($"furc://");
-                sb.Append($"{ owner.ToFurcadiaShortName()}");
-                if (!string.IsNullOrWhiteSpace(_Title))
-                    sb.Append($":{_Title.ToFurcadiaShortName()}");
+                sb.Append($"{ dreamOwner.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(dreamTitle))
+                    sb.Append($":{dreamTitle.ToFurcadiaShortName()}");
                 sb.Append("/");
+                Logger.Debug<Dream>(sb);
                 return sb.ToString();
             }
         }
@@ -256,7 +266,7 @@ namespace Furcadia.Net.DreamInfo
             if (GetType() != obj.GetType()) return false;
             if (obj is IDream dream)
             {
-                return Name.ToLower() == dream.Name.ToLower();
+                return Name == dream.Name;
             }
             return false;
         }
@@ -269,7 +279,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return _Title.GetHashCode() ^ owner.GetHashCode(); ;
+            return dreamTitle.GetHashCode() ^ dreamOwner.GetHashCode(); ;
         }
 
         /// <summary>
@@ -283,7 +293,7 @@ namespace Furcadia.Net.DreamInfo
 
             fileName = DreamInfo.CacheFileName;
             if (FileName.Length > 2)
-                _Title = fileName.Substring(2);
+                dreamTitle = fileName.Substring(2);
             isPermament = DreamInfo.IsPermanent;
         }
 

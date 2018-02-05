@@ -63,14 +63,8 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public string CacheFileName
         {
-            get
-            {
-                return fileName;
-            }
-            set
-            {
-                fileName = value;
-            }
+            get => fileName;
+            set => fileName = value;
         }
 
         /// <summary>
@@ -78,10 +72,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </summary>
         public bool IsModern
         {
-            get
-            {
-                return mode == "modern";
-            }
+            get => mode == "modern";
         }
 
         /// <summary>

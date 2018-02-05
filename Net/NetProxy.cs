@@ -255,7 +255,7 @@ namespace Furcadia.Net
         /// </summary>
         protected internal event EventHandler ClientExited;
 
-        protected internal event ActionDelegate ServerConnected;
+        public event ActionDelegate ServerConnected;
 
         #endregion Protected Internal Events
 

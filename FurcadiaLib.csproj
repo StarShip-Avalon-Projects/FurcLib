@@ -136,6 +136,7 @@
     <Compile Include="Net\Pounce\PounceIni.cs" />
     <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
     <Compile Include="Net\Proxy\ProxySession.cs.cs" />
+    <Compile Include="Net\Utils\ChannelObjects\QueryChannelObject.cs" />
     <Compile Include="Net\Utils\CommandQueue.cs" />
     <Compile Include="Net\Utils\ServerObjects\DiceObject.cs" />
     <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />

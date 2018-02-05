@@ -1,6 +1,7 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
 using System;
+using System.Text.RegularExpressions;
 using static Furcadia.Net.DreamInfo.Avatar;
 
 namespace Furcadia.Net.DreamInfo
@@ -398,6 +399,11 @@ namespace Furcadia.Net.DreamInfo
 
             // Return true if the fields match:
             return a.Equals(b);
+        }
+
+        public static implicit operator Furre(Regex v)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
