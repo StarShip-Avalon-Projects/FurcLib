@@ -91,7 +91,6 @@ namespace Furcadia.Net.Utils.ServerParser
         #endregion Public Properties
 
         /// <summary>
-
         /// Returns a <see cref="System.String" /> that
         /// represents this instance.
         /// </summary>
@@ -100,10 +99,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            sb.Append(base.ToString());
-            sb.AppendLine($"CacheFileName: '{fileName}' IsPermanent: '{IsPermanent}' IsModern: '{IsModern}'");
-            return sb.ToString();
+            return $"CacheFileName: '{fileName}' IsPermanent: '{IsPermanent}' IsModern: '{IsModern}'";
         }
     }
 }

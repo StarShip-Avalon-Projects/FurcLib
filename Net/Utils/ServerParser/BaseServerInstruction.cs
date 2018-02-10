@@ -86,7 +86,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </returns>
         public override string ToString()
         {
-            return $"Server Instruction Type: '{InstructionType} Raw Server Instruction: '{rawInstruction}'";
+            return $"Server Instruction Type: '{InstructionType}' Server: '{rawInstruction}'";
         }
     }
 }

@@ -817,6 +817,7 @@ namespace Furcadia.Net.Proxy
         /// </remarks>
         public void ParseServerData(string data, ref bool Handled)
         {
+            data = data.TrimEnd('\n');
             Logger.Debug<ProxySession>(data);
             switch (serverconnectphase)
             {

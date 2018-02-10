@@ -72,14 +72,11 @@ namespace Furcadia.Net.Utils.ServerParser
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(dreamOwner))
-                    throw new ArgumentException(dreamOwner);
                 var sb = new StringBuilder("furc://");
                 sb.Append(dreamOwner.ToFurcadiaShortName());
                 if (!string.IsNullOrWhiteSpace(title))
                     sb.Append($":{title.ToStrippedFurcadiaMarkupString()}");
                 sb.Append("/");
-                Logger.Debug<DreamBookmark>(sb);
                 return sb.ToString();
             }
         }
@@ -153,10 +150,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            sb.AppendLine(base.ToString());
-            sb.AppendLine($"DreamOwner: '{DreamOwner}' Title: '{title}' DreamUrl: '{DreamUrl}'");
-            return sb.ToString();
+            return $"DreamOwner: '{DreamOwner}' Title: '{title}' DreamUrl: '{DreamUrl}'";
         }
     }
 }
