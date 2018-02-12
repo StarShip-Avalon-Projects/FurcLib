@@ -2,6 +2,7 @@
 using Furcadia.Logging;
 using Furcadia.Movement;
 using Furcadia.Net.DreamInfo;
+using Furcadia.Net.Utils.ChannelObjects;
 using Furcadia.Net.Utils.ServerParser;
 using System;
 using System.Collections.Generic;
@@ -507,11 +508,14 @@ namespace Furcadia.Net.Proxy
                 Match QueryMatch = QueryCommand.Match(data);
                 if (QueryMatch.Success)
                 {
-                    player = ActivePlayer;
-                    chanObject.player = ActivePlayer;
+                    var ChanObj = new QueryChannelObject(data)
+                    {
+                        player = ActivePlayer
+                    };
+
                     args.Channel = QueryMatch.Groups[1].Value;
 
-                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    ProcessServerChannelData?.Invoke(ChanObj, args);
                     return;
                 }
                 Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
