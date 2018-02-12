@@ -68,7 +68,7 @@ namespace Furcadia.Net.Utils.ChannelObjects
             Match QueryMatch = QueryCommand.Match(ServerInstruction);
             var name = NameRegex.Match(ServerInstruction).Groups[2].Value;
             player = new Furre(name);
-            switch (QueryMatch.Groups[6].Value)
+            switch ($"{QueryMatch.Groups[6].Value} {QueryMatch.Groups[7].Value}")
             {
                 case "join their":
                     qType = QueryType.summon;

@@ -336,26 +336,6 @@ namespace Furcadia.Net.DreamInfo
             get { return _WasVisible; }
         }
 
-        ///// <summary>
-        ///// the X Position the Furre is currently standing at
-        ///// </summary>
-        //[Obsolete("use Position as FurrePosition", false)]
-        //public int X
-        //{
-        //    get { return Position.X; }
-        //    set { Position.X = value; }
-        //}
-
-        ///// <summary>
-        ///// the Y Position the Furre Standing At
-        ///// </summary>
-        //[Obsolete("use Position as FurrePosition", false)]
-        //public int Y
-        //{
-        //    get { return Position.Y; }
-        //    set { Position.Y = value; }
-        //}
-
         #endregion Public Properties
 
         #region Public Methods
@@ -416,12 +396,14 @@ namespace Furcadia.Net.DreamInfo
         {
             if (obj == null)
                 return false;
-            if (this.GetType() != obj.GetType()) return false;
+            if (this.GetType() != obj.GetType())
+                return false;
             if (obj is IFurre)
             {
-                if (ShortName != ((Furre)obj).ShortName)
-                    return ((Furre)obj).FurreID == FurreID;
-                return true;
+                if (((Furre)obj).FurreID == -1 && FurreID == -1)
+                    return false;
+                return ShortName == ((Furre)obj).ShortName
+                    || ((Furre)obj).FurreID == FurreID;
             }
             return base.Equals(obj);
         }

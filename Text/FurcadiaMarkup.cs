@@ -136,7 +136,7 @@ namespace Furcadia.Text
         /// Queries (join, summon, lead follow, cuddle)
         /// </summary>
         // <font color='query'><name shortname=['\"](.^?)['\"]>(.^?)</name> (.^?), <a href='command://(.^?)'>click here</a> or type `(.^?) and press &lt;enter&gt;.</font>
-        public static Regex QueryCommand = new Regex("<font color=[\'|\\\"](.*?)['|\\\"]><name shortname=['|\\\"](.*?)[\'|\"]>(.*?)</name> ((requests permission to|asks you to) ([azAZ]+) (.*?)), <a href=[\'|\"]command://(.*?)[\'|\"]>click here</a> or type (`.*?) and press &lt;enter&gt;.</font>", RegexOptions.Compiled);
+        public static Regex QueryCommand = new Regex("<font color='(.*?)'><name shortname='(.*?)'>(.*?)</name> ((requests permission to|asks you to) (.*?) (.*?) (.*?))", RegexOptions.None);
 
         /// <summary>
         /// Dream Urls

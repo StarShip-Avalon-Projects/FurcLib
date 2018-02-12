@@ -502,6 +502,8 @@ namespace Furcadia.Net.Proxy
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
                 }
+                //<a href='command://(.*?)'>click here</a> or type (`.*?) and press &lt;enter&gt;.</font>
+
                 Match QueryMatch = QueryCommand.Match(data);
                 if (QueryMatch.Success)
                 {
