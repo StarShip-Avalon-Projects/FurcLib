@@ -78,11 +78,11 @@ namespace Furcadia.Net.Utils.ChannelObjects
                     qType = QueryType.join;
                     break;
 
-                case "follow you":
+                case "follow you.":
                     qType = QueryType.follow;
                     break;
 
-                case "lead you":
+                case "lead you.":
                     qType = QueryType.lead;
                     break;
 
