@@ -47,6 +47,7 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.
         /// </summary>
         public bool IsReadOnly
         {
@@ -57,6 +58,7 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe).
         /// </summary>
         public bool IsSynchronized
         {
@@ -67,6 +69,7 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection" />.
         /// </summary>
         public object SyncRoot
         {
@@ -77,8 +80,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Convert Furre List to <see cref=" IList"/>
+        /// Gets to i list.
         /// </summary>
+        /// <value>
+        /// To i list.
+        /// </value>
         public IList<Furre> ToIList
         {
             get
@@ -88,11 +94,13 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the <see cref="Furre"/> at the specified index.
         /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <returns>
-        /// </returns>
+        /// <value>
+        /// The <see cref="Furre"/>.
+        /// </value>
+        /// <param name="index">The index.</param>
+        /// <returns></returns>
         public Furre this[int index]
         {
             get
@@ -139,9 +147,9 @@ namespace Furcadia.Net.DreamInfo
         private object RemoveLock = new object();
 
         /// <summary>
+        /// Adds the specified furre.
         /// </summary>
-        /// <param name="Furre">
-        /// </param>
+        /// <param name="Furre">The furre.</param>
         public void Add(Furre Furre)
         {
             if (!fList.Contains(Furre))
@@ -151,6 +159,7 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </summary>
         public void Clear()
         {
@@ -158,10 +167,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Determines whether [contains] [the specified furre identifier].
         /// </summary>
-        /// <param name="FurreID">
-        /// </param>
+        /// <param name="FurreID">The furre identifier.</param>
         /// <returns>
+        ///   <c>true</c> if [contains] [the specified furre identifier]; otherwise, <c>false</c>.
         /// </returns>
         public bool Contains(int FurreID)
         {
@@ -174,10 +184,12 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        ///
+        /// Determines whether [contains] [the specified furre name].
         /// </summary>
-        /// <param name="FurreName"></param>
-        /// <returns></returns>
+        /// <param name="FurreName">Name of the furre.</param>
+        /// <returns>
+        ///   <c>true</c> if [contains] [the specified furre name]; otherwise, <c>false</c>.
+        /// </returns>
         public bool Contains(string FurreName)
         {
             foreach (var fur in fList)
@@ -189,10 +201,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Determines whether [contains] [the specified furre].
         /// </summary>
-        /// <param name="Furre">
-        /// </param>
+        /// <param name="Furre">The furre.</param>
         /// <returns>
+        ///   <c>true</c> if [contains] [the specified furre]; otherwise, <c>false</c>.
         /// </returns>
         public bool Contains(Furre Furre)
         {
@@ -216,16 +229,17 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets a Furre object by the Furre's Name
         /// </summary>
-        /// <param name="sname">
-        /// </param>
+        /// <param name="sname">The sname.</param>
         /// <returns>
         /// Furre name with a real Furcadia ID if the furre is in the dream
         /// Other wise, Furre with Furre Id 0
         /// <para/>
         /// Furre Id of -1 is Undefined
         /// </returns>
-        public Furre GerFurreByName(string sname)
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public Furre GetFurreByName(string sname)
         {
             if (string.IsNullOrEmpty(sname))
                 throw new ArgumentNullException(sname);
@@ -240,8 +254,10 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Returns an enumerator that iterates through a collection.
         /// </summary>
         /// <returns>
+        /// An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
         /// </returns>
         public IEnumerator GetEnumerator()
         {
@@ -289,11 +305,10 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Indexes the of.
         /// </summary>
-        /// <param name="Furre">
-        /// </param>
-        /// <returns>
-        /// </returns>
+        /// <param name="Furre">The furre.</param>
+        /// <returns></returns>
         public int IndexOf(Furre Furre)
         {
             return fList.IndexOf(Furre);
@@ -327,32 +342,31 @@ namespace Furcadia.Net.DreamInfo
         #region IDisposable Support
 
         /// <summary>
+        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
         /// </summary>
-        /// <param name="array">
-        /// </param>
-        /// <param name="arrayIndex">
-        /// </param>
+        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
         public void CopyTo(Furre[] array, int arrayIndex)
         {
             fList.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
+        /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1" /> at the specified index.
         /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <param name="item">
-        /// </param>
+        /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
+        /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1" />.</param>
         public void Insert(int index, Furre item)
         {
             fList.Insert(index, item);
         }
 
         /// <summary>
+        /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </summary>
-        /// <param name="item">
-        /// </param>
+        /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
         /// <returns>
+        /// true if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </returns>
         public bool Remove(Furre item)
         {
@@ -368,14 +382,20 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Removes the <see cref="T:System.Collections.Generic.IList`1" /> item at the specified index.
         /// </summary>
-        /// <param name="index">
-        /// </param>
+        /// <param name="index">The zero-based index of the item to remove.</param>
         public void RemoveAt(int index)
         {
             fList.RemoveAt(index);
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that can be used to iterate through the collection.
+        /// </returns>
         IEnumerator<Furre> IEnumerable<Furre>.GetEnumerator()
         {
             return fList.GetEnumerator();

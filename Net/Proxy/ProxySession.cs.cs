@@ -448,7 +448,7 @@ namespace Furcadia.Net.Proxy
             Furre ActivePlayer = new Furre("Furcadia game server");
             string channel = null;
             if (NameRegex.Match(data).Success)
-                ActivePlayer = Dream.Furres.GerFurreByName(NameRegex.Match(data).Groups[2].Value);
+                ActivePlayer = Dream.Furres.GetFurreByName(NameRegex.Match(data).Groups[2].Value);
 
             if (DescTagRegexMatch.Success)
             {
@@ -489,7 +489,7 @@ namespace Furcadia.Net.Proxy
                 Regex DescRegex = new Regex(DescFilter, ChannelOptions);
                 if (DescRegex.Match(data).Success)
                 {
-                    ActivePlayer = Dream.Furres.GerFurreByName(DescRegex.Match(data).Groups[1].Value);
+                    ActivePlayer = Dream.Furres.GetFurreByName(DescRegex.Match(data).Groups[1].Value);
                     ActivePlayer.FurreDescription = DescRegex.Match(data).Groups[2].Value;
 
                     if (LookQue.Count > 0)
@@ -523,7 +523,7 @@ namespace Furcadia.Net.Proxy
                 Match ShoutMatch = ShoutRegex.Match(data);
                 if (ShoutMatch.Success)
                 {
-                    ActivePlayer = Dream.Furres.GerFurreByName(ShoutMatch.Groups[5].Value);
+                    ActivePlayer = Dream.Furres.GetFurreByName(ShoutMatch.Groups[5].Value);
                     ActivePlayer.Message = ShoutMatch.Groups[7].Value;
                     player = ActivePlayer;
                     chanObject.player = ActivePlayer;
@@ -646,7 +646,7 @@ namespace Furcadia.Net.Proxy
                     Match WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
                     {
-                        ActivePlayer = Dream.Furres.GerFurreByName(WhisperMatches.Groups[4].Value);
+                        ActivePlayer = Dream.Furres.GetFurreByName(WhisperMatches.Groups[4].Value);
                         ActivePlayer.Message = WhisperMatches.Groups[7].Value;
 
                         player = ActivePlayer;
@@ -681,7 +681,7 @@ namespace Furcadia.Net.Proxy
                 {
                     Regex EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
                     Match EmoteMatch = EmoteRegex.Match(data);
-                    ActivePlayer = Dream.Furres.GerFurreByName(EmoteMatch.Groups[2].Value);
+                    ActivePlayer = Dream.Furres.GetFurreByName(EmoteMatch.Groups[2].Value);
                     ActivePlayer.Message = EmoteMatch.Groups[4].Value;
                     player = ActivePlayer;
                     chanObject.player = ActivePlayer;
@@ -780,7 +780,7 @@ namespace Furcadia.Net.Proxy
                     if (NameRegex.Match(data).Success)
                     {
                         var name = NameRegex.Match(data).Groups[2].Value;
-                        player = Dream.Furres.GerFurreByName(name);
+                        player = Dream.Furres.GetFurreByName(name);
                     }
                 }
             }

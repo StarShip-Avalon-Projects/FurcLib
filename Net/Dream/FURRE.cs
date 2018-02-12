@@ -1,7 +1,6 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
 using System;
-using System.Text.RegularExpressions;
 using static Furcadia.Net.DreamInfo.Avatar;
 
 namespace Furcadia.Net.DreamInfo
@@ -11,6 +10,21 @@ namespace Furcadia.Net.DreamInfo
     /// </summary>
     public interface IFurre
     {
+        #region Public Properties
+
+        /// <summary>
+        /// Implements the FurreID or unique furre identifyer
+        /// </summary>
+        int FurreID { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message.
+        /// </summary>
+        /// <value>
+        /// The message.
+        /// </value>
+        string Message { get; set; }
+
         /// <summary>
         /// implements the Furre;s Name Property
         /// </summary>
@@ -21,12 +35,7 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         string ShortName { get; }
 
-        /// <summary>
-        /// Implements the FurreID or unique furre identifyer
-        /// </summary>
-        int FurreID { get; set; }
-
-        string Message { get; set; }
+        #endregion Public Properties
     }
 
     /// <summary>
@@ -54,14 +63,16 @@ namespace Furcadia.Net.DreamInfo
         private int _ID;
         private int _LastStat;
         private int _level;
-        private string message;
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
         private string _tag;
         private bool _Visible;
         private bool _WasVisible;
+        private av_DIR direction;
         private FurrePosition Location;
+        private string message;
         private string name;
+        private FurrePose pose;
         private FurrePosition SourceLocation;
 
         #endregion Private Fields
@@ -69,6 +80,7 @@ namespace Furcadia.Net.DreamInfo
         #region Public Constructors
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Furre"/> class.
         /// </summary>
         public Furre()
         {
@@ -81,9 +93,9 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Furre"/> class.
         /// </summary>
-        /// <param name="FurreID">
-        /// </param>
+        /// <param name="FurreID">The furre identifier.</param>
         public Furre(int FurreID) : this()
         {
             _ID = FurreID;
@@ -100,11 +112,10 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Furre"/> class.
         /// </summary>
-        /// <param name="FurreID">
-        /// </param>
-        /// <param name="Name">
-        /// </param>
+        /// <param name="FurreID">The furre identifier.</param>
+        /// <param name="Name">The name.</param>
         public Furre(int FurreID, string Name) : this()
         {
             _ID = FurreID;
@@ -114,10 +125,6 @@ namespace Furcadia.Net.DreamInfo
         #endregion Public Constructors
 
         #region Public Properties
-
-        private av_DIR direction;
-
-        private FurrePose pose;
 
         /// <summary>
         /// Away from keyboard time
@@ -129,7 +136,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the beekin badge.
         /// </summary>
+        /// <value>
+        /// The beekin badge.
+        /// </value>
         public string BeekinBadge
         {
             get { return _badge; }
@@ -143,7 +154,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the direction.
         /// </summary>
+        /// <value>
+        /// The direction.
+        /// </value>
         public av_DIR Direction
         {
             get { return direction; }
@@ -151,7 +166,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the floor object current.
         /// </summary>
+        /// <value>
+        /// The floor object current.
+        /// </value>
         [CLSCompliant(false)]
         public uint FloorObjectCurrent
         {
@@ -164,7 +183,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the floor object old.
         /// </summary>
+        /// <value>
+        /// The floor object old.
+        /// </value>
         [CLSCompliant(false)]
         public uint FloorObjectOld
         {
@@ -205,7 +228,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets the gender.
         /// </summary>
+        /// <value>
+        /// The gender.
+        /// </value>
         [Obsolete]
         public int Gender
         {
@@ -213,7 +240,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets the group.
         /// </summary>
+        /// <value>
+        /// The group.
+        /// </value>
         public int Group
         {
             get { return _group; }
@@ -229,14 +260,22 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets the last stat.
         /// </summary>
+        /// <value>
+        /// The last stat.
+        /// </value>
         public int LastStat
         {
             get { return _LastStat; }
         }
 
         /// <summary>
+        /// Gets the level.
         /// </summary>
+        /// <value>
+        /// The level.
+        /// </value>
         public int Level
         {
             get { return _level; }
@@ -261,7 +300,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the paw object current.
         /// </summary>
+        /// <value>
+        /// The paw object current.
+        /// </value>
         [CLSCompliant(false)]
         public uint PawObjectCurrent
         {
@@ -274,7 +317,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets the paw object old.
         /// </summary>
+        /// <value>
+        /// The paw object old.
+        /// </value>
         [CLSCompliant(false)]
         public uint PawObjectOld
         {
@@ -318,7 +365,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="Furre"/> is visible.
         /// </summary>
+        /// <value>
+        ///   <c>true</c> if visible; otherwise, <c>false</c>.
+        /// </value>
         public bool Visible
         {
             get { return _Visible; }
@@ -330,7 +381,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets a value indicating whether [was visible].
         /// </summary>
+        /// <value>
+        ///   <c>true</c> if [was visible]; otherwise, <c>false</c>.
+        /// </value>
         public bool WasVisible
         {
             get { return _WasVisible; }
@@ -341,12 +396,12 @@ namespace Furcadia.Net.DreamInfo
         #region Public Methods
 
         /// <summary>
+        /// Implements the operator !=.
         /// </summary>
-        /// <param name="a">
-        /// </param>
-        /// <param name="b">
-        /// </param>
+        /// <param name="a">a.</param>
+        /// <param name="b">The b.</param>
         /// <returns>
+        /// The result of the operator.
         /// </returns>
         public static bool operator !=(Furre a, IFurre b)
         {
@@ -354,12 +409,12 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Implements the operator ==.
         /// </summary>
-        /// <param name="a">
-        /// </param>
-        /// <param name="b">
-        /// </param>
+        /// <param name="a">a.</param>
+        /// <param name="b">The b.</param>
         /// <returns>
+        /// The result of the operator.
         /// </returns>
         public static bool operator ==(Furre a, IFurre b)
         {
@@ -381,36 +436,29 @@ namespace Furcadia.Net.DreamInfo
             return a.Equals(b);
         }
 
-        public static implicit operator Furre(Regex v)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
-        /// <param name="obj">
-        /// </param>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
         /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj == null)
-                return false;
-            if (this.GetType() != obj.GetType())
-                return false;
-            if (obj is IFurre)
+            if (obj is IFurre fur)
             {
-                if (((Furre)obj).FurreID == -1 && FurreID == -1)
-                    return false;
-                return ShortName == ((Furre)obj).ShortName
-                    || ((Furre)obj).FurreID == FurreID;
+                return ShortName == fur.ShortName
+                    || fur.FurreID == FurreID;
             }
+
             return base.Equals(obj);
         }
 
         /// <summary>
+        /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
@@ -418,20 +466,19 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// To the furcadia identifier.
         /// </summary>
-        /// <returns>
-        /// </returns>
+        /// <returns></returns>
         public int ToFurcadiaID()
         {
             return _ID;
         }
 
         /// <summary>
+        /// To the furcadia identifier.
         /// </summary>
-        /// <param name="format">
-        /// </param>
-        /// <returns>
-        /// </returns>
+        /// <param name="format">The format.</param>
+        /// <returns></returns>
         public int ToFurcadiaID(Func<IFurre, int> format)
         {
             if (format != null)
@@ -440,8 +487,10 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
@@ -449,10 +498,11 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
-        /// <param name="format">
-        /// </param>
+        /// <param name="format">The format.</param>
         /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public string ToString(Func<IFurre, string> format)
         {
