@@ -232,7 +232,7 @@ namespace Furcadia.Net.DreamInfo
                     return Character;
                 }
             }
-            return new Furre(sname);
+            return new Furre(0, sname);
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace Furcadia.Net.DreamInfo
                 if (Furre.FurreID == FurreID)
                     return Furre;
             }
-            return new Furre();
+            return new Furre(FurreID);
         }
 
         /// <summary>
