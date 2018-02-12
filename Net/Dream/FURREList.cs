@@ -220,6 +220,10 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="sname">
         /// </param>
         /// <returns>
+        /// Furre name with a real Furcadia ID if the furre is in the dream
+        /// Other wise, Furre with Furre Id 0
+        /// <para/>
+        /// Furre Id of -1 is Undefined
         /// </returns>
         public Furre GerFurreByName(string sname)
         {
@@ -269,7 +273,10 @@ namespace Furcadia.Net.DreamInfo
         /// Furre ID as integer
         /// </param>
         /// <returns>
-        /// Furre
+        /// Furre name with a real Furcadia ID if the furre is in the dream
+        /// Other wise, Furre with with name unknown and the given Furre Id
+        /// <para/>
+        /// Furre Id of -1 is Undefined
         /// </returns>
         public Furre GetFurreByID(int FurreID)
         {
