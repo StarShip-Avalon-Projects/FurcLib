@@ -10,7 +10,6 @@ namespace Furcadia.Net.DreamInfo
     /// </summary>
     [Legacy]
     public class Avatar
-
     {
         #region Private Fields
 
@@ -20,79 +19,103 @@ namespace Furcadia.Net.DreamInfo
 
         #region Private Enums
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR'
-
+        /// <summary>
+        ///
+        /// </summary>
         public enum av_DIR
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR'
         {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.SW'
+            /// <summary>
+            /// South West
+            /// </summary>
             SW,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.SW'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.SE'
+
+            /// <summary>
+            /// South East
+            /// </summary>
             SE,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.SE'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.NW'
+
+            /// <summary>
+            /// The nwNorth West
+            /// </summary>
             NW,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.NW'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.NE'
+
+            /// <summary>
+            /// North East
+            /// </summary>
             NE,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_DIR.NE'
-        };
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE'
-
-        public enum av_POSE
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE'
-        {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_SIT'
-            AVPOSE_SIT,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_SIT'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_WALK0'
-            AVPOSE_WALK0,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_WALK0'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_STAND'
-            AVPOSE_STAND,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_STAND'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_WALK1'
-            AVPOSE_WALK1,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_WALK1'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_LIE'
-            AVPOSE_LIE,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.av_POSE.AVPOSE_LIE'
         };
 
         /// <summary>
+        /// Avatar pose
+        /// </summary>
+        public enum av_POSE
+        {
+            /// <summary>
+            /// Sit
+            /// </summary>
+            AVPOSE_SIT,
+
+            /// <summary>
+            /// Walk 0
+            /// </summary>
+            AVPOSE_WALK0,
+
+            /// <summary>
+            /// Stand
+            /// </summary>
+            AVPOSE_STAND,
+
+            /// <summary>
+            /// Walk 1
+            /// </summary>
+            AVPOSE_WALK1,
+
+            /// <summary>
+            /// Lie
+            /// </summary>
+            AVPOSE_LIE,
+        };
+
+        /// <summary>
+        /// Furre Poses
         /// </summary>
         [Flags]
         public enum FurrePose
         {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.None'
+            /// <summary>
+            /// The none
+            /// </summary>
             None,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.None'
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Walk1'
+            /// <summary>
+            /// The walk1
+            /// </summary>
             Walk1,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Walk1'
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Stand1'
+            /// <summary>
+            /// The stand1
+            /// </summary>
             Stand1,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Stand1'
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Walk2'
+            /// <summary>
+            /// The walk2
+            /// </summary>
             Walk2,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Walk2'
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Stand2'
+            /// <summary>
+            /// The stand2
+            /// </summary>
             Stand2,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Stand2'
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Sit'
+            /// <summary>
+            /// The sit
+            /// </summary>
             Sit,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.Sit'
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.LieDown'
+            /// <summary>
+            /// The lie down
+            /// </summary>
             LieDown
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.FurrePose.LieDown'
         }
 
         #endregion Private Enums
@@ -280,33 +303,44 @@ namespace Furcadia.Net.DreamInfo
         {
             #region Public Fields
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.dir'
+            /// <summary>
+            /// The dir
+            /// </summary>
             public int dir;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.dir'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.DS_Number'
+
+            /// <summary>
+            /// The ds number
+            /// </summary>
             public int DS_Number;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.DS_Number'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.gender'
+
+            /// <summary>
+            /// The gender
+            /// </summary>
             public int gender;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.gender'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.pose'
+
+            /// <summary>
+            /// The pose
+            /// </summary>
             public int pose;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.pose'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.Spec'
+
+            /// <summary>
+            /// The spec
+            /// </summary>
             public int Spec;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.Spec'
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.Wings'
+
+            /// <summary>
+            /// The wings
+            /// </summary>
             public int Wings;
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.Wings'
 
             #endregion Public Fields
 
             #region Public Methods
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.Clear()'
-
+            /// <summary>
+            /// Clears this instance.
+            /// </summary>
             public void Clear()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Avatar.Frame.Clear()'
             {
                 Spec = -1;
                 dir = -1;
@@ -320,7 +354,5 @@ namespace Furcadia.Net.DreamInfo
         }
 
         #endregion Public Structs
-
-        //end class
     }
 }

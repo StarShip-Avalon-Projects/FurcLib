@@ -39,7 +39,8 @@ namespace Furcadia.Net.DreamInfo
     }
 
     /// <summary>
-    /// Class for Proxies and bots to use Furrre Data provided by the game server.
+    /// Class for Proxies and bots to use Furrre Data
+    /// provided by the game server.
     /// </summary>
     [Serializable]
     public class Furre : IFurre
@@ -48,17 +49,10 @@ namespace Furcadia.Net.DreamInfo
 
         private int _AFK;
         private string _badge;
-
-        /// <summary>
-        /// v31c Colorcodes
-        /// </summary>
         private ColorString _Color;
-
         private string _Desc;
-
         private uint _FloorObjectCurrent;
         private uint _FloorObjectOld;
-
         private int _group;
         private int _ID;
         private int _LastStat;
@@ -131,8 +125,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public int AfkTime
         {
-            get { return _AFK; }
-            set { _AFK = value; }
+            get => _AFK;
+            set => _AFK = value;
         }
 
         /// <summary>
@@ -143,7 +137,7 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public string BeekinBadge
         {
-            get { return _badge; }
+            get => _badge;
             set
             {
                 _badge = value;
@@ -161,8 +155,8 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public av_DIR Direction
         {
-            get { return direction; }
-            set { direction = value; }
+            get => direction;
+            set => direction = value;
         }
 
         /// <summary>
@@ -174,7 +168,7 @@ namespace Furcadia.Net.DreamInfo
         [CLSCompliant(false)]
         public uint FloorObjectCurrent
         {
-            get { return _FloorObjectCurrent; }
+            get => _FloorObjectCurrent;
             set
             {
                 _FloorObjectOld = _FloorObjectCurrent;
@@ -191,8 +185,8 @@ namespace Furcadia.Net.DreamInfo
         [CLSCompliant(false)]
         public uint FloorObjectOld
         {
-            get { return _FloorObjectOld; }
-            set { _FloorObjectOld = value; }
+            get => _FloorObjectOld;
+            set => _FloorObjectOld = value;
         }
 
         /// <summary>
@@ -202,11 +196,8 @@ namespace Furcadia.Net.DreamInfo
         {
             //TODO: Move section to a Costume Sub Class
             // Furcadia now supports Costumes through Online FurEd
-            get { return _Color; }
-            set
-            {
-                _Color = value;
-            }
+            get => _Color;
+            set => _Color = value;
         }
 
         /// <summary>
@@ -214,8 +205,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string FurreDescription
         {
-            get { return _Desc; }
-            set { _Desc = value; }
+            get => _Desc;
+            set => _Desc = value;
         }
 
         /// <summary>
@@ -223,8 +214,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public int FurreID
         {
-            get { return _ID; }
-            set { _ID = value; }
+            get => _ID;
+            set => _ID = value;
         }
 
         /// <summary>
@@ -234,10 +225,7 @@ namespace Furcadia.Net.DreamInfo
         /// The gender.
         /// </value>
         [Obsolete]
-        public int Gender
-        {
-            get { return FurreColors.Gender; }
-        }
+        public int Gender => FurreColors.Gender;
 
         /// <summary>
         /// Gets the group.
@@ -245,18 +233,15 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The group.
         /// </value>
-        public int Group
-        {
-            get { return _group; }
-        }
+        public int Group => _group;
 
         /// <summary>
         /// The Position the Furre Moved from
         /// </summary>
         public FurrePosition LastPosition
         {
-            get { return SourceLocation; }
-            set { SourceLocation = value; }
+            get => SourceLocation;
+            set => SourceLocation = value;
         }
 
         /// <summary>
@@ -265,10 +250,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The last stat.
         /// </value>
-        public int LastStat
-        {
-            get { return _LastStat; }
-        }
+        public int LastStat => _LastStat;
 
         /// <summary>
         /// Gets the level.
@@ -276,18 +258,15 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The level.
         /// </value>
-        public int Level
-        {
-            get { return _level; }
-        }
+        public int Level => _level;
 
         /// <summary>
         /// Last Message Furre had
         /// </summary>
         public string Message
         {
-            get { return message; }
-            set { message = value; }
+            get => message;
+            set => message = value;
         }
 
         /// <summary>
@@ -295,8 +274,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string Name
         {
-            get { return name; }
-            set { name = value; }
+            get => name;
+            set => name = value;
         }
 
         /// <summary>
@@ -308,7 +287,7 @@ namespace Furcadia.Net.DreamInfo
         [CLSCompliant(false)]
         public uint PawObjectCurrent
         {
-            get { return _PawObjectCurrent; }
+            get => _PawObjectCurrent;
             set
             {
                 _PawObjectOld = _PawObjectCurrent;
@@ -325,8 +304,8 @@ namespace Furcadia.Net.DreamInfo
         [CLSCompliant(false)]
         public uint PawObjectOld
         {
-            get { return _PawObjectOld; }
-            set { _PawObjectOld = value; }
+            get => _PawObjectOld;
+            set => _PawObjectOld = value;
         }
 
         /// <summary>
@@ -334,8 +313,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public FurrePose Pose
         {
-            get { return pose; }
-            set { pose = value; }
+            get => pose;
+            set => pose = value;
         }
 
         /// <summary>
@@ -343,26 +322,14 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public FurrePosition Position
         {
-            get
-            {
-                return Location;
-            }
-            set
-            {
-                Location = value;
-            }
+            get => Location;
+            set => Location = value;
         }
 
         /// <summary>
         /// Furcadia Shortname format for Furre Name
         /// </summary>
-        public string ShortName
-        {
-            get
-            {
-                return name.ToFurcadiaShortName();
-            }
-        }
+        public string ShortName => name.ToFurcadiaShortName();
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Furre"/> is visible.
@@ -372,7 +339,7 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public bool Visible
         {
-            get { return _Visible; }
+            get => _Visible;
             set
             {
                 _WasVisible = _Visible;
@@ -386,10 +353,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         ///   <c>true</c> if [was visible]; otherwise, <c>false</c>.
         /// </value>
-        public bool WasVisible
-        {
-            get { return _WasVisible; }
-        }
+        public bool WasVisible => _WasVisible;
 
         #endregion Public Properties
 
@@ -421,15 +385,7 @@ namespace Furcadia.Net.DreamInfo
             // If left hand side is null...
             if (a is null)
             {
-                // ...and right hand side is null...
-                if (b is null)
-                {
-                    //...both are null and are Equal.
-                    return true;
-                }
-
-                // ...right hand side is not null, therefore not Equal.
-                return false;
+                return b is null;
             }
 
             // Return true if the fields match:
@@ -447,7 +403,10 @@ namespace Furcadia.Net.DreamInfo
         {
             if (obj is IFurre fur)
             {
-                return ShortName == fur.ShortName
+                if (fur.FurreID <= 0 && FurreID <= 0
+                    && fur.FurreID == FurreID)
+                    return fur.ShortName == ShortName;
+                return fur.ShortName == ShortName
                     || fur.FurreID == FurreID;
             }
 

@@ -65,10 +65,12 @@ namespace Furcadia.Net.DreamInfo
 
         #region Public Methods
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetGroup(string)'
-
+        /// <summary>
+        /// Gets the group.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns></returns>
         public static int GetGroup(string tag)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetGroup(string)'
         {
             int result = 0;
             if (tag == "")
@@ -90,10 +92,12 @@ namespace Furcadia.Net.DreamInfo
             return result;
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetLevel(string)'
-
+        /// <summary>
+        /// Gets the level.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns></returns>
         public static int GetLevel(string tag)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetLevel(string)'
         {
             int result = 0;
             if (tag == "")
@@ -115,10 +119,12 @@ namespace Furcadia.Net.DreamInfo
             return result;
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetTag(string)'
-
+        /// <summary>
+        /// Gets the tag.
+        /// </summary>
+        /// <param name="tag">The tag.</param>
+        /// <returns></returns>
         public static string GetTag(string tag)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Badges.GetTag(string)'
         {
             string result = null;
             if (tag == "")
@@ -131,10 +137,8 @@ namespace Furcadia.Net.DreamInfo
                 if (Convert.IsDBNull(test) == false)
                     if (tag == (string)test)
                     {
-                        int lvl = 0;
-                        int grp = 0;
-                        int.TryParse(dt.Rows[i]["Level"].ToString(), out lvl);
-                        int.TryParse(dt.Rows[i]["Group"].ToString(), out grp);
+                        int.TryParse(dt.Rows[i]["Level"].ToString(), out int lvl);
+                        int.TryParse(dt.Rows[i]["Group"].ToString(), out int grp);
                         Group g = NumToEnum<Group>(grp);
                         Level l = NumToEnum<Level>(lvl);
                         result = "[" + g.ToString() + "-" + l.ToString() + "]";

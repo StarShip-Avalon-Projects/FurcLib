@@ -22,6 +22,12 @@ namespace Furcadia.Net.DreamInfo
 
         #endregion Protected Internal Fields
 
+        #region Private Fields
+
+        private object RemoveLock = new object();
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         /// <summary>
@@ -38,46 +44,22 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// Number of Avatars in the Dream
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return fList.Count;
-            }
-        }
+        public int Count => fList.Count;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.
         /// </summary>
-        public bool IsReadOnly
-        {
-            get
-            {
-                return fList.IsReadOnly;
-            }
-        }
+        public bool IsReadOnly => fList.IsReadOnly;
 
         /// <summary>
         /// Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe).
         /// </summary>
-        public bool IsSynchronized
-        {
-            get
-            {
-                return ((ICollection)fList).IsSynchronized;
-            }
-        }
+        public bool IsSynchronized => ((ICollection)fList).IsSynchronized;
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection" />.
         /// </summary>
-        public object SyncRoot
-        {
-            get
-            {
-                return ((ICollection)fList).SyncRoot;
-            }
-        }
+        public object SyncRoot => ((ICollection)fList).SyncRoot;
 
         /// <summary>
         /// Gets to i list.
@@ -85,13 +67,11 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// To i list.
         /// </value>
-        public IList<Furre> ToIList
-        {
-            get
-            {
-                return fList;
-            }
-        }
+        public IList<Furre> ToIList => fList;
+
+        #endregion Public Properties
+
+        #region Public Indexers
 
         /// <summary>
         /// Gets or sets the <see cref="Furre"/> at the specified index.
@@ -140,11 +120,9 @@ namespace Furcadia.Net.DreamInfo
             }
         }
 
-        #endregion Public Properties
+        #endregion Public Indexers
 
         #region Public Methods
-
-        private object RemoveLock = new object();
 
         /// <summary>
         /// Adds the specified furre.
@@ -229,28 +207,13 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Gets a Furre object by the Furre's Name
+        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
         /// </summary>
-        /// <param name="sname">The sname.</param>
-        /// <returns>
-        /// Furre name with a real Furcadia ID if the furre is in the dream
-        /// Other wise, Furre with Furre Id 0
-        /// <para/>
-        /// Furre Id of -1 is Undefined
-        /// </returns>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        public Furre GetFurreByName(string sname)
+        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
+        public void CopyTo(Furre[] array, int arrayIndex)
         {
-            if (string.IsNullOrEmpty(sname))
-                throw new ArgumentNullException(sname);
-            foreach (var Character in fList)
-            {
-                if (Character.ShortName == sname.ToFurcadiaShortName())
-                {
-                    return Character;
-                }
-            }
-            return new Furre(0, sname);
+            fList.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -262,6 +225,17 @@ namespace Furcadia.Net.DreamInfo
         public IEnumerator GetEnumerator()
         {
             return ((ICollection)fList).GetEnumerator();
+        }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that can be used to iterate through the collection.
+        /// </returns>
+        IEnumerator<Furre> IEnumerable<Furre>.GetEnumerator()
+        {
+            return fList.GetEnumerator();
         }
 
         /// <summary>
@@ -305,6 +279,31 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Gets a Furre object by the Furre's Name
+        /// </summary>
+        /// <param name="sname">The sname.</param>
+        /// <returns>
+        /// Furre name with a real Furcadia ID if the furre is in the dream
+        /// Other wise, Furre with Furre Id 0
+        /// <para/>
+        /// Furre Id of -1 is Undefined
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public Furre GetFurreByName(string sname)
+        {
+            if (string.IsNullOrEmpty(sname))
+                throw new ArgumentNullException(sname);
+            foreach (var Character in fList)
+            {
+                if (Character.ShortName == sname.ToFurcadiaShortName())
+                {
+                    return Character;
+                }
+            }
+            return new Furre(0, sname);
+        }
+
+        /// <summary>
         /// Indexes the of.
         /// </summary>
         /// <param name="Furre">The furre.</param>
@@ -312,6 +311,16 @@ namespace Furcadia.Net.DreamInfo
         public int IndexOf(Furre Furre)
         {
             return fList.IndexOf(Furre);
+        }
+
+        /// <summary>
+        /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1" /> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
+        /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1" />.</param>
+        public void Insert(int index, Furre item)
+        {
+            fList.Insert(index, item);
         }
 
         /// <summary>
@@ -335,30 +344,6 @@ namespace Furcadia.Net.DreamInfo
                 if (F != null)
                     fList.Remove(F);
             }
-        }
-
-        #endregion Public Methods
-
-        #region IDisposable Support
-
-        /// <summary>
-        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
-        /// </summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-        public void CopyTo(Furre[] array, int arrayIndex)
-        {
-            fList.CopyTo(array, arrayIndex);
-        }
-
-        /// <summary>
-        /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1" /> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
-        /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1" />.</param>
-        public void Insert(int index, Furre item)
-        {
-            fList.Insert(index, item);
         }
 
         /// <summary>
@@ -390,17 +375,6 @@ namespace Furcadia.Net.DreamInfo
             fList.RemoveAt(index);
         }
 
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        IEnumerator<Furre> IEnumerable<Furre>.GetEnumerator()
-        {
-            return fList.GetEnumerator();
-        }
-
-        #endregion IDisposable Support
+        #endregion Public Methods
     }
 }

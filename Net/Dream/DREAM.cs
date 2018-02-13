@@ -8,7 +8,6 @@ namespace Furcadia.Net.DreamInfo
     /// <summary>
     ///
     /// </summary>
-
     public interface IDream
     {
         #region Public Properties
@@ -42,9 +41,6 @@ namespace Furcadia.Net.DreamInfo
 
         private int _Lines;
 
-        /// <summary>
-        /// private variables
-        /// </summary>
         private string dreamTitle, _Rating, dreamOwner;
 
         private string fileName;
@@ -98,6 +94,30 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
+        /// Dreams full Furcadia Drean URL
+        /// <para>
+        /// IE: 'fdl furc://DreamOwner:DreamTitle/EntryCode#
+        /// </para>
+        /// </summary>
+        public string DreamUrl
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
+                    return null;
+                if (string.IsNullOrWhiteSpace(dreamOwner))
+                    throw new ArgumentException(dreamOwner);
+                var sb = new StringBuilder($"furc://");
+                sb.Append($"{ dreamOwner.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(dreamTitle))
+                    sb.Append($":{dreamTitle.ToFurcadiaShortName()}");
+                sb.Append("/");
+                Logger.Debug<Dream>(sb);
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
         /// File name for the dream cache stored on disk
         /// </summary>
         /// <value>
@@ -126,16 +146,13 @@ namespace Furcadia.Net.DreamInfo
         public FurreList Furres
         {
             get => furres;
-            set { furres = value; }
+            set => furres = value;
         }
 
         /// <summary>
         /// Is this dream Modern Mode?
         /// </summary>
-        public bool IsModern
-        {
-            get => mode == "modern";
-        }
+        public bool IsModern => mode == "modern";
 
         /// <summary>
         /// Gets a value indicating whether this dream is permament.
@@ -143,10 +160,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         ///   <c>true</c> if this dream is permament; otherwise, <c>false</c>.
         /// </value>
-        public bool IsPermanent
-        {
-            get => isPermament;
-        }
+        public bool IsPermanent => isPermament;
 
         /// <summary>
         /// Number of DS Lines
@@ -193,30 +207,6 @@ namespace Furcadia.Net.DreamInfo
             set => dreamTitle = value;
         }
 
-        /// <summary>
-        /// Dreams full Furcadia Drean URL
-        /// <para>
-        /// IE: 'fdl furc://DreamOwner:DreamTitle/EntryCode#
-        /// </para>
-        /// </summary>
-        public string DreamUrl
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
-                    return null;
-                if (string.IsNullOrWhiteSpace(dreamOwner))
-                    throw new ArgumentException(dreamOwner);
-                var sb = new StringBuilder($"furc://");
-                sb.Append($"{ dreamOwner.ToFurcadiaShortName()}");
-                if (!string.IsNullOrWhiteSpace(dreamTitle))
-                    sb.Append($":{dreamTitle.ToFurcadiaShortName()}");
-                sb.Append("/");
-                Logger.Debug<Dream>(sb);
-                return sb.ToString();
-            }
-        }
-
         #endregion Public Properties
 
         #region Public Methods
@@ -261,14 +251,11 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj is null)
-                return false;
-            if (GetType() != obj.GetType()) return false;
             if (obj is IDream dream)
             {
                 return Name == dream.Name;
             }
-            return false;
+            return base.Equals(obj);
         }
 
         /// <summary>
@@ -279,7 +266,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return dreamTitle.GetHashCode() ^ dreamOwner.GetHashCode(); ;
+            return Name.GetHashCode() ^ dreamOwner.GetHashCode(); ;
         }
 
         /// <summary>
