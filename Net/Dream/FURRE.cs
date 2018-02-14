@@ -42,6 +42,9 @@ namespace Furcadia.Net.DreamInfo
     /// Class for Proxies and bots to use Furrre Data
     /// provided by the game server.
     /// </summary>
+    /// <remarks>
+    /// Furre ID is provided by the Furcadia game
+    /// </remarks>
     [Serializable]
     public class Furre : IFurre
     {

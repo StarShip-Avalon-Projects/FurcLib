@@ -508,10 +508,7 @@ namespace Furcadia.Net.Proxy
                 Match QueryMatch = QueryCommand.Match(data);
                 if (QueryMatch.Success)
                 {
-                    var ChanObj = new QueryChannelObject(data)
-                    {
-                        player = ActivePlayer
-                    };
+                    var ChanObj = new QueryChannelObject(data, ActivePlayer);
 
                     args.Channel = QueryMatch.Groups[1].Value;
 

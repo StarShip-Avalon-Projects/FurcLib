@@ -89,6 +89,9 @@ namespace Furcadia.Net.Utils.ChannelObjects
                 case "cuddle with":
                     qType = QueryType.cuddle;
                     break;
+
+                default:
+                    throw new ArgumentException("Unknown Query Type");
             }
         }
 
@@ -102,7 +105,7 @@ namespace Furcadia.Net.Utils.ChannelObjects
             Match QueryMatch = QueryCommand.Match(ServerInstruction);
             var name = NameRegex.Match(ServerInstruction).Groups[2].Value;
             player = Furr;
-            switch (QueryMatch.Groups[6].Value)
+            switch ($"{QueryMatch.Groups[6].Value} {QueryMatch.Groups[7].Value}")
             {
                 case "join their":
                     qType = QueryType.summon;
@@ -112,18 +115,26 @@ namespace Furcadia.Net.Utils.ChannelObjects
                     qType = QueryType.join;
                     break;
 
-                case "follow you":
+                case "follow you.":
                     qType = QueryType.follow;
                     break;
 
-                case "lead you":
+                case "lead you.":
                     qType = QueryType.lead;
                     break;
 
                 case "cuddle with":
                     qType = QueryType.cuddle;
                     break;
+
+                default:
+                    throw new ArgumentException("Unknown Query Type");
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Query Furre: '{player}' Type: '{qType}' RawInstruction '{RawInstruction}'";
         }
     }
 }
