@@ -607,7 +607,7 @@ namespace Furcadia.Net.Proxy
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
                 }
-                else if (string.IsNullOrEmpty(Color) &
+                else if (string.IsNullOrEmpty(Color) &&
                            Regex.Match(data, NameFilter).Groups[2].Value != "forced")
                 {
                     Match DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -882,7 +882,7 @@ namespace Furcadia.Net.Proxy
                             CloseFurcadiaClient();
                     }
                     // Look instruction
-                    if (data.StartsWith("]f") & InDream == true)
+                    if (data.StartsWith("]f") && InDream == true)
                     {
                         if (Look)
                         {
@@ -953,8 +953,8 @@ namespace Furcadia.Net.Proxy
                         player.Position = new FurrePosition(data.Substring(5, 4));
                         connectedFurre = Dream.Furres[connectedFurre];
                         ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
-                        if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <= player.Position.Y &
-                            VisableRectangle.height >= player.Position.Y & VisableRectangle.length >=
+                        if (VisableRectangle.X <= player.Position.X && VisableRectangle.Y <= player.Position.Y &&
+                            VisableRectangle.height >= player.Position.Y && VisableRectangle.length >=
                             player.Position.X)
                         {
                             player.Visible = true;
@@ -980,8 +980,8 @@ namespace Furcadia.Net.Proxy
                         connectedFurre = Dream.Furres[connectedFurre];
                         ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
 
-                        if (VisableRectangle.X <= player.Position.X & VisableRectangle.Y <=
-                            player.Position.Y & VisableRectangle.height >= player.Position.Y &
+                        if (VisableRectangle.X <= player.Position.X && VisableRectangle.Y <=
+                            player.Position.Y && VisableRectangle.height >= player.Position.Y &&
                             VisableRectangle.length >= player.Position.X)
                         {
                             player.Visible = true;
@@ -1143,7 +1143,7 @@ namespace Furcadia.Net.Proxy
                     //Process Channels Seperatly
                     else if (data[0] == '(')
                     {
-                        if (ThroatTired == false & data.StartsWith("(<font color='warning'>Your throat is tired. Try again in a few seconds.</font>"))
+                        if (ThroatTired == false && data.StartsWith("(<font color='warning'>Your throat is tired. Try again in a few seconds.</font>"))
                         {
                             //Using Furclib ServQue
                             ThroatTired = true;
