@@ -22,7 +22,7 @@
         #region Public Constructors
 
         /// <summary>
-        /// Consgructor
+        /// Initializes a new instance of the <see cref="DiceObject"/> class.
         /// </summary>
         public DiceObject()
         {
@@ -36,27 +36,47 @@
         /// <summary>
         /// + or - Modifyer
         /// </summary>
-        public char DiceCompnentMatch { get { return diceCompnentMatch; } set { diceCompnentMatch = value; } }
+        public char DiceCompnentMatch
+        {
+            get => diceCompnentMatch;
+            set => diceCompnentMatch = value;
+        }
 
         /// <summary>
         /// Number of Dice
         /// </summary>
-        public double DiceCount { get { return diceCount; } set { diceCount = value; } }
+        public double DiceCount
+        {
+            get => diceCount;
+            set => diceCount = value;
+        }
 
         /// <summary>
         /// Die offset +/- n
         /// </summary>
-        public double DiceModifyer { get { return diceModifyer; } set { diceModifyer = value; } }
+        public double DiceModifyer
+        {
+            get => diceModifyer;
+            set => diceModifyer = value;
+        }
 
         /// <summary>
         /// Sum of the Dice Result
         /// </summary>
-        public double DiceResult { get { return diceResult; } set { diceResult = value; } }
+        public double DiceResult
+        {
+            get => diceResult;
+            set => diceResult = value;
+        }
 
         /// <summary>
         /// Number of sides per Die
         /// </summary>
-        public double DiceSides { get { return diceSides; } set { diceSides = value; } }
+        public double DiceSides
+        {
+            get => diceSides;
+            set => diceSides = value;
+        }
 
         #endregion Public Properties
     }

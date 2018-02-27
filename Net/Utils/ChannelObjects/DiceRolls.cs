@@ -10,12 +10,6 @@ namespace Furcadia.Net.Utils.ServerParser
     /// </summary>
     public class DiceRolls : ChannelObject
     {
-        #region Private Fields
-
-        private DiceObject dice;
-
-        #endregion Private Fields
-
         #region Public Constructors
 
         /// <summary>
@@ -24,7 +18,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </param>
         public DiceRolls(string ServerInstruction) : base(ServerInstruction)
         {
-            dice = new DiceObject();
+            Dice = new DiceObject();
             //Dice Filter needs Player Name "forced"
             Regex DiceREGEX = new Regex(DiceFilter, RegexOptions.IgnoreCase);
             System.Text.RegularExpressions.Match DiceMatch = DiceREGEX.Match(ServerInstruction);
@@ -44,18 +38,18 @@ namespace Furcadia.Net.Utils.ServerParser
                 Message = DiceMatch.Groups[7].Value
             };
             double.TryParse(DiceMatch.Groups[4].Value, out double num);
-            dice.DiceSides = num;
+            Dice.DiceSides = num;
             num = 0;
             double.TryParse(DiceMatch.Groups[3].Value, out num);
-            dice.DiceCount = num;
+            Dice.DiceCount = num;
             char.TryParse(DiceMatch.Groups[6].Value, out char cchar);
-            dice.DiceCompnentMatch = cchar;
+            Dice.DiceCompnentMatch = cchar;
             num = 0.0;
             double.TryParse(DiceMatch.Groups[5].Value, out num);
-            dice.DiceModifyer = num;
+            Dice.DiceModifyer = num;
             num = 0;
             double.TryParse(DiceMatch.Groups[8].Value, out num);
-            dice.DiceSides = num;
+            Dice.DiceSides = num;
         }
 
         #endregion Public Constructors
@@ -63,17 +57,12 @@ namespace Furcadia.Net.Utils.ServerParser
         #region Public Properties
 
         /// <summary>
+        /// the Dice Roll result from the game server
         /// </summary>
         public DiceObject Dice
         {
-            get
-            {
-                return dice;
-            }
-            set
-            {
-                dice = value;
-            }
+            get;
+            set;
         }
 
         #endregion Public Properties
