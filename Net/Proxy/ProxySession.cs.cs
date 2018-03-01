@@ -950,12 +950,12 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == '/')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        player.Position = new FurrePosition(data.Substring(5, 4));
+                        player.Location = new FurrePosition(data.Substring(5, 4));
                         connectedFurre = Dream.Furres[connectedFurre];
-                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
-                        if (VisableRectangle.X <= player.Position.X && VisableRectangle.Y <= player.Position.Y &&
-                            VisableRectangle.height >= player.Position.Y && VisableRectangle.length >=
-                            player.Position.X)
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Location.X, connectedFurre.Location.Y);
+                        if (VisableRectangle.X <= player.Location.X && VisableRectangle.Y <= player.Location.Y &&
+                            VisableRectangle.height >= player.Location.Y && VisableRectangle.length >=
+                            player.Location.X)
                         {
                             player.Visible = true;
                         }
@@ -975,14 +975,14 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'A')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        player.Position = new FurrePosition(data.Substring(5, 4));
+                        player.Location = new FurrePosition(data.Substring(5, 4));
 
                         connectedFurre = Dream.Furres[connectedFurre];
-                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Position.X, connectedFurre.Position.Y);
+                        ViewArea VisableRectangle = GetTargetRectFromCenterCoord(connectedFurre.Location.X, connectedFurre.Location.Y);
 
-                        if (VisableRectangle.X <= player.Position.X && VisableRectangle.Y <=
-                            player.Position.Y && VisableRectangle.height >= player.Position.Y &&
-                            VisableRectangle.length >= player.Position.X)
+                        if (VisableRectangle.X <= player.Location.X && VisableRectangle.Y <=
+                            player.Location.Y && VisableRectangle.height >= player.Location.Y &&
+                            VisableRectangle.length >= player.Location.X)
                         {
                             player.Visible = true;
                         }
@@ -1018,7 +1018,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'C')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        player.Position = new FurrePosition(data.Substring(5, 4));
+                        player.Location = new FurrePosition(data.Substring(5, 4));
                         player.Visible = false;
                     }
                     //Species Tags

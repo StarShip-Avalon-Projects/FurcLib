@@ -50,23 +50,23 @@ namespace Furcadia.Net.DreamInfo
     {
         #region Private Fields
 
-        private int _AFK;
-        private string _badge;
-        private ColorString _Color;
-        private string _Desc;
+        private int afk;
+        private string badge;
+        private ColorString colorString;
+        private string desc;
         private uint _FloorObjectCurrent;
         private uint _FloorObjectOld;
         private int _group;
-        private int _ID;
-        private int _LastStat;
-        private int _level;
+        private int iD;
+        private int lastStat;
+        private int level;
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
         private string _tag;
-        private bool _Visible;
-        private bool _WasVisible;
+        private bool visible;
+        private bool wasVisible;
         private av_DIR direction;
-        private FurrePosition Location;
+        private FurrePosition location;
         private string message;
         private string name;
         private FurrePose pose;
@@ -81,12 +81,12 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public Furre()
         {
-            _Color = new ColorString();
-            Location = new FurrePosition();
+            colorString = new ColorString();
+            location = new FurrePosition();
             LastPosition = new FurrePosition();
-            _LastStat = -1;
+            lastStat = -1;
             name = "Unknown";
-            _ID = -1;
+            iD = -1;
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="FurreID">The furre identifier.</param>
         public Furre(int FurreID) : this()
         {
-            _ID = FurreID;
+            iD = FurreID;
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="Name">The name.</param>
         public Furre(int FurreID, string Name) : this()
         {
-            _ID = FurreID;
+            iD = FurreID;
             name = Name;
         }
 
@@ -128,8 +128,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public int AfkTime
         {
-            get => _AFK;
-            set => _AFK = value;
+            get => afk;
+            set => afk = value;
         }
 
         /// <summary>
@@ -140,13 +140,13 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public string BeekinBadge
         {
-            get => _badge;
+            get => badge;
             set
             {
-                _badge = value;
-                _tag = Badges.GetTag(_badge);
-                _group = Badges.GetGroup(_badge);
-                _level = Badges.GetLevel(_badge);
+                badge = value;
+                _tag = Badges.GetTag(badge);
+                _group = Badges.GetGroup(badge);
+                level = Badges.GetLevel(badge);
             }
         }
 
@@ -199,8 +199,8 @@ namespace Furcadia.Net.DreamInfo
         {
             //TODO: Move section to a Costume Sub Class
             // Furcadia now supports Costumes through Online FurEd
-            get => _Color;
-            set => _Color = value;
+            get => colorString;
+            set => colorString = value;
         }
 
         /// <summary>
@@ -208,8 +208,8 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public string FurreDescription
         {
-            get => _Desc;
-            set => _Desc = value;
+            get => desc;
+            set => desc = value;
         }
 
         /// <summary>
@@ -217,18 +217,9 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public int FurreID
         {
-            get => _ID;
-            set => _ID = value;
+            get => iD;
+            set => iD = value;
         }
-
-        /// <summary>
-        /// Gets the gender.
-        /// </summary>
-        /// <value>
-        /// The gender.
-        /// </value>
-        [Obsolete]
-        public int Gender => FurreColors.Gender;
 
         /// <summary>
         /// Gets the group.
@@ -253,7 +244,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The last stat.
         /// </value>
-        public int LastStat => _LastStat;
+        public int LastStat => lastStat;
 
         /// <summary>
         /// Gets the level.
@@ -261,7 +252,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The level.
         /// </value>
-        public int Level => _level;
+        public int Level => level;
 
         /// <summary>
         /// Last Message Furre had
@@ -323,10 +314,10 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// Current position where the Furre is standing
         /// </summary>
-        public FurrePosition Position
+        public FurrePosition Location
         {
-            get => Location;
-            set => Location = value;
+            get => location;
+            set => location = value;
         }
 
         /// <summary>
@@ -342,11 +333,11 @@ namespace Furcadia.Net.DreamInfo
         /// </value>
         public bool Visible
         {
-            get => _Visible;
+            get => visible;
             set
             {
-                _WasVisible = _Visible;
-                _Visible = value;
+                wasVisible = visible;
+                visible = value;
             }
         }
 
@@ -356,7 +347,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         ///   <c>true</c> if [was visible]; otherwise, <c>false</c>.
         /// </value>
-        public bool WasVisible => _WasVisible;
+        public bool WasVisible => wasVisible;
 
         #endregion Public Properties
 
@@ -372,7 +363,14 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public static bool operator !=(Furre a, IFurre b)
         {
-            return !(a == b);
+            // If left hand side is null...
+            if (a is null)
+            {
+                return b is null;
+            }
+
+            // Return true if the fields match:
+            return !a.Equals(b);
         }
 
         /// <summary>
@@ -424,7 +422,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode() ^ FurreID;
+            return ShortName.GetHashCode() ^ FurreID;
         }
 
         /// <summary>
@@ -433,7 +431,7 @@ namespace Furcadia.Net.DreamInfo
         /// <returns></returns>
         public int ToFurcadiaID()
         {
-            return _ID;
+            return iD;
         }
 
         /// <summary>

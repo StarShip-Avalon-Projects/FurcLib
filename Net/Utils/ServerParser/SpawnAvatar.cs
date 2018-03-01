@@ -53,7 +53,7 @@ namespace Furcadia.Net.Utils.ServerParser
             player = new Furre(ConvertFromBase220(ServerInstruction.Substring(1, 4)))
             {
                 Name = ServerInstruction.Substring(12, ConvertFromBase220(ServerInstruction[11])),
-                Position = new FurrePosition(ServerInstruction.Substring(5, 4)),
+                Location = new FurrePosition(ServerInstruction.Substring(5, 4)),
                 Direction = (av_DIR)ConvertFromBase220(ServerInstruction.Substring(9, 1)),
                 Pose = (FurrePose)ConvertFromBase220(ServerInstruction.Substring(10, 1)),
                 AfkTime = ConvertFromBase220(ServerInstruction.Substring(ColTypePos + 1, 4)),
