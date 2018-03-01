@@ -8,6 +8,12 @@ namespace Furcadia.Drawing
     /// </summary>
     public class FurrePosition
     {
+        private double x;
+        private double y;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FurrePosition"/> class.
+        /// </summary>
         public FurrePosition()
         {
         }
@@ -27,21 +33,6 @@ namespace Furcadia.Drawing
         #region Public Constructors
 
         /// <summary>
-        /// Furre Position using Base 220 Corrdinates
-        /// </summary>
-        /// <param name="X">
-        /// Base 220 X Coordinate
-        /// </param>
-        /// <param name="Y">
-        /// Base 220 Y coordinate
-        /// </param>
-        public FurrePosition(string X, string Y)
-        {
-            this.X = ConvertFromBase220(X);
-            this.Y = ConvertFromBase220(Y);
-        }
-
-        /// <summary>
         /// Furre Position using integer Corrdinates
         /// </summary>
         /// <param name="X">
@@ -56,6 +47,17 @@ namespace Furcadia.Drawing
             this.X = X;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FurrePosition"/> class.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        public FurrePosition(double x, double y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
         #endregion Public Constructors
 
         #region Public Properties
@@ -63,12 +65,12 @@ namespace Furcadia.Drawing
         /// <summary>
         /// x coordinate
         /// </summary>
-        public int X { get; set; }
+        public int X { get => (int)x; set => x = value; }
 
         /// <summary>
         /// y coordinate
         /// </summary>
-        public int Y { get; set; }
+        public int Y { get => (int)y; set => y = value; }
 
         #endregion Public Properties
 
@@ -107,9 +109,35 @@ namespace Furcadia.Drawing
         /// </returns>
         public override string ToString()
         {
-            return string.Format("({0}, {1})", X.ToString(), Y.ToString());
+            return $"({x}, {y})";
         }
 
         #endregion Public Methods
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="obj1">The obj1.</param>
+        /// <param name="obj2">The obj2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(FurrePosition obj1, FurrePosition obj2)
+        {
+            return obj1.Equals(obj2);
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="obj1">The obj1.</param>
+        /// <param name="obj2">The obj2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(FurrePosition obj1, FurrePosition obj2)
+        {
+            return !obj1.Equals(obj2);
+        }
     }
 }
