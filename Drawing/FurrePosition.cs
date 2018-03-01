@@ -19,7 +19,7 @@ namespace Furcadia.Drawing
         }
 
         /// <summary>
-        /// Tak a B220 encoded string representing the x,y coordinates and convert them to Furcadia (X,Y) Coordinates
+        /// Takes a B220 encoded string representing the x,y coordinates and convert them to Furcadia (X,Y) coordinates
         /// </summary>
         /// <param name="b220Encoded">4 byte string</param>
         public FurrePosition(string b220Encoded)
@@ -33,14 +33,10 @@ namespace Furcadia.Drawing
         #region Public Constructors
 
         /// <summary>
-        /// Furre Position using integer Corrdinates
+        /// Initializes a new instance of the <see cref="FurrePosition"/> class.
         /// </summary>
-        /// <param name="X">
-        /// Integer X Coordinate
-        /// </param>
-        /// <param name="Y">
-        /// Integer Y Coordinate
-        /// </param>
+        /// <param name="X">The x coordinate.</param>
+        /// <param name="Y">The y coordinate.</param>
         public FurrePosition(int X, int Y)
         {
             this.Y = Y;
@@ -50,12 +46,12 @@ namespace Furcadia.Drawing
         /// <summary>
         /// Initializes a new instance of the <see cref="FurrePosition"/> class.
         /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        public FurrePosition(double x, double y)
+        /// <param name="X">The x coordinate.</param>
+        /// <param name="Y">The y coordinate.</param>
+        public FurrePosition(double X, double Y)
         {
-            this.x = x;
-            this.y = y;
+            this.Y = (int)Y;
+            this.X = (int)X;
         }
 
         #endregion Public Constructors
@@ -77,35 +73,39 @@ namespace Furcadia.Drawing
         #region Public Methods
 
         /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
-        /// <param name="obj">
-        /// </param>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
         /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
-            if (obj.GetType() == typeof(FurrePosition))
+            if (obj is FurrePosition ob)
             {
-                FurrePosition ob = (FurrePosition)obj;
                 return ob.Y == Y && ob.X == X;
             }
             return base.Equals(obj);
         }
 
         /// <summary>
+        /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (int)x ^ (int)y;
         }
 
         /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
