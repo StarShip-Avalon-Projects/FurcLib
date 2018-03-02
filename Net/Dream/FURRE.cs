@@ -1,5 +1,6 @@
 ﻿using Furcadia.Drawing;
 using Furcadia.Movement;
+using Furcadia.Text;
 using System;
 using static Furcadia.Net.DreamInfo.Avatar;
 
@@ -15,7 +16,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// Implements the FurreID or unique furre identifyer
         /// </summary>
-        int FurreID { get; set; }
+        Base220 FurreID { get; set; }
 
         /// <summary>
         /// Gets or sets the message.
@@ -57,7 +58,7 @@ namespace Furcadia.Net.DreamInfo
         private uint _FloorObjectCurrent;
         private uint _FloorObjectOld;
         private int _group;
-        private int iD;
+        private Base220 iD;
         private int lastStat;
         private int level;
         private uint _PawObjectCurrent;
@@ -93,7 +94,7 @@ namespace Furcadia.Net.DreamInfo
         /// Initializes a new instance of the <see cref="Furre"/> class.
         /// </summary>
         /// <param name="FurreID">The furre identifier.</param>
-        public Furre(int FurreID) : this()
+        public Furre(Base220 FurreID) : this()
         {
             iD = FurreID;
         }
@@ -113,7 +114,7 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         /// <param name="FurreID">The furre identifier.</param>
         /// <param name="Name">The name.</param>
-        public Furre(int FurreID, string Name) : this()
+        public Furre(Base220 FurreID, string Name) : this()
         {
             iD = FurreID;
             name = Name;
@@ -215,7 +216,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// Furre ID
         /// </summary>
-        public int FurreID
+        public Base220 FurreID
         {
             get => iD;
             set => iD = value;

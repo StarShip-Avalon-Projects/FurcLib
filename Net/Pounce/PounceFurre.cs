@@ -1,4 +1,5 @@
 ﻿using Furcadia.Net.DreamInfo;
+using Furcadia.Text;
 
 namespace Furcadia.Net.Pounce
 {
@@ -18,8 +19,22 @@ namespace Furcadia.Net.Pounce
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// implements the Furre;s Name Property
+        /// </summary>
         public string ShortName { get { return Name.ToFurcadiaShortName(); } }
-        public int FurreID { get; set; }
+
+        /// <summary>
+        /// Implements the FurreID or unique furre identifyer
+        /// </summary>
+        public Base220 FurreID { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message.
+        /// </summary>
+        /// <value>
+        /// The message.
+        /// </value>
         public string Message { get; set; }
 
         /// <summary>
