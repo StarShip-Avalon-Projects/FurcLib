@@ -66,7 +66,7 @@ namespace Furcadia.Net.DreamInfo
         private string _tag;
         private bool visible;
         private bool wasVisible;
-        private av_DIR direction;
+        private AvatarDirection direction;
         private FurrePosition location;
         private string message;
         private string name;
@@ -157,7 +157,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The direction.
         /// </value>
-        public av_DIR Direction
+        public AvatarDirection Direction
         {
             get => direction;
             set => direction = value;

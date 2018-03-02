@@ -68,9 +68,7 @@ namespace Furcadia.Movement
         /// </returns>
         public bool HasFlag(int FlagToCheck)
         {
-            if ((characterFlags & FlagToCheck) == FlagToCheck)
-                return true;
-            return false;
+            return ((characterFlags & FlagToCheck) == FlagToCheck);
         }
 
         #endregion Public Methods

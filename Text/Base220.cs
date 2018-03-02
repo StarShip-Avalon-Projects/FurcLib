@@ -53,7 +53,110 @@ namespace Furcadia.Text
 
         #endregion Public Constructors
 
-        #region Conversion Operators
+        #region Public Methods
+
+        /// <summary>
+        /// Process Base220 Strings.
+        /// <para>
+        /// these are string Prefixed with a Base220 character representing
+        /// the Lengeth of the string
+        /// </para>
+        /// </summary>
+        /// <param name="b220str">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <remarks>
+        /// Reference Base 220 Strings http://dev.furcadia.com/docs/base220.pdf
+        /// </remarks>
+        public static int Base220StringLengeth(ref string b220str)
+        {
+            int Length = ConvertFromBase220(b220str[0].ToString());
+            b220str = b220str.Substring(1, Length);
+            return Length;
+        }
+
+        /// <summary>
+        /// Converts from base220.
+        /// </summary>
+        /// <param name="b220str">The B220STR.</param>
+        /// <returns></returns>
+        public static int ConvertFromBase220(string b220str)
+        {
+            int num = 0;
+            int mod = 1;
+            if (string.IsNullOrEmpty(b220str))
+                return 0;
+            // Conversion
+            for (int i = 0; i < b220str.Length; i++)
+            {
+                num += (b220str[i] - CHAR_OFFSET) * mod;
+                mod *= 220;
+            }
+
+            return num;
+        }
+
+        /// <summary>
+        /// Converts from base220.
+        /// </summary>
+        /// <param name="b220chr">The B220CHR.</param>
+        /// <returns></returns>
+        public static int ConvertFromBase220(char b220chr)
+        {
+            int num = 0;
+            int mod = 1;
+            if (b220chr == '\0')
+                return 0;
+            // Conversion
+            for (int i = 0; i < 1; i++)
+            {
+                num += (b220chr - CHAR_OFFSET) * mod;
+                mod *= 220;
+            }
+
+            return num;
+        }
+
+        /// <summary>
+        /// Converts to base220.
+        /// </summary>
+        /// <param name="num">The number.</param>
+        /// <returns></returns>
+        public static string ConvertToBase220(int num)
+        {
+            return ConvertToBase220(num, 0);
+        }
+
+        /// <summary>
+        /// Converts to base220.
+        /// </summary>
+        /// <param name="num">The number.</param>
+        /// <param name="nDigits">The n digits.</param>
+        /// <returns></returns>
+        public static string ConvertToBase220(int num, int nDigits)
+        {
+            StringBuilder b220str = new StringBuilder();
+            int ch;
+
+            // Conversion
+            while (num > 0)
+            {
+                ch = (num % 220) + CHAR_OFFSET; num /= 220;
+                b220str.Append((char)ch);
+            }
+
+            // Applying padding if necessary.
+            if (nDigits > 0)
+            {
+                if (b220str.Length < nDigits)
+                    return b220str.Append(new String((char)CHAR_OFFSET, nDigits - b220str.Length)).ToString();
+                if (b220str.Length > nDigits)
+                    return new String((char)(CHAR_OFFSET + BASE - 1), nDigits);
+            }
+
+            return b220str.ToString();
+        }
 
         /// <summary>
         /// Performs an explicit conversion from <see cref="Base220"/> to <see cref="System.Int16"/>.
@@ -138,10 +241,6 @@ namespace Furcadia.Text
         {
             return b220n.ToString();
         }
-
-        #endregion Conversion Operators
-
-        #region Other Operators
 
         /// <summary>
         /// Implements the operator -.
@@ -260,113 +359,18 @@ namespace Furcadia.Text
             return n1.Value > n2.Value;
         }
 
-        #endregion Other Operators
-
         /*** Static Functions ***/
 
-        #region Public Methods
-
         /// <summary>
-        /// Process Base220 Strings.
-        /// <para>
-        /// these are string Prefixed with a Base220 character representing
-        /// the Lengeth of the string
-        /// </para>
+        /// Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.
         /// </summary>
-        /// <param name="b220str">
-        /// </param>
+        /// <param name="other">An object to compare with this instance.</param>
         /// <returns>
+        /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="other" /> in the sort order.  Zero This instance occurs in the same position in the sort order as <paramref name="other" />. Greater than zero This instance follows <paramref name="other" /> in the sort order.
         /// </returns>
-        /// <remarks>
-        /// Reference Base 220 Strings http://dev.furcadia.com/docs/base220.pdf
-        /// </remarks>
-        public static int Base220StringLengeth(ref string b220str)
+        public int CompareTo(int other)
         {
-            int Length = ConvertFromBase220(b220str[0].ToString());
-            b220str = b220str.Substring(1, Length);
-            return Length;
-        }
-
-        /// <summary>
-        /// Converts from base220.
-        /// </summary>
-        /// <param name="b220str">The B220STR.</param>
-        /// <returns></returns>
-        public static int ConvertFromBase220(string b220str)
-        {
-            int num = 0;
-            int mod = 1;
-            if (string.IsNullOrEmpty(b220str))
-                return 0;
-            // Conversion
-            for (int i = 0; i < b220str.Length; i++)
-            {
-                num += (b220str[i] - CHAR_OFFSET) * mod;
-                mod *= 220;
-            }
-
-            return num;
-        }
-
-        /// <summary>
-        /// Converts from base220.
-        /// </summary>
-        /// <param name="b220chr">The B220CHR.</param>
-        /// <returns></returns>
-        public static int ConvertFromBase220(char b220chr)
-        {
-            int num = 0;
-            int mod = 1;
-            if (b220chr == '\0')
-                return 0;
-            // Conversion
-            for (int i = 0; i < 1; i++)
-            {
-                num += (b220chr - CHAR_OFFSET) * mod;
-                mod *= 220;
-            }
-
-            return num;
-        }
-
-        /// <summary>
-        /// Converts to base220.
-        /// </summary>
-        /// <param name="num">The number.</param>
-        /// <returns></returns>
-        public static string ConvertToBase220(int num)
-        {
-            return ConvertToBase220(num, 0);
-        }
-
-        /// <summary>
-        /// Converts to base220.
-        /// </summary>
-        /// <param name="num">The number.</param>
-        /// <param name="nDigits">The n digits.</param>
-        /// <returns></returns>
-        public static string ConvertToBase220(int num, int nDigits)
-        {
-            StringBuilder b220str = new StringBuilder();
-            int ch;
-
-            // Conversion
-            while (num > 0)
-            {
-                ch = (num % 220) + CHAR_OFFSET; num /= 220;
-                b220str.Append((char)ch);
-            }
-
-            // Applying padding if necessary.
-            if (nDigits > 0)
-            {
-                if (b220str.Length < nDigits)
-                    return b220str.Append(new String((char)CHAR_OFFSET, nDigits - b220str.Length)).ToString();
-                if (b220str.Length > nDigits)
-                    return new String((char)(CHAR_OFFSET + BASE - 1), nDigits);
-            }
-
-            return b220str.ToString();
+            return Value.CompareTo(other);
         }
 
         /// <summary>
@@ -381,6 +385,18 @@ namespace Furcadia.Text
             if (!(obj is Base220))
                 return false;
             return this.Value == ((Base220)obj).Value;
+        }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
+        public bool Equals(int other)
+        {
+            return Value.Equals(other);
         }
 
         /// <summary>
@@ -449,33 +465,5 @@ namespace Furcadia.Text
         }
 
         #endregion Public Methods
-
-        #region Interface Implementation
-
-        /// <summary>
-        /// Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.
-        /// </summary>
-        /// <param name="other">An object to compare with this instance.</param>
-        /// <returns>
-        /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="other" /> in the sort order.  Zero This instance occurs in the same position in the sort order as <paramref name="other" />. Greater than zero This instance follows <paramref name="other" /> in the sort order.
-        /// </returns>
-        public int CompareTo(int other)
-        {
-            return Value.CompareTo(other);
-        }
-
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
-        /// </summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <returns>
-        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
-        /// </returns>
-        public bool Equals(int other)
-        {
-            return Value.Equals(other);
-        }
-
-        #endregion Interface Implementation
     }
 }

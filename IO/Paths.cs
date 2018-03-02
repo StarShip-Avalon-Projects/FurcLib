@@ -73,13 +73,7 @@ namespace Furcadia.IO
         ///<para/>
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia
         /// </summary>
-        public string CachePath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"tmp") : DefaultCachePath;
-            }
-        }
+        public string CachePath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"tmp") : DefaultCachePath;
 
         /// <summary>
         /// Character file path - contains furcadia.ini files with login
@@ -89,49 +83,26 @@ namespace Furcadia.IO
         /// </summary>
         [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
-        public string CharacterPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? sLocaldirPath : DefaultCharacterPath;
-            }
-        }
+        public string CharacterPath => UsingLocaldir ? sLocaldirPath : DefaultCharacterPath;
 
         /// <summary>
         /// c:\Program Data\
         /// </summary>
-        public string DefaultCachePath
-        {
-            get
-            {
-                return Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        public string DefaultCachePath => Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                     @"Dragon's Eye Productions", @"Furcadia");
-            }
-        }
 
         /// <summary>
         /// Default Character Path
         /// </summary>
         [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
-        public string DefaultCharacterPath
-        {
-            get
-            {
-                return Path.Combine(DefaultPersonalDataPath, @"Furcadia Characters");
-            }
-        }
+        public string DefaultCharacterPath => Path.Combine(DefaultPersonalDataPath,
+            @"Furcadia Characters");
 
         /// <summary>
         /// Personal Dreams Folder
         /// </summary>
-        public string DefaultDreamsPath
-        {
-            get
-            {
-                return Path.Combine(DefaultPersonalDataPath, @"Dreams");
-            }
-        }
+        public string DefaultDreamsPath => Path.Combine(DefaultPersonalDataPath, @"Dreams");
 
         /// <summary>
         /// Default Furcadia install folder - this path is used by default
@@ -154,51 +125,24 @@ namespace Furcadia.IO
         /// <summary>
         /// Main Maps Default path
         /// </summary>
-        public string DefaultGlobalMapsPath
-
-        {
-            get
-            {
-                return Path.Combine(DefaultFurcadiaPath, @"maps");
-            }
-        }
+        public string DefaultGlobalMapsPath => Path.Combine(DefaultFurcadiaPath, @"maps");
 
         /// <summary>
         /// default skins
         /// </summary>
-        public string DefaultGlobalSkinsPath
-
-        {
-            get
-            {
-                return Path.Combine(DefaultFurcadiaPath, @"skins");
-            }
-        }
+        public string DefaultGlobalSkinsPath => Path.Combine(DefaultFurcadiaPath, @"skins");
 
         /// <summary>
         /// default local skins
         /// </summary>
-        public string DefaultLocalSkinsPath
-
-        {
-            get
-            {
-                return Path.Combine(DefaultPersonalDataPath, @"Skins");
-            }
-        }
+        public string DefaultLocalSkinsPath => Path.Combine(DefaultPersonalDataPath, @"Skins");
 
         /// <summary>
         /// default personal log folder
         /// </summary>
         [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
-        public string DefaultLogsPath
-        {
-            get
-            {
-                return Path.Combine(DefaultPersonalDataPath, @"Logs");
-            }
-        }
+        public string DefaultLogsPath => Path.Combine(DefaultPersonalDataPath, @"Logs");
 
         /// <summary>
         /// Path to the default patch (graphics, sounds, layout) folder used
@@ -206,130 +150,63 @@ namespace Furcadia.IO
         ///<para/>
         /// Default: c:\Program Files\Furcadia\patches\default
         /// </summary>
-        public string DefaultPatchPath
-        {
-            get
-            {
-                return GetDefaultPatchPath();
-            }
-        }
+        public string DefaultPatchPath => GetDefaultPatchPath();
 
         /// <summary>
         /// Default Main Maps
         /// </summary>
-        public string DefaultPermanentMapsCachePath
-
-        {
-            get
-            {
-                return Path.Combine(DefaultCachePath, @"Permanent Maps");
-            }
-        }
+        public string DefaultPermanentMapsCachePath => Path.Combine(DefaultCachePath, @"Permanent Maps");
 
         /// <summary>
         /// Default Documents\Furcadia
         /// </summary>
-        public string DefaultPersonalDataPath
-        {
-            get
-            {
-                return Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        public string DefaultPersonalDataPath => Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                     @"Furcadia");
-            }
-        }
 
         /// <summary>
         /// Portrait cache
         /// </summary>
-        public string DefaultPortraitCachePath
-        {
-            get
-            {
-                return Path.Combine(DefaultCachePath, @"Portrait Cache");
-            }
-        }
+        public string DefaultPortraitCachePath => Path.Combine(DefaultCachePath, @"Portrait Cache");
 
         /// <summary>
         /// Furcadia Screen Shots default folder
         /// </summary>
-        public string DefaultScreenshotsPath
-        {
-            get
-            {
-                return Path.Combine(DefaultPersonalDataPath, @"Screenshots");
-            }
-        }
+        public string DefaultScreenshotsPath => Path.Combine(DefaultPersonalDataPath, @"Screenshots");
 
         /// <summary>
         /// User App Data Settings
         /// </summary>
-        public string DefaultSettingsPath
-        {
-            get
-            {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        public string DefaultSettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     @"Dragon's Eye Productions", @"Furcadia");
-            }
-        }
 
         /// <summary>
         /// Temporary dreams
         /// </summary>
-        public string DefaultTemporaryDreamsPath
-        {
-            get
-            {
-                return Path.Combine(DefaultCachePath, @"Temporary Dreams");
-            }
-        }
+        public string DefaultTemporaryDreamsPath => Path.Combine(DefaultCachePath, @"Temporary Dreams");
 
         /// <summary>
         /// Default Temporary Files
         /// </summary>
-        public string DefaultTemporaryFilesPath
-        {
-            get
-            {
-                return Path.Combine(DefaultCachePath, @"Temporary Files");
-            }
-        }
+        public string DefaultTemporaryFilesPath => Path.Combine(DefaultCachePath, @"Temporary Files");
 
         /// <summary>
         /// Temporary patches
         /// </summary>
-        public string DefaultTemporaryPatchesPath
-        {
-            get
-            {
-                return Path.Combine(DefaultCachePath, @"Temporary Patches");
-            }
-        }
+        public string DefaultTemporaryPatchesPath => Path.Combine(DefaultCachePath, @"Temporary Patches");
 
         /// <summary>
         /// Whisper Logs
         /// </summary>
         [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
-        public string DefaultWhisperLogsPath
-        {
-            get
-            {
-                return Path.Combine(DefaultLogsPath, @"Whispers");
-            }
-        }
+        public string DefaultWhisperLogsPath => Path.Combine(DefaultLogsPath, @"Whispers");
 
         /// <summary>
         /// Dreams path - contains Furcadia dreams made by the player.
         ///
         /// Default: My Documents\Furcadia\Dreams
         /// </summary>
-        public string DreamsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? sLocaldirPath : DefaultDreamsPath;
-            }
-        }
+        public string DreamsPath => UsingLocaldir ? sLocaldirPath : DefaultDreamsPath;
 
         /// <summary>
         /// Furcadia Localdir path - this path (when explicitly set),
@@ -339,26 +216,14 @@ namespace Furcadia.IO
         ///
         /// Default: -NONE-
         /// </summary>
-        public string FurcadiaLocaldirPath
-        {
-            get
-            {
-                return GetFurcadiaLocaldirPath();
-            }
-        }
+        public string FurcadiaLocaldirPath => GetFurcadiaLocaldirPath();
 
         /// <summary>
         /// Furcadia install path - this path corresponds to the path where
         /// Furcadia is installed on the current machine. If Furcadia is not
         /// found, this property will be null.
         /// </summary>
-        public string FurcadiaPath
-        {
-            get
-            {
-                return GetFurcadiaInstallPath();
-            }
-        }
+        public string FurcadiaPath => GetFurcadiaInstallPath();
 
         /// <summary>
         /// Path to the global maps, distributed with Furcadia and loadable
@@ -398,13 +263,7 @@ namespace Furcadia.IO
         /// retain the classic path structure or to run Furcadia from a
         /// removable disk.
         /// </summary>
-        public string LocaldirPath
-        {
-            get
-            {
-                return GetFurcadiaLocaldirPath();
-            }
-        }
+        public string LocaldirPath => GetFurcadiaLocaldirPath();
 
         /// <summary>
         /// Local skins path - contains Furcadia skins used locally by each user.
@@ -412,13 +271,7 @@ namespace Furcadia.IO
         /// Default: My Documents\Furcadia\Skins
         /// </para>
         /// </summary>
-        public string LocalSkinsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"skins") : DefaultLocalSkinsPath;
-            }
-        }
+        public string LocalSkinsPath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"skins") : DefaultLocalSkinsPath;
 
         /// <summary>
         /// Logs path - contains session logs for each character and a
@@ -429,13 +282,7 @@ namespace Furcadia.IO
         /// </summary>
         [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
-        public string LogsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"logs") : DefaultLogsPath;
-            }
-        }
+        public string LogsPath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"logs") : DefaultLogsPath;
 
         /// <summary>
         /// Permanent Maps cache path - contains downloaded main maps such
@@ -444,13 +291,7 @@ namespace Furcadia.IO
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia\Permanent Maps
         /// </para>
         /// </summary>
-        public string PermanentMapsCachePath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"maps") : DefaultPermanentMapsCachePath;
-            }
-        }
+        public string PermanentMapsCachePath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"maps") : DefaultPermanentMapsCachePath;
 
         /// <summary>
         /// Personal data path - contains user-specific files such as logs,
@@ -459,13 +300,7 @@ namespace Furcadia.IO
         /// Default: My Documents\Furcadia\
         /// </para>
         /// </summary>
-        public string PersonalDataPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? sLocaldirPath : DefaultPersonalDataPath;
-            }
-        }
+        public string PersonalDataPath => UsingLocaldir ? sLocaldirPath : DefaultPersonalDataPath;
 
         /// <summary>
         /// Portrait cache path - contains downloaded portraits and desctags
@@ -474,13 +309,7 @@ namespace Furcadia.IO
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye Productions\Furcadia\Portrait Cache
         /// </para>
         /// </summary>
-        public string PortraitCachePath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"portraits") : DefaultPortraitCachePath;
-            }
-        }
+        public string PortraitCachePath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"portraits") : DefaultPortraitCachePath;
 
         /// <summary>
         /// Screen shots path - contains screen shot files taken by Furcadia
@@ -489,13 +318,7 @@ namespace Furcadia.IO
         /// Default: My Documents\Furcadia\Screenshots
         /// </para>
         /// </summary>
-        public string ScreenshotsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"screenshots") : DefaultScreenshotsPath;
-            }
-        }
+        public string ScreenshotsPath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"screenshots") : DefaultScreenshotsPath;
 
         /// <summary>
         /// Personal settings path - contains all the Furcadia settings for
@@ -503,13 +326,7 @@ namespace Furcadia.IO
         ///<para/>
         /// Default (VISTA+): %USERPROFILE%\Local\AppData\Dragon's Eye Productions\Furcadia
         /// </summary>
-        public string SettingsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(sLocaldirPath, @"settings") : DefaultSettingsPath;
-            }
-        }
+        public string SettingsPath => UsingLocaldir ? Path.Combine(sLocaldirPath, @"settings") : DefaultSettingsPath;
 
         /// <summary>
         /// Temporary dreams path - contains downloaded player dreams for
@@ -518,13 +335,7 @@ namespace Furcadia.IO
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye
         ///          Productions\Furcadia\Temporary Dreams
         /// </summary>
-        public string TemporaryDreamsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? CachePath : DefaultTemporaryDreamsPath;
-            }
-        }
+        public string TemporaryDreamsPath => UsingLocaldir ? CachePath : DefaultTemporaryDreamsPath;
 
         /// <summary>
         /// Temporary files path - contains downloaded and uploaded files
@@ -533,13 +344,7 @@ namespace Furcadia.IO
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye
         ///          Productions\Furcadia\Temporary Files
         /// </summary>
-        public string TemporaryFilesPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? CachePath : DefaultTemporaryFilesPath;
-            }
-        }
+        public string TemporaryFilesPath => UsingLocaldir ? CachePath : DefaultTemporaryFilesPath;
 
         /// <summary>
         /// Temporary patch path - contains downloaded temporary patches.
@@ -549,21 +354,12 @@ namespace Furcadia.IO
         /// Default: %ALLUSERSPROFILE%\Dragon's Eye
         ///          Productions\Furcadia\Temporary Patches
         /// </summary>
-        public string TemporaryPatchesPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? CachePath : DefaultTemporaryPatchesPath;
-            }
-        }
+        public string TemporaryPatchesPath => UsingLocaldir ? CachePath : DefaultTemporaryPatchesPath;
 
         /// <summary>
         /// Has LoclDir.ini been detected?
         /// </summary>
-        public bool UsingLocaldir
-        {
-            get { return (sLocaldirPath != null); }
-        }
+        public bool UsingLocaldir => sLocaldirPath != null;
 
         /// <summary>
         /// Whisper logs path - contains whisper logs for each character
@@ -573,13 +369,7 @@ namespace Furcadia.IO
         /// </summary>
         [Legacy]
         [Obsolete("As of The Second Dreaming, Tis is now legacy")]
-        public string WhisperLogsPath
-        {
-            get
-            {
-                return (UsingLocaldir) ? Path.Combine(LogsPath, @"whispers") : DefaultWhisperLogsPath;
-            }
-        }
+        public string WhisperLogsPath => UsingLocaldir ? Path.Combine(LogsPath, @"whispers") : DefaultWhisperLogsPath;
 
         #endregion Public Properties
 
@@ -606,7 +396,7 @@ namespace Furcadia.IO
                     {
                         path = regpath.GetValue("default").ToString();
                         regpath.Close();
-                        if (System.IO.Directory.Exists(path))
+                        if (Directory.Exists(path))
                             return path; // Path found
                     }
                 }
@@ -620,7 +410,7 @@ namespace Furcadia.IO
                     {
                         path = regpath.GetValue("default").ToString();
                         regpath.Close();
-                        if (System.IO.Directory.Exists(path))
+                        if (Directory.Exists(path))
                             return path; // Path found
                     }
                 }
@@ -634,7 +424,7 @@ namespace Furcadia.IO
                     {
                         path = regpath.GetValue("default").ToString();
                         regpath.Close();
-                        if (System.IO.Directory.Exists(path))
+                        if (Directory.Exists(path))
                             return path; // Path found
                     }
                 }
@@ -677,7 +467,7 @@ namespace Furcadia.IO
                     {
                         path = regpath.GetValue("Path").ToString();
                         regpath.Close();
-                        if (System.IO.Directory.Exists(path))
+                        if (Directory.Exists(path))
                             return path; // Path found
                     }
                 }
@@ -691,7 +481,7 @@ namespace Furcadia.IO
                     {
                         path = regkey.GetValue("Path").ToString();
                         regpath.Close();
-                        if (System.IO.Directory.Exists(path))
+                        if (Directory.Exists(path))
                             return path; // Path found
                     }
                 }
@@ -706,7 +496,7 @@ namespace Furcadia.IO
                     {
                         path = regpath.GetValue("Path").ToString();
                         regpath.Close();
-                        if (System.IO.Directory.Exists(path))
+                        if (Directory.Exists(path))
                             return path; // Path found
                     }
                 }
@@ -716,7 +506,7 @@ namespace Furcadia.IO
             }
             // Making a guess from the FurcadiaDefaultPath property.
             path = DefaultFurcadiaPath;
-            if (System.IO.Directory.Exists(path))
+            if (Directory.Exists(path))
                 return path; // Path found
 
             // All options were exhausted - assume Furcadia not installed.
@@ -743,20 +533,19 @@ namespace Furcadia.IO
 
             // Try to locate localdir.ini
             string ini_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "localdir.ini");
-            if (!System.IO.File.Exists(ini_path))
+            if (!File.Exists(ini_path))
                 ini_path = Path.Combine(install_path, "localdir.ini");
-            if (!System.IO.File.Exists(ini_path))
+            if (!File.Exists(ini_path))
                 return null; // localdir.ini not found - regular path structure applies.
 
             // Read localdir.ini for remote path and verify it.
-            using (StreamReader sr = new StreamReader(ini_path))
+            using (StreamReader streamReader = new StreamReader(ini_path))
             {
-                path = sr.ReadLine();
+                path = streamReader.ReadLine();
                 if (path != null)
                     path = path.Trim();
                 else
                     path = Path.GetDirectoryName(ini_path);
-                sr.Close();
             }
 
             if (!Directory.Exists(path))

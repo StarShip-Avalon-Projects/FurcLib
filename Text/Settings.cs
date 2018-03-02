@@ -213,11 +213,8 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Restores the Furcadia Settings we backed up earlier.
+        /// Restores the furcadia settings.
         /// </summary>
-        /// <param name="BackupSettings">
-        /// Backed up settings array
-        /// </param>
         public void RestoreFurcadiaSettings()
         {
             Logging.Logger.Debug<Settings>("Restore Furcadia Settings");
@@ -236,11 +233,9 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Restores the Furcadia Settings we backed up earlier.
+        /// Restores the furcadia settings asynchronous.
         /// </summary>
-        /// <param name="BackupSettings">
-        /// Backed up settings array
-        /// </param>
+        /// <returns></returns>
         public async Task RestoreFurcadiaSettingsAsync()
         {
             await Task.Delay(5000);
@@ -316,14 +311,12 @@ namespace Furcadia.Text
         #region Private Methods
 
         /// <summary>
-        /// sets feilds in the FurcSettings array
+        /// Sets the user setting.
         /// </summary>
-        /// <param name="Setting">
-        /// </param>
-        /// <param name="Value">
-        /// </param>
-        /// <param name="SettingFile">
-        /// </param>
+        /// <param name="Setting">The setting.</param>
+        /// <param name="Value">The value.</param>
+        /// <param name="SettingFile">The setting file.</param>
+        /// <exception cref="ArgumentException"></exception>
         private void SetUserSetting(string Setting, string Value, ref List<string> SettingFile)
         {
             Logging.Logger.Debug<Settings>($"WhichSetting: '{Setting}' WhichValue '{Value}' SettingFile: '{SettingFile}'");
@@ -341,12 +334,11 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Retrieves a field setting in the FurcSettings array
+        /// Gets the user setting.
         /// </summary>
-        /// <param name="Setting">The setting to retrieve</param>
-        /// <param name="SettingFile">The setting file.</param>
+        /// <param name="Setting">The setting.</param>
         /// <returns></returns>
-        /// <exception cref="Exception">Couldn't find Furcadia setting(" + WhichSetting + ") to change.</exception>
+        /// <exception cref="ArgumentException">Couldn't find Furcadia setting(" + Setting + ") to change.</exception>
         internal string GetUserSetting(string Setting)
         {
             lock (ReadSettingLock)

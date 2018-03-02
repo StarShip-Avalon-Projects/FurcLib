@@ -12,21 +12,23 @@ namespace Furcadia.IO
 
         internal static string FormatWineHDDir(string path)
         {
-            string _s = path.Substring(0, 1);
-            string newPath = path.Remove(0, 3);
-            //newPath = newPath.Replace("\\",Path.DirectorySeparatorChar.ToString());
-            switch (_s.ToLower())
+            string newPath = path.Substring(3);
+
+            switch (path[0])
             {
-                case "c":
-                    return Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/.wine/drive_c/" + newPath;
+                case 'C':
+                case 'c':
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                        "/.wine/drive_c/", newPath);
             }
+
             return path;
         }
 
         internal static string ReadSubKey(string regPath, string key)
         {
             string path = null;
-            ProcessStartInfo startinfo = new ProcessStartInfo("regedit", "/S /E " + "tmp.reg " + "\"" + regPath + "\"");
+            ProcessStartInfo startinfo = new ProcessStartInfo("regedit", $"/S /E tmp.reg \"{ regPath }\"");
             Process proc = Process.Start(startinfo);
             proc.Close();
 
@@ -37,10 +39,10 @@ namespace Furcadia.IO
                 Thread.Sleep(100);
             }
 
-            FileStream fs = TryOpenFile("tmp.reg", FileMode.Open, FileAccess.Read, FileShare.Read, 3, 1000);
-            if (fs != null)
+            FileStream fileStream = TryOpenFile("tmp.reg", FileMode.Open, FileAccess.Read, FileShare.Read, 3, 1000);
+            if (fileStream != null)
             {
-                path = parseRegFile(fs, key);
+                path = ParseRegFile(fileStream, key);
                 path = path.Remove(0, path.IndexOf('=') + 1);
                 File.Delete("tmp.reg");
                 if (path != null)
@@ -55,15 +57,15 @@ namespace Furcadia.IO
 
         #region UGLY Wine Registry Code
 
-        internal static string parseRegFile(FileStream file, string key)
+        internal static string ParseRegFile(FileStream file, string key)
         {
             using (StreamReader reader = new StreamReader(file))
             {
                 List<string> lines = new List<string>();
-                string _l = null;
-                while ((_l = reader.ReadLine()) != null)
+                string l = null;
+                while (reader.Peek() != -1)
                 {
-                    lines.Add(_l);
+                    lines.Add(l);
                 }
                 for (int i = 1; i <= lines.Count - 1; i++)
                 {
@@ -80,7 +82,7 @@ namespace Furcadia.IO
 
         internal static FileStream TryOpenFile(string filePath, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int maximumAttempts, int attemptWaitMS)
         {
-            FileStream fs = null;
+            FileStream fileStream = null;
             int attempts = 0;
             while (true)
             {
@@ -88,18 +90,16 @@ namespace Furcadia.IO
                 {
                     if (File.Exists(filePath))
                     {
-                        fs = File.Open(filePath, fileMode, fileAccess, fileShare);
-                        return fs;
+                        fileStream = File.Open(filePath, fileMode, fileAccess, fileShare);
+                        return fileStream;
                     }
                 }
-#pragma warning disable CS0168 // The variable 'ioEx' is declared but never used
-                catch (IOException ioEx)
-#pragma warning restore CS0168 // The variable 'ioEx' is declared but never used
+                catch (IOException)
                 {
                     attempts++;
                     if (attempts > maximumAttempts)
                     {
-                        fs = null;
+                        fileStream = null;
                         return null;
                     }
                     else
@@ -108,9 +108,6 @@ namespace Furcadia.IO
                     }
                 }
             }
-#pragma warning disable CS0162 // Unreachable code detected
-            return fs;
-#pragma warning restore CS0162 // Unreachable code detected
         }
 
         #endregion UGLY Wine Registry Code

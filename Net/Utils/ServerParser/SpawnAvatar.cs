@@ -54,7 +54,7 @@ namespace Furcadia.Net.Utils.ServerParser
             {
                 Name = ServerInstruction.Substring(12, ConvertFromBase220(ServerInstruction[11])),
                 Location = new FurrePosition(ServerInstruction.Substring(5, 4)),
-                Direction = (av_DIR)ConvertFromBase220(ServerInstruction.Substring(9, 1)),
+                Direction = (AvatarDirection)ConvertFromBase220(ServerInstruction.Substring(9, 1)),
                 Pose = (FurrePose)ConvertFromBase220(ServerInstruction.Substring(10, 1)),
                 AfkTime = ConvertFromBase220(ServerInstruction.Substring(ColTypePos + 1, 4)),
                 FurreColors = new ColorString(ServerInstruction.Substring(ColTypePos, (ServerInstruction[ColTypePos] == 'w') ? 16 : 14))

@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Furcadia.Utils
 {
     // stolen I mean Borrowed from MonkeySpeak
+    /// <summary>
+    ///
+    /// </summary>
     public static class IOPermissions
     {
         private static WindowsIdentity _currentUser;
@@ -21,6 +19,13 @@ namespace Furcadia.Utils
             _currentPrincipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
         }
 
+        /// <summary>
+        /// Determines whether the specified directory has access.
+        /// </summary>
+        /// <param name="directory">The directory.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified directory has access; otherwise, <c>false</c>.
+        /// </returns>
         public static bool HasAccess(string directory)
         {
             if (directory == null) return false;
@@ -31,6 +36,13 @@ namespace Furcadia.Utils
             return HasFileOrDirectoryAccess(acl);
         }
 
+        /// <summary>
+        /// Determines whether the specified directory has access.
+        /// </summary>
+        /// <param name="directory">The directory.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified directory has access; otherwise, <c>false</c>.
+        /// </returns>
         public static bool HasAccess(DirectoryInfo directory)
         {
             if (directory == null) return false;
@@ -40,6 +52,13 @@ namespace Furcadia.Utils
             return HasFileOrDirectoryAccess(acl);
         }
 
+        /// <summary>
+        /// Determines whether the specified file has access.
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified file has access; otherwise, <c>false</c>.
+        /// </returns>
         public static bool HasAccess(FileInfo file)
         {
             if (file == null) return false;

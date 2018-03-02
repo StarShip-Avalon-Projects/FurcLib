@@ -14,12 +14,10 @@ namespace Furcadia
 
         #region Public Methods
 
-        public static void PrimeTable()
+        public SpeciesTable()
         {
             try
             {
-                //using (Stream streamie = Assembly.GetExecutingAssembly()
-                //        .GetManifestResourceStream("Furcadia.Resources.SpeciesTable.csv"))
                 Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Furcadia.Resources.SpeciesTable.csv");
 
                 using (StreamReader reader = new StreamReader(stream))
@@ -47,17 +45,18 @@ namespace Furcadia
             }
         }
 
-        //Convert Species to number
+        /// <summary>
+        /// Specs the number.
+        /// </summary>
+        /// <param name="species">The species.</param>
+        /// <param name="special">The special.</param>
+        /// <returns></returns>
         public static int SpecNum(int species, int special)
         {
             int result = 0;
-            if (dt == null)
-                PrimeTable();
-
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                int Special = 0;
-                int.TryParse(dt.Rows[i]["Special"].ToString(), out Special);
+                int.TryParse(dt.Rows[i]["Special"].ToString(), out int Special);
                 if (Special == special)
                 {
                     switch (Special)
@@ -141,20 +140,23 @@ namespace Furcadia
             return result;
         }
 
+        /// <summary>
+        /// Wingses the number.
+        /// </summary>
+        /// <param name="species">The species.</param>
+        /// <param name="special">The special.</param>
+        /// <returns></returns>
         public static int WingsNum(int species, int special)
         {
             int result = 0;
-            if (dt == null)
-                PrimeTable();
 
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                int Special = 0;
-                int.TryParse(dt.Rows[i]["Special"].ToString(), out Special);
+                int.TryParse(dt.Rows[i]["Special"].ToString(), out int Special);
                 if (Special == special)
                 {
-                    int.TryParse(dt.Rows[i]["Wings"].ToString(), out result);
-                    break;
+                    if (int.TryParse(dt.Rows[i]["Wings"].ToString(), out result))
+                        break;
                 }
             }
 
@@ -162,15 +164,5 @@ namespace Furcadia
         }
 
         #endregion Public Methods
-
-        ////convert Species to name
-        //public static string SpecName(int species, int special)
-        //{
-        //    if (dt == null)
-        //        PrimeTable();
-        //    DataRow[] dr = dt.Select("special = " + special);
-
-        //    return "";
-        //}
     }
 }

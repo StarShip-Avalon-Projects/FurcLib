@@ -99,6 +99,9 @@ namespace Furcadia.FurcMap
 
         #region Internal Constructors
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Map"/> class.
+        /// </summary>
         internal Map()
         {
         }
@@ -107,6 +110,12 @@ namespace Furcadia.FurcMap
 
         #region Internal Properties
 
+        /// <summary>
+        /// Gets the bytes layer count.
+        /// </summary>
+        /// <value>
+        /// The bytes layer count.
+        /// </value>
         internal int BytesLayerCount
         {
             get
@@ -267,7 +276,6 @@ namespace Furcadia.FurcMap
         /// type of dream patch to use
         /// </summary>
         public int UsePatch
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'Map.UsePatch'
         {
             get { return patcht; }
             set { patcht = value; }
@@ -508,29 +516,30 @@ namespace Furcadia.FurcMap
             FileStream fs = new FileStream(filename, FileMode.Create);
             BinaryWriter sw = new BinaryWriter(fs, Encoding.GetEncoding(1252));
 
-            String headerData = "MAP V01.40 Furcadia\n";
-            headerData += "height=" + height + "\n";
-            headerData += "width=" + width + "\n";
-            headerData += "revision=" + revision + "\n";
-            headerData += "patcht=" + patcht + "\n";
-            headerData += "name=" + name + "\n";
-            headerData += "patchs=" + patchs + "\n";
-            headerData += "encoded=" + (encoded ? "1" : "0") + "\n";
-            headerData += "allowjs=" + (allowjs ? "1" : "0") + "\n";
-            headerData += "allowlf=" + (allowlf ? "1" : "0") + "\n";
-            headerData += "allowfurl=" + (allowfurl ? "1" : "0") + "\n";
-            headerData += "swearfilter=" + (swearfilter ? "1" : "0") + "\n";
-            headerData += "nowho=" + (nowho ? "1" : "0") + "\n";
-            headerData += "forcesittable=" + (forcesittable ? "1" : "0") + "\n";
-            headerData += "allowshouts=" + (allowshouts ? "1" : "0") + "\n";
-            headerData += "rating=" + rating + "\n";
-            headerData += "allowlarge=" + (allowlarge ? "1" : "0") + "\n";
-            headerData += "notab=" + (notab ? "1" : "0") + "\n";
-            headerData += "nonovelty=" + (nonovelty ? "1" : "0") + "\n";
-            headerData += "parentalcontrols=" + (parentalcontrols ? "1" : "0") + "\n";
-            headerData += "BODY\n";
+            StringBuilder headerData = new StringBuilder()
+            .Append("MAP V01.40 Furcadia\n")
+            .Append("height=" + height + "\n")
+            .Append("width=" + width + "\n")
+            .Append("revision=" + revision + "\n")
+            .Append("patcht=" + patcht + "\n")
+            .Append("name=" + name + "\n")
+            .Append("patchs=" + patchs + "\n")
+            .Append("encoded=" + (encoded ? "1" : "0") + "\n")
+            .Append("allowjs=" + (allowjs ? "1" : "0") + "\n")
+            .Append("allowlf=" + (allowlf ? "1" : "0") + "\n")
+            .Append("allowfurl=" + (allowfurl ? "1" : "0") + "\n")
+            .Append("swearfilter=" + (swearfilter ? "1" : "0") + "\n")
+            .Append("nowho=" + (nowho ? "1" : "0") + "\n")
+            .Append("forcesittable=" + (forcesittable ? "1" : "0") + "\n")
+            .Append("allowshouts=" + (allowshouts ? "1" : "0") + "\n")
+            .Append("rating=" + rating + "\n")
+            .Append("allowlarge=" + (allowlarge ? "1" : "0") + "\n")
+            .Append("notab=" + (notab ? "1" : "0") + "\n")
+            .Append("nonovelty=" + (nonovelty ? "1" : "0") + "\n")
+            .Append("parentalcontrols=" + (parentalcontrols ? "1" : "0") + "\n")
+            .Append("BODY\n");
 
-            byte[] headerDataBytes = Encoding.GetEncoding(1252).GetBytes(headerData);
+            byte[] headerDataBytes = Encoding.GetEncoding(1252).GetBytes(headerData.ToString());
 
             sw.Write(headerDataBytes);
             sw.Write(floors);

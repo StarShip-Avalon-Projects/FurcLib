@@ -22,7 +22,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         ///
         /// </summary>
-        public enum av_DIR
+        public enum AvatarDirection
         {
             /// <summary>
             /// South West
@@ -48,7 +48,7 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// Avatar pose
         /// </summary>
-        public enum av_POSE
+        public enum AvatarPose
         {
             /// <summary>
             /// Sit
@@ -183,103 +183,103 @@ namespace Furcadia.Net.DreamInfo
                         switch (Frame % 20)
                         {
                             case 0:
-                                _Frame.dir = (int)av_DIR.SW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_SIT;
+                                _Frame.dir = (int)AvatarDirection.SW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_SIT;
                                 return _Frame;
 
                             case 1:
-                                _Frame.dir = (int)av_DIR.SW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK0;
+                                _Frame.dir = (int)AvatarDirection.SW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK0;
                                 return _Frame;
 
                             case 2:
-                                _Frame.dir = (int)av_DIR.SW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_STAND;
+                                _Frame.dir = (int)AvatarDirection.SW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_STAND;
                                 return _Frame;
 
                             case 3:
-                                _Frame.dir = (int)av_DIR.SW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK1;
+                                _Frame.dir = (int)AvatarDirection.SW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK1;
                                 return _Frame;
 
                             case 4:
-                                _Frame.dir = (int)av_DIR.SE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_SIT;
+                                _Frame.dir = (int)AvatarDirection.SE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_SIT;
                                 return _Frame;
 
                             case 5:
-                                _Frame.dir = (int)av_DIR.SE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK0;
+                                _Frame.dir = (int)AvatarDirection.SE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK0;
                                 return _Frame;
 
                             case 6:
-                                _Frame.dir = (int)av_DIR.SE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_STAND;
+                                _Frame.dir = (int)AvatarDirection.SE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_STAND;
                                 return _Frame;
 
                             case 7:
-                                _Frame.dir = (int)av_DIR.SE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK1;
+                                _Frame.dir = (int)AvatarDirection.SE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK1;
                                 return _Frame;
 
                             case 8:
-                                _Frame.dir = (int)av_DIR.NW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_SIT;
+                                _Frame.dir = (int)AvatarDirection.NW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_SIT;
                                 return _Frame;
 
                             case 9:
-                                _Frame.dir = (int)av_DIR.NW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK0;
+                                _Frame.dir = (int)AvatarDirection.NW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK0;
                                 return _Frame;
 
                             case 10:
-                                _Frame.dir = (int)av_DIR.NW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_STAND;
+                                _Frame.dir = (int)AvatarDirection.NW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_STAND;
                                 return _Frame;
 
                             case 11:
-                                _Frame.dir = (int)av_DIR.NW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK1;
+                                _Frame.dir = (int)AvatarDirection.NW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK1;
                                 return _Frame;
 
                             case 12:
-                                _Frame.dir = (int)av_DIR.NE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_SIT;
+                                _Frame.dir = (int)AvatarDirection.NE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_SIT;
                                 return _Frame;
 
                             case 13:
-                                _Frame.dir = (int)av_DIR.NE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK0;
+                                _Frame.dir = (int)AvatarDirection.NE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK0;
                                 return _Frame;
 
                             case 14:
-                                _Frame.dir = (int)av_DIR.NE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_STAND;
+                                _Frame.dir = (int)AvatarDirection.NE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_STAND;
                                 return _Frame;
 
                             case 15:
-                                _Frame.dir = (int)av_DIR.NE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_WALK1;
+                                _Frame.dir = (int)AvatarDirection.NE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_WALK1;
                                 return _Frame;
 
                             case 16:
-                                _Frame.dir = (int)av_DIR.NW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_LIE;
+                                _Frame.dir = (int)AvatarDirection.NW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_LIE;
                                 return _Frame;
 
                             case 17:
-                                _Frame.dir = (int)av_DIR.NE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_LIE;
+                                _Frame.dir = (int)AvatarDirection.NE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_LIE;
                                 return _Frame;
 
                             case 18:
-                                _Frame.dir = (int)av_DIR.SE;
-                                _Frame.pose = (int)av_POSE.AVPOSE_LIE;
+                                _Frame.dir = (int)AvatarDirection.SE;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_LIE;
                                 return _Frame;
 
                             case 19:
-                                _Frame.dir = (int)av_DIR.SW;
-                                _Frame.pose = (int)av_POSE.AVPOSE_LIE;
+                                _Frame.dir = (int)AvatarDirection.SW;
+                                _Frame.pose = (int)AvatarPose.AVPOSE_LIE;
                                 return _Frame;
                         }
                     }

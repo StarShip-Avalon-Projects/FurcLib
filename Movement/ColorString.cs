@@ -88,23 +88,12 @@ namespace Furcadia.Movement
 
                 #endregion Maybe Missing
             }
-            else
-            {
-                // thow error?
-            }
         }
 
         /// <summary>
         /// ColorString String Lengeth
         /// </summary>
-        public int Length
-
-        {
-            get
-            {
-                return ColorStringSize;
-            }
-        }
+        public int Length => ColorStringSize;
 
         #endregion Public Constructors
 
