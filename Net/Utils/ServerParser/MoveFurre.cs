@@ -1,9 +1,4 @@
 ﻿using Furcadia.Net.DreamInfo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -12,20 +7,31 @@ namespace Furcadia.Net.Utils.ServerParser
     /// </summary>
     public class MoveFurre : BaseServerInstruction
     {
-        public Furre Player;
+        #region Public Fields
 
         /// <summary>
-        ///
+        /// The active player
         /// </summary>
-        /// <param name="ServerInstruction"></param>
+        public Furre Player;
+
+        #endregion Public Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MoveFurre"/> class.
+        /// </summary>
+        /// <param name="ServerInstruction">raw server instruction</param>
         public MoveFurre(string ServerInstruction) : base(ServerInstruction)
         {
             if (ServerInstruction[0] == '/')
-                base.instructionType = ServerInstructionType.AnimatedMoveAvatar;
+                instructionType = ServerInstructionType.AnimatedMoveAvatar;
             else if (ServerInstruction[0] == 'A')
-                base.instructionType = ServerInstructionType.MoveAvatar;
+                instructionType = ServerInstructionType.MoveAvatar;
             if (ServerInstruction.Length > 4)
                 Player = new Furre();
         }
+
+        #endregion Public Constructors
     }
 }

@@ -1,11 +1,16 @@
-﻿namespace Furcadia.Drawing
+﻿using System;
+using Furcadia.Net.DreamInfo;
+
+namespace Furcadia.Drawing
 {
     /// <summary>
     /// Furre Visible area
     /// </summary>
-    public static class VisibleArea
+    public class VisibleArea
     {
         #region Public Methods
+
+        private ViewArea rec = new ViewArea();
 
         /// <summary>
         /// Gets the target View area from the center coordinates, This is useful for finding the View area of the Connected Furre
@@ -13,12 +18,20 @@
         /// <param name="X"></param>
         /// <param name="Y"></param>
         /// <returns></returns>
-        public static ViewArea GetTargetRectFromCenterCoord(int X, int Y)
+        public VisibleArea(int X, int Y) : this(new FurrePosition(X, Y))
+        {
+        }
 
+        /// <summary>
+        /// Gets the target rect from center coord.
+        /// </summary>
+        /// <param name="CenterLocation">The center location.</param>
+        /// <returns></returns>
+        public VisibleArea(FurrePosition CenterLocation)
         {
             // Set the size of the rectangle drawn around the player. The +1
             // is the tile the player is on.
-            var rec = new ViewArea();
+
             //Dim tilesWide As UInt32 = extraTilesLeft + 7 + 1 + 7 + extraTilesRight
             //Dim tilesHigh As UInt32 = extraTilesTop + 8 + 1 + 8 + extraTilesBottom
             // NB: these lines *look* similar, but the numbers are for *completely* different reasons!
@@ -28,17 +41,16 @@
             // Set where in the map our visible (0,0) will be.
             int XoddOffset = 2;
             int YoddOffset = 0;
-            if (IsOdd(Y))
+            if (IsOdd(CenterLocation.Y))
             {
                 XoddOffset = 0;
                 YoddOffset = 1;
             }
-            rec.X = X - 8 + XoddOffset;
-            rec.Y = Y - 8 - 1;
+            rec.FurreLocation.X = CenterLocation.X - 8 + XoddOffset;
+            rec.FurreLocation.Y = CenterLocation.Y - 8 - 1;
             // 1 for the tile the user is in.
-            rec.length = rec.X + 14;
-            rec.height = rec.Y + 17 + YoddOffset;
-            return rec;
+            rec.Length = rec.FurreLocation.X + 14;
+            rec.Height = rec.FurreLocation.Y + 17 + YoddOffset;
         }
 
         /// <summary>
@@ -59,27 +71,58 @@
     /// </summary>
     public class ViewArea
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewArea"/> class.
+        /// </summary>
+        public ViewArea()
+        {
+            location = new FurrePosition();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewArea"/> class.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        public ViewArea(int x, int y)
+        {
+            location = new FurrePosition(x, y);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewArea"/> class.
+        /// </summary>
+        /// <param name="location">The location.</param>
+        public ViewArea(FurrePosition location)
+        {
+            this.location = location;
+        }
+
         #region Public Fields
+
+        private FurrePosition location;
 
         /// <summary>
         /// height
         /// </summary>
-        public int height;
+        public int Height { get; set; }
 
         /// <summary>
         /// length
         /// </summary>
-        public int length;
+        public int Length { get; set; }
 
         /// <summary>
-        /// X Coordinate
+        /// Gets or sets the furre location.
         /// </summary>
-        public int X;
-
-        /// <summary>
-        /// Y Coordinate
-        /// </summary>
-        public int Y;
+        /// <value>
+        /// The furre location.
+        /// </value>
+        public FurrePosition FurreLocation
+        {
+            get => location;
+            set => location = value;
+        }
 
         #endregion Public Fields
     }
