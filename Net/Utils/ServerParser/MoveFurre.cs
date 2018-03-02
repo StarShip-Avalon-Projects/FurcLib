@@ -12,7 +12,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// The active player
         /// </summary>
-        public Furre Player;
+        public IFurre Player;
 
         #endregion Public Fields
 

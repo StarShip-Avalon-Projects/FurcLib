@@ -24,14 +24,14 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <value>
         /// Triggering furre.
         /// </value>
-        public Furre Player
+        public IFurre Player
         {
             get
             { return player; }
             set { player = value; }
         }
 
-        private Furre player = null;
+        private IFurre player = null;
 
         #endregion Public Fields
 

@@ -13,7 +13,7 @@ namespace Furcadia.Net.Utils.ServerParser
 
         private Match FontColorRegexMatch;
 
-        internal Furre player;
+        internal IFurre player;
 
         private string channelText;
 
@@ -34,10 +34,11 @@ namespace Furcadia.Net.Utils.ServerParser
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ChannelObject"/> class.
         /// </summary>
-        /// <param name="ServerInstruction">
-        /// </param>
-        public ChannelObject(string ServerInstruction, Furre Furr) : base(ServerInstruction)
+        /// <param name="ServerInstruction">The server instruction.</param>
+        /// <param name="Furr">The furr.</param>
+        public ChannelObject(string ServerInstruction, IFurre Furr) : base(ServerInstruction)
         {
             instructionType = ServerInstructionType.DisplayText;
             FontColorRegexMatch = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant).Match(RawInstruction);
@@ -76,7 +77,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// Active Triggering avatar
         /// </summary>
-        public Furre Player
+        public IFurre Player
         {
             get => player;
         }
