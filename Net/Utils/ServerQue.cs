@@ -121,14 +121,11 @@ namespace Furcadia.Net.Utils
         }
 
         /// <summary>
-        /// Queue Manager constructor
+        /// Initializes a new instance of the <see cref="ServerQue"/> class.
         /// </summary>
-        /// <param name="ThroatTiredTime">
-        /// Delay time to pause for Throat Tired Syndrome
-        /// </param>
-        /// <param name="PingTimerTime">
-        /// Optional ping the game server time in seconds
-        /// </param>
+        /// <param name="ThroatTiredTime">The throat tired time.</param>
+        /// <param name="PingTimerTime">The ping timer time.</param>
+        [CLSCompliant(false)]
         public ServerQue(int ThroatTiredTime, uint PingTimerTime = 30)
         {
             Initialize();
@@ -165,8 +162,6 @@ namespace Furcadia.Net.Utils
 
         #endregion Public Delegates
 
-
-
         #region Public Properties
 
         /// <summary>
@@ -181,6 +176,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Ping the server Time in Seconds
         /// </summary>
+        [CLSCompliant(false)]
         public uint PingDelayTime
         {
             get { return pingdelaytime; }

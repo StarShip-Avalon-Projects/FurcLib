@@ -207,7 +207,7 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="Base220"/> to <see cref="System.Byte[]"/>.
+        /// Performs an implicit conversion from <see cref="Base220"/> to <see cref="Byte"/>.
         /// </summary>
         /// <param name="b220n">The B220N.</param>
         /// <returns>

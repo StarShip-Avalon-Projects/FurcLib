@@ -114,6 +114,13 @@ namespace Furcadia.Net.Utils.ServerParser
             get { return type; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is modern.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is modern; otherwise, <c>false</c>.
+        /// </value>
+        /// <exception cref="System.NotImplementedException"></exception>
         public bool IsModern => throw new System.NotImplementedException();
 
         /// <summary>
@@ -142,7 +149,6 @@ namespace Furcadia.Net.Utils.ServerParser
         #endregion Public Properties
 
         /// <summary>
-
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>

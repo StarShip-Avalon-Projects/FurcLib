@@ -12,14 +12,26 @@ using System.Threading.Tasks;
 
 namespace Furcadia.Logging
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <seealso cref="Furcadia.Logging.ILogOutput" />
     public class ConsoleLogOutput : ILogOutput
     {
-        private static readonly DateTime startTime = new DateTime();
+        ///private static readonly DateTime startTime = new DateTime();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsoleLogOutput"/> class.
+        /// </summary>
         public ConsoleLogOutput()
         {
         }
 
+        /// <summary>
+        /// Builds the message.
+        /// </summary>
+        /// <param name="msg">The MSG.</param>
+        /// <returns></returns>
         protected LogMessage BuildMessage(ref LogMessage msg)
         {
             var level = msg.Level;
@@ -38,6 +50,10 @@ namespace Furcadia.Logging
             return msg;
         }
 
+        /// <summary>
+        /// Logs the specified log MSG.
+        /// </summary>
+        /// <param name="logMsg">The log MSG.</param>
         public virtual void Log(LogMessage logMsg)
         {
             if (logMsg.message == null)

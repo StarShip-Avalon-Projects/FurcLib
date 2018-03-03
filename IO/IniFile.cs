@@ -8,12 +8,10 @@ using System.Text.RegularExpressions;
 // Date: 08\23\2010
 // Purpose: Allow INI manipulation in .NET
 
-/// <summary>
-/// IniFile class used to read and write ini files by loading the file into memory
-/// </summary>
 namespace Furcadia.IO
 {
     /// <summary>
+    /// IniFile class used to read and write ini files by loading the file into memory
     /// </summary>
     [CLSCompliant(true)]
     public class IniFile

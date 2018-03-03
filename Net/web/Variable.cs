@@ -5,53 +5,121 @@ using System.Linq;
 
 namespace Furcadia.Net.Web
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <seealso cref="System.Exception" />
     [Serializable]
     public class VariableIsConstantException : Exception
     {
+        /// <summary>
+        ///
+        /// </summary>
         public VariableIsConstantException()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VariableIsConstantException"/> class.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
         public VariableIsConstantException(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VariableIsConstantException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="inner">The inner.</param>
         public VariableIsConstantException(string message, Exception inner)
             : base(message, inner)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VariableIsConstantException"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
         protected VariableIsConstantException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context)
             : base(info, context) { }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public class VariableEqualityComparer : IEqualityComparer<IVariable>
     {
+        /// <summary>
+        /// Determines whether the specified objects are equal.
+        /// </summary>
+        /// <returns>
+        /// true if the specified objects are equal; otherwise, false.
+        /// </returns>
         public bool Equals(IVariable x, IVariable y)
         {
             return x.Equals(y);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        /// </returns>
         public int GetHashCode(IVariable obj)
         {
             return obj.GetHashCode();
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public interface IVariable : IEquatable<IVariable>
     {
+        /// <summary>
+        ///
+        /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
         object Value { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is constant.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is constant; otherwise, <c>false</c>.
+        /// </value>
         bool IsConstant { get; }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <seealso cref="Furcadia.Net.Web.IVariable" />
     [Serializable]
     [CLSCompliant(false)]
     public class Variable : IVariable
     {
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
         public bool Equals(IVariable other)
         {
             return Equals(value, other.Value) && string.Equals(Name, other.Name);
@@ -71,15 +139,35 @@ namespace Furcadia.Net.Web
             }
         }
 
+        /// <summary>
+        /// The no value
+        /// </summary>
         public static readonly IVariable NoValue = new Variable("%none", null);
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is constant.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is constant; otherwise, <c>false</c>.
+        /// </value>
         public bool IsConstant
         {
             get => false;
         }
 
+        /// <summary>
+        /// The value
+        /// </summary>
         private object value;
 
+        /// <summary>
+        /// Gets or sets the value.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
+        /// <exception cref="TypeNotSupportedException"></exception>
+        /// <exception cref="Furcadia.Net.Web.VariableIsConstantException"></exception>
         public object Value
         {
             get { return value; }
@@ -98,13 +186,24 @@ namespace Furcadia.Net.Web
             }
         }
 
+        /// <summary>
+        /// </summary>
         public string Name { get; internal set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Variable"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
         public Variable(string name)
         {
             Name = name;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Variable"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
         public Variable(string name, object value)
         {
             Name = name;
@@ -131,9 +230,8 @@ namespace Furcadia.Net.Web
         }
 
         /// <summary>
-        ///
+        /// Clones this instance.
         /// </summary>
-        /// <param name="asConstant">Clone as Constant</param>
         /// <returns></returns>
         public Variable Clone()
         {
@@ -260,6 +358,13 @@ namespace Furcadia.Net.Web
             return var.Value.AsDouble();
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             return obj != null && obj is Variable && Equals((Variable)obj);

@@ -15,11 +15,29 @@ using Furcadia.Extensions;
 
 namespace Furcadia.Logging
 {
+    /// <summary>
+    ///
+    /// </summary>
     public enum Level : byte
     {
+        /// <summary>
+        /// The information
+        /// </summary>
         Info = 1,
+
+        /// <summary>
+        /// The warning
+        /// </summary>
         Warning = 2,
+
+        /// <summary>
+        /// The error
+        /// </summary>
         Error = 3,
+
+        /// <summary>
+        /// The debug
+        /// </summary>
         Debug = 4
     }
 
@@ -33,9 +51,16 @@ namespace Furcadia.Logging
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public struct LogMessage : IEquatable<LogMessage>
     {
+        /// <summary>
+        /// The message
+        /// </summary>
         public string message;
+
         private readonly DateTime expires, timeStamp;
         private readonly Level level;
 
@@ -46,16 +71,40 @@ namespace Furcadia.Logging
             get { return string.IsNullOrWhiteSpace(message); }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is spam.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is spam; otherwise, <c>false</c>.
+        /// </value>
         public bool IsSpam
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Gets the level.
+        /// </summary>
+        /// <value>
+        /// The level.
+        /// </value>
         public Level Level { get { return level; } }
 
+        /// <summary>
+        /// Gets the thread.
+        /// </summary>
+        /// <value>
+        /// The thread.
+        /// </value>
         public Thread Thread => curThread;
 
+        /// <summary>
+        /// Gets the time stamp.
+        /// </summary>
+        /// <value>
+        /// The time stamp.
+        /// </value>
         public DateTime TimeStamp => timeStamp;
 
         private LogMessage(Level level, string msg, TimeSpan expireDuration)
@@ -69,6 +118,13 @@ namespace Furcadia.Logging
             curThread = Thread.CurrentThread;
         }
 
+        /// <summary>
+        /// Froms the specified level.
+        /// </summary>
+        /// <param name="level">The level.</param>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="expireDuration">Duration of the expire.</param>
+        /// <returns></returns>
         public static LogMessage? From(Level level, string msg, TimeSpan expireDuration)
         {
             LogMessage logMsg = new LogMessage(level, msg, expireDuration);
@@ -122,6 +178,13 @@ namespace Furcadia.Logging
             return message;
         }
 
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
         public bool Equals(LogMessage other)
         {
             return message == other.message &&
@@ -130,6 +193,12 @@ namespace Furcadia.Logging
                    EqualityComparer<Thread>.Default.Equals(curThread, other.curThread);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        /// </returns>
         public override int GetHashCode()
         {
             var hashCode = -975352547;
@@ -142,6 +211,9 @@ namespace Furcadia.Logging
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public static class Logger
     {
         private static ILogOutput _logOutput;
@@ -157,12 +229,15 @@ namespace Furcadia.Logging
         private static bool _suppressSpam;
         private static TimeSpan _messagesExpire = TimeSpan.FromSeconds(10);
 
-        private static bool singleThreaded, initialized;
+        private static bool singleThreaded; //, initialized;
 
         private static Task logTask;
 
         private static CancellationTokenSource cancelToken;
 
+        /// <summary>
+        /// Occurs when [spam found].
+        /// </summary>
         public static event Action<LogMessage> SpamFound;
 
         static Logger()
@@ -200,32 +275,68 @@ namespace Furcadia.Logging
             if (!singleThreaded) logTask.Start();
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [log calling method].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [log calling method]; otherwise, <c>false</c>.
+        /// </value>
         public static bool LogCallingMethod { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [information enabled].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [information enabled]; otherwise, <c>false</c>.
+        /// </value>
         public static bool InfoEnabled
         {
             get { return _infoEnabled; }
             set { _infoEnabled = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [warning enabled].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [warning enabled]; otherwise, <c>false</c>.
+        /// </value>
         public static bool WarningEnabled
         {
             get { return _warningEnabled; }
             set { _warningEnabled = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [error enabled].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [error enabled]; otherwise, <c>false</c>.
+        /// </value>
         public static bool ErrorEnabled
         {
             get { return _errorEnabled; }
             set { _errorEnabled = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [debug enabled].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [debug enabled]; otherwise, <c>false</c>.
+        /// </value>
         public static bool DebugEnabled
         {
             get { return _debugEnabled; }
             set { _debugEnabled = value; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [suppress spam].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [suppress spam]; otherwise, <c>false</c>.
+        /// </value>
         public static bool SuppressSpam
         {
             get { return _suppressSpam; }
@@ -250,7 +361,6 @@ namespace Furcadia.Logging
         /// <summary>
         /// Sets the <see cref="ILogOutput"/>.
         /// </summary>
-        /// <param name="output">The output.</param>
         /// <exception cref="System.ArgumentNullException">output</exception>
         public static ILogOutput LogOutput
         {
@@ -356,6 +466,12 @@ namespace Furcadia.Logging
             }
         }
 
+        /// <summary>
+        /// Asserts the specified cond.
+        /// </summary>
+        /// <param name="cond">if set to <c>true</c> [cond].</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Assert(bool cond, string failMsg)
         {
             if (!cond)
@@ -366,6 +482,13 @@ namespace Furcadia.Logging
             return true;
         }
 
+        /// <summary>
+        /// Asserts the specified cond.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cond">if set to <c>true</c> [cond].</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Assert<T>(bool cond, string failMsg)
         {
             if (!cond)
@@ -376,6 +499,12 @@ namespace Furcadia.Logging
             return true;
         }
 
+        /// <summary>
+        /// Asserts the specified cond.
+        /// </summary>
+        /// <param name="cond">The cond.</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Assert(Func<bool> cond, string failMsg)
         {
             if (!cond?.Invoke() ?? false)
@@ -386,6 +515,13 @@ namespace Furcadia.Logging
             return true;
         }
 
+        /// <summary>
+        /// Asserts the specified cond.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cond">The cond.</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Assert<T>(Func<bool> cond, string failMsg)
         {
             if (!cond?.Invoke() ?? false)
@@ -396,6 +532,12 @@ namespace Furcadia.Logging
             return true;
         }
 
+        /// <summary>
+        /// Failses the specified cond.
+        /// </summary>
+        /// <param name="cond">if set to <c>true</c> [cond].</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Fails(bool cond, string failMsg)
         {
             if (cond)
@@ -406,6 +548,13 @@ namespace Furcadia.Logging
             return false;
         }
 
+        /// <summary>
+        /// Failses the specified cond.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cond">if set to <c>true</c> [cond].</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Fails<T>(bool cond, string failMsg)
         {
             if (cond)
@@ -416,6 +565,12 @@ namespace Furcadia.Logging
             return false;
         }
 
+        /// <summary>
+        /// Failses the specified cond.
+        /// </summary>
+        /// <param name="cond">The cond.</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Fails(Func<bool> cond, string failMsg)
         {
             if (cond?.Invoke() ?? false)
@@ -426,6 +581,13 @@ namespace Furcadia.Logging
             return false;
         }
 
+        /// <summary>
+        /// Failses the specified cond.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cond">The cond.</param>
+        /// <param name="failMsg">The fail MSG.</param>
+        /// <returns></returns>
         public static bool Fails<T>(Func<bool> cond, string failMsg)
         {
             if (cond?.Invoke() ?? false)
@@ -436,48 +598,92 @@ namespace Furcadia.Logging
             return false;
         }
 
+        /// <summary>
+        /// Debugs the specified MSG.
+        /// </summary>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Debug(object msg, [CallerMemberName]string memberName = "")
         {
             if (!DebugEnabled) return;
             Log(LogMessage.From(Level.Debug, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Debugs the specified MSG.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Debug<T>(object msg, [CallerMemberName]string memberName = "")
         {
             if (DebugEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Debug, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Informations the specified MSG.
+        /// </summary>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Info(object msg, [CallerMemberName]string memberName = "")
         {
             if (!InfoEnabled) return;
             Log(LogMessage.From(Level.Info, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Informations the specified MSG.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Info<T>(object msg, [CallerMemberName]string memberName = "")
         {
             if (InfoEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Info, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Errors the specified MSG.
+        /// </summary>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Error(object msg, [CallerMemberName]string memberName = "")
         {
             if (!ErrorEnabled) return;
             Log(LogMessage.From(Level.Error, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Errors the specified MSG.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Error<T>(object msg, [CallerMemberName]string memberName = "")
         {
             if (ErrorEnabled && TypeCheck(typeof(T), out string typeName))
                 Log(LogMessage.From(Level.Error, $"{typeName}{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {msg}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Warns the specified MSG.
+        /// </summary>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Warn(object msg, [CallerMemberName]string memberName = "")
         {
             if (!WarningEnabled) return;
             Log(LogMessage.From(Level.Warning, $"System{(LogCallingMethod && !memberName.IsNullOrBlank() ? $" ({memberName})" : "")}: {(msg != null ? msg.ToString() : "null")}", MessagesExpire));
         }
 
+        /// <summary>
+        /// Warns the specified MSG.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg">The MSG.</param>
+        /// <param name="memberName">Name of the member.</param>
         public static void Warn<T>(object msg, [CallerMemberName]string memberName = "")
         {
             if (WarningEnabled && TypeCheck(typeof(T), out string typeName))

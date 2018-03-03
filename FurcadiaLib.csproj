@@ -112,7 +112,6 @@
     <Compile Include="Extentions\ExceptionExtensions.cs" />
     <Compile Include="Extentions\ObjectExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Logging\ConcurrentList.cs" />
     <Compile Include="Logging\ConsoleLogOutput.cs" />
     <Compile Include="Logging\FileLogOutput.cs" />

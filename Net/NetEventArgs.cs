@@ -198,6 +198,7 @@ namespace Furcadia.Net
     /// <summary>
     ///
     /// </summary>
+    /// <seealso cref="Furcadia.Net.NetServerEventArgs" />
     public class NetChannelEventArgs : NetServerEventArgs
     {
         #region Private Fields

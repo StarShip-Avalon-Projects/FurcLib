@@ -11,6 +11,9 @@ using static Furcadia.Text.FurcadiaMarkup;
 
 namespace Furcadia.Net.Utils.ChannelObjects
 {
+    /// <summary>
+    ///
+    /// </summary>
     [Flags]
     public enum QueryType
     {
@@ -132,6 +135,12 @@ namespace Furcadia.Net.Utils.ChannelObjects
             }
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             return $"Query Furre: '{player}' Type: '{qType}' RawInstruction '{RawInstruction}'";

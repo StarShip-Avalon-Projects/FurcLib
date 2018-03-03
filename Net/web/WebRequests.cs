@@ -5,8 +5,19 @@ using System.Text;
 namespace Furcadia.Net.Web
 
 {
+    /// <summary>
+    ///
+    /// </summary>
     public class WebRequests
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebRequests"/> class.
+        /// </summary>
+        public WebRequests()
+        {
+            oCookies = null;
+        }
+
         #region Private Fields
 
         private static CookieCollection oCookies;

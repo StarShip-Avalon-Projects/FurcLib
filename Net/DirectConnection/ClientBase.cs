@@ -27,12 +27,6 @@ namespace Furcadia.Net.DirectConnection
 
         #endregion Protected Internal Fields
 
-        #region Private Fields
-
-        private Text.Settings DefaultSettings;
-
-        #endregion Private Fields
-
         #region Event Handling
 
         /// <summary>
@@ -225,6 +219,14 @@ namespace Furcadia.Net.DirectConnection
                 return Utilities.GetEncoding;// ENCODE_PAGE;
             }
         }
+
+        /// <summary>
+        /// Gets the default settings.
+        /// </summary>
+        /// <value>
+        /// The default settings.
+        /// </value>
+        public Settings DefaultSettings { get; private set; }
 
         #endregion Public Static Properties
 

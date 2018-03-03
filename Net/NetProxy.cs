@@ -210,7 +210,6 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="e">The e.</param>
         /// <param name="o">The o.</param>
-        /// <param name="n">The n.</param>
         public delegate void ErrorEventHandler(Exception e, Object o);
 
         #endregion Public Delegates
@@ -243,6 +242,9 @@ namespace Furcadia.Net
 
         #region Protected Internal Events
 
+        /// <summary>
+        /// Occurs when [client connected].
+        /// </summary>
         protected internal event ActionDelegate ClientConnected;
 
         /// <summary>
@@ -255,6 +257,9 @@ namespace Furcadia.Net
         /// </summary>
         protected internal event EventHandler ClientExited;
 
+        /// <summary>
+        /// Occurs when [server connected].
+        /// </summary>
         public event ActionDelegate ServerConnected;
 
         #endregion Protected Internal Events
@@ -554,7 +559,9 @@ namespace Furcadia.Net
             }
         }
 
-        // This code added to correctly implement the disposable pattern.
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public virtual void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

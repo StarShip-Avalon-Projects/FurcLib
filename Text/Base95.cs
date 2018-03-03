@@ -16,9 +16,6 @@ namespace Furcadia.Text
     /// <para/>
     /// Modified by: Gerolkae
     /// </summary>
-    /// </summary>
-    /// <seealso cref="System.IComparable{System.UInt32}" />
-    /// <seealso cref="System.IEquatable{System.UInt32}" />
     public class Base95 : IComparable<uint>, IEquatable<uint>
     {
         #region Public Fields
@@ -189,7 +186,7 @@ namespace Furcadia.Text
         }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="Base95"/> to <see cref="System.Byte[]"/>.
+        /// Performs an implicit conversion from <see cref="Base95"/> to <see cref="Byte"/>.
         /// </summary>
         /// <param name="b95n">The B95N.</param>
         /// <returns>

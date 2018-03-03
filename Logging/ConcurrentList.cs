@@ -10,9 +10,9 @@ namespace Furcadia.Logging
 {
     internal class ConcurrentList<T> : IList<T>
     {
-        public event Action<T, int> Removed;
+        // public event Action<T, int> Removed;
 
-        public event Action<T, int> Added;
+        // public event Action<T, int> Added;
 
         private readonly List<T> underlyingList;
         private readonly object syncRoot = new object();

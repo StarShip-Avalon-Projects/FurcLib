@@ -6,8 +6,17 @@ using System.Runtime.CompilerServices;
 
 #endregion Usings
 
+/// <summary>
+///
+/// </summary>
 public static class ExceptionExtensions
 {
+    /// <summary>
+    /// Logs the specified level.
+    /// </summary>
+    /// <param name="ex">The ex.</param>
+    /// <param name="level">The level.</param>
+    /// <param name="memberName">Name of the member.</param>
     public static void Log(this Exception ex, Level level = Level.Debug, [CallerMemberName] string memberName = "")
     {
         if (ex != null)
@@ -37,6 +46,13 @@ public static class ExceptionExtensions
         }
     }
 
+    /// <summary>
+    /// Logs the specified level.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="ex">The ex.</param>
+    /// <param name="level">The level.</param>
+    /// <param name="memberName">Name of the member.</param>
     public static void Log<T>(this Exception ex, Level level = Level.Debug, [CallerMemberName] string memberName = "")
     {
         if (ex != null)
@@ -66,6 +82,12 @@ public static class ExceptionExtensions
         }
     }
 
+    /// <summary>
+    /// Logs the message.
+    /// </summary>
+    /// <param name="ex">The ex.</param>
+    /// <param name="level">The level.</param>
+    /// <param name="memberName">Name of the member.</param>
     public static void LogMessage(this Exception ex, Level level = Level.Debug, [CallerMemberName] string memberName = "")
     {
         if (ex != null)
@@ -91,6 +113,13 @@ public static class ExceptionExtensions
         }
     }
 
+    /// <summary>
+    /// Logs the message.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="ex">The ex.</param>
+    /// <param name="level">The level.</param>
+    /// <param name="memberName">Name of the member.</param>
     public static void LogMessage<T>(this Exception ex, Level level = Level.Debug, [CallerMemberName] string memberName = "")
     {
         if (ex != null)
@@ -116,6 +145,11 @@ public static class ExceptionExtensions
         }
     }
 
+    /// <summary>
+    /// Flattens the specified exception.
+    /// </summary>
+    /// <param name="exception">The exception.</param>
+    /// <returns></returns>
     public static string Flatten(this Exception exception)
     {
         var stringBuilder = new System.Text.StringBuilder();

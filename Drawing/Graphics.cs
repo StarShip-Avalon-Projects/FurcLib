@@ -117,11 +117,13 @@ namespace Furcadia.Drawing.Graphics
         /// <summary>
         /// The flags
         /// </summary>
+        [CLSCompliant(false)]
         public ShapeFlags Flags;
 
         /// <summary>
         /// The frames
         /// </summary>
+        [CLSCompliant(false)]
         public Frame[] Frames;
 
         /// <summary>
@@ -191,6 +193,7 @@ namespace Furcadia.Drawing.Graphics
         /// <summary>
         /// The step type
         /// </summary>
+        [CLSCompliant(false)]
         public StepBlockStepTypes StepType;
 
         /// <summary>

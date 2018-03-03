@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Furcadia.Text
 {
@@ -32,12 +33,6 @@ namespace Furcadia.Text
 
             return IconMatch.Success;
         }
-
-        /// <summary>
-        /// Strip a string from all Furcadia Markup
-        /// </summary>
-        /// <param name="Text">string to process</param>
-        /// <returns></returns>
 
         #endregion Public Methods
 
@@ -97,6 +92,9 @@ namespace Furcadia.Text
         /// </summary>
         public const string YouWhisperRegex = "^<font color=('(whisper)'|\"(whisper)\")>\\[ ?You whisper \"(.*?)\" to ?<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") forced(=('forced')|(\"forced\")?) src='whisper-to'>(.*?)</name>\\. \\]</font>$";
 
+        /// <summary>
+        /// You shout filter
+        /// </summary>
         public const string YouShoutFilter = "<font color=('(shout)'|\"(shout)\")>You shout, \"(.*?)\"</font>";
 
         /// <summary>
@@ -104,6 +102,9 @@ namespace Furcadia.Text
         /// </summary>
         public const string WhisperRegex = "^\\<font color=('(whisper)'|\"(whisper)\")\\>\\[ \\<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") src=('whisper-from'|\"whisper-from\")\\>(.{2,64})\\</name\\> whispers, \"(?<msg>.+)\" to you\\. \\]\\</font\\>$";
 
+        /// <summary>
+        /// The shout regex filter
+        /// </summary>
         public const string ShoutRegexFilter = "<font color=('(shout)'|\"(shout)\")>\\{S\\} <name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\")>(.{2,64})</name>(.*)shouts: (.*?)</font>";
 
         /// <summary>
@@ -146,8 +147,12 @@ namespace Furcadia.Text
         /// <summary>
         /// Dream Url regex
         /// </summary>
+        [CLSCompliant(false)]
         public static Regex URLRegex = new Regex(UrlRegex, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        /// <summary>
+        /// The channel regex
+        /// </summary>
         public static Regex ChannelRegex = new Regex("<font color=[\'|\\\"](.*?)['|\\\"]>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         #region Public Constructors
