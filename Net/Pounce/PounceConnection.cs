@@ -139,7 +139,7 @@ namespace Furcadia.Net.Pounce
         public PounceConnection()
         {
             FurcadiaUtilities = new Utilities();
-            _url = string.Format("http://{0}/", FurcadiaUtilities.PounceServerHost);
+            _url = $"http://{FurcadiaUtilities.PounceServerHost}/";
             // TODO: Load Online.ini (uses Players List as default
         }
 

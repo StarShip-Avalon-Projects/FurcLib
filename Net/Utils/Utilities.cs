@@ -129,10 +129,7 @@ namespace Furcadia.Net.Utils
         /// Gets or sets the Furcadia Pounce Server host (IE
         /// on.furcadia.com). (Furcadia v31c)
         /// </summary>
-        public string PounceServerHost
-        {
-            get => pounceserverhost;
-        }
+        public string PounceServerHost => pounceserverhost;
 
         /// <summary>
         /// Mono Registry Path
