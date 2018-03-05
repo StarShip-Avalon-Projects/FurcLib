@@ -126,7 +126,7 @@
     <Compile Include="Net\Account\AccountInfo.cs" />
     <Compile Include="Net\Account\CharacterInfo.cs" />
     <Compile Include="Net\DirectConnection\NetConnection.cs" />
-    <Compile Include="Net\NetProxy.cs" />
+    <Compile Include="Net\Proxy\NetProxy.cs" />
     <Compile Include="Net\Options\ClientOptions.cs" />
     <Compile Include="Net\Options\PouncrOptions.cs" />
     <Compile Include="Net\Options\ProxyOptions.cs" />

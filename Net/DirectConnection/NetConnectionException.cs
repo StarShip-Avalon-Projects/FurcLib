@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.DirectConnection
 {
     /// <summary>
     /// Desctiption of NetConnectionException.

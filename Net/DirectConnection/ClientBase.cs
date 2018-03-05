@@ -14,7 +14,7 @@ using System.Net.Sockets;
 using System.Threading;
 using static Furcadia.Net.Utils.Utilities;
 
-namespace Furcadia.Net
+namespace Furcadia.Net.DirectConnection
 {
     /// <summary>
     /// Furcadia base proxy connect between Client and Server. This is a low
