@@ -118,6 +118,7 @@
     <Compile Include="Logging\ILogOutput.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\MutliLogOutput.cs" />
+    <Compile Include="Net\DirectConnection\NetConnectionException.cs" />
     <Compile Include="Net\Dream\Avatar.cs" />
     <Compile Include="Net\Dream\Badges.cs" />
     <Compile Include="IO\IniFile.cs" />

@@ -57,11 +57,11 @@ namespace Furcadia.Net
         private int ENCODE_PAGE = 1252;
 
         private ClientOptions options;
-        private byte[] serverBuffer = new byte[BUFFER_CAP];
+        internal byte[] serverBuffer = new byte[BUFFER_CAP];
         // private object ServerBufferLock = new object();
 
-        private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
-        private int ServerLeftOversSize = 0;
+        internal byte[] ServerLeftOvers = new byte[BUFFER_CAP];
+        internal int ServerLeftOversSize = 0;
 
         #endregion Private Fields
 
@@ -165,7 +165,7 @@ namespace Furcadia.Net
         /// <summary>
         ///This is triggered when the Server Disconnects
         /// </summary>
-        public event ActionDelegate ServerDisconnected;
+        public virtual event ActionDelegate ServerDisconnected;
 
         #endregion Public Events
 
@@ -174,7 +174,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Occurs when [server connected].
         /// </summary>
-        public event ActionDelegate ServerConnected;
+        public virtual event ActionDelegate ServerConnected;
 
         #endregion Protected Internal Events
 
@@ -201,7 +201,7 @@ namespace Furcadia.Net
         /// The current connection attempt.
         /// </value>
         public int CurrentConnectionAttempt
-        { get; private set; }
+        { get; internal set; }
 
         /// <summary>
         /// Encodig
@@ -281,37 +281,30 @@ namespace Furcadia.Net
 
             try
             {
-                try
-                {
-                    //when the connection completes before the timeout it will cause a race
-                    //we want EndConnect to always treat the connection as successful if it wins
+                //when the connection completes before the timeout it will cause a race
+                //we want EndConnect to always treat the connection as successful if it wins
 
-                    Logger.Info($"Starting connection to Furcadia gameserver.");
-                    while (!sucess)
+                Logger.Info($"Starting connection to Furcadia gameserver.");
+                while (!sucess)
+                {
+                    IAsyncResult ar = LightBringer.BeginConnect(options.GameServerHost, options.GameServerPort, EndConnect, state);
+                    state.Success = ar.AsyncWaitHandle.WaitOne(MiliSecondTime, false);
+
+                    sucess = (state.Success && LightBringer.Connected);
+                    if (sucess)
+                        break;
+                    if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                     {
-                        IAsyncResult ar = LightBringer.BeginConnect(options.GameServerHost, options.GameServerPort, EndConnect, state);
-                        state.Success = ar.AsyncWaitHandle.WaitOne(MiliSecondTime, false);
-
-                        sucess = (state.Success && LightBringer.Connected);
-                        if (sucess)
-                            break;
-                        if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
-                        {
-                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
-                            ServerDisconnected?.Invoke();
-                        }
-                        if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
-                        {
-                            throw new NetProxyException($"Faile to connect, Aborting");
-                        }
-
-                        CurrentConnectionAttempt++;
-                        Thread.Sleep(MiliSecondTime);
+                        Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                        ServerDisconnected?.Invoke();
                     }
-                }
-                catch (SocketException se)
-                {
-                    throw se;
+                    if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
+                    {
+                        throw new NetConnectionException($"Faile to connect, Aborting");
+                    }
+
+                    CurrentConnectionAttempt++;
+                    Thread.Sleep(MiliSecondTime);
                 }
             }
             catch (Exception e)
@@ -323,7 +316,7 @@ namespace Furcadia.Net
         /// <summary>
         /// Disconnect from the Furcadia gameserver and Furcadia client
         /// </summary>
-        public virtual void DisconnectServerStream()
+        public virtual void Disconnect()
         {
             if (LightBringer.Connected)
             {
@@ -429,7 +422,7 @@ namespace Furcadia.Net
             }
         }
 
-        private void EndConnect(IAsyncResult ar)
+        internal void EndConnect(IAsyncResult ar)
         {
             var state = (State)ar.AsyncState;
             TcpClient ThisClient = state.Client;
@@ -452,7 +445,7 @@ namespace Furcadia.Net
         /// </summary>
         /// <param name="ar">
         /// </param>
-        private void GetServerData(IAsyncResult ar)
+        internal void GetServerData(IAsyncResult ar)
         {
             LightBringer = (TcpClient)ar.AsyncState;
 
@@ -536,6 +529,11 @@ namespace Furcadia.Net
             FurcadiaUtilities = new Utils.Utilities();
         }
 
+        /// <summary>
+        /// Sanatizes the protocol strinng.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        // TODO: Move this to utils?
         internal void SanatizeProtocolStrinng(ref string message)
         {
             string replaceWith = "";
@@ -547,7 +545,7 @@ namespace Furcadia.Net
 
         #region Private Classes
 
-        private class State
+        internal class State
         {
             #region Public Constructors
 

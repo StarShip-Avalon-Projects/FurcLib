@@ -29,7 +29,7 @@ namespace Furcadia.Net
     /// </summary>
     /// <remarks>
     /// </remarks>
-    public class NetProxy : IDisposable
+    public class NetProxy : ClientBase, IDisposable
     {
         #region Protected Internal Fields
 
@@ -81,11 +81,7 @@ namespace Furcadia.Net
         private TcpListener listen;
 
         private ProxyOptions options;
-        private byte[] serverBuffer = new byte[BUFFER_CAP];
-        private object ServerBufferLock = new object();
 
-        private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
-        private int ServerLeftOversSize = 0;
         private Text.Settings settings;
         private Action SettingsRestore;
 
@@ -191,29 +187,6 @@ namespace Furcadia.Net
 
         #endregion Public Constructors
 
-        #region Public Delegates
-
-        /// <summary>
-        /// </summary>
-        public delegate void ActionDelegate();
-
-        /// <summary>
-        /// </summary>
-        public delegate string DataEventHandler(string data);
-
-        /// <summary>
-        /// </summary>
-        public delegate void DataEventHandler2(string data);
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="e">The e.</param>
-        /// <param name="o">The o.</param>
-        public delegate void ErrorEventHandler(Exception e, Object o);
-
-        #endregion Public Delegates
-
         #region Public Events
 
         /// <summary>
@@ -221,22 +194,6 @@ namespace Furcadia.Net
         /// Expects a return value.
         /// </summary>
         public virtual event DataEventHandler2 ClientData2;
-
-        /// <summary>
-        /// This is triggered when a handled Exception is thrown.
-        /// </summary>
-        public event ErrorEventHandler Error;
-
-        /// <summary>
-        /// This is triggered when the Server sends data to the client.
-        /// Doesn't expect a return value.
-        /// </summary>
-        public virtual event DataEventHandler2 ServerData2;
-
-        /// <summary>
-        ///This is triggered when the Server Disconnects
-        /// </summary>
-        public event ActionDelegate ServerDisconnected;
 
         #endregion Public Events
 
@@ -257,50 +214,19 @@ namespace Furcadia.Net
         /// </summary>
         protected internal event EventHandler ClientExited;
 
+        #endregion Protected Internal Events
+
+        /// <summary>
+        ///This is triggered when the Server Disconnects
+        /// </summary>
+        public override event ActionDelegate ServerDisconnected;
+
         /// <summary>
         /// Occurs when [server connected].
         /// </summary>
-        public event ActionDelegate ServerConnected;
-
-        #endregion Protected Internal Events
+        public override event ActionDelegate ServerConnected;
 
         #region Public Properties
-
-        /// <summary>
-        /// Gets the buffer capacity.
-        /// </summary>
-        /// <value>
-        /// The buffer capacity.
-        /// </value>
-        public int BufferCapacity
-        {
-            get
-            {
-                return BUFFER_CAP;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current connection attempt.
-        /// </summary>
-        /// <value>
-        /// The current connection attempt.
-        /// </value>
-        public int CurrentConnectionAttempt
-        { get; private set; }
-
-        /// <summary>
-        /// Encodig
-        /// <para/>
-        /// DEFAULT: Windows 1252
-        /// </summary>
-        public int EncoderPage
-        {
-            get
-            {
-                return ENCODE_PAGE;
-            }
-        }
 
         /// <summary>
         /// Gets a value indicating whether [the Furcadia lient is a running process].
@@ -312,9 +238,7 @@ namespace Furcadia.Net
         {
             get
             {
-                if (furcProcess == null)
-                    return false;
-                if (furcID == -1)
+                if (furcID == -1 || furcProcess == null)
                     return false;
                 try
                 {
@@ -363,31 +287,12 @@ namespace Furcadia.Net
         }
 
         /// <summary>
-        /// Check our connection status to the game server
-        /// </summary>
-        public bool IsServerSocketConnected
-        {
-            get
-            {
-                try
-                {
-                    if (LightBringer != null && LightBringer.Client != null)
-                    {
-                        return LightBringer.Connected;
-                    }
-                }
-                catch { }
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the options.
         /// </summary>
         /// <value>
         /// The options.
         /// </value>
-        public virtual ProxyOptions Options
+        public ProxyOptions Options
         {
             get
             { return options; }
@@ -445,7 +350,7 @@ namespace Furcadia.Net
         /// or
         /// Client executable '" + options.FurcadiaProcess + "' not found.
         /// </exception>
-        public virtual void Connect()
+        public override void Connect()
         {
             settings = new Text.Settings(options);
             var MiliSecondTime = (int)TimeSpan.FromSeconds(options.ConnectionTimeOut).TotalMilliseconds;
@@ -484,7 +389,7 @@ namespace Furcadia.Net
                         if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                         {
                             Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
-                            ServerDisconnected?.Invoke();
+                            this.ServerDisconnected?.Invoke();
                         }
                         if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
                         {
@@ -551,18 +456,13 @@ namespace Furcadia.Net
         {
             DisconnectClientStream();
 
-            if (LightBringer.Connected)
-            {
-                LightBringer.Close();
-                LightBringer.Dispose();
-                ServerDisconnected?.Invoke();
-            }
+            base.Disconnect();
         }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public virtual void Dispose()
+        public override void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
@@ -620,7 +520,7 @@ namespace Furcadia.Net
             {
                 if (LightBringer.GetStream().CanWrite)
                     LightBringer.GetStream().Write(System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message), 0, System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message).Length);
-                else ServerDisconnected?.Invoke();
+                else this.ServerDisconnected?.Invoke();
             }
             catch (Exception e)
             {
@@ -634,27 +534,6 @@ namespace Furcadia.Net
         }
 
         #endregion Public Methods
-
-        #region Protected Methods
-
-        /// <summary>
-        /// send errors to the error handler
-        /// </summary>
-        /// <param name="e"></param>
-        /// <param name="o"></param>
-        protected virtual void SendError(Exception e, object o)
-        {
-            if (Error != null)
-            {
-                Error?.Invoke(e, o);
-            }
-            else
-            {
-                throw e;
-            }
-        }
-
-        #endregion Protected Methods
 
         #region Private Methods
 
@@ -686,6 +565,7 @@ namespace Furcadia.Net
         {
             if (!disposedValue)
             {
+                base.Dispose();
                 if (disposing)
                 {
                     if (client != null) client.Dispose();
@@ -700,24 +580,6 @@ namespace Furcadia.Net
 
                 disposedValue = true;
             }
-        }
-
-        private void EndConnect(IAsyncResult ar)
-        {
-            var state = (State)ar.AsyncState;
-            TcpClient ThisClient = state.Client;
-            if (ThisClient == null)
-                return;
-            try
-            {
-                ThisClient.EndConnect(ar);
-            }
-            catch { }
-
-            if (ThisClient.Connected && state.Success)
-                return;
-
-            ThisClient.Close();
         }
 
         /// <summary>
@@ -794,84 +656,6 @@ namespace Furcadia.Net
             }
         }
 
-        /// <summary>
-        /// Handle the raw server data
-        /// </summary>
-        /// <param name="ar">
-        /// </param>
-        private void GetServerData(IAsyncResult ar)
-        {
-            LightBringer = (TcpClient)ar.AsyncState;
-
-            if (LightBringer.Client.Connected)
-            {
-                try
-                {
-                    int read = 0;
-                    // TcpClient GameServer = listener.EndAcceptTcpClient(ar);
-                    read = LightBringer.GetStream().EndRead(ar);
-                    int currStart = 0;
-                    int currEnd = -1;
-
-                    for (int i = 0; i < read; i++)
-                    {
-                        if (i < BUFFER_CAP && serverBuffer[i] == 10)
-                        {
-                            // Set the end of the data
-                            currEnd = i;
-
-                            // If we have left overs from previous runs:
-                            if (ServerLeftOversSize != 0)
-                            {
-                                // Allocate enough space for the joined buffer
-                                byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
-
-                                // And add the current read as well
-                                Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
-
-                                // Get the leftover from the previous read
-                                Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
-
-                                // Now handle it string test =
-                                ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
-                                             currStart, joinedData.Length));
-                                ServerLeftOversSize = 0;
-                            }
-                            else
-                            {
-                                ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
-                                 currStart, currEnd - currStart));
-
-                                // Handle the data, from the start to the end,
-                                // between delimiter '\n'
-                            }
-                            // Set the new start - after our delimiter
-                            currStart = i + 1;
-                        }
-                    }
-
-                    // See if we still have any leftovers
-                    if (currStart < read)
-                    {
-                        // ServerLeftOvers = new byte[read - currStart];
-
-                        Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
-                        ServerLeftOversSize = read - currStart;
-                    }
-
-                    if (IsServerSocketConnected)
-                        LightBringer.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), LightBringer);
-                }
-                catch (Exception ex) //Catch any unknown exception and close the connection gracefully
-                {
-                    ServerDisconnected?.Invoke();
-                    SendError(ex, this);
-                }
-            }
-            else
-                ServerDisconnected?.Invoke();
-        }
-
         private void Initialize()
         {
 #if DEBUG
@@ -922,36 +706,7 @@ namespace Furcadia.Net
             return -1;
         }
 
-        private void SanatizeProtocolStrinng(ref string message)
-        {
-            message = message.Replace("\n", string.Empty).Replace("\r", string.Empty);
-            message += '\n';
-        }
-
         #endregion Private Methods
-
-        #region Private Classes
-
-        private class State
-        {
-            #region Public Constructors
-
-            public State()
-            {
-                Success = true;
-            }
-
-            #endregion Public Constructors
-
-            #region Public Properties
-
-            public TcpClient Client { get; set; }
-            public bool Success { get; set; }
-
-            #endregion Public Properties
-        }
-
-        #endregion Private Classes
 
         // To detect redundant calls
     }
