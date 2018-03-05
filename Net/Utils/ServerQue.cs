@@ -295,7 +295,7 @@ namespace Furcadia.Net.Utils
             if (!Debugger.IsAttached)
                 Logger.Disable<ServerQue>();
 #else
-            Logger.Disable<NetProxy>();
+            Logger.Disable<ServerQue>();
 #endif
         }
 

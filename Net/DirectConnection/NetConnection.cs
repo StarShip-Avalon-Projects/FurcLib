@@ -1,7 +1,6 @@
 ﻿using Furcadia.Net.Options;
 using Furcadia.Net.Utils;
 using System;
-using System.Net;
 
 namespace Furcadia.Net.DirectConnection
 {

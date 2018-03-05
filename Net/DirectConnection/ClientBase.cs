@@ -571,7 +571,5 @@ namespace Furcadia.Net.DirectConnection
         }
 
         #endregion Internal Classes
-
-        // To detect redundant calls
     }
 }
