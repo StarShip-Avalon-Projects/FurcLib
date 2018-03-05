@@ -10,8 +10,6 @@ namespace Furcadia.Net.Options
         #region Private Fields
 
         private string characterini;
-        private int connectionRetries;
-        private int connectionTimeOut;
         private string furcinstallpath;
 
         /// <summary>
@@ -44,8 +42,6 @@ namespace Furcadia.Net.Options
         /// </summary>
         public ProxyOptions() : base()
         {
-            connectionTimeOut = 10;
-            connectionRetries = 5;
             proxyHost = "localhost";
             LocalhostPort = 6700;
             GameServerPort = int.Parse(FurcadiaUtilities.GameServerPort);
@@ -80,34 +76,6 @@ namespace Furcadia.Net.Options
         {
             get => characterini;
             set => characterini = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the connection retries.
-        /// </summary>
-        /// <value>
-        /// Number of reconnection attempts
-        /// <para/>
-        /// Default: 5 tries
-        /// </value>
-        public int ConnectionRetries
-        {
-            get => connectionRetries;
-            set => connectionRetries = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the connection time out.
-        /// </summary>
-        /// <value>
-        /// Time out in seconds
-        /// <para/>
-        /// Default: 10 seconds
-        /// </value>
-        public int ConnectionTimeOut
-        {
-            get => connectionTimeOut;
-            set => connectionTimeOut = value;
         }
 
         /// <summary>

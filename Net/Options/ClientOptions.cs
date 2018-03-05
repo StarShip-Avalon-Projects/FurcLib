@@ -27,6 +27,9 @@
         /// </summary>
         private int gameserverport;
 
+        private int connectionRetries;
+        private int connectionTimeOut;
+
         #endregion Private Fields
 
         #region Private Properties
@@ -55,12 +58,14 @@
 
         /// <summary>
         /// </summary>
-        protected ClientOptions()
+        public ClientOptions()
         {
             FurcadiaUtilities = new Utils.Utilities();
             FurcadiaFilePaths = new IO.Paths();
             gameserverport = int.Parse(FurcadiaUtilities.GameServerPort);
             gameserverhost = FurcadiaUtilities.GameServerHost;
+            ConnectionTimeOut = 10;
+            ConnectionRetries = 5;
         }
 
         /// <summary>
@@ -71,8 +76,38 @@
             FurcadiaFilePaths = new IO.Paths();
             gameserverport = port; // TODO: Settings Prefered Serve Port
             gameserverhost = host;
+            ConnectionTimeOut = 10;
+            ConnectionRetries = 5;
         }
 
         #endregion Public Constructors
+
+        /// <summary>
+        /// Gets or sets the connection retries.
+        /// </summary>
+        /// <value>
+        /// Number of reconnection attempts
+        /// <para/>
+        /// Default: 5 tries
+        /// </value>
+        public int ConnectionRetries
+        {
+            get => connectionRetries;
+            set => connectionRetries = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the connection time out.
+        /// </summary>
+        /// <value>
+        /// Time out in seconds
+        /// <para/>
+        /// Default: 10 seconds
+        /// </value>
+        public int ConnectionTimeOut
+        {
+            get => connectionTimeOut;
+            set => connectionTimeOut = value;
+        }
     }
 }

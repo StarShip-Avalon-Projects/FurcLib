@@ -1,22 +1,33 @@
-using Furcadia.IO;
-using Furcadia.Net.Utils;
-using Furcadia.Text;
+/*Log Header
+ *Format: (date,Version) AuthorName, Changes.
+ * (?,2007) Kylix, Initial Coder and SimpleProxy project manager
+ * (Oct 27,2009) Squizzle, Added NetMessage, delegates, and ClientBase wrapper class.
+ * (July 26, 2011) Gerolkae, added setting.ini switch for proxy.ini
+ * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
+ */
+
+using Furcadia.Logging;
+using Furcadia.Net.Options;
 using System;
-using System.Collections.Generic;
-
-using System.Net;
-using System.Net.Security;
+using System.Diagnostics;
 using System.Net.Sockets;
+using System.Threading;
+using static Furcadia.Net.Utils.Utilities;
 
-namespace Furcadia.Net.DirectConnection
+namespace Furcadia.Net
 {
     /// <summary>
-    /// NetConnection
+    /// Furcadia base proxy connect between Client and Server. This is a low
+    /// level class that handles the raw connections and furcadia
+    /// proxy/firewall settings.
     /// <para>
-    /// Derived from ProxyBase for Stand alone connections
+    /// We don't have TLS/SSL handling here, so therefore, Furcadia Settings
+    /// for this are disabled
     /// </para>
     /// </summary>
-    public class ClientBase
+    /// <remarks>
+    /// </remarks>
+    public class ClientBase : IDisposable
     {
         #region Protected Internal Fields
 
@@ -27,7 +38,95 @@ namespace Furcadia.Net.DirectConnection
 
         #endregion Protected Internal Fields
 
-        #region Event Handling
+        #region Private Fields
+
+        /// <summary>
+        /// Max buffer size
+        /// </summary>
+        private static int BUFFER_CAP = 4096;
+
+        /// <summary>
+        /// Furcadia Client TCP Client
+        /// </summary>
+        private static TcpClient LightBringer;
+
+        private bool disposedValue = false;
+
+        /// <summary>
+        /// </summary>
+        private int ENCODE_PAGE = 1252;
+
+        private ClientOptions options;
+        private byte[] serverBuffer = new byte[BUFFER_CAP];
+        // private object ServerBufferLock = new object();
+
+        private byte[] ServerLeftOvers = new byte[BUFFER_CAP];
+        private int ServerLeftOversSize = 0;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>
+        /// Connect to game server with default settings
+        /// </summary>
+        public ClientBase()
+        {
+            options = new ClientOptions
+            {
+                GameServerPort = 6500
+            };
+            Initialize();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="port">
+        /// gameserver port
+        /// </param>
+        /// <param name="lport">
+        /// localhost port
+        /// </param>
+        public ClientBase(int port)
+        {
+            options = new ClientOptions
+            {
+                GameServerPort = port
+            };
+            Initialize();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="host">
+        /// Game server host
+        /// </param>
+        /// <param name="port">
+        /// </param>
+        public ClientBase(string host, int port)
+        {
+            options = new ClientOptions
+            {
+                GameServerPort = port,
+                GameServerHost = host
+            };
+            Initialize();
+        }
+
+        /// <summary>
+        /// Connect to Furcadia with Proxy Options
+        /// </summary>
+        /// <param name="Options">
+        /// </param>
+        public ClientBase(ClientOptions Options)
+        {
+            options = Options;
+            Initialize();
+        }
+
+        #endregion Public Constructors
+
+        #region Public Delegates
 
         /// <summary>
         /// </summary>
@@ -35,25 +134,22 @@ namespace Furcadia.Net.DirectConnection
 
         /// <summary>
         /// </summary>
-        /// <param name="data">
-        /// </param>
+        public delegate string DataEventHandler(string data);
+
+        /// <summary>
+        /// </summary>
         public delegate void DataEventHandler2(string data);
 
         /// <summary>
+        ///
         /// </summary>
-        /// <param name="e">
-        /// </param>
-        /// <param name="o">
-        /// </param>
-        /// <param name="n">
-        /// </param>
-        public delegate void ErrorEventHandler(Exception e, Object o, String n);
+        /// <param name="e">The e.</param>
+        /// <param name="o">The o.</param>
+        public delegate void ErrorEventHandler(Exception e, Object o);
 
-        //public delegate void ErrorEventHandler(Exception e);
-        /// <summary>
-        ///This is triggered when the
-        /// </summary>
-        public event ActionDelegate Connected;
+        #endregion Public Delegates
+
+        #region Public Events
 
         /// <summary>
         /// This is triggered when a handled Exception is thrown.
@@ -64,144 +160,33 @@ namespace Furcadia.Net.DirectConnection
         /// This is triggered when the Server sends data to the client.
         /// Doesn't expect a return value.
         /// </summary>
-        public event DataEventHandler2 ServerData;
+        public virtual event DataEventHandler2 ServerData2;
 
         /// <summary>
         ///This is triggered when the Server Disconnects
         /// </summary>
-        public event ActionDelegate ServerDisConnected;
+        public event ActionDelegate ServerDisconnected;
 
-        #endregion Event Handling
+        #endregion Public Events
 
-        #region Private Declarations
-
-        /// <summary>
-        /// Max buffer size
-        /// </summary>
-        private static int BUFFER_CAP = 1024;
-
-        private IPEndPoint _endpoint;
-
-        private string _ServerLeftOvers;
-
-#pragma warning disable CS0414 // The field 'ClientBase.CConnected' is assigned but its value is never used
-        private bool CConnected = false;
-#pragma warning restore CS0414 // The field 'ClientBase.CConnected' is assigned but its value is never used
-
-        private TcpClient server;
-
-        private byte[] serverBuffer = new byte[BUFFER_CAP];
-
-        private string serverBuild;
+        #region Protected Internal Events
 
         /// <summary>
-        /// Game Server IP/Port
+        /// Occurs when [server connected].
         /// </summary>
-        public IPEndPoint EndPoint
-        {
-            get { return _endpoint; }
-            set { _endpoint = value; }
-        }
+        public event ActionDelegate ServerConnected;
 
-        #endregion Private Declarations
+        #endregion Protected Internal Events
 
-        #region Constructors
+        #region Public Properties
 
         /// <summary>
-        /// Furcadia Path Collection
+        /// Gets the buffer capacity.
         /// </summary>
-        public Paths FurcPath;
-
-        /// <summary>
-        /// Default Constructor
-        /// <para>
-        /// Load furcadia defaults from %appData%\settings.ini
-        /// </para>
-        /// </summary>
-        public ClientBase()
-        {
-            FurcPath = new Paths();
-            string SetPath = FurcPath.SettingsPath;
-            DefaultSettings.LoadFurcadiaSettings(SetPath);
-            int port = Convert.ToInt32(DefaultSettings.GetUserSetting("PreferredServerPort"));
-            try
-            {
-                _endpoint = new IPEndPoint(Dns.GetHostEntry(FurcadiaUtilities.GameServerHost).AddressList[0], port);
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="port">
-        /// </param>
-        public ClientBase(int port)
-        {
-            FurcPath = new Paths();
-            try
-            {
-                _endpoint = new IPEndPoint(Dns.GetHostEntry(FurcadiaUtilities.GameServerHost).AddressList[0], port);
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="host">
-        /// </param>
-        /// <param name="port">
-        /// </param>
-        public ClientBase(string host, int port)
-        {
-            FurcPath = new Paths();
-            try
-            {
-                _endpoint = new IPEndPoint(Dns.GetHostEntry(host).AddressList[0], port);
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="ip">
-        /// </param>
-        /// <param name="port">
-        /// </param>
-        public ClientBase(IPAddress ip, int port)
-        {
-            FurcPath = new Paths();
-            try
-            {
-                _endpoint = new IPEndPoint(ip, port);
-            }
-            catch { }
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        /// <summary>
-        /// Proxy is connected, or not.
-        /// </summary>
-        public bool IsServerConnected
-        {
-            get
-            {
-                if (server != null)
-                    return server.Connected;
-                else
-                    return false;
-            }
-        }
-
-        #endregion Properties
-
-        #region Public Static Properties
-
-        /// <summary>
-        /// </summary>
-        public static int BufferCapacity
+        /// <value>
+        /// The buffer capacity.
+        /// </value>
+        public int BufferCapacity
         {
             get
             {
@@ -210,189 +195,379 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
-        /// Set the Encoder to win 1252 encoding
+        /// Gets the current connection attempt.
         /// </summary>
-        public static int EncoderPage
+        /// <value>
+        /// The current connection attempt.
+        /// </value>
+        public int CurrentConnectionAttempt
+        { get; private set; }
+
+        /// <summary>
+        /// Encodig
+        /// <para/>
+        /// DEFAULT: Windows 1252
+        /// </summary>
+        public int EncoderPage
         {
             get
             {
-                return Utilities.GetEncoding;// ENCODE_PAGE;
+                return ENCODE_PAGE;
             }
         }
 
         /// <summary>
-        /// Gets the default settings.
+        /// Check our connection status to the game server
+        /// </summary>
+        public bool IsServerSocketConnected
+        {
+            get
+            {
+                try
+                {
+                    if (LightBringer != null && LightBringer.Client != null)
+                    {
+                        return LightBringer.Connected;
+                    }
+                }
+                catch { }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the options.
         /// </summary>
         /// <value>
-        /// The default settings.
+        /// The options.
         /// </value>
-        public Settings DefaultSettings { get; private set; }
+        public virtual ClientOptions Options
+        {
+            get
+            { return options; }
+            set
+            {
+                options = value;
+            }
+        }
 
-        #endregion Public Static Properties
+        #endregion Public Properties
 
         #region Public Methods
 
         /// <summary>
         /// Connects to the Furcadia Server and starts the mini proxy.
         /// </summary>
+        /// Could not fine available localhost port
+        /// or
+        /// there is a problem with the Proxy server
+        /// or
+        /// Process path not found.
+        /// or
+        /// Client executable '" + options.FurcadiaProcess + "' not found.
+        /// </exception>
         public virtual void Connect()
         {
-            //Start the async connect operation
-            server = new TcpClient();
+            var MiliSecondTime = (int)TimeSpan.FromSeconds(options.ConnectionTimeOut).TotalMilliseconds;
+            CurrentConnectionAttempt = 1;
 
-            server.BeginConnect(_endpoint.Address, _endpoint.Port, new AsyncCallback(AsyncListener), server);
-        }
+            LightBringer = new TcpClient
+            {
+                ReceiveTimeout = MiliSecondTime,
+                SendTimeout = MiliSecondTime
+            };
+            var state = new State { Client = LightBringer, Success = true };
+            var sucess = false;
 
-        /// <summary>
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Sends the text to the game server
-        /// </summary>
-        /// <param name="message">
-        /// </param>
-        public void SendServer(INetMessage message)
-        {
-            SendServer(message.GetString());
-        }
-
-        /// <summary>
-        /// Sends Data to the Game server
-        /// </summary>
-        /// <param name="message">
-        /// string to send to game server
-        /// </param>
-        public virtual void SendServer(string message)
-        {
             try
             {
-                if (!message.EndsWith("\n"))
-                    message += "\n";
-                if (server.GetStream().CanWrite)
-                    server.GetStream().Write(System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message), 0, System.Text.Encoding.GetEncoding(EncoderPage).GetBytes(message).Length);
+                try
+                {
+                    //when the connection completes before the timeout it will cause a race
+                    //we want EndConnect to always treat the connection as successful if it wins
+
+                    Logger.Info($"Starting connection to Furcadia gameserver.");
+                    while (!sucess)
+                    {
+                        IAsyncResult ar = LightBringer.BeginConnect(options.GameServerHost, options.GameServerPort, EndConnect, state);
+                        state.Success = ar.AsyncWaitHandle.WaitOne(MiliSecondTime, false);
+
+                        sucess = (state.Success && LightBringer.Connected);
+                        if (sucess)
+                            break;
+                        if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
+                        {
+                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                            ServerDisconnected?.Invoke();
+                        }
+                        if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
+                        {
+                            throw new NetProxyException($"Faile to connect, Aborting");
+                        }
+
+                        CurrentConnectionAttempt++;
+                        Thread.Sleep(MiliSecondTime);
+                    }
+                }
+                catch (SocketException se)
+                {
+                    throw se;
+                }
             }
             catch (Exception e)
             {
-                Error?.Invoke(e, this, "SendServer");
-                ServerDisConnected?.Invoke();
+                SendError(e, this);
             }
         }
 
         /// <summary>
+        /// Disconnect from the Furcadia gameserver and Furcadia client
         /// </summary>
-        /// <param name="disposing">
-        /// </param>
-        protected virtual void Dispose(bool disposing)
+        public virtual void DisconnectServerStream()
         {
-            if (disposing)
+            if (LightBringer.Connected)
             {
-                if (server != null && server.Connected == true)
-                {
-                    NetworkStream serverStream = server.GetStream();
-                    if (serverStream != null)
-                    {
-                        serverStream.Flush();
-                        serverStream.Dispose();
-                        serverStream.Close();
-                    }
-                    server.Close();
-                    //server.Dispose();
-                }
-                // Free other state (managed objects).
+                LightBringer.Close();
+                LightBringer.Dispose();
+                ServerDisconnected?.Invoke();
             }
-            // Free your own state (unmanaged objects). Set large fields to null.
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public virtual void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        public virtual void SendToServer(INetMessage message)
+        {
+            SendToServer(message.GetString());
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        public virtual void SendToServer(string message)
+        {
+            SanatizeProtocolStrinng(ref message);
+
+            if (!IsServerSocketConnected)
+                return;
+            try
+            {
+                if (LightBringer.GetStream().CanWrite)
+                    LightBringer.GetStream().Write(System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message), 0, System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message).Length);
+                else ServerDisconnected?.Invoke();
+            }
+            catch (Exception e)
+            {
+                ServerDisconnected?.Invoke();
+                SendError(e, this);
+            }
         }
 
         #endregion Public Methods
 
+        #region Protected Methods
+
+        /// <summary>
+        /// send errors to the error handler
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="o"></param>
+        protected virtual void SendError(Exception e, object o)
+        {
+            if (Error != null)
+            {
+                Error?.Invoke(e, o);
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        #endregion Protected Methods
+
         #region Private Methods
 
-        private object lck = new object();
-
+        /// <summary>
+        /// Asynchronouses the listener.
+        /// </summary>
+        /// <param name="ar">The ar.</param>
         private void AsyncListener(IAsyncResult ar)
         {
             try
             {
-                // Connects to the server
-                server = new TcpClient(FurcadiaUtilities.GameServerHost, _endpoint.Port);
-
-                if (!server.Connected) throw new Exception("There was a problem connecting to the server.");
-
-                server.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
-
-                Connected?.Invoke();
+                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
+                ServerConnected?.Invoke();
             }
-            catch (Exception e) { Error?.Invoke(e, this, "AsyncListener()"); }
+            catch (Exception e)
+            {
+                SendError(e, this);
+            }
         }
 
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (LightBringer != null) LightBringer.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        private void EndConnect(IAsyncResult ar)
+        {
+            var state = (State)ar.AsyncState;
+            TcpClient ThisClient = state.Client;
+            if (ThisClient == null)
+                return;
+            try
+            {
+                ThisClient.EndConnect(ar);
+            }
+            catch { }
+
+            if (ThisClient.Connected && state.Success)
+                return;
+
+            ThisClient.Close();
+        }
+
+        /// <summary>
+        /// Handle the raw server data
+        /// </summary>
+        /// <param name="ar">
+        /// </param>
         private void GetServerData(IAsyncResult ar)
         {
-            lock (lck)
+            LightBringer = (TcpClient)ar.AsyncState;
+
+            if (LightBringer.Client.Connected)
             {
-                using (SslStream sslStream = new SslStream(server.GetStream(), false))
+                try
                 {
-                    try
+                    int read = 0;
+                    // TcpClient GameServer = listener.EndAcceptTcpClient(ar);
+                    read = LightBringer.GetStream().EndRead(ar);
+                    int currStart = 0;
+                    int currEnd = -1;
+
+                    for (int i = 0; i < read; i++)
                     {
-                        if (IsServerConnected == false)
+                        if (i < BUFFER_CAP && serverBuffer[i] == 10)
                         {
-                            throw new SocketException((int)SocketError.NotConnected);
-                        }
-                        else
-                        {
-                            List<string> lines = new List<string>();
-                            int read = server.GetStream().EndRead(ar);
+                            // Set the end of the data
+                            currEnd = i;
 
-                            if (read == 0)
+                            // If we have left overs from previous runs:
+                            if (ServerLeftOversSize != 0)
                             {
-                                ServerDisConnected?.Invoke(); return;
-                            }
-                            //If we have left over data add it to this server build
-                            if (!string.IsNullOrEmpty(_ServerLeftOvers) && _ServerLeftOvers.Length > 0)
-                                serverBuild += _ServerLeftOvers;
-                            serverBuild = System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, read);
+                                // Allocate enough space for the joined buffer
+                                byte[] joinedData = new byte[ServerLeftOversSize + (currEnd - currStart + 1)];
 
-                            while (server.GetStream().DataAvailable == true)
-                            {
-                                int pos = sslStream.Read(serverBuffer, 0, serverBuffer.Length);
-                                serverBuild += System.Text.Encoding.GetEncoding(EncoderPage).GetString(serverBuffer, 0, pos);
-                            }
-                            lines.AddRange(serverBuild.Split('\n'));
-                            if (!serverBuild.EndsWith("\n"))
-                            {
-                                _ServerLeftOvers += lines[lines.Count - 1];
-                                lines.RemoveAt(lines.Count - 1);
-                            }
+                                // And add the current read as well
+                                Array.Copy(ServerLeftOvers, 0, joinedData, 0, ServerLeftOversSize);
 
-                            for (int i = 0; i < lines.Count; i++)
-                            {
-                                ServerData?.Invoke(lines[i]);
+                                // Get the leftover from the previous read
+                                Array.Copy(serverBuffer, currStart, joinedData, ServerLeftOversSize, (currEnd - currStart + 1));
+
+                                // Now handle it string test =
+                                ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(joinedData,
+                                             currStart, joinedData.Length));
+                                ServerLeftOversSize = 0;
                             }
+                            else
+                            {
+                                ServerData2?.Invoke(System.Text.Encoding.GetEncoding(GetEncoding).GetString(serverBuffer,
+                                 currStart, currEnd - currStart));
+
+                                // Handle the data, from the start to the end,
+                                // between delimiter '\n'
+                            }
+                            // Set the new start - after our delimiter
+                            currStart = i + 1;
                         }
                     }
-                    catch (Exception e)
+
+                    // See if we still have any leftovers
+                    if (currStart < read)
                     {
-                        // if (IsServerConnected == true) ServerDisConnected();
-                        Error?.Invoke(e, this, "GetServerData()");
-                        ServerDisConnected?.Invoke();
-                        return;
-                    } //else throw e;
-                      // Detect if client disconnected
-                    if (IsServerConnected && serverBuild.Length < 1 || IsServerConnected == false)
-                    {
-                        ServerDisConnected?.Invoke();
+                        // ServerLeftOvers = new byte[read - currStart];
+
+                        Array.Copy(serverBuffer, currStart, ServerLeftOvers, 0, read - currStart);
+                        ServerLeftOversSize = read - currStart;
                     }
 
-                    if (IsServerConnected && serverBuild.Length > 0)
-                        sslStream.BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), server);
+                    if (IsServerSocketConnected)
+                        LightBringer.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), LightBringer);
+                }
+                catch (Exception ex) //Catch any unknown exception and close the connection gracefully
+                {
+                    ServerDisconnected?.Invoke();
+                    SendError(ex, this);
                 }
             }
+            else
+                ServerDisconnected?.Invoke();
+        }
+
+        private void Initialize()
+        {
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Logger.Disable<ClientBase>();
+#else
+            Logger.Disable<ClientBase>();
+#endif
+            FurcadiaUtilities = new Utils.Utilities();
+        }
+
+        internal void SanatizeProtocolStrinng(ref string message)
+        {
+            string replaceWith = "";
+            string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
+            message = removedBreaks + '\n';
         }
 
         #endregion Private Methods
+
+        #region Private Classes
+
+        private class State
+        {
+            #region Public Constructors
+
+            public State()
+            {
+                Success = true;
+            }
+
+            #endregion Public Constructors
+
+            #region Public Properties
+
+            public TcpClient Client { get; set; }
+            public bool Success { get; set; }
+
+            #endregion Public Properties
+        }
+
+        #endregion Private Classes
+
+        // To detect redundant calls
     }
 }

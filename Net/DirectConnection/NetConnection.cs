@@ -1,4 +1,5 @@
-﻿using Furcadia.Net.Utils;
+﻿using Furcadia.Net.Options;
+using Furcadia.Net.Utils;
 using System;
 using System.Net;
 
@@ -16,6 +17,8 @@ namespace Furcadia.Net.DirectConnection
         /// </summary>
         private ServerQue ServerBalancer;
 
+        private ClientOptions options;
+
         #endregion Private Fields
 
         #region Public Constructors
@@ -30,6 +33,17 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="NetConnection"/> class.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        public NetConnection(ClientOptions options)
+        {
+            ServerBalancer = new ServerQue();
+            ServerBalancer.OnServerSendMessage += MessageSentToServer;
+            this.options = options;
+        }
+
+        /// <summary>
         /// Connect to game server with Host DNS and Specified port
         /// </summary>
         /// <param name="host">
@@ -40,19 +54,8 @@ namespace Furcadia.Net.DirectConnection
         /// </param>
         public NetConnection(string host, int port) : base(host, port)
         {
-        }
-
-        /// <summary>
-        /// Connect to game server with Host IP address and Specified port
-        /// </summary>
-        /// <param name="ip">
-        /// Game Server IP
-        /// </param>
-        /// <param name="port">
-        /// Game Server port
-        /// </param>
-        public NetConnection(IPAddress ip, int port) : base(ip, port)
-        {
+            ServerBalancer = new ServerQue();
+            ServerBalancer.OnServerSendMessage += MessageSentToServer;
         }
 
         #endregion Public Constructors
@@ -72,7 +75,7 @@ namespace Furcadia.Net.DirectConnection
         /// </summary>
         /// <param name="message">
         /// </param>
-        public override void SendServer(string message)
+        public virtual void SendServer(string message)
         {
             ServerBalancer.SendToServer(message);
         }
@@ -92,7 +95,7 @@ namespace Furcadia.Net.DirectConnection
         /// </param>
         private void MessageSentToServer(object message, EventArgs e)
         {
-            base.SendServer((string)message);
+            SendServer((string)message);
         }
 
         #endregion Private Methods
