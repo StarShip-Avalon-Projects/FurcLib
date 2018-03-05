@@ -7,7 +7,6 @@ using Furcadia.Net.Utils.ServerParser;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static Furcadia.Drawing.VisibleArea;
 using static Furcadia.Movement.CharacterFlags;
 using static Furcadia.Text.FurcadiaMarkup;
 
@@ -1086,9 +1085,9 @@ namespace Furcadia.Net.Proxy
                     //Disconnection Error
                     else if (data[0] == '[')
                     {
-#if DEBUG
-                        Console.WriteLine("Disconnection Dialog:" + data);
-#endif
+                        //#if DEBUG
+                        //                        Console.WriteLine("Disconnection Dialog:" + data);
+                        //#endif
 
                         Dream.Furres.Clear();
 
@@ -1150,9 +1149,9 @@ namespace Furcadia.Net.Proxy
                     }
                     else if (data.StartsWith("]c"))
                     {
-#if DEBUG
-                        Console.WriteLine(data);
-#endif
+                        //#if DEBUG
+                        //                        Console.WriteLine(data);
+                        //#endif
                     }
                     // Dream Bookmark
                     //]CBookmark Type[1]Dream URL[*]

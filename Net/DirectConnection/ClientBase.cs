@@ -29,6 +29,17 @@ namespace Furcadia.Net.DirectConnection
     /// </remarks>
     public class ClientBase : IDisposable
     {
+        #region Internal Fields
+
+        internal byte[] serverBuffer = new byte[BUFFER_CAP];
+
+        internal byte[] ServerLeftOvers = new byte[BUFFER_CAP];
+
+        // private object ServerBufferLock = new object();
+        internal int ServerLeftOversSize = 0;
+
+        #endregion Internal Fields
+
         #region Protected Internal Fields
 
         /// <summary>
@@ -57,11 +68,6 @@ namespace Furcadia.Net.DirectConnection
         private int ENCODE_PAGE = 1252;
 
         private ClientOptions options;
-        internal byte[] serverBuffer = new byte[BUFFER_CAP];
-        // private object ServerBufferLock = new object();
-
-        internal byte[] ServerLeftOvers = new byte[BUFFER_CAP];
-        internal int ServerLeftOversSize = 0;
 
         #endregion Private Fields
 
@@ -157,6 +163,11 @@ namespace Furcadia.Net.DirectConnection
         public event ErrorEventHandler Error;
 
         /// <summary>
+        /// Occurs when [server connected].
+        /// </summary>
+        public virtual event ActionDelegate ServerConnected;
+
+        /// <summary>
         /// This is triggered when the Server sends data to the client.
         /// Doesn't expect a return value.
         /// </summary>
@@ -168,15 +179,6 @@ namespace Furcadia.Net.DirectConnection
         public virtual event ActionDelegate ServerDisconnected;
 
         #endregion Public Events
-
-        #region Protected Internal Events
-
-        /// <summary>
-        /// Occurs when [server connected].
-        /// </summary>
-        public virtual event ActionDelegate ServerConnected;
-
-        #endregion Protected Internal Events
 
         #region Public Properties
 
@@ -369,58 +371,7 @@ namespace Furcadia.Net.DirectConnection
 
         #endregion Public Methods
 
-        #region Protected Methods
-
-        /// <summary>
-        /// send errors to the error handler
-        /// </summary>
-        /// <param name="e"></param>
-        /// <param name="o"></param>
-        protected virtual void SendError(Exception e, object o)
-        {
-            if (Error != null)
-            {
-                Error?.Invoke(e, o);
-            }
-            else
-            {
-                throw e;
-            }
-        }
-
-        #endregion Protected Methods
-
-        #region Private Methods
-
-        /// <summary>
-        /// Asynchronouses the listener.
-        /// </summary>
-        /// <param name="ar">The ar.</param>
-        private void AsyncListener(IAsyncResult ar)
-        {
-            try
-            {
-                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
-                ServerConnected?.Invoke();
-            }
-            catch (Exception e)
-            {
-                SendError(e, this);
-            }
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    if (LightBringer != null) LightBringer.Dispose();
-                }
-
-                disposedValue = true;
-            }
-        }
+        #region Internal Methods
 
         internal void EndConnect(IAsyncResult ar)
         {
@@ -518,17 +469,6 @@ namespace Furcadia.Net.DirectConnection
                 ServerDisconnected?.Invoke();
         }
 
-        private void Initialize()
-        {
-#if DEBUG
-            if (!Debugger.IsAttached)
-                Logger.Disable<ClientBase>();
-#else
-            Logger.Disable<ClientBase>();
-#endif
-            FurcadiaUtilities = new Utils.Utilities();
-        }
-
         /// <summary>
         /// Sanatizes the protocol strinng.
         /// </summary>
@@ -541,9 +481,75 @@ namespace Furcadia.Net.DirectConnection
             message = removedBreaks + '\n';
         }
 
+        #endregion Internal Methods
+
+        #region Protected Methods
+
+        /// <summary>
+        /// send errors to the error handler
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="o"></param>
+        protected virtual void SendError(Exception e, object o)
+        {
+            if (Error != null)
+            {
+                Error?.Invoke(e, o);
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        #endregion Protected Methods
+
+        #region Private Methods
+
+        /// <summary>
+        /// Asynchronouses the listener.
+        /// </summary>
+        /// <param name="ar">The ar.</param>
+        private void AsyncListener(IAsyncResult ar)
+        {
+            try
+            {
+                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
+                ServerConnected?.Invoke();
+            }
+            catch (Exception e)
+            {
+                SendError(e, this);
+            }
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (LightBringer != null) LightBringer.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        private void Initialize()
+        {
+#if DEBUG
+            if (!Debugger.IsAttached)
+                Logger.Disable<ClientBase>();
+#else
+            Logger.Disable<ClientBase>();
+#endif
+            FurcadiaUtilities = new Utils.Utilities();
+        }
+
         #endregion Private Methods
 
-        #region Private Classes
+        #region Internal Classes
 
         internal class State
         {
@@ -564,7 +570,7 @@ namespace Furcadia.Net.DirectConnection
             #endregion Public Properties
         }
 
-        #endregion Private Classes
+        #endregion Internal Classes
 
         // To detect redundant calls
     }
