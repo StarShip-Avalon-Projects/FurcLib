@@ -32,15 +32,6 @@ namespace Furcadia.Net.Proxy
     /// </remarks>
     public class NetProxy : ClientBase, IDisposable
     {
-        #region Protected Internal Fields
-
-        /// <summary>
-        /// Furcadia Utilities
-        /// </summary>
-        protected internal Utils.Utilities FurcadiaUtilities;
-
-        #endregion Protected Internal Fields
-
         #region Private Fields
 
         /// <summary>
