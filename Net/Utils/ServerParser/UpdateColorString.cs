@@ -27,7 +27,7 @@ namespace Furcadia.Net.Utils.ServerParser
         public UpdateColorString(IFurre Player, string ServerInstruction) : base(ServerInstruction)
         {
             if (ServerInstruction.StartsWith("B"))
-                base.instructionType = ServerInstructionType.UpdateColorString;
+                instructionType = ServerInstructionType.UpdateColorString;
 
             player = Player;
 
