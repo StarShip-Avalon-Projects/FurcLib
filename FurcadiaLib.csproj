@@ -136,7 +136,9 @@
     <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
     <Compile Include="Net\Proxy\ProxySession.cs.cs" />
     <Compile Include="Net\Utils\ChannelObjects\QueryChannelObject.cs" />
+    <Compile Include="Net\Utils\ServerObjects\State.cs" />
     <Compile Include="Net\Utils\ServerObjects\DiceObject.cs" />
+    <Compile Include="Net\Utils\ServerObjects\RepQue.cs" />
     <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />
     <Compile Include="Net\Utils\ChannelObjects\ChannelObject.cs" />
     <Compile Include="Net\Utils\ServerObjects\DataObject.cs" />
