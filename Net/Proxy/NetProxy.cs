@@ -488,44 +488,6 @@ namespace Furcadia.Net.Proxy
             SendToClient(message.GetString());
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="message">
-        /// </param>
-        public virtual void SendToServer(INetMessage message)
-        {
-            SendToServer(message.GetString());
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="message">
-        /// </param>
-        public virtual void SendToServer(string message)
-        {
-            string replaceWith = "";
-            string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
-            message = removedBreaks + '\n';
-
-            if (!IsServerSocketConnected)
-                return;
-            try
-            {
-                if (LightBringer.GetStream().CanWrite)
-                    LightBringer.GetStream().Write(System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message), 0, System.Text.Encoding.GetEncoding(GetEncoding).GetBytes(message).Length);
-                else this.ServerDisconnected?.Invoke();
-            }
-            catch (Exception e)
-            {
-                ServerDisconnected?.Invoke();
-                if (IsClientSocketConnected)
-                {
-                    DisconnectClientStream();
-                }
-                SendError(e, this);
-            }
-        }
-
         #endregion Public Methods
 
         #region Private Methods
