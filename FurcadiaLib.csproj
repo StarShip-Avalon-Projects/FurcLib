@@ -60,7 +60,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>..\build\Debug\FurcadiaLib.XML</DocumentationFile>
+    <DocumentationFile>..\Build\Debug\FurcadiaLib.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>None</DebugType>
@@ -136,7 +136,9 @@
     <Compile Include="Net\Proxy\CharacterNotFoundException.cs" />
     <Compile Include="Net\Proxy\ProxySession.cs.cs" />
     <Compile Include="Net\Utils\ChannelObjects\QueryChannelObject.cs" />
+    <Compile Include="Net\Utils\ServerObjects\State.cs" />
     <Compile Include="Net\Utils\ServerObjects\DiceObject.cs" />
+    <Compile Include="Net\Utils\ServerObjects\RepQue.cs" />
     <Compile Include="Net\Utils\ServerParser\BaseServerInstruction.cs" />
     <Compile Include="Net\Utils\ChannelObjects\ChannelObject.cs" />
     <Compile Include="Net\Utils\ServerObjects\DataObject.cs" />

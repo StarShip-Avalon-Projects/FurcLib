@@ -8,6 +8,7 @@
 
 using Furcadia.Logging;
 using Furcadia.Net.Options;
+using Furcadia.Net.Utils.ServerObjects;
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -86,13 +87,9 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ClientBase"/> class.
         /// </summary>
-        /// <param name="port">
-        /// gameserver port
-        /// </param>
-        /// <param name="lport">
-        /// localhost port
-        /// </param>
+        /// <param name="port">The port.</param>
         public ClientBase(int port)
         {
             options = new ClientOptions
@@ -103,12 +100,10 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ClientBase"/> class.
         /// </summary>
-        /// <param name="host">
-        /// Game server host
-        /// </param>
-        /// <param name="port">
-        /// </param>
+        /// <param name="host">The host.</param>
+        /// <param name="port">The port.</param>
         public ClientBase(string host, int port)
         {
             options = new ClientOptions
@@ -120,10 +115,9 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
-        /// Connect to Furcadia with Proxy Options
+        /// Initializes a new instance of the <see cref="ClientBase"/> class.
         /// </summary>
-        /// <param name="Options">
-        /// </param>
+        /// <param name="Options">The options.</param>
         public ClientBase(ClientOptions Options)
         {
             options = Options;
@@ -135,12 +129,13 @@ namespace Furcadia.Net.DirectConnection
         #region Public Delegates
 
         /// <summary>
+        ///
         /// </summary>
         public delegate void ActionDelegate();
 
         /// <summary>
         /// </summary>
-        public delegate string DataEventHandler(string data);
+        public delegate string DataEventHandler(ref string data);
 
         /// <summary>
         /// </summary>
@@ -258,16 +253,9 @@ namespace Furcadia.Net.DirectConnection
         #region Public Methods
 
         /// <summary>
-        /// Connects to the Furcadia Server and starts the mini proxy.
+        /// Connects to the Furcadia game server
         /// </summary>
-        /// Could not fine available localhost port
-        /// or
-        /// there is a problem with the Proxy server
-        /// or
-        /// Process path not found.
-        /// or
-        /// Client executable '" + options.FurcadiaProcess + "' not found.
-        /// </exception>
+        /// <exception cref="NetConnectionException"></exception>
         public virtual void Connect()
         {
             var MiliSecondTime = (int)TimeSpan.FromSeconds(options.ConnectionTimeOut).TotalMilliseconds;
@@ -548,28 +536,5 @@ namespace Furcadia.Net.DirectConnection
         }
 
         #endregion Private Methods
-
-        #region Internal Classes
-
-        internal class State
-        {
-            #region Public Constructors
-
-            public State()
-            {
-                Success = true;
-            }
-
-            #endregion Public Constructors
-
-            #region Public Properties
-
-            public TcpClient Client { get; set; }
-            public bool Success { get; set; }
-
-            #endregion Public Properties
-        }
-
-        #endregion Internal Classes
     }
 }

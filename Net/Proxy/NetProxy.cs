@@ -9,6 +9,7 @@
 using Furcadia.Logging;
 using Furcadia.Net.DirectConnection;
 using Furcadia.Net.Options;
+using Furcadia.Net.Utils.ServerObjects;
 using System;
 using System.Diagnostics;
 

@@ -3,6 +3,7 @@ using Furcadia.Logging;
 using Furcadia.Movement;
 using Furcadia.Net.DreamInfo;
 using Furcadia.Net.Utils.ChannelObjects;
+using Furcadia.Net.Utils.ServerObjects;
 using Furcadia.Net.Utils.ServerParser;
 using System;
 using System.Collections.Generic;
@@ -1468,35 +1469,5 @@ namespace Furcadia.Net.Proxy
         }
 
         #endregion Private Methods
-
-        #region Public Structs
-
-        //TODO Check Furcadoia Popup Windows
-        /// <summary>
-        /// </summary>
-        public struct Rep
-        {
-            #region Private Fields
-
-            private string iD;
-
-            private int type;
-
-            #endregion Private Fields
-
-            #region Public Properties
-
-            /// <summary>
-            /// </summary>
-            public string ID { get { return iD; } set { iD = value; } }
-
-            /// <summary>
-            /// </summary>
-            public int Type { get { return type; } set { type = value; } }
-
-            #endregion Public Properties
-        }
-
-        #endregion Public Structs
     }
 }
