@@ -326,18 +326,18 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
+        /// Sends to server.
         /// </summary>
-        /// <param name="message">
-        /// </param>
+        /// <param name="message">The message.</param>
         public virtual void SendToServer(INetMessage message)
         {
             SendToServer(message.GetString());
         }
 
         /// <summary>
+        /// Sends to server.
         /// </summary>
-        /// <param name="message">
-        /// </param>
+        /// <param name="message">The message.</param>
         public virtual void SendToServer(string message)
         {
             SanatizeProtocolStrinng(ref message);
@@ -464,9 +464,8 @@ namespace Furcadia.Net.DirectConnection
         // TODO: Move this to utils?
         internal void SanatizeProtocolStrinng(ref string message)
         {
-            string replaceWith = "";
-            string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
-            message = removedBreaks + '\n';
+            string replaceWith = string.Empty;
+            message = message.Replace("\n", replaceWith).Replace("\r", replaceWith) + '\n';
         }
 
         #endregion Internal Methods
