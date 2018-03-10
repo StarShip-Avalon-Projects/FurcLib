@@ -232,6 +232,8 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfoersionCS1.cs</LastGenOutput>
     </None>
+    <Content Include="AssemblyFileVersion.txt" />
+    <Content Include="AssemblyInfoVersion.txt" />
     <Content Include="FurcLib LGPLv3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
