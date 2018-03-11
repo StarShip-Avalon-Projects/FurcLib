@@ -363,7 +363,7 @@ namespace Furcadia.Net.DirectConnection
 
         internal void EndConnect(IAsyncResult ar)
         {
-            var state = (State)ar.AsyncState;
+            State state = (State)ar.AsyncState;
             TcpClient ThisClient = state.Client;
             if (ThisClient == null)
                 return;
