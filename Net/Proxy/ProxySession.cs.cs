@@ -366,14 +366,6 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// Disconnect from Furcadia and notify delegates.
-        /// </summary>
-        public override void DisconnectServerAndClientStreams()
-        {
-            base.DisconnectServerAndClientStreams();
-        }
-
-        /// <summary>
         /// implementation of Dispose pattern callable by consumers.
         /// </summary>
         public override void Dispose()

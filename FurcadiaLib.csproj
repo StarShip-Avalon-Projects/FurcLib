@@ -118,13 +118,12 @@
     <Compile Include="Logging\ILogOutput.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\MutliLogOutput.cs" />
+    <Compile Include="Net\DirectConnection\IniReader.cs" />
     <Compile Include="Net\DirectConnection\NetConnectionException.cs" />
     <Compile Include="Net\Dream\Avatar.cs" />
     <Compile Include="Net\Dream\Badges.cs" />
     <Compile Include="IO\IniFile.cs" />
     <Compile Include="LegacyAttribute.cs" />
-    <Compile Include="Net\Account\AccountInfo.cs" />
-    <Compile Include="Net\Account\CharacterInfo.cs" />
     <Compile Include="Net\DirectConnection\NetConnection.cs" />
     <Compile Include="Net\Options\BaseConnectionOptions.cs" />
     <Compile Include="Net\Options\ClientOptions.cs" />
@@ -198,7 +197,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\IOPermissions.cs" />
     <None Include="FurcLibSNK.snk" />
-    <None Include="Text\Character.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
