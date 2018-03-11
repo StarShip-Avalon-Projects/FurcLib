@@ -408,5 +408,18 @@ namespace Furcadia.Movement
         }
 
         #endregion Public Properties
+
+        /// <summary>
+
+        /// Performs an implicit conversion from <see cref="System.String"/> to <see cref="ColorString"/>.
+        /// </summary>
+        /// <param name="colors">The colors.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
+        public static implicit operator ColorString(string colors)
+        {
+            return new ColorString(colors);
+        }
     }
 }

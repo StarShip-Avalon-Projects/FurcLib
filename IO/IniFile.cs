@@ -133,7 +133,7 @@ namespace Furcadia.IO
         /// Loads the Reads the data in the ini file into the IniFile object
         /// </summary>
         /// <param name="sFileName">Name of the s file.</param>
-        /// <param name="bMerge">if set to <c>true</c> [b merge].</param>
+        /// <param name="bMerge">if set to <c>fase</c>, remove all sections.</param>
         public void Load(string sFileName, bool bMerge = false)
         {
             if (!File.Exists(sFileName))

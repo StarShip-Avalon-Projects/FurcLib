@@ -47,6 +47,14 @@ namespace Furcadia.Net.Options
         public ColorString Colors { get; set; }
 
         /// <summary>
+        /// Gets or sets the version.
+        /// </summary>
+        /// <value>
+        /// The version.
+        /// </value>
+        public double Version { get; set; }
+
+        /// <summary>
         /// Gets or sets the avatar description.
         /// </summary>
         /// <value>
@@ -61,6 +69,11 @@ namespace Furcadia.Net.Options
         /// The password.
         /// </value>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Costume to use with Selected Character
+        /// </summary>
+        public string Costume { get; set; }
 
         #endregion Public Properties
     }

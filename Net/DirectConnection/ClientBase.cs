@@ -77,13 +77,8 @@ namespace Furcadia.Net.DirectConnection
         /// <summary>
         /// Connect to game server with default settings
         /// </summary>
-        public ClientBase()
+        public ClientBase() : this(6500)
         {
-            options = new BaseConnectionOptions
-            {
-                GameServerPort = 6500
-            };
-            Initialize();
         }
 
         /// <summary>
@@ -523,7 +518,7 @@ namespace Furcadia.Net.DirectConnection
             }
         }
 
-        private void Initialize()
+        internal virtual void Initialize()
         {
 #if DEBUG
             if (!Debugger.IsAttached)

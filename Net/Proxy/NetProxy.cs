@@ -85,7 +85,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Connect to game server with default settings
         /// </summary>
-        public NetProxy()
+        public NetProxy() : base()
         {
             options = new ProxyOptions
             {
@@ -99,7 +99,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="LocalPort">
         /// </param>
-        public NetProxy(int LocalPort)
+        public NetProxy(int LocalPort) : base(LocalPort)
         {
             options = new ProxyOptions
             {
@@ -116,7 +116,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="lport">
         /// localhost port
         /// </param>
-        public NetProxy(int port, int lport)
+        public NetProxy(int port, int lport) : base(port)
         {
             options = new ProxyOptions
             {
@@ -133,7 +133,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         /// <param name="port">
         /// </param>
-        public NetProxy(string host, int port)
+        public NetProxy(string host, int port) : base(host, port)
         {
             options = new ProxyOptions
             {
@@ -149,7 +149,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="Options">
         /// </param>
-        public NetProxy(ProxyOptions Options)
+        public NetProxy(ProxyOptions Options) : base(Options)
         {
             options = Options;
             Initialize();
@@ -167,7 +167,7 @@ namespace Furcadia.Net.Proxy
         /// <param name="lport">
         /// Localhost port
         /// </param>
-        public NetProxy(string host, int port, int lport)
+        public NetProxy(string host, int port, int lport) : base(host, port)
         {
             options = new ProxyOptions
             {
@@ -382,7 +382,7 @@ namespace Furcadia.Net.Proxy
                         if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                         {
                             Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
-                            this.ServerDisconnected?.Invoke();
+                            ServerDisconnected?.Invoke();
                         }
                         if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
                         {
@@ -415,13 +415,7 @@ namespace Furcadia.Net.Proxy
             }
             finally
             {
-                // if (listen.Pending())
-                // {
-                //
-                // listen.Server.Disconnect(true);
-                // listen = null;
                 listen.Stop();
-                //}
             }
         }
 
@@ -448,8 +442,8 @@ namespace Furcadia.Net.Proxy
         public virtual void DisconnectServerAndClientStreams()
         {
             DisconnectClientStream();
-
             base.Disconnect();
+            ServerDisconnected?.Invoke();
         }
 
         /// <summary>
@@ -467,9 +461,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public virtual void SendToClient(string message)
         {
-            string replaceWith = "";
-            string removedBreaks = message.Replace("\r\n", replaceWith).Replace("\n", replaceWith).Replace("\r", replaceWith);
-            message = removedBreaks + '\n';
+            SanatizeProtocolStrinng(ref message);
             Logger.Debug<NetProxy>($"{message}");
             try
             {
@@ -611,15 +603,15 @@ namespace Furcadia.Net.Proxy
             }
         }
 
-        private void Initialize()
+        internal override void Initialize()
         {
+            base.Initialize();
 #if DEBUG
             if (!Debugger.IsAttached)
                 Logger.Disable<NetProxy>();
 #else
             Logger.Disable<NetProxy>();
 #endif
-            FurcadiaUtilities = new Utils.Utilities();
             SettingsRestore += () =>
             {
                 DateTime end = DateTime.Now + TimeSpan.FromSeconds(Options.ResetSettingTime);

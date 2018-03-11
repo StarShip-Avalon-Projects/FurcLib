@@ -24,7 +24,7 @@ namespace Furcadia.Net.Options
 
         private string proxyHost;
 
-        private int resetSettingTime = 20;
+        private int resetSettingTime = 10;
         private bool standalone;
 
         #endregion Private Fields
