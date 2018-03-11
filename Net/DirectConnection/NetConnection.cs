@@ -2,6 +2,7 @@
 using Furcadia.Logging;
 using Furcadia.Movement;
 using Furcadia.Net.DreamInfo;
+using Furcadia.Net.Options;
 using Furcadia.Net.Utils;
 using Furcadia.Net.Utils.ChannelObjects;
 using Furcadia.Net.Utils.ServerObjects;
@@ -42,6 +43,7 @@ namespace Furcadia.Net.DirectConnection
         #region Private Fields
 
         private static IFurre connectedFurre;
+        private ClientOptions clientOptions;
 
         ///// <summary>
         ///// Beekin Badge
@@ -84,8 +86,9 @@ namespace Furcadia.Net.DirectConnection
 
         /// <summary>
         /// </summary>
-        public NetConnection() : this(new Options.ClientOptions())
+        public NetConnection() : this(new ClientOptions())
         {
+            Initilize();
         }
 
         /// <summary>
@@ -93,9 +96,10 @@ namespace Furcadia.Net.DirectConnection
         /// <param name="Options">
         /// NetConnection Options
         /// </param>
-        public NetConnection(Options.ClientOptions Options) : base(Options)
+        public NetConnection(ClientOptions Options) : base(Options)
         {
             Initilize();
+            clientOptions = Options;
         }
 
         #endregion Public Constructors
@@ -780,9 +784,14 @@ namespace Furcadia.Net.DirectConnection
                     {
                         // Login Sucessful
                         serverconnectphase = ConnectionPhase.Auth;
+
+                        // connect characterName password machineID
+                        if (string.IsNullOrWhiteSpace(clientOptions.Account))
+                            SendToServer($"connect {clientOptions.CharacterShortName} {clientOptions.Password}");
+                        else // account email characterName password token
+                            SendToServer($"account {clientOptions.Account} {clientOptions.CharacterShortName} {clientOptions.Password}");
+
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
-                        // Standalone / account Send(String.Format("connect
-                        // {0} {1}\n", sUsername, sPassword));
                     }
                     break;
 
@@ -796,7 +805,7 @@ namespace Furcadia.Net.DirectConnection
                         //We've connected to Furcadia
                         serverconnectphase = ConnectionPhase.Connected;
 
-                        ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                        ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase));
                     }
                     break;
 
@@ -1014,18 +1023,8 @@ namespace Furcadia.Net.DirectConnection
                     //Disconnection Error
                     else if (data[0] == '[')
                     {
-                        //#if DEBUG
-                        //                        Console.WriteLine("Disconnection Dialog:" + data);
-                        //#endif
-
                         Dream.Furres.Clear();
-
-                        //;{mapfile}	Load a local map (one in the furcadia folder)
-                        //]q {name} {id}	Request to download a specific patch
                     }
-                    //else if (data.StartsWith(";") || data.StartsWith("]r"))
-                    //{
-                    //}
 
                     //Dream Load ]q
                     //vasecodegamma
@@ -1115,16 +1114,13 @@ namespace Furcadia.Net.DirectConnection
                     }
 
                     break;
-
+                // Do nothing - we're disconnected...
                 case ConnectionPhase.Disconnected:
                     {
                         ServerStatusChanged?.Invoke(null,
                                     new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
                         break;
                     }
-                // Do nothing - we're disconnected...
-                default:
-                    break;
             }
         }
 
@@ -1250,6 +1246,7 @@ namespace Furcadia.Net.DirectConnection
 #else
             Logger.Disable<NetConnection>();
 #endif
+            clientOptions = new ClientOptions();
             SpeciesTag = new Queue<string>();
             BadgeTag = new Queue<string>();
 

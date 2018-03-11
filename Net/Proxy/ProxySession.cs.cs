@@ -1424,12 +1424,14 @@ namespace Furcadia.Net.Proxy
             {
                 case ConnectionPhase.Auth:
 
+                    // connect characterName password machineID
                     if (data.StartsWith("connect"))
                     {
                         string test = data.Replace("connect ", "").TrimStart(' ');
                         string botName = test.Substring(0, test.IndexOf(" "));
                         connectedFurre = new Furre(botName);
                     }
+                    // account email characterName password token
                     else if (data.ToLower().StartsWith("account"))
                     {
                         string[] words = data.Split(' ');

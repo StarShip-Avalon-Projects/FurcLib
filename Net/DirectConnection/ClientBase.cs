@@ -68,7 +68,7 @@ namespace Furcadia.Net.DirectConnection
         /// </summary>
         private int ENCODE_PAGE = 1252;
 
-        private ClientOptions options;
+        private BaseConnectionOptions options;
 
         #endregion Private Fields
 
@@ -79,7 +79,7 @@ namespace Furcadia.Net.DirectConnection
         /// </summary>
         public ClientBase()
         {
-            options = new ClientOptions
+            options = new BaseConnectionOptions
             {
                 GameServerPort = 6500
             };
@@ -92,7 +92,7 @@ namespace Furcadia.Net.DirectConnection
         /// <param name="port">The port.</param>
         public ClientBase(int port)
         {
-            options = new ClientOptions
+            options = new BaseConnectionOptions
             {
                 GameServerPort = port
             };
@@ -106,7 +106,7 @@ namespace Furcadia.Net.DirectConnection
         /// <param name="port">The port.</param>
         public ClientBase(string host, int port)
         {
-            options = new ClientOptions
+            options = new BaseConnectionOptions
             {
                 GameServerPort = port,
                 GameServerHost = host
@@ -118,7 +118,7 @@ namespace Furcadia.Net.DirectConnection
         /// Initializes a new instance of the <see cref="ClientBase"/> class.
         /// </summary>
         /// <param name="Options">The options.</param>
-        public ClientBase(ClientOptions Options)
+        public ClientBase(BaseConnectionOptions Options)
         {
             options = Options;
             Initialize();
@@ -238,14 +238,10 @@ namespace Furcadia.Net.DirectConnection
         /// <value>
         /// The options.
         /// </value>
-        public virtual ClientOptions Options
+        public virtual BaseConnectionOptions Options
         {
-            get
-            { return options; }
-            set
-            {
-                options = value;
-            }
+            get => options;
+            set => options = value;
         }
 
         #endregion Public Properties
@@ -282,7 +278,10 @@ namespace Furcadia.Net.DirectConnection
 
                     sucess = (state.Success && LightBringer.Connected);
                     if (sucess)
+                    {
+                        ServerConnected?.Invoke();
                         break;
+                    }
                     if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
                     {
                         Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
@@ -296,6 +295,7 @@ namespace Furcadia.Net.DirectConnection
                     CurrentConnectionAttempt++;
                     Thread.Sleep(MiliSecondTime);
                 }
+                LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
             }
             catch (Exception e)
             {
@@ -503,7 +503,7 @@ namespace Furcadia.Net.DirectConnection
             try
             {
                 LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
-                ServerConnected?.Invoke();
+                //  ServerConnected?.Invoke();
             }
             catch (Exception e)
             {

@@ -126,8 +126,9 @@
     <Compile Include="Net\Account\AccountInfo.cs" />
     <Compile Include="Net\Account\CharacterInfo.cs" />
     <Compile Include="Net\DirectConnection\NetConnection.cs" />
-    <Compile Include="Net\Proxy\NetProxy.cs" />
+    <Compile Include="Net\Options\BaseConnectionOptions.cs" />
     <Compile Include="Net\Options\ClientOptions.cs" />
+    <Compile Include="Net\Proxy\NetProxy.cs" />
     <Compile Include="Net\Options\PouncrOptions.cs" />
     <Compile Include="Net\Options\ProxyOptions.cs" />
     <Compile Include="Net\Pounce\PounceClient.cs" />
@@ -232,11 +233,8 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfoersionCS1.cs</LastGenOutput>
     </None>
-    <Content Include="AssemblyFileVersion.txt" />
-    <Content Include="AssemblyInfoVersion.txt" />
-    <Content Include="FurcLib LGPLv3.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="AssemblyFileVersion.txt" />
+    <None Include="AssemblyInfoVersion.txt" />
     <Content Include="FurcLib Change Log.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

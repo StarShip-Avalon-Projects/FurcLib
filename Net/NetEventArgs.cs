@@ -329,7 +329,7 @@ namespace Furcadia.Net
         /// <param name="Instruction">
         /// Game <see cref="ServerInstructionType"/> to client
         /// </param>
-        public NetServerEventArgs(ConnectionPhase phase, ServerInstructionType Instruction)
+        public NetServerEventArgs(ConnectionPhase phase, ServerInstructionType Instruction = ServerInstructionType.Unknown)
         {
             ConnectPhase = phase;
             serverinstruction = Instruction;

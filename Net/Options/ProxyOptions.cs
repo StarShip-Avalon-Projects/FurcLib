@@ -5,7 +5,7 @@ namespace Furcadia.Net.Options
     /// <summary>
     /// Configuration options for NetProxy
     /// </summary>
-    public class ProxyOptions : ClientOptions
+    public class ProxyOptions : BaseConnectionOptions
     {
         #region Private Fields
 

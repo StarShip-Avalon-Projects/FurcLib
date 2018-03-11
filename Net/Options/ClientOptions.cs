@@ -1,113 +1,67 @@
-﻿namespace Furcadia.Net.Options
+﻿using Furcadia.Movement;
+
+namespace Furcadia.Net.Options
 {
     /// <summary>
-    /// Game server connection settings collection
+    /// Client options based on Character.ini settings
     /// </summary>
-    public class ClientOptions
+    public class ClientOptions : BaseConnectionOptions
     {
-        #region Private Fields
-
-        /// <summary>
-        /// Furcadia Paths File Path Structure.
-        /// </summary>
-        protected internal IO.Paths FurcadiaFilePaths;
-
-        /// <summary>
-        /// Furcadia Utilities
-        /// </summary>
-        protected internal Utils.Utilities FurcadiaUtilities;
-
-        /// <summary>
-        /// Host Name or IP address
-        /// </summary>
-        private string gameserverhost;
-
-        /// <summary>
-        /// Game Server TCP port
-        /// </summary>
-        private int gameserverport;
-
-        private int connectionRetries;
-        private int connectionTimeOut;
-
-        #endregion Private Fields
-
-        #region Private Properties
-
-        /// <summary>
-        /// Host name or IP of the game server
-        /// </summary>
-        public string GameServerHost
-        {
-            get { return gameserverhost; }
-            set { gameserverhost = value; }
-        }
-
-        /// <summary>
-        /// Game server TCP Port
-        /// </summary>
-        public int GameServerPort
-        {
-            get { return gameserverport; }
-            set { gameserverport = value; }
-        }
-
-        #endregion Private Properties
-
         #region Public Constructors
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ClientOptions"/> class.
         /// </summary>
-        public ClientOptions()
+        public ClientOptions() : base()
         {
-            FurcadiaUtilities = new Utils.Utilities();
-            FurcadiaFilePaths = new IO.Paths();
-            gameserverport = int.Parse(FurcadiaUtilities.GameServerPort);
-            gameserverhost = FurcadiaUtilities.GameServerHost;
-            ConnectionTimeOut = 10;
-            ConnectionRetries = 5;
-        }
-
-        /// <summary>
-        /// </summary>
-        protected ClientOptions(string host, int port)
-        {
-            FurcadiaUtilities = new Utils.Utilities();
-            FurcadiaFilePaths = new IO.Paths();
-            gameserverport = port; // TODO: Settings Prefered Serve Port
-            gameserverhost = host;
-            ConnectionTimeOut = 10;
-            ConnectionRetries = 5;
         }
 
         #endregion Public Constructors
 
-        /// <summary>
-        /// Gets or sets the connection retries.
-        /// </summary>
-        /// <value>
-        /// Number of reconnection attempts
-        /// <para/>
-        /// Default: 5 tries
-        /// </value>
-        public int ConnectionRetries
-        {
-            get => connectionRetries;
-            set => connectionRetries = value;
-        }
+        #region Public Properties
 
         /// <summary>
-        /// Gets or sets the connection time out.
+        /// Optional Account E-Mail
+        /// </summary>
+        public string Account { get; set; }
+
+        /// <summary>
+        /// Character Name
+        /// </summary>
+        public string CharacterName { get; set; }
+
+        /// <summary>
+        /// Gets the short name of the character.
         /// </summary>
         /// <value>
-        /// Time out in seconds
-        /// <para/>
-        /// Default: 10 seconds
+        /// The short name of the character.
         /// </value>
-        public int ConnectionTimeOut
-        {
-            get => connectionTimeOut;
-            set => connectionTimeOut = value;
-        }
+        public string CharacterShortName => CharacterName.ToFurcadiaShortName();
+
+        /// <summary>
+        /// Gets or sets the avatar colors.
+        /// </summary>
+        /// <value>
+        /// The colors.
+        /// </value>
+        public ColorString Colors { get; set; }
+
+        /// <summary>
+        /// Gets or sets the avatar description.
+        /// </summary>
+        /// <value>
+        /// The description.
+        /// </value>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the password.
+        /// </summary>
+        /// <value>
+        /// The password.
+        /// </value>
+        public string Password { get; set; }
+
+        #endregion Public Properties
     }
 }
