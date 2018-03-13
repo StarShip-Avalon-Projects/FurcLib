@@ -235,7 +235,7 @@ namespace Furcadia.Logging
             DebugEnabled = true;
             LogCallingMethod = true;
 #else
-            _debugEnabled = false; // can be set via property
+            DebugEnabled = false; // can be set via property
             LogCallingMethod = false;
 #endif
             singleThreaded = true;
