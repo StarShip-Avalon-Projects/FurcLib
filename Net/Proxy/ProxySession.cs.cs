@@ -1338,7 +1338,7 @@ namespace Furcadia.Net.Proxy
 
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
-            ServerBalancer.TroatTiredEventHandler += e => TroatTiredEventHandler(e);
+            ServerBalancer.TroatTiredEventHandler += e => OnThroatTiredTrigger(e);
             base.ServerData2 += e => OnServerDataReceived(e);
             ServerConnected += () => OnServerConnected();
             ServerDisconnected += () => OnServerDisonnected();
@@ -1356,6 +1356,15 @@ namespace Furcadia.Net.Proxy
 
             //          SpeciesTag = new Queue<string>(50);
             //          BanishString = new List<string>(50);
+        }
+
+        /// <summary>
+        /// Called when [throat tired trigger].
+        /// </summary>
+        /// <param name="stat">if set to <c>true</c> [stat].</param>
+        public void OnThroatTiredTrigger(bool stat)
+        {
+            TroatTiredEventHandler?.Invoke(stat);
         }
 
         private void OnClientConnected()
@@ -1410,24 +1419,21 @@ namespace Furcadia.Net.Proxy
         {
             Logger.Debug<ProxySession>(data);
 
-            //lock (clientlock)
-            //{
             switch (clientconnectionphase)
             {
                 case ConnectionPhase.Auth:
+                    var ConnectString = data.Split(new char[] { ' ' }, 5);
+                    switch (ConnectString[0])
+                    {
+                        // connect characterName password machineID
+                        case "connect":
+                            connectedFurre = new Furre(0, ConnectString[1]);
+                            break;
 
-                    // connect characterName password machineID
-                    if (data.StartsWith("connect"))
-                    {
-                        string test = data.Replace("connect ", "").TrimStart(' ');
-                        string botName = test.Substring(0, test.IndexOf(" "));
-                        connectedFurre = new Furre(botName);
-                    }
-                    // account email characterName password token
-                    else if (data.ToLower().StartsWith("account"))
-                    {
-                        string[] words = data.Split(' ');
-                        connectedFurre = new Furre(words[2]);
+                        // account email characterName password token
+                        case "account":
+                            connectedFurre = new Furre(0, ConnectString[2]);
+                            break;
                     }
 
                     ClientData2?.Invoke(data);

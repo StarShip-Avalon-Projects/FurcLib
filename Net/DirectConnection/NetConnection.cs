@@ -30,6 +30,15 @@ namespace Furcadia.Net.DirectConnection
         #region Public Fields
 
         /// <summary>
+        /// Called when [throat tired trigger].
+        /// </summary>
+        /// <param name="stat">if set to <c>true</c> [stat].</param>
+        public void OnThroatTiredTrigger(bool stat)
+        {
+            TroatTiredEventHandler?.Invoke(stat);
+        }
+
+        /// <summary>
         /// </summary>
         public Queue<Rep> Repq = new Queue<Rep>();
 
@@ -789,8 +798,10 @@ namespace Furcadia.Net.DirectConnection
                         if (string.IsNullOrWhiteSpace(clientOptions.Account))
                             SendToServer($"connect {clientOptions.CharacterShortName} {clientOptions.Password}");
                         else // account email characterName password token
+                        {
                             SendToServer($"account {clientOptions.Account} {clientOptions.CharacterShortName} {clientOptions.Password}");
-
+                            SendToServer($"costume %-1");
+                        }
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
                     }
                     break;
@@ -1254,7 +1265,7 @@ namespace Furcadia.Net.DirectConnection
 
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
-            ServerBalancer.TroatTiredEventHandler += e => TroatTiredEventHandler(e);
+            ServerBalancer.TroatTiredEventHandler += e => OnThroatTiredTrigger(e);
             base.ServerData2 += e => OnServerDataReceived(e);
             ServerConnected += () => OnServerConnected();
             ServerDisconnected += () => OnServerDisonnected();

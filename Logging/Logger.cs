@@ -2,14 +2,10 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Furcadia.Logging;
-using Furcadia.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
 
 #endregion Usings
 
@@ -62,8 +58,6 @@ namespace Furcadia.Logging
         public string message;
 
         private readonly DateTime expires, timeStamp;
-        private readonly Level level;
-
         private readonly Thread curThread;
 
         private bool IsEmpty
@@ -89,7 +83,7 @@ namespace Furcadia.Logging
         /// <value>
         /// The level.
         /// </value>
-        public Level Level { get { return level; } }
+        public Level Level { get; }
 
         /// <summary>
         /// Gets the thread.
@@ -109,7 +103,7 @@ namespace Furcadia.Logging
 
         private LogMessage(Level level, string msg, TimeSpan expireDuration)
         {
-            this.level = level;
+            Level = level;
             message = string.IsNullOrEmpty(msg) ? string.Empty : msg;
             var now = DateTime.Now;
             expires = now.Add(expireDuration);
@@ -189,7 +183,7 @@ namespace Furcadia.Logging
         {
             return message == other.message &&
                    timeStamp == other.timeStamp &&
-                   level == other.level &&
+                   Level == other.Level &&
                    EqualityComparer<Thread>.Default.Equals(curThread, other.curThread);
         }
 
@@ -205,7 +199,7 @@ namespace Furcadia.Logging
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(message);
             hashCode = hashCode * -1521134295 + timeStamp.GetHashCode();
-            hashCode = hashCode * -1521134295 + level.GetHashCode();
+            hashCode = hashCode * -1521134295 + Level.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<Thread>.Default.GetHashCode(curThread);
             return hashCode;
         }
@@ -216,19 +210,11 @@ namespace Furcadia.Logging
     /// </summary>
     public static class Logger
     {
-        private static ILogOutput _logOutput;
         internal static readonly ConcurrentList<LogMessage> history = new ConcurrentList<LogMessage>();
         internal static readonly ConcurrentQueue<LogMessage> queue = new ConcurrentQueue<LogMessage>();
         private static readonly ConcurrentList<Type> disabledTypes = new ConcurrentList<Type>();
         private static LogMessageComparer comparer = new LogMessageComparer();
         private static object syncObj = new object();
-        private static bool _infoEnabled = true;
-        private static bool _warningEnabled = true;
-        private static bool _errorEnabled = true;
-        private static bool _debugEnabled;
-        private static bool _suppressSpam;
-        private static TimeSpan _messagesExpire = TimeSpan.FromSeconds(10);
-
         private static bool singleThreaded; //, initialized;
 
         private static Task logTask;
@@ -242,11 +228,11 @@ namespace Furcadia.Logging
 
         static Logger()
         {
-            _logOutput = new ConsoleLogOutput();
+            LogOutput = new ConsoleLogOutput();
             AppDomain.CurrentDomain.UnhandledException += (sender, args) => Error(args.ExceptionObject);
 
 #if DEBUG
-            _debugEnabled = true;
+            DebugEnabled = true;
             LogCallingMethod = true;
 #else
             _debugEnabled = false; // can be set via property
@@ -289,11 +275,7 @@ namespace Furcadia.Logging
         /// <value>
         ///   <c>true</c> if [information enabled]; otherwise, <c>false</c>.
         /// </value>
-        public static bool InfoEnabled
-        {
-            get { return _infoEnabled; }
-            set { _infoEnabled = value; }
-        }
+        public static bool InfoEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether [warning enabled].
@@ -301,11 +283,7 @@ namespace Furcadia.Logging
         /// <value>
         ///   <c>true</c> if [warning enabled]; otherwise, <c>false</c>.
         /// </value>
-        public static bool WarningEnabled
-        {
-            get { return _warningEnabled; }
-            set { _warningEnabled = value; }
-        }
+        public static bool WarningEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether [error enabled].
@@ -313,11 +291,7 @@ namespace Furcadia.Logging
         /// <value>
         ///   <c>true</c> if [error enabled]; otherwise, <c>false</c>.
         /// </value>
-        public static bool ErrorEnabled
-        {
-            get { return _errorEnabled; }
-            set { _errorEnabled = value; }
-        }
+        public static bool ErrorEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether [debug enabled].
@@ -325,11 +299,7 @@ namespace Furcadia.Logging
         /// <value>
         ///   <c>true</c> if [debug enabled]; otherwise, <c>false</c>.
         /// </value>
-        public static bool DebugEnabled
-        {
-            get { return _debugEnabled; }
-            set { _debugEnabled = value; }
-        }
+        public static bool DebugEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether [suppress spam].
@@ -337,11 +307,7 @@ namespace Furcadia.Logging
         /// <value>
         ///   <c>true</c> if [suppress spam]; otherwise, <c>false</c>.
         /// </value>
-        public static bool SuppressSpam
-        {
-            get { return _suppressSpam; }
-            set { _suppressSpam = value; }
-        }
+        public static bool SuppressSpam { get; set; }
 
         /// <summary>
         /// Gets or sets the messages expire time limit.
@@ -352,24 +318,13 @@ namespace Furcadia.Logging
         /// <value>
         /// The messages expire time limit.
         /// </value>
-        public static TimeSpan MessagesExpire
-        {
-            get { return _messagesExpire; }
-            set { _messagesExpire = value; }
-        }
+        public static TimeSpan MessagesExpire { get; set; } = TimeSpan.FromSeconds(10);
 
         /// <summary>
         /// Sets the <see cref="ILogOutput"/>.
         /// </summary>
         /// <exception cref="System.ArgumentNullException">output</exception>
-        public static ILogOutput LogOutput
-        {
-            get { return _logOutput; }
-            set
-            {
-                _logOutput = value;
-            }
-        }
+        public static ILogOutput LogOutput { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether [single threaded].
@@ -379,10 +334,7 @@ namespace Furcadia.Logging
         /// </value>
         public static bool SingleThreaded
         {
-            get
-            {
-                return singleThreaded;
-            }
+            get => singleThreaded;
             set
             {
                 singleThreaded = value;
@@ -443,26 +395,26 @@ namespace Furcadia.Logging
                 switch (msg.Level)
                 {
                     case Level.Debug:
-                        if (!_debugEnabled)
+                        if (!DebugEnabled)
                             return;
                         break;
 
                     case Level.Error:
-                        if (!_errorEnabled)
+                        if (!ErrorEnabled)
                             return;
                         break;
 
                     case Level.Info:
-                        if (!_infoEnabled)
+                        if (!InfoEnabled)
                             return;
                         break;
 
                     case Level.Warning:
-                        if (!_warningEnabled)
+                        if (!WarningEnabled)
                             return;
                         break;
                 }
-                _logOutput.Log(msg);
+                LogOutput.Log(msg);
             }
         }
 
