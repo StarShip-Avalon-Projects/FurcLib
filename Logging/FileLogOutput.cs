@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Furcadia.Logging
@@ -83,10 +84,21 @@ namespace Furcadia.Logging
         {
             if (logMsg.Level != level) return;
             logMsg = BuildMessage(ref logMsg);
-            using (FileStream stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Write, 4096))
-            using (StreamWriter writer = new StreamWriter(stream))
+            using (var mutex = new Mutex(false, GetType().Name))
             {
-                writer.WriteLine(logMsg.message);
+                if (mutex.WaitOne())
+                    try
+                    {
+                        using (FileStream stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Write, 4096))
+                        using (StreamWriter writer = new StreamWriter(stream))
+                        {
+                            writer.WriteLine(logMsg.message);
+                        }
+                    }
+                    finally
+                    {
+                        mutex.ReleaseMutex();
+                    }
             }
         }
 

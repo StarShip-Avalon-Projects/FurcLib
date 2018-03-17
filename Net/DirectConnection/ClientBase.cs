@@ -456,7 +456,6 @@ namespace Furcadia.Net.DirectConnection
         /// Sanatizes the protocol strinng.
         /// </summary>
         /// <param name="message">The message.</param>
-        // TODO: Move this to utils?
         internal void SanatizeProtocolStrinng(ref string message)
         {
             string replaceWith = string.Empty;

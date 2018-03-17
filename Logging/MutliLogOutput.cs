@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace Furcadia.Logging
 {
@@ -25,7 +26,10 @@ namespace Furcadia.Logging
         /// <param name="logMsg">The log MSG.</param>
         public void Log(LogMessage logMsg)
         {
-            foreach (var output in outputs) output.Log(logMsg);
+            foreach (var output in outputs)
+            {
+                output.Log(logMsg);
+            }
         }
 
         /// <summary>

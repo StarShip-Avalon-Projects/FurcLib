@@ -264,7 +264,7 @@ namespace Furcadia.Net.Utils
         public void SendToServer(string data)
         {
             Logging.Logger.Debug<ServerQue>(data);
-            if (string.IsNullOrEmpty(data))
+            if (string.IsNullOrWhiteSpace(data))
                 return;
             // if (string.IsNullOrEmpty(data)) return;
             ServerStack.Enqueue(data);
@@ -363,6 +363,8 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void QueueTick(double DelayTime)
         {
+            if (throattired)
+                return;
             lock (QueLock)
             {
                 if (ServerStack.Count == 0)
@@ -392,8 +394,7 @@ namespace Furcadia.Net.Utils
                         OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
                     }
                 }
-                else if (!ThroatTired)
-                {
+                else
                     // Only send a speech line if the mass will be under the
                     // limit. */
                     while (ServerStack.Count > 0 & g_mass + MASS_SPEECH <= MASS_CRITICAL)
@@ -401,7 +402,6 @@ namespace Furcadia.Net.Utils
                         g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
                         OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
                     }
-                }
             }
         }
 

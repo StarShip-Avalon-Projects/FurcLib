@@ -455,7 +455,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override string ToString()
         {
-            return string.Format($"{FurreID} - {Name}");
+            return $"{FurreID} - {Name}";
         }
 
         /// <summary>
