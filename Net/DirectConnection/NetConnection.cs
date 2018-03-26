@@ -648,7 +648,7 @@ namespace Furcadia.Net.DirectConnection
                 else if (Color == "notify")
                 {
                     string NameStr = "";
-                    if (Text.StartsWith("players banished from your Dreams: "))
+                    if (chanObject.ChannelText.StartsWith("players banished from your Dreams: "))
                     {
                         //Banish-List
                         //[notify> players banished from your Dreams:
@@ -660,7 +660,7 @@ namespace Furcadia.Net.DirectConnection
                             BanishList.Add(t);
                         }
                     }
-                    else if (Text.StartsWith("The banishment of player "))
+                    else if (chanObject.ChannelText.StartsWith("The banishment of player "))
                     {
                         //banish-off <name> (on list)
                         //[notify> The banishment of player (.*?) has ended.
@@ -682,13 +682,15 @@ namespace Furcadia.Net.DirectConnection
                         if (found)
                             BanishList.RemoveAt(I);
                     }
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (Color == "error")
                 {
                     channel = "error";
 
                     string NameStr = "";
-                    if (Text.Contains("There are no Furres around right now with a name starting with "))
+                    if (chanObject.ChannelText.Contains("There are no Furres around right now with a name starting with "))
                     {
                         //Banish <name> (Not online)
                         //Error:>>  There are no Furres around right now with a name starting with (.*?) .
@@ -696,20 +698,22 @@ namespace Furcadia.Net.DirectConnection
                         Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
                         NameStr = t.Match(data).Groups[1].Value;
                     }
-                    else if (Text == "Sorry, this player has not been banished from your Dreams.")
+                    else if (chanObject.ChannelText == "Sorry, this player has not been banished from your Dreams.")
                     {
                         //banish-off <name> (not on list)
                         //Error:>> Sorry, this player has not been banished from your Dreams.
 
                         NameStr = BanishName;
                     }
-                    else if (Text == "You have not banished anyone.")
+                    else if (chanObject.ChannelText == "You have not banished anyone.")
                     {
                         //banish-off-all (empty List)
                         //Error:>> You have not banished anyone.
 
                         BanishList.Clear();
                     }
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (data.StartsWith("Communication"))
                 {

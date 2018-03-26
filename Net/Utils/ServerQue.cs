@@ -48,12 +48,6 @@ namespace Furcadia.Net.Utils
         private bool disposedValue = false;
 
         private double g_mass = 0;
-
-        /// <summary>
-        /// NoEndurance. Send data at the speed of the server
-        /// </summary>
-        private bool noendurance;
-
         private uint pingdelaytime;
 
         private Timer PingTimer;
@@ -79,11 +73,6 @@ namespace Furcadia.Net.Utils
         /// </summary>
         private bool throattired;
 
-        /// <summary>
-        /// Throat tired delay in seconds
-        /// </summary>
-        private int throattireddelaytime;
-
         private DateTime TickTime = DateTime.Now;
 
         /// <summary>
@@ -106,7 +95,7 @@ namespace Furcadia.Net.Utils
         public ServerQue()
         {
             Initialize();
-            throattireddelaytime = 45;
+            ThroatTiredDelayTime = 45;
             QueueTimer = new Timer(ProcessQueue,
                 null,
                 0,
@@ -129,7 +118,7 @@ namespace Furcadia.Net.Utils
         public ServerQue(int ThroatTiredTime, uint PingTimerTime = 30)
         {
             Initialize();
-            throattireddelaytime = ThroatTiredTime;
+            ThroatTiredDelayTime = ThroatTiredTime;
             QueueTimer = new Timer(ProcessQueue,
                 null,
                 0,
@@ -167,11 +156,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Is the connect `noendurance enabled?
         /// </summary>
-        public bool NoEndurance
-        {
-            get { return noendurance; }
-            set { noendurance = value; }
-        }
+        public bool NoEndurance { get; set; }
 
         /// <summary>
         /// Ping the server Time in Seconds
@@ -198,12 +183,15 @@ namespace Furcadia.Net.Utils
             get { return throattired; }
             set
             {
+                if (!throattired && TroatTiredDelay == null)
+                {
+                    TroatTiredDelay = new Timer(TroatTiredDelayTick,
+                        null,
+                        TimeSpan.FromSeconds(ThroatTiredDelayTime),
+                        TimeSpan.FromSeconds(ThroatTiredDelayTime)
+                        );
+                }
                 throattired = value;
-                TroatTiredDelay = new Timer(TroatTiredDelayTick,
-                    null,
-                    TimeSpan.Zero,
-                    TimeSpan.FromSeconds(throattireddelaytime)
-                    );
                 TroatTiredEventHandler?.Invoke(throattired);
             }
         }
@@ -212,11 +200,7 @@ namespace Furcadia.Net.Utils
         /// When "Your throat is tired appears, Pause processing of client
         /// to server instructions,
         /// </summary>
-        public int ThroatTiredDelayTime
-        {
-            get { return throattireddelaytime; }
-            set { throattireddelaytime = value; }
-        }
+        public int ThroatTiredDelayTime { get; set; }
 
         #endregion Public Properties
 
@@ -268,7 +252,7 @@ namespace Furcadia.Net.Utils
                 return;
             // if (string.IsNullOrEmpty(data)) return;
             ServerStack.Enqueue(data);
-            if (!noendurance)
+            if (!NoEndurance)
             {
                 if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
                 {
@@ -323,7 +307,7 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void PingTimerTick(object state)
         {
-            if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
+            if (g_mass + MASS_SPEECH <= MASS_CRITICAL && !throattired)
             {
                 ServerStack.Enqueue("Ping");
             }
@@ -336,7 +320,7 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void ProcessQueue(object state)
         {
-            double seconds = DateTime.Now.Subtract(TickTime).Milliseconds;
+            double seconds = DateTime.Now.Subtract(TickTime).TotalMilliseconds;
             QueueTick(seconds);
             TickTime = DateTime.Now;
         }
@@ -385,7 +369,7 @@ namespace Furcadia.Net.Utils
                     g_mass -= decay;
                 }
 
-                if (noendurance)
+                if (NoEndurance)
                 {
                     /* just send everything right away */
                     while (ServerStack.Count > 0 & g_mass <= MASS_NOENDURANCE)
@@ -415,6 +399,7 @@ namespace Furcadia.Net.Utils
             ThroatTired = false;
             TroatTiredDelay.Dispose();
             TroatTiredEventHandler?.Invoke(throattired);
+            TroatTiredDelay = null;
         }
 
         #endregion Private Methods

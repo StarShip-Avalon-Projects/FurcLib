@@ -80,7 +80,6 @@ namespace Furcadia.Net.DreamInfo
                 //Modern should be set bu this point
                 dreamTitle = value.Title;
                 dreamOwner = value.DreamOwner;
-                Logger.Debug<Dream>(value);
             }
         }
 

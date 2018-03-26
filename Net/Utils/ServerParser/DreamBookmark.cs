@@ -28,7 +28,6 @@ namespace Furcadia.Net.Utils.ServerParser
     {
         #region Private Fields
 
-        private int type;
         private string dreamOwner;
         private string title;
 
@@ -45,7 +44,7 @@ namespace Furcadia.Net.Utils.ServerParser
         public DreamBookmark(string ServerInstruction) : base(ServerInstruction)
         {
             base.instructionType = ServerInstructionType.BookmarkDream;
-            type = int.Parse(ServerInstruction[2].ToString());
+            DreamType = int.Parse(ServerInstruction[2].ToString());
 
             var UrlMatch = URLRegex.Match(RawInstruction);
 
@@ -109,10 +108,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// Type 1 = Regular
         /// Type -1 = undefined
         /// </summary>
-        public int DreamType
-        {
-            get { return type; }
-        }
+        public int DreamType { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is modern.
@@ -137,10 +133,10 @@ namespace Furcadia.Net.Utils.ServerParser
                 if (string.IsNullOrWhiteSpace(dreamOwner))
                     throw new ArgumentException(dreamOwner);
                 var sb = new StringBuilder();
+
                 sb.Append(dreamOwner.ToFurcadiaShortName());
                 if (!string.IsNullOrWhiteSpace(title))
                     sb.Append($":{title.ToFurcadiaShortName()}");
-                Logger.Debug<DreamBookmark>(sb);
                 return sb.ToString();
             }
             set => throw new System.NotImplementedException();
