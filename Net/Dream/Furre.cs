@@ -405,13 +405,9 @@ namespace Furcadia.Net.DreamInfo
         {
             if (obj is IFurre fur)
             {
-                if (fur.FurreID <= 0 && FurreID <= 0
-                    && fur.FurreID == FurreID)
-                    return fur.ShortName == ShortName;
                 return fur.ShortName == ShortName
                     || fur.FurreID == FurreID;
             }
-
             return base.Equals(obj);
         }
 

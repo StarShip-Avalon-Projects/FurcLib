@@ -464,8 +464,8 @@ namespace Furcadia.Net.Proxy
                     //LineCount = new Regex(LineCountRegex);
                     //if (LineCount.Match(data).Success)
                     //    Dream.Title = LineCount.Match(data).Groups[1].Value;
-
-                    chanObject.player = ActivePlayer;
+                    player = ActivePlayer;
+                    chanObject.player = player;
                     args.Channel = "@emit";
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
@@ -473,303 +473,297 @@ namespace Furcadia.Net.Proxy
                 }
             }
             string Color = FontColorRegexMatch.Groups[1].Value;
-            try
+
+            Regex DescRegex = new Regex(DescFilter, ChannelOptions);
+            if (DescRegex.Match(data).Success)
             {
-                Regex DescRegex = new Regex(DescFilter, ChannelOptions);
-                if (DescRegex.Match(data).Success)
+                ActivePlayer = Dream.Furres.GetFurreByName(DescRegex.Match(data).Groups[1].Value);
+                ((Furre)ActivePlayer).FurreDescription = DescRegex.Match(data).Groups[2].Value;
+
+                if (LookQue.Count > 0)
                 {
-                    ActivePlayer = Dream.Furres.GetFurreByName(DescRegex.Match(data).Groups[1].Value);
-                    ((Furre)ActivePlayer).FurreDescription = DescRegex.Match(data).Groups[2].Value;
-
-                    if (LookQue.Count > 0)
-                    {
-                        ((Furre)ActivePlayer).FurreColors = new ColorString(LookQue.Dequeue());
-                    }
-                    player = ActivePlayer;
-                    chanObject.player = ActivePlayer;
-                    args.Channel = "desc";
-
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
+                    ((Furre)ActivePlayer).FurreColors = new ColorString(LookQue.Dequeue());
                 }
-                //<a href='command://(.*?)'>click here</a> or type (`.*?) and press &lt;enter&gt;.</font>
+                player = ActivePlayer;
+                chanObject.player = ActivePlayer;
+                args.Channel = "desc";
 
-                Match QueryMatch = QueryCommand.Match(data);
-                if (QueryMatch.Success)
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            //<a href='command://(.*?)'>click here</a> or type (`.*?) and press &lt;enter&gt;.</font>
+
+            Match QueryMatch = QueryCommand.Match(data);
+            if (QueryMatch.Success)
+            {
+                chanObject = new QueryChannelObject(data, ((Furre)ActivePlayer));
+
+                args.Channel = QueryMatch.Groups[1].Value;
+
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
+
+            Match ShoutMatch = ShoutRegex.Match(data);
+            if (ShoutMatch.Success)
+            {
+                ActivePlayer = Dream.Furres.GetFurreByName(ShoutMatch.Groups[5].Value);
+                ActivePlayer.Message = ShoutMatch.Groups[7].Value;
+                player = ActivePlayer;
+                chanObject.player = player;
+                args.Channel = ShoutMatch.Groups[2].Value;
+
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            ShoutRegex = new Regex(YouShoutFilter, ChannelOptions);
+            ShoutMatch = ShoutRegex.Match(data);
+            if (ShoutMatch.Success)
+            {
+                connectedFurre.Message = ShoutMatch.Groups[4].Value;
+                player = connectedFurre;
+                chanObject.player = player;
+                args.Channel = ShoutMatch.Groups[2].Value;
+
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+
+            if (Color == "success")
+            {
+                if (chanObject.ChannelText.Contains(" has been banished from your Dreams."))
                 {
-                    chanObject = new QueryChannelObject(data, ((Furre)ActivePlayer));
+                    //banish <name> (online)
+                    //Success: (.*?) has been banished from your Dreams.
 
-                    args.Channel = QueryMatch.Groups[1].Value;
+                    Regex t = new Regex("(.*?) has been banished from your Dreams.", RegexOptions.Compiled);
+                    BanishName = t.Match(chanObject.ChannelText).Groups[1].Value;
 
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
+                    BanishList.Add(BanishName);
                 }
-                Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
-
-                Match ShoutMatch = ShoutRegex.Match(data);
-                if (ShoutMatch.Success)
+                else if (chanObject.ChannelText == "You have canceled all banishments from your Dreams.")
                 {
-                    ActivePlayer = Dream.Furres.GetFurreByName(ShoutMatch.Groups[5].Value);
-                    ActivePlayer.Message = ShoutMatch.Groups[7].Value;
-                    player = ActivePlayer;
-                    chanObject.player = player;
-                    args.Channel = ShoutMatch.Groups[2].Value;
-
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
+                    //banish-off-all (active list)
+                    //Success: You have canceled all banishments from your Dreams.
+                    BanishList.Clear();
                 }
-                ShoutRegex = new Regex(YouShoutFilter, ChannelOptions);
-                ShoutMatch = ShoutRegex.Match(data);
-                if (ShoutMatch.Success)
+                else if (chanObject.ChannelText.EndsWith(" has been temporarily banished from your Dreams."))
                 {
-                    connectedFurre.Message = ShoutMatch.Groups[4].Value;
-                    player = connectedFurre;
-                    chanObject.player = connectedFurre;
-                    args.Channel = ShoutMatch.Groups[2].Value;
+                    //tempbanish <name> (online)
+                    //Success: (.*?) has been temporarily banished from your Dreams.
 
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
+                    Regex t = new Regex("(.*?) has been temporarily banished from your Dreams.", RegexOptions.Compiled);
+                    BanishName = t.Match(chanObject.ChannelText).Groups[1].Value;
+
+                    // MainMSEngine.PageExecute(61)
+                    BanishList.Add(BanishName);
                 }
-
-                if (Color == "success")
+                else if (chanObject.ChannelText == "Control of this Dream is now being shared with you.")
                 {
-                    if (chanObject.ChannelText.Contains(" has been banished from your Dreams."))
-                    {
-                        //banish <name> (online)
-                        //Success: (.*?) has been banished from your Dreams.
-
-                        Regex t = new Regex("(.*?) has been banished from your Dreams.", RegexOptions.Compiled);
-                        BanishName = t.Match(chanObject.ChannelText).Groups[1].Value;
-
-                        BanishList.Add(BanishName);
-                    }
-                    else if (chanObject.ChannelText == "You have canceled all banishments from your Dreams.")
-                    {
-                        //banish-off-all (active list)
-                        //Success: You have canceled all banishments from your Dreams.
-                        BanishList.Clear();
-                    }
-                    else if (chanObject.ChannelText.EndsWith(" has been temporarily banished from your Dreams."))
-                    {
-                        //tempbanish <name> (online)
-                        //Success: (.*?) has been temporarily banished from your Dreams.
-
-                        Regex t = new Regex("(.*?) has been temporarily banished from your Dreams.", RegexOptions.Compiled);
-                        BanishName = t.Match(chanObject.ChannelText).Groups[1].Value;
-
-                        // MainMSEngine.PageExecute(61)
-                        BanishList.Add(BanishName);
-                    }
-                    else if (chanObject.ChannelText == "Control of this Dream is now being shared with you.")
-                    {
-                        hasShare = true;
-                    }
-                    else if (chanObject.ChannelText.EndsWith("is now sharing control of this Dream with you."))
-                    {
-                        hasShare = true;
-                    }
-                    else if (chanObject.ChannelText.EndsWith("has stopped sharing control of this Dream with you."))
-                    {
-                        hasShare = false;
-                    }
-                    else if (chanObject.ChannelText.StartsWith("The endurance limits of player "))
-                    {
-                        Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.", RegexOptions.Compiled);
-                        string m = t.Match(chanObject.ChannelText).Groups[1].Value;
-                        if (m.ToFurcadiaShortName() == ConnectedFurre.ShortName)
-                        {
-                            NoEndurance = true;
-                        }
-                    }
+                    hasShare = true;
                 }
-                else if (Color == "myspeech")
+                else if (chanObject.ChannelText.EndsWith("is now sharing control of this Dream with you."))
                 {
-                    Regex t = new Regex(YouSayFilter);
-                    connectedFurre.Message = t.Match(data).Groups[2].Value;
-
-                    chanObject.player = connectedFurre;
-                    args.Channel = Color;
-
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
+                    hasShare = true;
                 }
-                else if (string.IsNullOrEmpty(Color) && Regex.Match(data, NameFilter).Groups[2].Value != "forced")
+                else if (chanObject.ChannelText.EndsWith("has stopped sharing control of this Dream with you."))
                 {
-                    Match DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-                    if (!DescMatch.Success)
-                    {
-                        Regex SayRegex = new Regex($"{NameFilter}: (.*)", RegexOptions.Compiled);
-                        Match SayMatch = SayRegex.Match(data);
-                        ActivePlayer.Message = SayRegex.Match(data).Groups[3].Value;
-                        player = ActivePlayer;
-                        chanObject.player = ActivePlayer;
-                        args.Channel = "say";
-
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
-                    }
-                    else // You see [FURRE]
-                    {
-                        ActivePlayer.Message = null;
-                        player = ActivePlayer;
-                        chanObject.player = ActivePlayer;
-                        // args.Channel = ??
-
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
-                    }
+                    hasShare = false;
                 }
-                else if (Color == "whisper")
+                else if (chanObject.ChannelText.StartsWith("The endurance limits of player "))
                 {
-                    Regex WhisperIncoming = new Regex(WhisperRegex, ChannelOptions);
-                    //'WHISPER
-                    Match WhisperMatches = WhisperIncoming.Match(data);
-                    if (WhisperMatches.Success)
+                    Regex t = new Regex("The endurance limits of player (.*?) are now toggled off.", RegexOptions.Compiled);
+                    string m = t.Match(chanObject.ChannelText).Groups[1].Value;
+                    if (m.ToFurcadiaShortName() == ConnectedFurre.ShortName)
                     {
-                        ActivePlayer = Dream.Furres.GetFurreByName(WhisperMatches.Groups[4].Value);
-                        ActivePlayer.Message = WhisperMatches.Groups[7].Value;
-
-                        player = ActivePlayer;
-
-                        chanObject.player = ActivePlayer;
-                        args.Channel = WhisperMatches.Groups[2].Value;
-
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
-                    }
-                    WhisperIncoming = new Regex(YouWhisperRegex, ChannelOptions);
-                    WhisperMatches = WhisperIncoming.Match(data);
-                    if (WhisperMatches.Success)
-                    {
-                        connectedFurre.Message = WhisperMatches.Groups[4].Value;
-                        Player = connectedFurre;
-                        chanObject = new ChannelObject(data, connectedFurre);
-                        args.Channel = WhisperMatches.Groups[2].Value;
-
-                        ProcessServerChannelData?.Invoke(chanObject, args);
-                        return;
-                    }
-                }
-                else if (Color == "trade")
-                {
-                    //TODO: Verify Trade System is correct
-
-                    ActivePlayer.Message = FontColorRegex.Match(data).Groups[4].Value;
-                    player = ActivePlayer;
-                }
-                else if (Color == "emote")
-                {
-                    Regex EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
-                    Match EmoteMatch = EmoteRegex.Match(data);
-
-                    ActivePlayer = Dream.Furres.GetFurreByName(EmoteMatch.Groups[2].Value);
-                    ActivePlayer.Message = EmoteMatch.Groups[4].Value;
-                    player = ActivePlayer;
-
-                    chanObject.player = player;
-                    args.Channel = Color;
-
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
-                }
-                else if (Color == "notify" || Color == "error")
-                {
-                    string NameStr = "";
-                    if (chanObject.ChannelText.StartsWith("Players banished from your dreams: "))
-                    {
-                        //Banish-List
-                        //[notify> players banished from your Dreams:
-                        //`(0:54) When the bot sees the banish list
-                        BanishList.Clear();
-                        string[] tmp = chanObject.ChannelText.Substring(35).Split(',');
-                        foreach (string t in tmp)
-                        {
-                            if (!string.IsNullOrWhiteSpace(t))
-                                BanishList.Add(t);
-                        }
-                    }
-                    else if (chanObject.ChannelText.Contains("There are no Furres around right now with a name starting with "))
-                    {
-                        //Banish <name> (Not online)
-                        //Error:>>  There are no Furres around right now with a name starting with (.*?) .
-
-                        Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
-                        NameStr = t.Match(data).Groups[1].Value;
-                    }
-                    else if (chanObject.ChannelText == "Sorry, this player has not been banished from your Dreams.")
-                    {
-                        //banish-off <name> (not on list)
-                        //Error:>> Sorry, this player has not been banished from your Dreams.
-
-                        NameStr = BanishName;
-                    }
-                    else if (chanObject.ChannelText == "You have not banished anyone.")
-                    {
-                        //banish-off-all (empty List)
-                        //Error:>> You have not banished anyone.
-
-                        BanishList.Clear();
-                    }
-                    else if (chanObject.ChannelText.StartsWith("The banishment of player "))
-                    {
-                        //banish-off <name> (on list)
-                        //[notify> The banishment of player (.*?) has ended.
-
-                        Regex t = new Regex("The banishment of player (.*?) has ended.", RegexOptions.Compiled);
-                        NameStr = t.Match(data).Groups[1].Value;
-                        ActivePlayer = new Furre(NameStr);
-                        player = ActivePlayer;
-                        bool found = false;
-                        int I;
-                        for (I = 0; I <= BanishList.Count - 1; I++)
-                        {
-                            if (BanishList[I].ToFurcadiaShortName() == player.ShortName)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found)
-                            BanishList.RemoveAt(I);
-                    }
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
-                }
-                else if (data.StartsWith("Communication"))
-                {
-                    DisconnectServerAndClientStreams();
-                }
-                else if (Color == "@cookie")
-                {
-                    // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Cookie <a href='http://www.furcadia.com/cookies/Cookie%20Economy.html'>bank</a> has currently collected: 0</font>
-                    // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> All-time Cookie total: 0</font>
-                    // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
-                    //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
-
-                    Regex EatCookie = new Regex("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.(.*?)", ChannelOptions);
-                    if (EatCookie.Match(data).Success)
-                    {
-                        connectedFurre.Message = "You eat a cookie." + EatCookie.Replace(data, "");
-                    }
-                    player = connectedFurre;
-                    chanObject.player = Player;
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
-                }
-                else //Dynamic Channels
-                {
-                    args.Channel = FontColorRegexMatch.Groups[8].Value;
-                    if (NameRegex.Match(data).Success)
-                    {
-                        var name = NameRegex.Match(data).Groups[2].Value;
-                        player = Dream.Furres.GetFurreByName(name);
+                        NoEndurance = true;
                     }
                 }
             }
-            catch (Exception ex)
+            else if (Color == "myspeech")
             {
-                SendError(ex, this);
+                Regex t = new Regex(YouSayFilter);
+                connectedFurre.Message = t.Match(data).Groups[2].Value;
+
+                chanObject.player = connectedFurre;
+                args.Channel = Color;
+
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            else if (string.IsNullOrEmpty(Color) && Regex.Match(data, NameFilter).Groups[2].Value != "forced")
+            {
+                Match DescMatch = Regex.Match(data, "\\(you see(.*?)\\)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+                if (!DescMatch.Success)
+                {
+                    Regex SayRegex = new Regex($"{NameFilter}: (.*)", RegexOptions.Compiled);
+                    Match SayMatch = SayRegex.Match(data);
+                    ActivePlayer.Message = SayRegex.Match(data).Groups[3].Value;
+                    player = ActivePlayer;
+                    chanObject.player = ActivePlayer;
+                    args.Channel = "say";
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
+                else // You see [FURRE]
+                {
+                    ActivePlayer.Message = null;
+                    player = ActivePlayer;
+                    chanObject.player = ActivePlayer;
+                    // args.Channel = ??
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
+            }
+            else if (Color == "whisper")
+            {
+                Regex WhisperIncoming = new Regex(WhisperRegex, ChannelOptions);
+                //'WHISPER
+                Match WhisperMatches = WhisperIncoming.Match(data);
+                if (WhisperMatches.Success)
+                {
+                    ActivePlayer = Dream.Furres.GetFurreByName(WhisperMatches.Groups[4].Value);
+                    ActivePlayer.Message = WhisperMatches.Groups[7].Value;
+
+                    player = ActivePlayer;
+
+                    chanObject.player = ActivePlayer;
+                    args.Channel = WhisperMatches.Groups[2].Value;
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
+                WhisperIncoming = new Regex(YouWhisperRegex, ChannelOptions);
+                WhisperMatches = WhisperIncoming.Match(data);
+                if (WhisperMatches.Success)
+                {
+                    connectedFurre.Message = WhisperMatches.Groups[4].Value;
+                    Player = connectedFurre;
+                    chanObject = new ChannelObject(data, connectedFurre);
+                    args.Channel = WhisperMatches.Groups[2].Value;
+
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
+                }
+            }
+            else if (Color == "trade")
+            {
+                //TODO: Verify Trade System is correct
+
+                ActivePlayer.Message = FontColorRegex.Match(data).Groups[4].Value;
+                player = ActivePlayer;
+            }
+            else if (Color == "emote")
+            {
+                Regex EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
+                Match EmoteMatch = EmoteRegex.Match(data);
+
+                ActivePlayer = Dream.Furres.GetFurreByName(EmoteMatch.Groups[2].Value);
+                ActivePlayer.Message = EmoteMatch.Groups[4].Value;
+                player = ActivePlayer;
+
+                chanObject.player = player;
+                args.Channel = Color;
+
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            else if (Color == "notify" || Color == "error")
+            {
+                string NameStr = "";
+                if (chanObject.ChannelText.StartsWith("Players banished from your dreams: "))
+                {
+                    //Banish-List
+                    //[notify> players banished from your Dreams:
+                    //`(0:54) When the bot sees the banish list
+                    BanishList.Clear();
+                    string[] tmp = chanObject.ChannelText.Substring(35).Split(',');
+                    foreach (string t in tmp)
+                    {
+                        if (!string.IsNullOrWhiteSpace(t))
+                            BanishList.Add(t);
+                    }
+                }
+                else if (chanObject.ChannelText.Contains("There are no Furres around right now with a name starting with "))
+                {
+                    //Banish <name> (Not online)
+                    //Error:>>  There are no Furres around right now with a name starting with (.*?) .
+
+                    Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
+                    NameStr = t.Match(data).Groups[1].Value;
+                }
+                else if (chanObject.ChannelText == "Sorry, this player has not been banished from your Dreams.")
+                {
+                    //banish-off <name> (not on list)
+                    //Error:>> Sorry, this player has not been banished from your Dreams.
+
+                    NameStr = BanishName;
+                }
+                else if (chanObject.ChannelText == "You have not banished anyone.")
+                {
+                    //banish-off-all (empty List)
+                    //Error:>> You have not banished anyone.
+
+                    BanishList.Clear();
+                }
+                else if (chanObject.ChannelText.StartsWith("The banishment of player "))
+                {
+                    //banish-off <name> (on list)
+                    //[notify> The banishment of player (.*?) has ended.
+
+                    Regex t = new Regex("The banishment of player (.*?) has ended.", RegexOptions.Compiled);
+                    NameStr = t.Match(data).Groups[1].Value;
+                    ActivePlayer = new Furre(NameStr);
+                    player = ActivePlayer;
+                    bool found = false;
+                    int I;
+                    for (I = 0; I <= BanishList.Count - 1; I++)
+                    {
+                        if (BanishList[I].ToFurcadiaShortName() == player.ShortName)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        BanishList.RemoveAt(I);
+                }
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            else if (data.StartsWith("Communication"))
+            {
+                DisconnectServerAndClientStreams();
+            }
+            else if (Color == "@cookie")
+            {
+                // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Cookie <a href='http://www.furcadia.com/cookies/Cookie%20Economy.html'>bank</a> has currently collected: 0</font>
+                // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> All-time Cookie total: 0</font>
+                // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
+                //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
+
+                Regex EatCookie = new Regex("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.(.*?)", ChannelOptions);
+                if (EatCookie.Match(data).Success)
+                {
+                    connectedFurre.Message = "You eat a cookie." + EatCookie.Replace(data, "");
+                }
+                player = connectedFurre;
+                chanObject.player = Player;
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
+            }
+            else //Dynamic Channels
+            {
+                args.Channel = FontColorRegexMatch.Groups[8].Value;
+                if (NameRegex.Match(data).Success)
+                {
+                    var name = NameRegex.Match(data).Groups[2].Value;
+                    player = Dream.Furres.GetFurreByName(name);
+                }
             }
 
             if (string.IsNullOrWhiteSpace(ActivePlayer.Message))
@@ -921,11 +915,8 @@ namespace Furcadia.Net.Proxy
                         }
 
                         if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
-                            if (ProcessServerInstruction != null)
-                            {
-                                ProcessServerInstruction?.Invoke(FurreSpawn,
-                                new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
-                            }
+                            ProcessServerInstruction?.Invoke(FurreSpawn,
+                            new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
                     }
                     //Remove Furre
                     else if (data[0] == ')' || data[0] == ' ')
@@ -935,15 +926,12 @@ namespace Furcadia.Net.Proxy
 
                         Dream.Furres.Remove(RemoveFurre.FurreId);
 
-                        if (ProcessServerInstruction != null)
-                        {
-                            Handled = true;
-                            ProcessServerInstruction?.Invoke
-                            (
-                                RemoveFurre,
-                                new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
-                            );
-                        }
+                        Handled = true;
+                        ProcessServerInstruction?.Invoke
+                        (
+                            RemoveFurre,
+                            new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
+                        );
                     }
                     //Animated Move
                     else if (data[0] == '/')
@@ -1021,11 +1009,8 @@ namespace Furcadia.Net.Proxy
 
                         if (InDream)
                         {
-                            if (ProcessServerInstruction != null)
-                            {
-                                ProcessServerInstruction?.Invoke(ColorStringUpdate,
-                                new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
-                            }
+                            ProcessServerInstruction?.Invoke(ColorStringUpdate,
+                            new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
                         }
                     }
                     //Hide Avatar
@@ -1092,9 +1077,9 @@ namespace Furcadia.Net.Proxy
                         LoadDream loadDream = new LoadDream(data);
                         Dream.Load(loadDream);
                         Logger.Debug<ProxySession>($"Load Dream {loadDream}");
-                        if (ProcessServerInstruction != null)
-                            ProcessServerInstruction?.Invoke(loadDream,
-                               new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
+
+                        ProcessServerInstruction?.Invoke(loadDream,
+                           new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
 
                         // Set Proxy to Stand-Alone Operation
 

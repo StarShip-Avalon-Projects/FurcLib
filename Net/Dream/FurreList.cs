@@ -182,7 +182,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Contains(IFurre Furre)
         {
-            foreach (var fur in furreList)
+            foreach (Furre fur in furreList)
             {
                 if (fur == Furre)
                     return true;
