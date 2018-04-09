@@ -30,7 +30,7 @@ namespace Furcadia.Extensions
         }
 
         /// <summary>
-        /// Ases the int16.
+        /// converts an object to 16 bit integer
         /// </summary>
         /// <param name="obj">The object.</param>
         /// <param name="default">The default.</param>

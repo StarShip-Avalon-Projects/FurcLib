@@ -603,7 +603,7 @@ namespace Furcadia.Net.Proxy
                     ActivePlayer.Message = SayRegex.Match(data).Groups[3].Value;
                     player = ActivePlayer;
                     chanObject.player = ActivePlayer;
-                    args.Channel = "say";
+                    //args.Channel = "say";
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
@@ -690,7 +690,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (chanObject.ChannelText.Contains("There are no Furres around right now with a name starting with "))
                 {
-                    //Banish <name> (Not online)
+                    //Banish <name> (Furre is not on-line)
                     //Error:>>  There are no Furres around right now with a name starting with (.*?) .
 
                     Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
@@ -698,7 +698,7 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (chanObject.ChannelText == "Sorry, this player has not been banished from your Dreams.")
                 {
-                    //banish-off <name> (not on list)
+                    //banish-off <name> (Furre is not on-line)
                     //Error:>> Sorry, this player has not been banished from your Dreams.
 
                     NameStr = BanishName;
@@ -816,8 +816,8 @@ namespace Furcadia.Net.Proxy
                         // Login Sucessful
                         serverconnectphase = ConnectionPhase.Auth;
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
-                        // Standalone / account Send(String.Format("connect
-                        // {0} {1}\n", sUsername, sPassword));
+                        // Standalone / account
+                        // SendToServer($"connect {sUsername} {sPassword}");
 
                         if (IsClientSocketConnected)
                         {
@@ -942,7 +942,7 @@ namespace Furcadia.Net.Proxy
 
                         ViewArea VisableRectangle = new ViewArea(((Furre)connectedFurre).Location);
 
-                        // TODO: Refactor tis mess some how... -Gero
+                        // TODO: Re-factor tis mess some how... -Gero
                         if (
                             VisableRectangle.FurreLocation.X <= ((Furre)player).Location.X
                             && VisableRectangle.FurreLocation.Y <= ((Furre)player).Location.Y
@@ -1233,7 +1233,7 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// chanObject.ChannelText Channel Prefixes (shout,whisper emote, Raw Server command)
+        /// Text Channel Prefixes (shout,whisper emote, Raw Server command)
         /// <para>
         /// default to say or "normal spoken command"
         /// </para>
@@ -1242,10 +1242,10 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public void TextToServer(ref string data)
         {
-            Logger.Debug<ProxySession>(data);
             if (string.IsNullOrWhiteSpace(data))
                 return;
-            //Clean chanObject.ChannelText input to match Client
+            Logger.Debug<ProxySession>(data);
+            //Clean Text input to match Client handling
             string result = "";
             switch (data[0])
             {
@@ -1254,7 +1254,7 @@ namespace Furcadia.Net.Proxy
                     break;
 
                 case '/':
-                    result = "wh " + data.Substring(1);
+                    result = $"wh {data.Substring(1)}";
                     break;
 
                 case ':':

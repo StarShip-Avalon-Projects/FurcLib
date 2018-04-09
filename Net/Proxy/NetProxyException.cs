@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Furcadia.Net
 {
     /// <summary>
-    /// Desctiption of NetProxyException.
+    /// Description of NetProxyException.
     /// </summary>
     [Serializable]
     public class NetProxyException : Exception, ISerializable

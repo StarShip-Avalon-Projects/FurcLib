@@ -111,7 +111,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// </summary>
         /// <param name="port">
-        /// gameserver port
+        /// game-server port
         /// </param>
         /// <param name="lport">
         /// localhost port
@@ -159,7 +159,7 @@ namespace Furcadia.Net.Proxy
         /// Connect to the Game serer by Host name to IP address
         /// </summary>
         /// <param name="host">
-        /// GameServer Ip address or hostname
+        /// GameServer IP address or host-name
         /// </param>
         /// <param name="port">
         /// Game server port
@@ -370,7 +370,7 @@ namespace Furcadia.Net.Proxy
                     //when the connection completes before the timeout it will cause a race
                     //we want EndConnect to always treat the connection as successful if it wins
 
-                    Logger.Info($"Starting connection to Furcadia gameserver.");
+                    Logger.Info($"Starting connection to Furcadia game-server.");
                     while (!sucess)
                     {
                         IAsyncResult ar = LightBringer.BeginConnect(options.GameServerHost, options.GameServerPort, EndConnect, state);
@@ -437,7 +437,7 @@ namespace Furcadia.Net.Proxy
         }
 
         /// <summary>
-        /// Disconnect from the Furcadia gameserver and Furcadia client
+        /// Disconnect from the Furcadia game-server and Furcadia client
         /// </summary>
         public virtual void DisconnectServerAndClientStreams()
         {
@@ -462,7 +462,7 @@ namespace Furcadia.Net.Proxy
         public virtual void SendToClient(string message)
         {
             SanatizeProtocolStrinng(ref message);
-            Logger.Debug<NetProxy>($"{message}");
+            Logger.Debug<NetProxy>(message);
             try
             {
                 if (client.Client != null && client.GetStream().CanWrite && client.Connected)
