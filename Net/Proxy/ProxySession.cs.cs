@@ -900,7 +900,9 @@ namespace Furcadia.Net.Proxy
                     {
                         SpawnAvatar FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.player;
-
+                        var NewFurre = false;
+                        if (!Dream.Furres.Contains(player))
+                            NewFurre = true;
                         Dream.Furres.Add(player);
 
                         //New furre Arrival to current Dream
@@ -909,12 +911,12 @@ namespace Furcadia.Net.Proxy
                             player = Dream.Furres[Dream.Furres.IndexOf(FurreSpawn.player)];
                         }
 
-                        if (IsConnectedCharacter(player)) // Keep connectedFurre upto date
+                        if (IsConnectedCharacter(player)) // Keep connectedFurre up to date
                         {
                             connectedFurre = player;
                         }
 
-                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
+                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) && NewFurre)
                             ProcessServerInstruction?.Invoke(FurreSpawn,
                             new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
                     }
@@ -923,15 +925,17 @@ namespace Furcadia.Net.Proxy
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         RemoveFurre.Player = Dream.Furres.GetFurreByID(RemoveFurre.FurreId);
+                        if (RemoveFurre.Player.ShortName != "unknown")
+                        {
+                            Dream.Furres.Remove(RemoveFurre.FurreId);
 
-                        Dream.Furres.Remove(RemoveFurre.FurreId);
-
-                        Handled = true;
-                        ProcessServerInstruction?.Invoke
-                        (
-                            RemoveFurre,
-                            new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
-                        );
+                            Handled = true;
+                            ProcessServerInstruction?.Invoke
+                            (
+                                RemoveFurre,
+                                new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
+                            );
+                        }
                     }
                     //Animated Move
                     else if (data[0] == '/')
@@ -1204,7 +1208,8 @@ namespace Furcadia.Net.Proxy
                 BanishName = "";
             }
 
-            TextToServer(ref data);
+            FormatTextToServer(ref data);
+            SendToServer(data);
         }
 
         /// <summary>
@@ -1240,7 +1245,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         /// <param name="data">
         /// </param>
-        public void TextToServer(ref string data)
+        public void FormatTextToServer(ref string data)
         {
             if (string.IsNullOrWhiteSpace(data))
                 return;
@@ -1271,7 +1276,7 @@ namespace Furcadia.Net.Proxy
                     result = "\"" + data;
                     break;
             }
-            SendToServer(result);
+            data = result;
         }
 
         #endregion Public Methods
@@ -1384,7 +1389,8 @@ namespace Furcadia.Net.Proxy
 
         private void OnServerQueSent(object o, EventArgs e)
         {
-            base.SendToServer(o.ToString());
+            if (o != null)
+                base.SendToServer(o.ToString());
         }
 
         /// <summary>

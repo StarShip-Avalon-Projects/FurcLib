@@ -5,7 +5,7 @@
 
 using Furcadia.Logging;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 
@@ -45,6 +45,11 @@ namespace Furcadia.Net.Utils
 
         private const int MASS_SPEECH = 1000;
 
+        /// <summary>
+        /// FIFO Stack of Server Instructions to process
+        /// </summary>
+        private static ConcurrentQueue<string> ServerStack = new ConcurrentQueue<string>();
+
         private bool disposedValue = false;
 
         private double g_mass = 0;
@@ -52,17 +57,10 @@ namespace Furcadia.Net.Utils
 
         private Timer PingTimer;
 
-        private object QueLock = new object();
-
         /// <summary>
         /// Queue Processing timer.
         /// </summary>
         private Timer QueueTimer;
-
-        /// <summary>
-        /// FIFO Stack of Server Instructions to process
-        /// </summary>
-        private Queue<string> ServerStack = new Queue<string>(500);
 
         /// <summary>
         /// Throat Tired System.
@@ -247,11 +245,14 @@ namespace Furcadia.Net.Utils
         /// </param>
         public void SendToServer(string data)
         {
-            Logging.Logger.Debug<ServerQue>(data);
             if (string.IsNullOrWhiteSpace(data))
                 return;
-            // if (string.IsNullOrEmpty(data)) return;
+            Logger.Debug<ServerQue>(data);
+
             ServerStack.Enqueue(data);
+            if (ServerStack.Count == 0)
+                return;
+
             if (!NoEndurance)
             {
                 if (g_mass + MASS_SPEECH <= MASS_CRITICAL)
@@ -347,46 +348,53 @@ namespace Furcadia.Net.Utils
         /// </param>
         private void QueueTick(double DelayTime)
         {
+            string message = string.Empty;
             if (throattired)
                 return;
-            lock (QueLock)
+
+            if (ServerStack.Count == 0)
+                return;
+            if (DelayTime != 0)
             {
-                if (ServerStack.Count == 0)
-                    return;
-                if (DelayTime != 0)
-                {
-                    DelayTime = Math.Round(DelayTime, 0) + 1;
-                }
-
-                /* Send buffered speech. */
-                double decay = Math.Round(DelayTime * MASS_DECAYPS / 1000f, 0);
-                if ((decay > g_mass))
-                {
-                    g_mass = 0;
-                }
-                else
-                {
-                    g_mass -= decay;
-                }
-
-                if (NoEndurance)
-                {
-                    /* just send everything right away */
-                    while (ServerStack.Count > 0 & g_mass <= MASS_NOENDURANCE)
-                    {
-                        g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
-                        OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
-                    }
-                }
-                else
-                    // Only send a speech line if the mass will be under the
-                    // limit. */
-                    while (ServerStack.Count > 0 & g_mass + MASS_SPEECH <= MASS_CRITICAL)
-                    {
-                        g_mass += ServerStack.Peek().Length + MASS_DEFAULT;
-                        OnServerSendMessage?.Invoke(ServerStack.Dequeue(), System.EventArgs.Empty);
-                    }
+                DelayTime = Math.Round(DelayTime, 0) + 1;
             }
+
+            /* Send buffered speech. */
+            double decay = Math.Round(DelayTime * MASS_DECAYPS / 1000f, 0);
+            if ((decay > g_mass))
+            {
+                g_mass = 0;
+            }
+            else
+            {
+                g_mass -= decay;
+            }
+
+            if (NoEndurance)
+            {
+                /* just send everything right away */
+                while (ServerStack.Count > 0 && g_mass <= MASS_NOENDURANCE)
+                {
+                    if (ServerStack.TryPeek(out message))
+                    {
+                        g_mass += message.Length + MASS_DEFAULT;
+                        ServerStack.TryDequeue(out message);
+                        OnServerSendMessage?.Invoke(message, System.EventArgs.Empty);
+                    }
+                }
+            }
+            else
+                // Only send a speech line if the mass will be under the
+                // limit. */
+                while (ServerStack.Count > 0 && g_mass + MASS_SPEECH <= MASS_CRITICAL)
+                {
+                    if (ServerStack.TryPeek(out message))
+                    {
+                        g_mass += message.Length + MASS_DEFAULT;
+                        ServerStack.TryDequeue(out message);
+                        OnServerSendMessage?.Invoke(message, System.EventArgs.Empty);
+                    }
+                }
         }
 
         /// <summary>
