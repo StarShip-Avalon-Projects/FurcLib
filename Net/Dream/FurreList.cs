@@ -241,9 +241,9 @@ namespace Furcadia.Net.DreamInfo
         /// </param>
         /// <returns>
         /// </returns>
-        public IFurre GetFurreByID(Base220 FurreID)
+        public Furre GetFurreByID(Base220 FurreID)
         {
-            foreach (var Furre in furreList)
+            foreach (Furre Furre in furreList)
             {
                 if (Furre.FurreID == FurreID)
                     return Furre;
@@ -263,9 +263,9 @@ namespace Furcadia.Net.DreamInfo
         /// <para/>
         /// Furre Id of -1 is Undefined
         /// </returns>
-        public IFurre GetFurreByID(int FurreID)
+        public Furre GetFurreByID(int FurreID)
         {
-            foreach (var Furre in furreList)
+            foreach (Furre Furre in furreList)
             {
                 if (Furre.FurreID == FurreID)
                     return Furre;
@@ -284,11 +284,11 @@ namespace Furcadia.Net.DreamInfo
         /// Furre Id of -1 is Undefined
         /// </returns>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public IFurre GetFurreByName(string sname)
+        public Furre GetFurreByName(string sname)
         {
             if (string.IsNullOrEmpty(sname))
                 throw new ArgumentNullException(sname);
-            foreach (IFurre Character in furreList)
+            foreach (Furre Character in furreList)
             {
                 if (Character.ShortName == sname.ToFurcadiaShortName())
                 {
@@ -350,7 +350,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Remove(IFurre item)
         {
-            foreach (var Furre in furreList)
+            foreach (Furre Furre in furreList)
             {
                 if (Furre.FurreID == item.FurreID)
                 {

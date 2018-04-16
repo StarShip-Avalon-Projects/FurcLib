@@ -64,8 +64,8 @@ namespace Furcadia.Net.DreamInfo
         private uint _PawObjectCurrent;
         private uint _PawObjectOld;
         private string _tag;
-        private bool visible;
-        private bool wasVisible;
+        private bool inRange;
+        private bool wasInRange;
         private AvatarDirection direction;
         private FurrePosition location;
         private string message;
@@ -253,7 +253,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The level.
         /// </value>
-        public int Level => level;
+        public int GroupLevel => level;
 
         /// <summary>
         /// Last Message Furre had
@@ -322,33 +322,47 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Furcadia Shortname format for Furre Name
+        /// Furcadia Short-name format for Furre Name
         /// </summary>
         public string ShortName => name.ToFurcadiaShortName();
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="Furre"/> is visible.
+        /// Gets or sets a value indicating whether this <see cref="Furre"/> is inRange.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if visible; otherwise, <c>false</c>.
+        ///   <c>true</c> if inRange; otherwise, <c>false</c>.
         /// </value>
-        public bool Visible
+        public bool InRange
         {
-            get => visible;
+            get => inRange;
             set
             {
-                wasVisible = visible;
-                visible = value;
+                wasInRange = inRange;
+                inRange = value;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether [was visible].
+        /// Gets a value indicating whether this furre has left the bots view.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [was visible]; otherwise, <c>false</c>.
+        ///   <c>true</c> if this instance has left range; otherwise, <c>false</c>.
         /// </value>
-        public bool WasVisible => wasVisible;
+        public bool HasLeftRange
+        {
+            get => inRange == false && wasInRange == true;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this furre has left the bots view.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has left range; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasEnteredRange
+        {
+            get => inRange == true && wasInRange == false;
+        }
 
         #endregion Public Properties
 
@@ -451,7 +465,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override string ToString()
         {
-            return $"{FurreID} - {Name}";
+            return $"{(int)FurreID} - {Name}";
         }
 
         /// <summary>

@@ -218,9 +218,9 @@ namespace Furcadia.Net.DreamInfo
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator !=(Dream dreamA, IDream DreamB)
+        public static bool operator !=(Dream dreamA, IDream dreamB)
         {
-            return !(dreamA == DreamB);
+            return !dreamA.Equals(dreamB);
         }
 
         /// <summary>

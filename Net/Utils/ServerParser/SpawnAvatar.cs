@@ -23,7 +23,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <summary>
         /// the Active Player
         /// </summary>
-        public Furre player
+        public Furre Player
         { get; internal set; }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Furcadia.Net.Utils.ServerParser
 
             PlayerFlags = new CharacterFlags(ServerInstruction[ColTypePos]);
 
-            player = new Furre(ConvertFromBase220(ServerInstruction.Substring(1, 4)))
+            Player = new Furre(ConvertFromBase220(ServerInstruction.Substring(1, 4)))
             {
                 Name = ServerInstruction.Substring(12, ConvertFromBase220(ServerInstruction[11])),
                 Location = new FurrePosition(ServerInstruction.Substring(5, 4)),

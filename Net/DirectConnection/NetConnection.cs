@@ -874,14 +874,14 @@ namespace Furcadia.Net.DirectConnection
                     else if (data[0] == '<')
                     {
                         SpawnAvatar FurreSpawn = new SpawnAvatar(data);
-                        player = FurreSpawn.player;
+                        player = FurreSpawn.Player;
 
                         Dream.Furres.Add(player);
 
                         //New furre Arrival to current Dream
                         if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
                         {
-                            player = Dream.Furres[Dream.Furres.IndexOf(FurreSpawn.player)];
+                            player = Dream.Furres[Dream.Furres.IndexOf(FurreSpawn.Player)];
                         }
 
                         if (IsConnectedCharacter(player)) // Keep connectedFurre upto date
@@ -931,11 +931,11 @@ namespace Furcadia.Net.DirectConnection
                             && VisableRectangle.Length >= ((Furre)player).Location.X
                             )
                         {
-                            ((Furre)player).Visible = true;
+                            ((Furre)player).InRange = true;
                         }
                         else
                         {
-                            ((Furre)player).Visible = false;
+                            ((Furre)player).InRange = false;
                         }
 
                         var FurreMoved = new MoveFurre(data)
@@ -967,11 +967,11 @@ namespace Furcadia.Net.DirectConnection
                             && VisableRectangle.Length >= ((Furre)player).Location.X
                             )
                         {
-                            ((Furre)player).Visible = true;
+                            ((Furre)player).InRange = true;
                         }
                         else
                         {
-                            ((Furre)player).Visible = false;
+                            ((Furre)player).InRange = false;
                         }
                         MoveFurre FurreMoved = new MoveFurre(data)
                         {
@@ -1002,7 +1002,7 @@ namespace Furcadia.Net.DirectConnection
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
                         ((Furre)player).Location = new FurrePosition(data.Substring(5, 4));
-                        ((Furre)player).Visible = false;
+                        ((Furre)player).InRange = false;
                     }
                     //Species Tags
                     else if (data.StartsWith("]-"))
