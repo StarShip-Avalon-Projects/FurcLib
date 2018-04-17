@@ -82,22 +82,29 @@ namespace Furcadia.Net
         None,
 
         /// <summary>
-        /// Spawns a new Furre in the dream furre list because they have
-        /// joing the Dream we're in
+        /// Spawns a new Furre in the dream furre list because they have arrived in the dream.
         /// <para/>
-        /// '&lt;' + user id + x + y + shape number + name + color code +
-        /// flag + linefeed
+        /// '&lt;' + user id + x + y + shape number + name + color code + flag + AFK + Scale + linefeed
+        /// <para/>
+        /// X ;amp& Y = 2 Base220 Bytes
+        /// <para/>
+        /// shape number = 2 Base220 Bytes
+        /// <para/>
+        /// color-code Bas220 Encoded color string <see cref="Furcadia.Movement.ColorString"/>
+        /// <para/>
+        /// AFK (greyness) - 4 Base220 Bytes
+        /// <para/>
+        /// Scale (kitter size)
         /// <para/>
         /// sender object is Type SpawnAvatar()
         /// </summary>
         SpawnAvatar,
 
         /// <summary>
-        /// Remove the Avatar from the Dream Furre list because they have
+        /// Remove the Avatar from the Dream's Furre list because they have
         /// left the dream
         /// <para/>
         /// ')' + user id + linefeed
-        /// <para/>
         /// Source: Furcatia Technical Resources
         /// <para/>
         /// sender object is Type RemoveAvatar()

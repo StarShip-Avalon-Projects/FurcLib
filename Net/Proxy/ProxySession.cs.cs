@@ -1,10 +1,12 @@
 ﻿using Furcadia.Drawing;
+using Furcadia.Extensions;
 using Furcadia.Logging;
 using Furcadia.Movement;
 using Furcadia.Net.DreamInfo;
 using Furcadia.Net.Utils.ChannelObjects;
 using Furcadia.Net.Utils.ServerObjects;
 using Furcadia.Net.Utils.ServerParser;
+using Furcadia.Text;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -293,7 +295,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public Furre Player
         {
-            get => (Furre)player;
+            get => player;
             private set => player = value;
         }
 
@@ -879,7 +881,7 @@ namespace Furcadia.Net.Proxy
                         {
                             // player = NameToFurre(data.Remove(0, length +
                             // 2)); If player.ID = 0 Then Exit Sub
-                            ((Furre)player).FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
+                            player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
 
                             if (IsConnectedCharacter())
                                 Look = false;
@@ -902,59 +904,68 @@ namespace Furcadia.Net.Proxy
                     {
                         SpawnAvatar FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.Player;
-                        var NewFurre = false;
-                        if (!Dream.Furres.Contains(player))
-                            NewFurre = true;
-                        Dream.Furres.Add(player);
+
+                        // Always make sure Connect Furre is in the Dream
+                        if (!Dream.Furres.Contains(player) && player.ShortName == connectedFurre.ToFurcadiaShortName())
+                            Dream.Furres.Add(Player);
 
                         //New furre Arrival to current Dream
-                        //if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
-                        //{
-                        //    player = Dream.Furres[FurreSpawn.Player];
-                        //}
-
-                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR) && NewFurre)
-                            ProcessServerInstruction?.Invoke(FurreSpawn,
-                            new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                        if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
+                        {
+                            Logger.Debug<ProxySession>(FurreSpawn);
+                            if (!Dream.Furres.Contains(player))
+                            {
+                                Dream.Furres.Add(Player);
+                                ProcessServerInstruction?.Invoke(
+                                    FurreSpawn,
+                                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                            }
+                        }
                     }
                     //Remove Furre
                     else if (data[0] == ')' || data[0] == ' ')
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         RemoveFurre.Player = Dream.Furres.GetFurreByID(RemoveFurre.FurreId);
-                        if (RemoveFurre.Player.ShortName != "unknown")
+                        //if (player.ShortName == "unknown" || player.FurreID < 1)
+                        //    throw new ArgumentException($"Remove Avatar unknown Furre {player}");
+                        if (Dream.Furres.Contains(RemoveFurre.FurreId))
                         {
                             Dream.Furres.Remove(RemoveFurre.FurreId);
 
                             Handled = true;
+                            Logger.Debug<ProxySession>(RemoveFurre);
                             ProcessServerInstruction?.Invoke
                             (
                                 RemoveFurre,
                                 new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
                             );
                         }
+                        return;
                     }
                     //Animated Move
                     else if (data[0] == '/')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        ((Furre)player).Location = new FurrePosition(data.Substring(5, 4));
+                        //if (player.ShortName == "unknown" || player.FurreID < 1)
+                        //    throw new ArgumentException("Animated Move Avatar unknown Furre");
+                        player.Location = new FurrePosition(data.Substring(5, 4));
 
                         ViewArea VisableRectangle = new ViewArea(Player.Location);
 
                         // TODO: Re-factor tis mess some how... -Gero
                         if (
-                            VisableRectangle.FurreLocation.X <= ((Furre)player).Location.X
-                            && VisableRectangle.FurreLocation.Y <= ((Furre)player).Location.Y
-                            && VisableRectangle.Height >= ((Furre)player).Location.Y
-                            && VisableRectangle.Length >= ((Furre)player).Location.X
+                            VisableRectangle.FurreLocation.X <= player.Location.X
+                            && VisableRectangle.FurreLocation.Y <= player.Location.Y
+                            && VisableRectangle.Height >= player.Location.Y
+                            && VisableRectangle.Length >= player.Location.X
                             )
                         {
-                            ((Furre)player).InRange = true;
+                            player.InRange = true;
                         }
                         else
                         {
-                            ((Furre)player).InRange = false;
+                            player.InRange = false;
                         }
 
                         var FurreMoved = new MoveFurre(data)
@@ -962,11 +973,9 @@ namespace Furcadia.Net.Proxy
                             Player = player
                         };
 
-                        ProcessServerInstruction?.Invoke
-                        (
-                            FurreMoved,
-                            new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, serverconnectphase)
-                        );
+                        Logger.Debug<ProxySession>(FurreMoved);
+                        ProcessServerInstruction?.Invoke(FurreMoved,
+                              new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, serverconnectphase));
 
                         return;
                     }
@@ -974,6 +983,7 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'A')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
+
                         player.Location = new FurrePosition(data.Substring(5, 4));
 
                         //connectedFurre = (Furre)Dream.Furres[connectedFurre];
@@ -996,6 +1006,7 @@ namespace Furcadia.Net.Proxy
                         {
                             Player = player
                         };
+                        Logger.Debug<ProxySession>(FurreMoved);
                         ProcessServerInstruction?.Invoke(FurreMoved,
                               new ParseServerArgs(ServerInstructionType.MoveAvatar, serverconnectphase));
                         return;
@@ -1017,8 +1028,8 @@ namespace Furcadia.Net.Proxy
                     else if (data[0] == 'C')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        ((Furre)player).Location = new FurrePosition(data.Substring(5, 4));
-                        ((Furre)player).InRange = false;
+                        player.Location = new FurrePosition(data.Substring(5, 4));
+                        player.InRange = false;
                     }
                     //Species Tags
                     else if (data.StartsWith("]-"))

@@ -410,7 +410,6 @@ namespace Furcadia.Movement
         #endregion Public Properties
 
         /// <summary>
-
         /// Performs an implicit conversion from <see cref="System.String"/> to <see cref="ColorString"/>.
         /// </summary>
         /// <param name="colors">The colors.</param>

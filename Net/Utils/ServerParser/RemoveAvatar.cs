@@ -24,14 +24,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <value>
         /// Triggering furre.
         /// </value>
-        public IFurre Player
-        {
-            get
-            { return player; }
-            set { player = value; }
-        }
-
-        private IFurre player = null;
+        public IFurre Player { get; set; } = null;
 
         #endregion Public Fields
 
@@ -48,6 +41,17 @@ namespace Furcadia.Net.Utils.ServerParser
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
                 FurreId = ConvertFromBase220(ServerInstruction.Substring(1, 4));
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return $"Server Instruction Type: '{InstructionType}' FurreId: '{FurreId}' Server: '{RawInstruction}'";
         }
 
         #endregion Public Constructors

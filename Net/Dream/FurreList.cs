@@ -140,23 +140,6 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Determines whether [contains] [the specified furre identifier].
-        /// </summary>
-        /// <param name="FurreID">The furre identifier.</param>
-        /// <returns>
-        ///   <c>true</c> if [contains] [the specified furre identifier]; otherwise, <c>false</c>.
-        /// </returns>
-        public bool Contains(int FurreID)
-        {
-            foreach (var fur in furreList)
-            {
-                if (fur.FurreID == FurreID)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Determines whether [contains] [the specified furre name].
         /// </summary>
         /// <param name="FurreName">Name of the furre.</param>
@@ -165,9 +148,26 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Contains(string FurreName)
         {
-            foreach (var fur in furreList)
+            foreach (Furre fur in furreList)
             {
                 if (fur.ShortName == FurreName.ToFurcadiaShortName())
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether [contains] [the specified furre identifier].
+        /// </summary>
+        /// <param name="FurreId">The furre identifier.</param>
+        /// <returns>
+        ///   <c>true</c> if [contains] [the specified furre identifier]; otherwise, <c>false</c>.
+        /// </returns>
+        public bool Contains(Base220 FurreId)
+        {
+            foreach (Furre fur in furreList)
+            {
+                if (fur.FurreID == FurreId)
                     return true;
             }
             return false;
@@ -182,12 +182,16 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Contains(IFurre Furre)
         {
+            var found = false;
             foreach (Furre fur in furreList)
             {
                 if (fur == Furre)
-                    return true;
+                {
+                    found = true;
+                    break;
+                }
             }
-            return false;
+            return found;
         }
 
         /// <summary>
@@ -252,28 +256,6 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// get a Furre from the Furrelist by its integer idd
-        /// </summary>
-        /// <param name="FurreID">
-        /// Furre ID as integer
-        /// </param>
-        /// <returns>
-        /// Furre name with a real Furcadia ID if the furre is in the dream
-        /// Other wise, Furre with with name unknown and the given Furre Id
-        /// <para/>
-        /// Furre Id of -1 is Undefined
-        /// </returns>
-        public Furre GetFurreByID(int FurreID)
-        {
-            foreach (Furre Furre in furreList)
-            {
-                if (Furre.FurreID == FurreID)
-                    return Furre;
-            }
-            return new Furre(FurreID);
-        }
-
-        /// <summary>
         /// Gets a Furre object by the Furre's Name
         /// </summary>
         /// <param name="sname">The sname.</param>
@@ -323,12 +305,12 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         /// <param name="FurreID">
         /// </param>
-        public void Remove(int FurreID)
+        public void Remove(Base220 FurreID)
         {
             lock (RemoveLock)
             {
                 IFurre fur = null;
-                foreach (var Fur in furreList)
+                foreach (Furre Fur in furreList)
                 {
                     if (Fur.FurreID == FurreID)
                     {
