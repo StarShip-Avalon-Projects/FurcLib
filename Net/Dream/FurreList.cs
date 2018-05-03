@@ -14,13 +14,9 @@ namespace Furcadia.Net.DreamInfo
     /// </summary>
     public class FurreList : IList<IFurre>, ICollection
     {
-        #region Protected Internal Fields
+        #region Private Fields
 
         private static IList<IFurre> furreList;
-
-        #endregion Protected Internal Fields
-
-        #region Private Fields
 
         private object RemoveLock = new object();
 
@@ -125,10 +121,10 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="Furre">The furre.</param>
         public void Add(IFurre Furre)
         {
-            if (!furreList.Contains(Furre))
+            if (!furreList.Contains((Furre)Furre))
                 furreList.Add(Furre);
             else
-                furreList[furreList.IndexOf(Furre)] = Furre;
+                furreList[furreList.IndexOf((Furre)Furre)] = Furre;
         }
 
         /// <summary>
@@ -256,28 +252,23 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Gets a Furre object by the Furre's Name
+        /// Gets the furre by name.
         /// </summary>
-        /// <param name="sname">The sname.</param>
-        /// <returns>
-        /// Furre name with a real Furcadia ID if the furre is in the dream
-        /// Other wise, Furre with Furre Id 0
-        /// <para/>
-        /// Furre Id of -1 is Undefined
-        /// </returns>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        public Furre GetFurreByName(string sname)
+        /// <param name="FurreName">Name of the furre.</param>
+        /// <returns><see cref="Furre"/></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Furre GetFurreByName(string FurreName)
         {
-            if (string.IsNullOrEmpty(sname))
-                throw new ArgumentNullException(sname);
-            foreach (Furre Character in furreList)
+            if (string.IsNullOrEmpty(FurreName))
+                throw new ArgumentNullException(FurreName);
+            foreach (Furre Furre in furreList)
             {
-                if (Character.ShortName == sname.ToFurcadiaShortName())
+                if (Furre.ShortName == FurreName.ToFurcadiaShortName())
                 {
-                    return Character;
+                    return Furre;
                 }
             }
-            return new Furre(0, sname);
+            return new Furre(0, FurreName);
         }
 
         /// <summary>

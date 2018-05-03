@@ -105,12 +105,12 @@ namespace Furcadia.Text
         /// <summary>
         /// The shout regex filter
         /// </summary>
-        public const string ShoutRegexFilter = "<font color=('(shout)'|\"(shout)\")>\\{S\\} <name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\")>(.{2,64})</name>(.*)shouts: (.*?)</font>";
+        public const string ShoutRegexFilter = "<font color=('(shout)'|\"(shout)\")>\\{S\\} <name shortname=('(.*?)'|\"(.*?)\")>(.*?)</name>(.*)shouts: (.*?)</font>";
 
         /// <summary>
         ///
         /// </summary>
-        public const string EmoteRegexFilter = "<font color='(.*?)'><name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\")>(.{2,64})</name> (.*?)</font>";
+        public const string EmoteRegexFilter = "<font color='(.*?)'><name shortname=('(.*?)'|\"(.*?)\")>(.*?)</name>(.*?)</font>";
 
         /// <summary>
         /// Regex for working with HTML URLS

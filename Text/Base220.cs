@@ -18,9 +18,16 @@ namespace Furcadia.Text
     {
         #region Private Fields
 
-        private const byte BASE = 220;
-        private const byte CHAR_OFFSET = (byte)'#';
-        private int Value;
+        private const int BASE = 220;
+        private const int CHAR_OFFSET = (byte)'#'; // should be 35
+
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
+        public int Value { get; private set; }
 
         #endregion Private Fields
 
@@ -59,7 +66,7 @@ namespace Furcadia.Text
         /// Process Base220 Strings.
         /// <para>
         /// these are string Prefixed with a Base220 character representing
-        /// the Lengeth of the string
+        /// the Length of the string
         /// </para>
         /// </summary>
         /// <param name="b220str">
@@ -71,7 +78,7 @@ namespace Furcadia.Text
         /// </remarks>
         public static int Base220StringLengeth(ref string b220str)
         {
-            int Length = ConvertFromBase220(b220str[0].ToString());
+            int Length = (Base220)b220str[0];
             b220str = b220str.Substring(1, Length);
             return Length;
         }
@@ -85,15 +92,15 @@ namespace Furcadia.Text
         {
             int num = 0;
             int mod = 1;
-            if (string.IsNullOrEmpty(b220str))
+            if (string.IsNullOrWhiteSpace(b220str))
                 return 0;
             // Conversion
+
             for (int i = 0; i < b220str.Length; i++)
             {
                 num += (b220str[i] - CHAR_OFFSET) * mod;
-                mod *= 220;
+                mod = mod * BASE;
             }
-
             return num;
         }
 
@@ -104,18 +111,18 @@ namespace Furcadia.Text
         /// <returns></returns>
         public static int ConvertFromBase220(char b220chr)
         {
-            int num = 0;
-            int mod = 1;
+            uint num = 0;
+            uint mod = 1;
             if (b220chr == '\0')
                 return 0;
             // Conversion
             for (int i = 0; i < 1; i++)
             {
-                num += (b220chr - CHAR_OFFSET) * mod;
-                mod *= 220;
+                num += ((uint)b220chr - CHAR_OFFSET) * mod;
+                mod *= BASE;
             }
 
-            return num;
+            return (int)num;
         }
 
         /// <summary>
@@ -142,7 +149,8 @@ namespace Furcadia.Text
             // Conversion
             while (num > 0)
             {
-                ch = (num % 220) + CHAR_OFFSET; num /= 220;
+                ch = (num % 220) + CHAR_OFFSET;
+                num /= 220;
                 b220str.Append((char)ch);
             }
 
@@ -438,7 +446,7 @@ namespace Furcadia.Text
         {
             // System.Text.Encoding.GetEncoding(EncoderPage).GetBytes
 
-            return System.Text.Encoding.GetEncoding(Utilities.GetEncoding).GetBytes(ToString(nDigits));
+            return Encoding.GetEncoding(Utilities.GetEncoding).GetBytes(ToString(nDigits));
         }
 
         /// <summary>

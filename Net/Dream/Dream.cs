@@ -44,9 +44,17 @@ namespace Furcadia.Net.DreamInfo
         private string dreamTitle, _Rating, dreamOwner;
 
         private string fileName;
-        private FurreList furres;
+        private static FurreList furres;
         private bool isPermament;
         private string mode;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Bot has just arrived in a new dream;.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [just arrived]; otherwise, <c>false</c>.
+        /// </value>
+        public bool JustArrived { get; set; }
 
         #endregion Private Fields
 
@@ -59,6 +67,17 @@ namespace Furcadia.Net.DreamInfo
         {
             furres = new FurreList();
             mode = "legacy";
+            JustArrived = false;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dream"/> class.
+        /// </summary>
+        /// <param name="DreamOwner">The dream owner.</param>
+        public Dream(string DreamOwner) : this()
+        {
+            this.dreamOwner = DreamOwner;
+            JustArrived = true;
         }
 
         #endregion Public Constructors
@@ -79,7 +98,8 @@ namespace Furcadia.Net.DreamInfo
                     throw new ArgumentNullException(value.DreamOwner);
                 //Modern should be set bu this point
                 dreamTitle = value.Title;
-                dreamOwner = value.DreamOwner;
+                if (string.IsNullOrEmpty(dreamOwner))
+                    dreamOwner = value.DreamOwner;
             }
         }
 
@@ -220,6 +240,10 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public static bool operator !=(Dream dreamA, IDream dreamB)
         {
+            if (dreamA is null)
+            {
+                return dreamB is null;
+            }
             return !dreamA.Equals(dreamB);
         }
 

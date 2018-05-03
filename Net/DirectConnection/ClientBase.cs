@@ -63,11 +63,6 @@ namespace Furcadia.Net.DirectConnection
         private static TcpClient LightBringer;
 
         private bool disposedValue = false;
-
-        /// <summary>
-        /// </summary>
-        private int ENCODE_PAGE = 1252;
-
         private BaseConnectionOptions options;
 
         #endregion Private Fields
@@ -200,13 +195,7 @@ namespace Furcadia.Net.DirectConnection
         /// <para/>
         /// DEFAULT: Windows 1252
         /// </summary>
-        public int EncoderPage
-        {
-            get
-            {
-                return ENCODE_PAGE;
-            }
-        }
+        public int EncoderPage { get; } = 1252;
 
         /// <summary>
         /// Check our connection status to the game server

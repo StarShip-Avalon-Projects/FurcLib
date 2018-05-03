@@ -15,7 +15,7 @@ namespace Furcadia.Net.Utils
         /// <summary>
         /// Set Encoders to win 1252 encoding
         /// </summary>
-        private const int EncoderPage = 1252;
+        private const int EncoderPage = 28591;
 
         private readonly string defaultClient;
 

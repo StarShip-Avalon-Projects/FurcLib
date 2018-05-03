@@ -51,7 +51,7 @@ namespace Furcadia.Net.DreamInfo
     {
         #region Private Fields
 
-        private int afk;
+        private Base220 afk;
         private string badge;
         private ColorString colorString;
         private string desc;
@@ -465,7 +465,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override string ToString()
         {
-            return $"{(int)FurreID} - {Name}";
+            return $"{(double)FurreID} - {Name}";
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Furcadia.Text;
+using System;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -306,7 +307,7 @@ namespace Furcadia.Net.DreamInfo
             /// <summary>
             /// The dir
             /// </summary>
-            public int dir;
+            public Base220 dir;
 
             /// <summary>
             /// The ds number
@@ -321,12 +322,12 @@ namespace Furcadia.Net.DreamInfo
             /// <summary>
             /// The pose
             /// </summary>
-            public int pose;
+            public Base220 pose;
 
             /// <summary>
             /// The spec
             /// </summary>
-            public int Spec;
+            public Base220 Spec;
 
             /// <summary>
             /// The wings

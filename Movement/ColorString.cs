@@ -1,4 +1,5 @@
 ﻿using Furcadia.Text;
+using System;
 
 namespace Furcadia.Movement
 {
@@ -44,46 +45,46 @@ namespace Furcadia.Movement
         {
             if (Colors[0] == 'w' && Colors.Length >= ColorStringSize)
             {
-                fur = Base220.ConvertFromBase220(Colors[1].ToString());
-                markings = Base220.ConvertFromBase220(Colors[2].ToString());
-                hair = Base220.ConvertFromBase220(Colors[3].ToString());
-                eye = Base220.ConvertFromBase220(Colors[4].ToString());
-                badge = Base220.ConvertFromBase220(Colors[5].ToString());
-                vest = Base220.ConvertFromBase220(Colors[6].ToString());
-                bracers = Base220.ConvertFromBase220(Colors[7].ToString());
-                cape = Base220.ConvertFromBase220(Colors[8].ToString());
-                boots = Base220.ConvertFromBase220(Colors[9].ToString());
-                trousers = Base220.ConvertFromBase220(Colors[10].ToString());
-                _wings = Base220.ConvertFromBase220(Colors[11].ToString());
-                _accent = Base220.ConvertFromBase220(Colors[12].ToString());
+                Fur = Colors[1];
+                Markings = Colors[2];
+                Hair = Colors[3];
+                Eye = Colors[4];
+                Badge = Colors[5];
+                Vest = Colors[6];
+                Bracers = Colors[7];
+                Cape = Colors[8];
+                Boots = Colors[9];
+                Trousers = Colors[10];
+                Wings = Colors[11];
+                Accent = Colors[12];
 
                 if (Colors.Length > 13)
                 {
-                    gender = Base220.ConvertFromBase220(Colors[13].ToString());
-                    species = Base220.ConvertFromBase220(Colors[14].ToString());
-                    avatar = Base220.ConvertFromBase220(Colors[15].ToString());
+                    Gender = Colors[13];
+                    Species = Colors[14];
+                    Avatar = Colors[15];
                 }
             }
-            else if (Colors[0] == 't' && Colors.Length >= 11)
+            else if (Colors[0] == 't' && Colors.Length >= 10)
             {
-                fur = Base220.ConvertFromBase220(Colors[1].ToString());
-                markings = Base220.ConvertFromBase220(Colors[2].ToString());
-                hair = Base220.ConvertFromBase220(Colors[3].ToString());
-                eye = Base220.ConvertFromBase220(Colors[4].ToString());
-                badge = Base220.ConvertFromBase220(Colors[5].ToString());
-                vest = Base220.ConvertFromBase220(Colors[6].ToString());
-                bracers = Base220.ConvertFromBase220(Colors[7].ToString());
-                cape = Base220.ConvertFromBase220(Colors[8].ToString());
-                boots = Base220.ConvertFromBase220(Colors[9].ToString());
-                trousers = Base220.ConvertFromBase220(Colors[10].ToString());
+                Fur = Colors[1];
+                Markings = Colors[2];
+                Hair = Colors[3];
+                Eye = Colors[4];
+                Badge = Colors[5];
+                Vest = Colors[6];
+                Bracers = Colors[7];
+                Cape = Colors[8];
+                Boots = Colors[9];
+                Trousers = Colors[10];
 
                 #region Maybe Missing
 
                 if (Colors.Length > 11)
                 {
-                    gender = Base220.ConvertFromBase220(Colors[11].ToString());
-                    species = Base220.ConvertFromBase220(Colors[12].ToString());
-                    avatar = Base220.ConvertFromBase220(Colors[13].ToString());
+                    Gender = Colors[11];
+                    Species = Colors[12];
+                    Special = Colors[13];
                 }
 
                 #endregion Maybe Missing
@@ -107,31 +108,7 @@ namespace Furcadia.Movement
         /// </returns>
         public override string ToString()
         {
-            return string.Format("w{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}{15}",
-                Base220.ConvertToBase220(fur),
-                Base220.ConvertToBase220(markings),
-                Base220.ConvertToBase220(hair),
-                Base220.ConvertToBase220(eye),
-                Base220.ConvertToBase220(badge),
-                Base220.ConvertToBase220(vest),
-                Base220.ConvertToBase220(bracers),
-                Base220.ConvertToBase220(cape),
-                Base220.ConvertToBase220(boots),
-                Base220.ConvertToBase220(trousers),
-
-                // Thanks DD for the v31 Update
-                Base220.ConvertToBase220(_wings),
-                Base220.ConvertToBase220(_accent),
-
-            #region Maybe Missing
-
-                Base220.ConvertToBase220(gender),
-                Base220.ConvertToBase220(species),
-                Base220.ConvertToBase220(avatar)
-
-            #endregion Maybe Missing
-
-                );
+            return $"w{Fur}{Markings}{Hair}{Eye}{Badge}{Vest}{Bracers}{Cape}{Boots}{Trousers}{Wings}{Accent}{Gender}{Species}{Avatar.ToString(2)}";
         }
 
         /// <summary>
@@ -144,268 +121,109 @@ namespace Furcadia.Movement
         {
             if (Colors[0] == 'w' && Colors.Length == ColorStringSize)
             {
-                fur = Base220.ConvertFromBase220(Colors[1].ToString());
-                markings = Base220.ConvertFromBase220(Colors[2].ToString());
-                hair = Base220.ConvertFromBase220(Colors[3].ToString());
-                eye = Base220.ConvertFromBase220(Colors[4].ToString());
-                badge = Base220.ConvertFromBase220(Colors[5].ToString());
-                vest = Base220.ConvertFromBase220(Colors[6].ToString());
-                bracers = Base220.ConvertFromBase220(Colors[7].ToString());
-                cape = Base220.ConvertFromBase220(Colors[8].ToString());
-                boots = Base220.ConvertFromBase220(Colors[9].ToString());
-                trousers = Base220.ConvertFromBase220(Colors[10].ToString());
-                _wings = Base220.ConvertFromBase220(Colors[11].ToString());
-                _accent = Base220.ConvertFromBase220(Colors[12].ToString());
+                Fur = Colors[1];
+                Markings = Colors[2];
+                Hair = Colors[3];
+                Eye = Colors[4];
+                Badge = Colors[5];
+                Vest = Colors[6];
+                Bracers = Colors[7];
+                Cape = Colors[8];
+                Boots = Colors[9];
+                Trousers = Colors[10];
+                Wings = Colors[11];
+                Accent = Colors[12];
             }
         }
 
         #endregion Public Methods
-
-        #region Private Fields
-
-        private int _accent;
-        private int _wings;
-        private int avatar;
-        private int badge;
-        private int boots;
-        private int bracers;
-        private int cape;
-        private int eye;
-        private int fur;
-        private int gender;
-        private int hair;
-        private int markings;
-        private int species;
-        private int trousers;
-        private int vest;
-
-        #endregion Private Fields
 
         #region Public Properties
 
         /// <summary>
         /// Acccent
         /// </summary>
-        public int Accent
-        {
-            get
-            {
-                return _accent;
-            }
-
-            set
-            {
-                _accent = value;
-            }
-        }
+        public Base220 Accent { get; set; }
 
         /// <summary>
         /// Avatar
         /// </summary>
-        public int Avatar
-        {
-            get
-            {
-                return avatar;
-            }
-            set
-            {
-                avatar = value;
-            }
-        }
+        public Base220 Avatar { get; set; }
 
         /// <summary>
         /// Badge Color
         /// </summary>
-        public int Badge
-        {
-            get
-            {
-                return badge;
-            }
-            set
-            {
-                badge = value;
-            }
-        }
+        public Base220 Badge { get; set; }
 
         /// <summary>
         /// Boots Color
         /// </summary>
-        public int Boots
-        {
-            get
-            {
-                return boots;
-            }
-            set
-            {
-                boots = value;
-            }
-        }
+        public Base220 Boots { get; set; }
 
         /// <summary>
         /// Bracers color
         /// </summary>
-        public int Bracers
-        {
-            get
-            {
-                return bracers;
-            }
-            set
-            {
-                bracers = value;
-            }
-        }
+        public Base220 Bracers { get; set; }
 
         /// <summary>
         /// cape color
         /// </summary>
-        public int Cape
-        {
-            get
-            {
-                return cape;
-            }
-            set
-            {
-                cape = value;
-            }
-        }
+        public Base220 Cape { get; set; }
 
         /// <summary>
         /// Eye color
         /// </summary>
-        public int Eye
-        {
-            get
-            {
-                return eye;
-            }
-            set
-            {
-                eye = value;
-            }
-        }
+        public Base220 Eye { get; set; }
 
         /// <summary>
         /// Fur color
         /// </summary>
-        public int Fur
-        {
-            get
-            {
-                return fur;
-            }
-            set
-            {
-                fur = value;
-            }
-        }
+        public Base220 Fur { get; set; }
 
         /// <summary>
         /// Avatar Gender
         /// </summary>
-        public int Gender
-        {
-            get
-            {
-                return gender;
-            }
-            set
-            {
-                gender = value;
-            }
-        }
+        public Base220 Gender { get; set; }
+
+        /// <summary>
+        /// Gets or sets the special.
+        ///
+        /// </summary>
+        /// <value>
+        /// The special.
+        /// </value>
+        [Obsolete("Legacy as of Furcadia V31", false)]
+        public Base220 Special { get; set; }
 
         /// <summary>
         /// Hair color
         /// </summary>
-        public int Hair
-        {
-            get
-            {
-                return hair;
-            }
-            set
-            { hair = value; }
-        }
+        public Base220 Hair { get; set; }
 
         /// <summary>
         /// Markings color
         /// </summary>
-        public int Markings
-        {
-            get
-            {
-                return markings;
-            }
-            set
-            {
-                markings = value;
-            }
-        }
+        public Base220 Markings { get; set; }
 
         /// <summary>
         /// Avatar Species
         /// </summary>
-        public int Species
-        {
-            get
-            {
-                return species;
-            }
-            set
-            {
-                species = value;
-            }
-        }
+        public Base220 Species { get; set; }
 
         /// <summary>
         /// Trousers color
         /// </summary>
-        public int Trousers
-        {
-            get
-            {
-                return trousers;
-            }
-            set
-            {
-                trousers = value;
-            }
-        }
+        public Base220 Trousers { get; set; }
 
         /// <summary>
         /// /Vest Color
         /// </summary>
-        public int Vest
-        {
-            get
-            {
-                return vest;
-            }
-            set
-            {
-                vest = value;
-            }
-        }
+        public Base220 Vest { get; set; }
 
         /// <summary>
         /// Wings
         /// </summary>
-        public int Wings
-        {
-            get
-            {
-                return _wings;
-            }
-            set
-            {
-                _wings = value;
-            }
-        }
+        public Base220 Wings { get; set; }
 
         #endregion Public Properties
 

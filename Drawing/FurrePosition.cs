@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Furcadia.Text;
+using System;
+using System.Text;
 using static Furcadia.Text.Base220;
 
 namespace Furcadia.Drawing
@@ -8,9 +10,6 @@ namespace Furcadia.Drawing
     /// </summary>
     public class FurrePosition
     {
-        private double x;
-        private double y;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FurrePosition"/> class.
         /// </summary>
@@ -21,13 +20,15 @@ namespace Furcadia.Drawing
         /// <summary>
         /// Takes a B220 encoded string representing the x,y coordinates and convert them to Furcadia (X,Y) coordinates
         /// </summary>
-        /// <param name="b220Encoded">4 byte string</param>
-        public FurrePosition(string b220Encoded)
+        /// <param name="b220EncodedString">4 byte string</param>
+        public FurrePosition(string b220EncodedString)
         {
-            if (b220Encoded.Length < 4)
-                throw new ArgumentOutOfRangeException("Not enough bytes to process");
-            X = ConvertFromBase220(b220Encoded.Substring(0, 2)) * 2;
-            Y = ConvertFromBase220(b220Encoded.Substring(2, 2));
+            if (b220EncodedString.Length < 4)
+                throw new ArgumentOutOfRangeException("b220EncodedString", b220EncodedString, "Not enough bytes to process");
+            if (b220EncodedString.Length > 4)
+                throw new ArgumentOutOfRangeException("b220EncodedString", b220EncodedString, "Too many bytes to process");
+            X = (Base220)b220EncodedString.Substring(0, 2) * 2;
+            Y = b220EncodedString.Substring(2, 2);
         }
 
         #region Public Constructors
@@ -37,7 +38,7 @@ namespace Furcadia.Drawing
         /// </summary>
         /// <param name="X">The x coordinate.</param>
         /// <param name="Y">The y coordinate.</param>
-        public FurrePosition(int X, int Y)
+        public FurrePosition(Base220 X, Base220 Y)
         {
             this.Y = Y;
             this.X = X;
@@ -61,12 +62,12 @@ namespace Furcadia.Drawing
         /// <summary>
         /// x coordinate
         /// </summary>
-        public int X { get => (int)x; set => x = value; }
+        public Base220 X { get; set; }
 
         /// <summary>
         /// y coordinate
         /// </summary>
-        public int Y { get => (int)y; set => y = value; }
+        public Base220 Y { get; set; }
 
         #endregion Public Properties
 
@@ -81,7 +82,7 @@ namespace Furcadia.Drawing
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
             if (obj is FurrePosition ob)
             {
@@ -98,7 +99,7 @@ namespace Furcadia.Drawing
         /// </returns>
         public override int GetHashCode()
         {
-            return (int)x ^ (int)y;
+            return X.GetHashCode() ^ Y.GetHashCode();
         }
 
         /// <summary>
@@ -109,7 +110,10 @@ namespace Furcadia.Drawing
         /// </returns>
         public override string ToString()
         {
-            return $"({x}, {y})";
+            var sb = new StringBuilder();
+            sb.Append($"{X}");
+            sb.Append($"{Y}");
+            return sb.ToString();
         }
 
         #endregion Public Methods

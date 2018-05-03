@@ -7,6 +7,7 @@ using Furcadia.Net.Utils;
 using Furcadia.Net.Utils.ChannelObjects;
 using Furcadia.Net.Utils.ServerObjects;
 using Furcadia.Net.Utils.ServerParser;
+using Furcadia.Text;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -51,7 +52,6 @@ namespace Furcadia.Net.DirectConnection
 
         #region Private Fields
 
-        private static IFurre connectedFurre;
         private ClientOptions clientOptions;
 
         ///// <summary>
@@ -75,7 +75,7 @@ namespace Furcadia.Net.DirectConnection
 
         private Queue<string> LookQue;
 
-        private IFurre player;
+        private Furre player;
 
         /// <summary>
         /// Balance the out going load to server
@@ -230,10 +230,14 @@ namespace Furcadia.Net.DirectConnection
         /// <summary>
         /// Connected Furre (Who we are)
         /// </summary>
-        public IFurre ConnectedFurre
+        public Furre ConnectedFurre
         {
-            set => connectedFurre = value;
-            get => connectedFurre;
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(ConnectedFurreName))
+                    return Dream.Furres.GetFurreByName(ConnectedFurreName);
+                return new Furre(ConnectedFurreId, ConnectedFurreName);
+            }
         }
 
         /// <summary>
@@ -262,7 +266,7 @@ namespace Furcadia.Net.DirectConnection
         /// <summary>
         /// Current Triggering player
         /// </summary>
-        public IFurre Player
+        public Furre Player
         {
             get => player;
             private set => player = value;
@@ -315,6 +319,22 @@ namespace Furcadia.Net.DirectConnection
             set => ServerBalancer.NoEndurance = value;
         }
 
+        /// <summary>
+        /// Gets or sets the connected furre identifier.
+        /// </summary>
+        /// <value>
+        /// The connected furre identifier.
+        /// </value>
+        public int ConnectedFurreId { get; set; } = -1;
+
+        /// <summary>
+        /// Gets or sets the name of the connected furre.
+        /// </summary>
+        /// <value>
+        /// The name of the connected furre.
+        /// </value>
+        public string ConnectedFurreName { get; set; }
+
         #endregion Internal Properties
 
         #region Public Methods
@@ -357,7 +377,7 @@ namespace Furcadia.Net.DirectConnection
         /// </summary>
         public bool IsConnectedCharacter()
         {
-            return connectedFurre == player;
+            return ConnectedFurre == player;
         }
 
         /// <summary>
@@ -367,7 +387,7 @@ namespace Furcadia.Net.DirectConnection
         /// <returns>True if Fur is the Connected Furre</returns>
         public bool IsConnectedCharacter(IFurre Fur)
         {
-            return connectedFurre == Fur;
+            return ConnectedFurre == (Furre)Fur;
         }
 
         /// <summary>
@@ -400,7 +420,7 @@ namespace Furcadia.Net.DirectConnection
             Regex FontColorRegex = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
             Match FontColorRegexMatch = FontColorRegex.Match(data);
             Match DescTagRegexMatch = DescTagRegex.Match(data);
-            IFurre ActivePlayer = new Furre("Furcadia game server");
+            Furre ActivePlayer = new Furre(0, "Furcadia game server");
             string channel = null;
 
             if (NameRegex.Match(data).Success)
@@ -471,16 +491,17 @@ namespace Furcadia.Net.DirectConnection
                     ProcessServerChannelData?.Invoke(ChanObj, args);
                     return;
                 }
-                Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
 
+                Regex ShoutRegex = new Regex(ShoutRegexFilter, ChannelOptions);
                 Match ShoutMatch = ShoutRegex.Match(data);
                 if (ShoutMatch.Success)
                 {
-                    ActivePlayer = Dream.Furres.GetFurreByName(ShoutMatch.Groups[5].Value);
-                    ActivePlayer.Message = ShoutMatch.Groups[7].Value;
-                    player = ActivePlayer;
-                    chanObject.player = ActivePlayer;
                     args.Channel = ShoutMatch.Groups[2].Value;
+
+                    player = Dream.Furres.GetFurreByName(ShoutMatch.Groups[5].Value);
+                    player.Message = ShoutMatch.Groups[9].Value;
+
+                    chanObject.player = player;
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
@@ -489,10 +510,12 @@ namespace Furcadia.Net.DirectConnection
                 ShoutMatch = ShoutRegex.Match(data);
                 if (ShoutMatch.Success)
                 {
-                    connectedFurre.Message = ShoutMatch.Groups[4].Value;
-                    player = connectedFurre;
-                    chanObject.player = connectedFurre;
                     args.Channel = ShoutMatch.Groups[2].Value;
+
+                    player = ConnectedFurre;
+                    player.Message = ShoutMatch.Groups[4].Value;
+
+                    chanObject.player = player;
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
@@ -555,9 +578,9 @@ namespace Furcadia.Net.DirectConnection
                 else if (Color == "myspeech")
                 {
                     Regex t = new Regex(YouSayFilter);
-                    connectedFurre.Message = t.Match(data).Groups[2].Value;
+                    ConnectedFurre.Message = t.Match(data).Groups[2].Value;
 
-                    chanObject.player = connectedFurre;
+                    chanObject.player = ConnectedFurre;
                     args.Channel = Color;
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
@@ -593,7 +616,6 @@ namespace Furcadia.Net.DirectConnection
                 }
                 else if (Color == "whisper")
                 {
-                    channel = "whisper";
                     Regex WhisperIncoming = new Regex(WhisperRegex, ChannelOptions);
                     //'WHISPER
                     Match WhisperMatches = WhisperIncoming.Match(data);
@@ -614,9 +636,10 @@ namespace Furcadia.Net.DirectConnection
                     WhisperMatches = WhisperIncoming.Match(data);
                     if (WhisperMatches.Success)
                     {
-                        connectedFurre.Message = WhisperMatches.Groups[4].Value;
-                        Player = connectedFurre;
-                        chanObject = new ChannelObject(data, connectedFurre);
+                        player = ConnectedFurre;
+                        //TODO: Test Player is active Furre
+                        Player.Message = WhisperMatches.Groups[4].Value;
+                        chanObject = new ChannelObject(data, ConnectedFurre);
                         args.Channel = WhisperMatches.Groups[2].Value;
 
                         ProcessServerChannelData?.Invoke(chanObject, args);
@@ -635,12 +658,12 @@ namespace Furcadia.Net.DirectConnection
                     Regex EmoteRegex = new Regex(EmoteRegexFilter, ChannelOptions);
                     Match EmoteMatch = EmoteRegex.Match(data);
 
-                    ActivePlayer = Dream.Furres.GetFurreByName(EmoteMatch.Groups[2].Value);
-                    ActivePlayer.Message = EmoteMatch.Groups[4].Value;
-                    player = ActivePlayer;
+                    args.Channel = EmoteMatch.Groups[1].Value;
 
-                    chanObject.player = ActivePlayer;
-                    args.Channel = Color;
+                    player = Dream.Furres.GetFurreByName(EmoteMatch.Groups[3].Value);
+                    player.Message = EmoteMatch.Groups[6].Value;
+
+                    chanObject.player = player;
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
@@ -729,9 +752,9 @@ namespace Furcadia.Net.DirectConnection
                     Regex EatCookie = new Regex("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.(.*?)", ChannelOptions);
                     if (EatCookie.Match(data).Success)
                     {
-                        connectedFurre.Message = "You eat a cookie." + EatCookie.Replace(data, "");
+                        player.Message = "You eat a cookie." + EatCookie.Replace(data, "");
                     }
-                    player = connectedFurre;
+                    //player = ConnectedFurre;
                 }
                 else //Dynamic Channels
                 {
@@ -800,11 +823,15 @@ namespace Furcadia.Net.DirectConnection
 
                         // connect characterName password machineID
                         if (string.IsNullOrWhiteSpace(clientOptions.Account))
+                        {
                             SendToServer($"connect {clientOptions.CharacterShortName} {clientOptions.Password}");
+                            ConnectedFurreName = clientOptions.CharacterName;
+                        }
                         else // account email characterName password token
                         {
                             SendToServer($"account {clientOptions.Account} {clientOptions.CharacterShortName} {clientOptions.Password}");
                             SendToServer($"costume %-1");
+                            ConnectedFurreName = clientOptions.CharacterName;
                         }
                         ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
                     }
@@ -852,7 +879,7 @@ namespace Furcadia.Net.DirectConnection
                         {
                             // player = NameToFurre(data.Remove(0, length +
                             // 2)); If player.ID = 0 Then Exit Sub
-                            ((Furre)player).FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
+                            player.FurreColors = new ColorString(data.Substring(2, ColorString.ColorStringSize));
 
                             if (IsConnectedCharacter())
                                 Look = false;
@@ -875,67 +902,62 @@ namespace Furcadia.Net.DirectConnection
                     {
                         SpawnAvatar FurreSpawn = new SpawnAvatar(data);
                         player = FurreSpawn.Player;
-
-                        Dream.Furres.Add(player);
-
+                        Dream.Furres.Add(Player);
+                        Logger.Debug<NetConnection>(FurreSpawn);
                         //New furre Arrival to current Dream
-                        if (!FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
-                        {
-                            player = Dream.Furres[Dream.Furres.IndexOf(FurreSpawn.Player)];
-                        }
-
-                        if (IsConnectedCharacter(player)) // Keep connectedFurre upto date
-                        {
-                            connectedFurre = player;
-                        }
-
                         if (FurreSpawn.PlayerFlags.HasFlag(CHAR_FLAG_NEW_AVATAR))
-                            if (ProcessServerInstruction != null)
+                        {
+                            Logger.Debug<NetConnection>(FurreSpawn);
+                            if (!Dream.Furres.Contains(player))
                             {
-                                ProcessServerInstruction?.Invoke(FurreSpawn,
-                                new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                                ProcessServerInstruction?.Invoke(
+                                    FurreSpawn,
+                                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
                             }
+                        }
                     }
                     //Remove Furre
                     else if (data[0] == ')' || data[0] == ' ')
                     {
                         RemoveAvatar RemoveFurre = new RemoveAvatar(data);
                         RemoveFurre.Player = Dream.Furres.GetFurreByID(RemoveFurre.FurreId);
-
-                        Dream.Furres.Remove(RemoveFurre.FurreId);
-
-                        if (ProcessServerInstruction != null)
+                        //if (player.ShortName == "unknown" || player.FurreID < 1)
+                        //    throw new ArgumentException($"Remove Avatar unknown Furre {player}");
+                        if (Dream.Furres.Contains(RemoveFurre.FurreId))
                         {
+                            Dream.Furres.Remove(RemoveFurre.FurreId);
+
                             Handled = true;
+                            Logger.Debug<NetConnection>(RemoveFurre);
                             ProcessServerInstruction?.Invoke
                             (
                                 RemoveFurre,
                                 new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
                             );
                         }
+                        return;
                     }
                     //Animated Move
                     else if (data[0] == '/')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        ((Furre)player).Location = new FurrePosition(data.Substring(5, 4));
-                        connectedFurre = Dream.Furres[connectedFurre];
+                        player.Location = new FurrePosition(data.Substring(5, 4));
 
-                        ViewArea VisableRectangle = new ViewArea(((Furre)connectedFurre).Location);
+                        ViewArea VisableRectangle = new ViewArea(player.Location);
 
                         // TODO: Refactor tis mess some how... -Gero
                         if (
-                            VisableRectangle.FurreLocation.X <= ((Furre)player).Location.X
-                            && VisableRectangle.FurreLocation.Y <= ((Furre)player).Location.Y
-                            && VisableRectangle.Height >= ((Furre)player).Location.Y
-                            && VisableRectangle.Length >= ((Furre)player).Location.X
+                            VisableRectangle.FurreLocation.X <= player.Location.X
+                            && VisableRectangle.FurreLocation.Y <= player.Location.Y
+                            && VisableRectangle.Height >= player.Location.Y
+                            && VisableRectangle.Length >= player.Location.X
                             )
                         {
-                            ((Furre)player).InRange = true;
+                            player.InRange = true;
                         }
                         else
                         {
-                            ((Furre)player).InRange = false;
+                            player.InRange = false;
                         }
 
                         var FurreMoved = new MoveFurre(data)
@@ -955,23 +977,22 @@ namespace Furcadia.Net.DirectConnection
                     else if (data[0] == 'A')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        ((Furre)player).Location = new FurrePosition(data.Substring(5, 4));
+                        player.Location = new FurrePosition(data.Substring(5, 4));
 
-                        connectedFurre = Dream.Furres[connectedFurre];
-                        ViewArea VisableRectangle = new ViewArea(((Furre)connectedFurre).Location);
+                        ViewArea VisableRectangle = new ViewArea(player.Location);
 
                         // TODO: Refactor tis mess some how... -Gero
-                        if (VisableRectangle.FurreLocation.X <= ((Furre)player).Location.X
-                            && VisableRectangle.FurreLocation.Y <= ((Furre)player).Location.Y
-                            && VisableRectangle.Height >= ((Furre)player).Location.Y
-                            && VisableRectangle.Length >= ((Furre)player).Location.X
+                        if (VisableRectangle.FurreLocation.X <= player.Location.X
+                            && VisableRectangle.FurreLocation.Y <= player.Location.Y
+                            && VisableRectangle.Height >= player.Location.Y
+                            && VisableRectangle.Length >= player.Location.X
                             )
                         {
-                            ((Furre)player).InRange = true;
+                            player.InRange = true;
                         }
                         else
                         {
-                            ((Furre)player).InRange = false;
+                            player.InRange = false;
                         }
                         MoveFurre FurreMoved = new MoveFurre(data)
                         {
@@ -1001,8 +1022,8 @@ namespace Furcadia.Net.DirectConnection
                     else if (data[0] == 'C')
                     {
                         player = Dream.Furres.GetFurreByID(data.Substring(1, 4));
-                        ((Furre)player).Location = new FurrePosition(data.Substring(5, 4));
-                        ((Furre)player).InRange = false;
+                        player.Location = new FurrePosition(data.Substring(5, 4));
+                        player.InRange = false;
                     }
                     //Species Tags
                     else if (data.StartsWith("]-"))
@@ -1076,10 +1097,10 @@ namespace Furcadia.Net.DirectConnection
                     // Credits Artex, FTR
                     else if (data.StartsWith("]B"))
                     {
-                        int ID = int.Parse(data.Substring(2, data.Length -
-                            connectedFurre.Name.Length - 3));
-                        connectedFurre.FurreID = ID;
+                        var furre = data.Split(new char[] { ' ' }, 2);
 
+                        ConnectedFurreId = int.Parse(furre[0].Substring(2));
+                        ConnectedFurreName = furre[1];
                         ProcessServerInstruction?.Invoke
                         (
                             new BaseServerInstruction(data),
@@ -1274,7 +1295,6 @@ namespace Furcadia.Net.DirectConnection
             ServerConnected += () => OnServerConnected();
             ServerDisconnected += () => OnServerDisonnected();
 
-            connectedFurre = new Furre();
             player = new Furre();
             Dream = new Dream();
 
