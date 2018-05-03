@@ -1037,10 +1037,11 @@ namespace Furcadia.Net.Proxy
 
                             if (player.FurreID < 1 || player.ShortName == "unknown")
                                 throw new ArgumentOutOfRangeException("Player", player, "Player not found in dream.");
-                            if (ConnectedFurre.FurreID < 1)
-                                throw new ArgumentOutOfRangeException("ConnectedFurre", ConnectedFurre, "ConnectedFurre not found in dream.");
 
                             player.Location = new FurrePosition(data.Substring(5, 4));
+
+                            if (ConnectedFurre.FurreID < 1)
+                                throw new ArgumentOutOfRangeException("ConnectedFurre", ConnectedFurre, "ConnectedFurre not found in dream.");
 
                             //connectedFurre = (Furre)Dream.Furres[connectedFurre];
                             ViewArea VisableRectangle = new ViewArea(ConnectedFurre.Location);

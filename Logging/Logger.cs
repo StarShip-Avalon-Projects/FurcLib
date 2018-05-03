@@ -344,7 +344,7 @@ namespace Furcadia.Logging
                     if (logTask.Status == TaskStatus.Running)
                         return;
                     cancelToken.Dispose();
-                    cancelToken = new CancellationTokenSource();
+                    cancelToken = new CancellationTokenSource(100);
                     logTask.Start();
                 }
             }
