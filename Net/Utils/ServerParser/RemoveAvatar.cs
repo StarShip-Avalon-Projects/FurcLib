@@ -1,5 +1,5 @@
 ﻿using Furcadia.Net.DreamInfo;
-using static Furcadia.Text.Base220;
+using Furcadia.Text;
 
 namespace Furcadia.Net.Utils.ServerParser
 {
@@ -16,7 +16,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// 4 byte Base220 string
         /// </para>
         /// </summary>
-        public int FurreId;
+        public Base220 FurreId;
 
         /// <summary>
         /// Triggering furre being removed
@@ -24,7 +24,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// <value>
         /// Triggering furre.
         /// </value>
-        public IFurre Player { get; set; } = null;
+        public Furre Player { get; set; } = null;
 
         #endregion Public Fields
 
@@ -40,7 +40,7 @@ namespace Furcadia.Net.Utils.ServerParser
             if (ServerInstruction[0] == ')')
                 base.instructionType = ServerInstructionType.RemoveAvatar;
             if (ServerInstruction.Length > 4)
-                FurreId = ConvertFromBase220(ServerInstruction.Substring(1, 4));
+                FurreId = ServerInstruction.Substring(1, 4);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Furcadia.Net.Utils.ServerParser
         /// </returns>
         public override string ToString()
         {
-            return $"Server Instruction Type: '{InstructionType}' FurreId: '{FurreId}' Server: '{RawInstruction}'";
+            return $"Server Instruction Type: '{InstructionType}' FurreId: '{(int)FurreId}' Server: '{RawInstruction}'";
         }
 
         #endregion Public Constructors

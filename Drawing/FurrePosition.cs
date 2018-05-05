@@ -15,6 +15,8 @@ namespace Furcadia.Drawing
         /// </summary>
         public FurrePosition()
         {
+            this.Y = 0;
+            this.X = 0;
         }
 
         /// <summary>

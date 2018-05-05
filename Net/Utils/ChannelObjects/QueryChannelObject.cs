@@ -103,7 +103,7 @@ namespace Furcadia.Net.Utils.ChannelObjects
         /// </summary>
         /// <param name="ServerInstruction">The server instruction.</param>
         /// <param name="Furr">The furr.</param>
-        public QueryChannelObject(string ServerInstruction, IFurre Furr) : base(ServerInstruction, Furr)
+        public QueryChannelObject(string ServerInstruction, Furre Furr) : base(ServerInstruction, Furr)
         {
             Match QueryMatch = QueryCommand.Match(ServerInstruction);
             var name = NameRegex.Match(ServerInstruction).Groups[2].Value;

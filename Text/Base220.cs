@@ -235,6 +235,8 @@ namespace Furcadia.Text
         /// </returns>
         public static implicit operator int(Base220 b220n)
         {
+            if (b220n is null)
+                return 0;
             return b220n.Value;
         }
 

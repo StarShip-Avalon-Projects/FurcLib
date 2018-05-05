@@ -7,85 +7,57 @@ namespace Furcadia.Net.DreamInfo
 {
     /// <summary>
     /// Furre List information for a Furcadia Dream
-    /// <para>
-    /// This class acts like an enhanced List(of &lt;T&gt;) because you can
-    /// Select a Furre by Item as well as index
-    /// </para>
+    /// <para/>
+    /// Implements List
     /// </summary>
-    public class FurreList : IList<IFurre>, ICollection
+    public class FurreList : List<Furre>, ICollection, IEnumerable
     {
-        #region Private Fields
-
-        private static IList<IFurre> furreList;
-
-        private object RemoveLock = new object();
-
-        #endregion Private Fields
-
-        #region Public Constructors
-
         /// <summary>
+        /// Initializes a new instance of the <see cref="FurreList"/> class.
         /// </summary>
-        public FurreList()
+        public FurreList() : base()
         {
-            furreList = new List<IFurre>(100);
         }
 
-        #endregion Public Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FurreList"/> class.
+        /// </summary>
+        /// <param name="ie">The ie.</param>
+        public FurreList(IEnumerable<Furre> ie) : base(ie)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FurreList"/> class.
+        /// </summary>
+        /// <param name="capacity">The number of elements that the new list can initially store.</param>
+        public FurreList(int capacity) : base(capacity)
+        {
+        }
+
+        #region Private Fields
+
+        private object RemoveLockId = new object();
+        private object RemoveLock = new object();
+        private object AddLock = new object();
+
+        #endregion Private Fields
 
         #region Public Properties
 
         /// <summary>
-        /// Number of Avatars in the Dream
-        /// </summary>
-        public int Count => furreList.Count;
-
-        /// <summary>
-        /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.
-        /// </summary>
-        public bool IsReadOnly => furreList.IsReadOnly;
-
-        /// <summary>
         /// Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe).
         /// </summary>
-        public bool IsSynchronized => ((ICollection)furreList).IsSynchronized;
+        public bool IsSynchronized => ((ICollection)this).IsSynchronized;
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection" />.
         /// </summary>
-        public object SyncRoot => ((ICollection)furreList).SyncRoot;
-
-        /// <summary>
-        /// Gets to i list.
-        /// </summary>
-        /// <value>
-        /// To i list.
-        /// </value>
-        public IList<IFurre> ToIList => furreList;
+        public object SyncRoot => ((ICollection)this).SyncRoot;
 
         #endregion Public Properties
 
         #region Public Indexers
-
-        /// <summary>
-        /// Gets or sets the <see cref="Furre"/> at the specified index.
-        /// </summary>
-        /// <value>
-        /// The <see cref="Furre"/>.
-        /// </value>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        public IFurre this[int index]
-        {
-            get
-            {
-                return furreList[index];
-            }
-            set
-            {
-                furreList[index] = value;
-            }
-        }
 
         /// <summary>
         /// Gets or set the Furre at index of fur
@@ -95,19 +67,15 @@ namespace Furcadia.Net.DreamInfo
         /// </param>
         /// <returns>
         /// </returns>
-        public IFurre this[IFurre fur]
+        public Furre this[Furre fur]
         {
             get
             {
-                if (furreList.Contains(fur))
-                    return furreList[furreList.IndexOf(fur)];
-                fur.FurreID = 0;
-                return fur;
+                return this[this.IndexOf(fur)];
             }
             set
             {
-                if (furreList.Contains(fur))
-                    furreList[furreList.IndexOf(fur)] = value;
+                this[this.IndexOf(fur)] = value;
             }
         }
 
@@ -115,25 +83,23 @@ namespace Furcadia.Net.DreamInfo
 
         #region Public Methods
 
-        /// <summary>
-        /// Adds the specified furre.
-        /// </summary>
-        /// <param name="Furre">The furre.</param>
-        public void Add(IFurre Furre)
-        {
-            if (!furreList.Contains((Furre)Furre))
-                furreList.Add(Furre);
-            else
-                furreList[furreList.IndexOf((Furre)Furre)] = Furre;
-        }
-
-        /// <summary>
-        /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.
-        /// </summary>
-        public void Clear()
-        {
-            furreList.Clear();
-        }
+        ///// <summary>
+        ///// Adds the specified furre.
+        ///// </summary>
+        ///// <param name="Furre">The furre.</param>
+        //public void AddOrUpdate(Furre Furre)
+        //{
+        //    lock (AddLock)
+        //    {
+        //        if (!Contains(Furre))
+        //            Add(Furre);
+        //        else
+        //        {
+        //            var idx = IndexOf(Furre);
+        //            this[idx] = Furre;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Determines whether [contains] [the specified furre name].
@@ -144,7 +110,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Contains(string FurreName)
         {
-            foreach (Furre fur in furreList)
+            foreach (Furre fur in this)
             {
                 if (fur.ShortName == FurreName.ToFurcadiaShortName())
                     return true;
@@ -161,27 +127,10 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Contains(Base220 FurreId)
         {
-            foreach (Furre fur in furreList)
+            var found = false;
+            foreach (Furre fur in this)
             {
                 if (fur.FurreID == FurreId)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether [contains] [the specified furre].
-        /// </summary>
-        /// <param name="Furre">The furre.</param>
-        /// <returns>
-        ///   <c>true</c> if [contains] [the specified furre]; otherwise, <c>false</c>.
-        /// </returns>
-        public bool Contains(IFurre Furre)
-        {
-            var found = false;
-            foreach (Furre fur in furreList)
-            {
-                if (fur == Furre)
                 {
                     found = true;
                     break;
@@ -198,39 +147,7 @@ namespace Furcadia.Net.DreamInfo
         /// </param>
         public void CopyTo(Array array, int index)
         {
-            ((ICollection)furreList).CopyTo(array, index);
-        }
-
-        /// <summary>
-        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
-        /// </summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-        public void CopyTo(IFurre[] array, int arrayIndex)
-        {
-            furreList.CopyTo(array, arrayIndex);
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through a collection.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
-        /// </returns>
-        public IEnumerator GetEnumerator()
-        {
-            return ((ICollection)furreList).GetEnumerator();
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        IEnumerator<IFurre> IEnumerable<IFurre>.GetEnumerator()
-        {
-            return furreList.GetEnumerator();
+            ((ICollection)this).CopyTo(array, index);
         }
 
         /// <summary>
@@ -243,12 +160,13 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public Furre GetFurreByID(Base220 FurreID)
         {
-            foreach (Furre Furre in furreList)
+            var fur = new Furre(FurreID);
+            foreach (Furre Furre in this)
             {
                 if (Furre.FurreID == FurreID)
-                    return Furre;
+                    fur = Furre;
             }
-            return new Furre(FurreID);
+            return fur;
         }
 
         /// <summary>
@@ -261,7 +179,7 @@ namespace Furcadia.Net.DreamInfo
         {
             if (string.IsNullOrEmpty(FurreName))
                 throw new ArgumentNullException(FurreName);
-            foreach (Furre Furre in furreList)
+            foreach (Furre Furre in this)
             {
                 if (Furre.ShortName == FurreName.ToFurcadiaShortName())
                 {
@@ -272,36 +190,16 @@ namespace Furcadia.Net.DreamInfo
         }
 
         /// <summary>
-        /// Indexes the of.
-        /// </summary>
-        /// <param name="Furre">The furre.</param>
-        /// <returns></returns>
-        public int IndexOf(IFurre Furre)
-        {
-            return furreList.IndexOf(Furre);
-        }
-
-        /// <summary>
-        /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1" /> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
-        /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1" />.</param>
-        public void Insert(int index, IFurre item)
-        {
-            furreList.Insert(index, item);
-        }
-
-        /// <summary>
         /// Removes a Furre based on their Furre ID
         /// </summary>
         /// <param name="FurreID">
         /// </param>
-        public void Remove(Base220 FurreID)
+        public bool Remove(Base220 FurreID)
         {
-            lock (RemoveLock)
+            lock (RemoveLockId)
             {
-                IFurre fur = null;
-                foreach (Furre Fur in furreList)
+                Furre fur = null;
+                foreach (Furre Fur in this)
                 {
                     if (Fur.FurreID == FurreID)
                     {
@@ -309,38 +207,8 @@ namespace Furcadia.Net.DreamInfo
                         break;
                     }
                 }
-                if (fur != null)
-                    furreList.Remove(fur);
+                return this.Remove(fur);
             }
-        }
-
-        /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1" />.
-        /// </summary>
-        /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        /// <returns>
-        /// true if <paramref name="item" /> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false. This method also returns false if <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
-        /// </returns>
-        public bool Remove(IFurre item)
-        {
-            foreach (Furre Furre in furreList)
-            {
-                if (Furre.FurreID == item.FurreID)
-                {
-                    furreList.Remove(Furre);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Removes the <see cref="T:System.Collections.Generic.IList`1" /> item at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the item to remove.</param>
-        public void RemoveAt(int index)
-        {
-            furreList.RemoveAt(index);
         }
 
         #endregion Public Methods

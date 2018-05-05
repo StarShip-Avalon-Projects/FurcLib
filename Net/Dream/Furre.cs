@@ -67,11 +67,11 @@ namespace Furcadia.Net.DreamInfo
         private bool inRange;
         private bool wasInRange;
         private AvatarDirection direction;
-        private FurrePosition location;
+        private FurrePosition location = new FurrePosition(0, 0);
         private string message;
         private string name;
         private FurrePose pose;
-        private FurrePosition SourceLocation;
+        private FurrePosition SourceLocation = new FurrePosition(0, 0);
 
         #endregion Private Fields
 

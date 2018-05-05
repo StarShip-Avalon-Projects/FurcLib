@@ -32,9 +32,9 @@ namespace Furcadia.Net.DirectConnection
     {
         #region Internal Fields
 
-        internal byte[] serverBuffer = new byte[BUFFER_CAP];
+        internal byte[] serverBuffer = new byte[BufferCapacity];
 
-        internal byte[] ServerLeftOvers = new byte[BUFFER_CAP];
+        internal byte[] ServerLeftOvers = new byte[BufferCapacity];
 
         // private object ServerBufferLock = new object();
         internal int ServerLeftOversSize = 0;
@@ -51,11 +51,6 @@ namespace Furcadia.Net.DirectConnection
         #endregion Protected Internal Fields
 
         #region Private Fields
-
-        /// <summary>
-        /// Max buffer size
-        /// </summary>
-        private static int BUFFER_CAP = 4096;
 
         /// <summary>
         /// Furcadia Client TCP Client
@@ -173,13 +168,7 @@ namespace Furcadia.Net.DirectConnection
         /// <value>
         /// The buffer capacity.
         /// </value>
-        public int BufferCapacity
-        {
-            get
-            {
-                return BUFFER_CAP;
-            }
-        }
+        public static int BufferCapacity { get; } = 4096;
 
         /// <summary>
         /// Gets the current connection attempt.
@@ -189,13 +178,6 @@ namespace Furcadia.Net.DirectConnection
         /// </value>
         public int CurrentConnectionAttempt
         { get; internal set; }
-
-        /// <summary>
-        /// Encodig
-        /// <para/>
-        /// DEFAULT: Windows 1252
-        /// </summary>
-        public int EncoderPage { get; } = 1252;
 
         /// <summary>
         /// Check our connection status to the game server
@@ -254,7 +236,7 @@ namespace Furcadia.Net.DirectConnection
                 //when the connection completes before the timeout it will cause a race
                 //we want EndConnect to always treat the connection as successful if it wins
 
-                Logger.Info($"Starting connection to Furcadia gameserver.");
+                Logger.Info($"Starting connection to Furcadia game-server.");
                 while (!sucess)
                 {
                     IAsyncResult ar = LightBringer.BeginConnect(options.GameServerHost, options.GameServerPort, EndConnect, state);
@@ -273,7 +255,7 @@ namespace Furcadia.Net.DirectConnection
                     }
                     if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
                     {
-                        throw new NetConnectionException($"Faile to connect, Aborting");
+                        throw new NetConnectionException($"Failed to connect, Aborting");
                     }
 
                     CurrentConnectionAttempt++;
@@ -288,7 +270,7 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
-        /// Disconnect from the Furcadia gameserver and Furcadia client
+        /// Disconnect from the Furcadia game-server and Furcadia client
         /// </summary>
         public virtual void Disconnect()
         {
@@ -377,14 +359,13 @@ namespace Furcadia.Net.DirectConnection
                 try
                 {
                     int read = 0;
-                    // TcpClient GameServer = listener.EndAcceptTcpClient(ar);
                     read = LightBringer.GetStream().EndRead(ar);
                     int currStart = 0;
                     int currEnd = -1;
 
                     for (int i = 0; i < read; i++)
                     {
-                        if (i < BUFFER_CAP && serverBuffer[i] == 10)
+                        if (i < BufferCapacity && serverBuffer[i] == 10)
                         {
                             // Set the end of the data
                             currEnd = i;
@@ -429,7 +410,7 @@ namespace Furcadia.Net.DirectConnection
                     }
 
                     if (IsServerSocketConnected)
-                        LightBringer.GetStream().BeginRead(serverBuffer, 0, BUFFER_CAP, new AsyncCallback(GetServerData), LightBringer);
+                        LightBringer.GetStream().BeginRead(serverBuffer, 0, BufferCapacity, new AsyncCallback(GetServerData), LightBringer);
                 }
                 catch (Exception ex) //Catch any unknown exception and close the connection gracefully
                 {
@@ -442,7 +423,7 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
-        /// Sanatizes the protocol strinng.
+        /// Sanitizes the protocol string.
         /// </summary>
         /// <param name="message">The message.</param>
         internal void SanatizeProtocolStrinng(ref string message)
@@ -460,7 +441,7 @@ namespace Furcadia.Net.DirectConnection
         /// </summary>
         /// <param name="e"></param>
         /// <param name="o"></param>
-        protected virtual void SendError(Exception e, object o)
+        public virtual void SendError(Exception e, object o)
         {
             if (Error != null)
             {
@@ -477,7 +458,7 @@ namespace Furcadia.Net.DirectConnection
         #region Private Methods
 
         /// <summary>
-        /// Asynchronouses the listener.
+        /// Asynchronous the listener.
         /// </summary>
         /// <param name="ar">The ar.</param>
         private void AsyncListener(IAsyncResult ar)
@@ -485,7 +466,6 @@ namespace Furcadia.Net.DirectConnection
             try
             {
                 LightBringer.GetStream().BeginRead(serverBuffer, 0, serverBuffer.Length, new AsyncCallback(GetServerData), LightBringer);
-                //  ServerConnected?.Invoke();
             }
             catch (Exception e)
             {

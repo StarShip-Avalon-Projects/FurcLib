@@ -36,11 +36,6 @@ namespace Furcadia.Net.Proxy
         #region Private Fields
 
         /// <summary>
-        /// Max buffer size
-        /// </summary>
-        private static int BUFFER_CAP = 4096;
-
-        /// <summary>
         /// Furcadia Client TCP Client
         /// </summary>
         private static TcpClient client;
@@ -52,16 +47,12 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         private static TcpClient LightBringer;
 
-        private byte[] clientBuffer = new byte[BUFFER_CAP];
+        private byte[] clientBuffer = new byte[BufferCapacity];
         private object ClientBufferLock = new object();
         private object ClientDataObject = new object();
-        private byte[] ClientLeftOvers = new byte[BUFFER_CAP];
+        private byte[] ClientLeftOvers = new byte[BufferCapacity];
         private int ClientLeftOversSize = 0;
         private bool disposedValue = false;
-
-        /// <summary>
-        /// </summary>
-        private int ENCODE_PAGE = 1252;
 
         /// <summary>
         /// Furcadia Client Process
@@ -72,8 +63,6 @@ namespace Furcadia.Net.Proxy
         /// Allow Furcadia Client to connect to us
         /// </summary>
         private TcpListener listen;
-
-        private ProxyOptions options;
 
         private Text.Settings settings;
         private Action SettingsRestore;
@@ -87,7 +76,7 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public NetProxy() : base()
         {
-            options = new ProxyOptions
+            Options = new ProxyOptions
             {
                 LocalhostPort = 6700,
                 GameServerPort = 6500
@@ -101,7 +90,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public NetProxy(int LocalPort) : base(LocalPort)
         {
-            options = new ProxyOptions
+            Options = new ProxyOptions
             {
                 LocalhostPort = LocalPort,
             };
@@ -118,7 +107,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public NetProxy(int port, int lport) : base(port)
         {
-            options = new ProxyOptions
+            Options = new ProxyOptions
             {
                 LocalhostPort = lport,
                 GameServerPort = port
@@ -135,7 +124,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public NetProxy(string host, int port) : base(host, port)
         {
-            options = new ProxyOptions
+            Options = new ProxyOptions
             {
                 GameServerPort = port,
                 LocalhostPort = 6700,
@@ -151,7 +140,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public NetProxy(ProxyOptions Options) : base(Options)
         {
-            options = Options;
+            this.Options = Options;
             Initialize();
         }
 
@@ -169,7 +158,7 @@ namespace Furcadia.Net.Proxy
         /// </param>
         public NetProxy(string host, int port, int lport) : base(host, port)
         {
-            options = new ProxyOptions
+            Options = new ProxyOptions
             {
                 LocalhostPort = lport,
                 GameServerHost = host,
@@ -285,17 +274,7 @@ namespace Furcadia.Net.Proxy
         /// <value>
         /// The options.
         /// </value>
-        public ProxyOptions Options
-        {
-            get
-            { return options; }
-            set
-            {
-                //if (IsServerSocketConnected)
-                //    throw new InvalidOperationException("NetProxy is alread connected");
-                options = value;
-            }
-        }
+        public ProxyOptions Options { get; set; }
 
         #endregion Public Properties
 
@@ -311,13 +290,8 @@ namespace Furcadia.Net.Proxy
             {
                 try
                 {
-                    //while (!furcProcess.HasExited)
-                    //{
-                    //if (furcProcess == null)
-                    //    break;
                     var Furc = Process.GetProcessById(furcProcess.Id, furcProcess.MachineName);
                     Furc.CloseMainWindow();
-                    //}
                 }
                 finally
                 {
@@ -345,8 +319,8 @@ namespace Furcadia.Net.Proxy
         /// </exception>
         public override void Connect()
         {
-            settings = new Text.Settings(options);
-            var MiliSecondTime = (int)TimeSpan.FromSeconds(options.ConnectionTimeOut).TotalMilliseconds;
+            settings = new Text.Settings(Options);
+            var MiliSecondTime = (int)TimeSpan.FromSeconds(Options.ConnectionTimeOut).TotalMilliseconds;
             CurrentConnectionAttempt = 1;
 
             LightBringer = new TcpClient
@@ -357,7 +331,7 @@ namespace Furcadia.Net.Proxy
             var state = new State { Client = LightBringer, Success = true };
             var sucess = false;
 
-            listen = new TcpListener(IPAddress.Any, options.LocalhostPort)
+            listen = new TcpListener(IPAddress.Any, Options.LocalhostPort)
             {
                 ExclusiveAddressUse = true
             };
@@ -373,18 +347,18 @@ namespace Furcadia.Net.Proxy
                     Logger.Info($"Starting connection to Furcadia game-server.");
                     while (!sucess)
                     {
-                        IAsyncResult ar = LightBringer.BeginConnect(options.GameServerHost, options.GameServerPort, EndConnect, state);
+                        IAsyncResult ar = LightBringer.BeginConnect(Options.GameServerHost, Options.GameServerPort, EndConnect, state);
                         state.Success = ar.AsyncWaitHandle.WaitOne(MiliSecondTime, false);
 
                         sucess = (state.Success && LightBringer.Connected);
                         if (sucess)
                             break;
-                        if (!sucess && CurrentConnectionAttempt < options.ConnectionRetries)
+                        if (!sucess && CurrentConnectionAttempt < Options.ConnectionRetries)
                         {
-                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{options.ConnectionRetries} Has Failed, Trying again in {options.ConnectionTimeOut} seconds");
+                            Logger.Warn($"Connect attempt {CurrentConnectionAttempt}/{Options.ConnectionRetries} Has Failed, Trying again in {Options.ConnectionTimeOut} seconds");
                             ServerDisconnected?.Invoke();
                         }
-                        if (!sucess && CurrentConnectionAttempt == options.ConnectionRetries)
+                        if (!sucess && CurrentConnectionAttempt == Options.ConnectionRetries)
                         {
                             throw new NetProxyException($"Faile to connect, Aborting");
                         }
@@ -402,7 +376,7 @@ namespace Furcadia.Net.Proxy
 
                 //Run
                 // Set the Proxy/Firewall Settings
-                settings.InitializeFurcadiaSettings(options.FurcadiaFilePaths.SettingsPath);
+                settings.InitializeFurcadiaSettings(Options.FurcadiaFilePaths.SettingsPath);
                 Logger.Debug<NetProxy>("Start Furcadia");
                 // LaunchFurcadia
                 furcID = LaunchFurcadiaClient();
@@ -550,7 +524,7 @@ namespace Furcadia.Net.Proxy
 
                     for (int i = 0; i < read; i++)
                     {
-                        if (i < BUFFER_CAP && clientBuffer[i] == '\n')//10
+                        if (i < BufferCapacity && clientBuffer[i] == '\n')//10
                         {
                             // Set the end of the data
                             currEnd = i;
@@ -590,7 +564,7 @@ namespace Furcadia.Net.Proxy
                         ClientLeftOversSize = read - currStart;
                     }
                     if (IsClientSocketConnected)
-                        client.GetStream().BeginRead(clientBuffer, 0, BUFFER_CAP, new AsyncCallback(GetClientData), client);
+                        client.GetStream().BeginRead(clientBuffer, 0, BufferCapacity, new AsyncCallback(GetClientData), client);
                     else
                         ClientDisconnected?.Invoke();
                 }

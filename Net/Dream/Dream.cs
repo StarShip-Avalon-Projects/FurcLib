@@ -44,7 +44,7 @@ namespace Furcadia.Net.DreamInfo
         private string dreamTitle, _Rating, dreamOwner;
 
         private string fileName;
-        private static FurreList furres;
+
         private bool isPermament;
         private string mode;
 
@@ -65,7 +65,6 @@ namespace Furcadia.Net.DreamInfo
         /// </summary>
         public Dream()
         {
-            furres = new FurreList();
             mode = "legacy";
             JustArrived = false;
         }
@@ -146,26 +145,6 @@ namespace Furcadia.Net.DreamInfo
         {
             get => fileName;
             set => fileName = value;
-        }
-
-        /// <summary>
-        /// Dream List Furcadia requires Clients to handle thier own Dream
-        /// Lists See
-        /// <para>
-        /// http://dev.furcadia.com/docs New Movement for Spawn and Remove packets
-        /// </para>
-        /// <para>
-        /// **Spawn is out dated. New information requires a 4byte for AFK
-        ///   flag at the end
-        /// </para>
-        /// <para>
-        /// As of V31, Color code has changed.
-        /// </para>
-        /// </summary>
-        public FurreList Furres
-        {
-            get => furres;
-            set => furres = value;
         }
 
         /// <summary>

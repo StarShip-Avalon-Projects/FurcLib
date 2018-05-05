@@ -258,7 +258,11 @@ namespace Furcadia.Logging
                     }
                 }
             }, cancelToken.Token, TaskCreationOptions.LongRunning);
-            if (!singleThreaded) logTask.Start();
+            if (!singleThreaded)
+            {
+                logTask.Start();
+                logTask.Wait();
+            }
         }
 
         /// <summary>
@@ -341,10 +345,11 @@ namespace Furcadia.Logging
                 if (singleThreaded) cancelToken.Cancel();
                 else
                 {
-                    if (logTask.Status == TaskStatus.Running)
+                    if (logTask.Status == TaskStatus.Running || logTask.IsCompleted || logTask.IsCanceled)
                         return;
                     cancelToken.Dispose();
-                    cancelToken = new CancellationTokenSource(100);
+                    cancelToken = new CancellationTokenSource();
+
                     logTask.Start();
                 }
             }
