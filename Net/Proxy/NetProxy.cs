@@ -6,6 +6,7 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  */
 
+using Extentions;
 using Furcadia.Logging;
 using Furcadia.Net.DirectConnection;
 using Furcadia.Net.Options;
@@ -57,7 +58,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Furcadia Client Process
         /// </summary>
-        private static Process furcProcess;
+        private Process furcProcess;
 
         /// <summary>
         /// Allow Furcadia Client to connect to us
@@ -284,14 +285,21 @@ namespace Furcadia.Net.Proxy
         ///  Disconnects the furcadia client and Closes the application
         /// </summary>
         /// <exception cref="System.InvalidOperationException"></exception>
-        public static void CloseFurcadiaClient()
+        public void CloseFurcadiaClient()
         {
             if (furcProcess != null)
             {
                 try
                 {
-                    var Furc = Process.GetProcessById(furcProcess.Id, furcProcess.MachineName);
-                    Furc.CloseMainWindow();
+                    while (!furcProcess.HasExited)
+                    {
+                        var Furc = Process.GetProcessById(furcProcess.Id, furcProcess.MachineName);
+                        Furc.CloseMainWindow();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.Log();
                 }
                 finally
                 {

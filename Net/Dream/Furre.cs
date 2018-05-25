@@ -364,6 +364,14 @@ namespace Furcadia.Net.DreamInfo
             get => inRange == true && wasInRange == false;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="Furre"/> is visible.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if visible; otherwise, <c>false</c>.
+        /// </value>
+        public bool Visible { get; internal set; }
+
         #endregion Public Properties
 
         #region Public Methods

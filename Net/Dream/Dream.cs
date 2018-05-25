@@ -123,12 +123,13 @@ namespace Furcadia.Net.DreamInfo
             {
                 if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
                     return null;
-                if (string.IsNullOrWhiteSpace(dreamOwner))
-                    throw new ArgumentException(dreamOwner);
                 var sb = new StringBuilder($"furc://");
-                sb.Append($"{ dreamOwner.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(dreamOwner))
+                    sb.Append($"{ dreamOwner.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(dreamOwner) && !string.IsNullOrWhiteSpace(dreamTitle))
+                    sb.Append(":");
                 if (!string.IsNullOrWhiteSpace(dreamTitle))
-                    sb.Append($":{dreamTitle.ToFurcadiaShortName()}");
+                    sb.Append($"{dreamTitle.ToFurcadiaShortName()}");
                 sb.Append("/");
                 Logger.Debug<Dream>(sb);
                 return sb.ToString();

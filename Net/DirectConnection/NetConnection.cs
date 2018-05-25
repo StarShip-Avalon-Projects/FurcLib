@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static Furcadia.Movement.CharacterFlags;
+using static Furcadia.Net.DirectConnection.ClientBase;
 using static Furcadia.Text.FurcadiaMarkup;
 
 namespace Furcadia.Net.DirectConnection
@@ -26,18 +27,9 @@ namespace Furcadia.Net.DirectConnection
     /// Part3: This Class Links loosely to the GUI
     /// </para>
     /// </summary>
-    public class NetConnection : ClientBase, IDisposable
+    public class NetConnection : IDisposable
     {
         #region Public Fields
-
-        /// <summary>
-        /// Called when [throat tired trigger].
-        /// </summary>
-        /// <param name="stat">if set to <c>true</c> [stat].</param>
-        public void OnThroatTiredTrigger(bool stat)
-        {
-            TroatTiredEventHandler?.Invoke(stat);
-        }
 
         /// <summary>
         /// </summary>
@@ -52,22 +44,22 @@ namespace Furcadia.Net.DirectConnection
 
         #region Private Fields
 
-        private ClientOptions clientOptions;
-
         ///// <summary>
         ///// Beekin Badge
         ///// </summary>
         private Queue<string> BadgeTag;
 
         private string banishName = "";
-
         private List<string> banishString = new List<string>();
-
         private object ChannelLock = new object();
-
         private RegexOptions ChannelOptions = RegexOptions.Compiled | RegexOptions.CultureInvariant;
+        private ClientBase Client;
+
+        private ClientOptions clientOptions;
 
         private bool disposed = false;
+
+        private FurreList furres;
 
         private bool hasShare;
 
@@ -95,7 +87,7 @@ namespace Furcadia.Net.DirectConnection
 
         /// <summary>
         /// </summary>
-        public NetConnection() : this(new ClientOptions())
+        public NetConnection()
         {
             Initilize();
         }
@@ -105,10 +97,11 @@ namespace Furcadia.Net.DirectConnection
         /// <param name="Options">
         /// NetConnection Options
         /// </param>
-        public NetConnection(ClientOptions Options) : base(Options)
+        public NetConnection(ClientOptions Options)
         {
             Initilize();
             clientOptions = Options;
+            Client.Options = clientOptions;
         }
 
         #endregion Public Constructors
@@ -180,6 +173,11 @@ namespace Furcadia.Net.DirectConnection
         #region Public Events
 
         /// <summary>
+        /// This is triggered when a handled Exception is thrown.
+        /// </summary>
+        public event ErrorEventHandler Error;
+
+        /// <summary>
         /// Process Display Text and Channels
         /// </summary>
         public event ProcessChannel ProcessServerChannelData;
@@ -189,10 +187,19 @@ namespace Furcadia.Net.DirectConnection
         public event ProcessInstruction ProcessServerInstruction;
 
         /// <summary>
-        /// This is triggered when the Server sends data to the client.
-        /// Doesn't expect a return value.
+        /// Occurs when [server connected].
         /// </summary>
-        public override event DataEventHandler2 ServerData2;
+        public event ActionDelegate ServerConnected;
+
+        /// <summary>
+        /// Occurs when [server data2].
+        /// </summary>
+        public event DataEventHandler2 ServerData2;
+
+        /// <summary>
+        ///This is triggered when the Server Disconnects
+        /// </summary>
+        public event ActionDelegate ServerDisconnected;
 
         /// <summary>
         /// Track the Server Status
@@ -241,6 +248,22 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
+        /// Gets or sets the connected furre identifier.
+        /// </summary>
+        /// <value>
+        /// The connected furre identifier.
+        /// </value>
+        public int ConnectedFurreId { get; set; } = -1;
+
+        /// <summary>
+        /// Gets or sets the name of the connected furre.
+        /// </summary>
+        /// <value>
+        /// The name of the connected furre.
+        /// </value>
+        public string ConnectedFurreName { get; set; }
+
+        /// <summary>
         /// Current Dream Information with Furre List
         /// </summary>
         public Dream Dream
@@ -248,7 +271,13 @@ namespace Furcadia.Net.DirectConnection
             get; private set;
         }
 
-        public FurreList Furres { get; private set; }
+        /// <summary>
+        /// Gets or sets the furres.
+        /// </summary>
+        /// <value>
+        /// The furres.
+        /// </value>
+        public FurreList Furres { get => furres; set => furres = value; }
 
         /// <summary>
         /// We have Dream Share or We are Dream owner
@@ -264,6 +293,14 @@ namespace Furcadia.Net.DirectConnection
         {
             get => !string.IsNullOrWhiteSpace(Dream.FileName);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is server socket connected.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is server socket connected; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsServerSocketConnected => Client.IsServerSocketConnected;
 
         /// <summary>
         /// Current Triggering player
@@ -321,22 +358,6 @@ namespace Furcadia.Net.DirectConnection
             set => ServerBalancer.NoEndurance = value;
         }
 
-        /// <summary>
-        /// Gets or sets the connected furre identifier.
-        /// </summary>
-        /// <value>
-        /// The connected furre identifier.
-        /// </value>
-        public int ConnectedFurreId { get; set; } = -1;
-
-        /// <summary>
-        /// Gets or sets the name of the connected furre.
-        /// </summary>
-        /// <value>
-        /// The name of the connected furre.
-        /// </value>
-        public string ConnectedFurreName { get; set; }
-
         #endregion Internal Properties
 
         #region Public Methods
@@ -344,16 +365,24 @@ namespace Furcadia.Net.DirectConnection
         /// <summary>
         ///Connect the Proxy to the Furcadia  Game server
         /// </summary>
-        public override void Connect()
+        public void Connect()
         {
             serverconnectphase = ConnectionPhase.Connecting;
-            base.Connect();
+            Client.Connect();
+        }
+
+        /// <summary>
+        /// Disconnects this instance.
+        /// </summary>
+        public void Disconnect()
+        {
+            Client.Disconnect();
         }
 
         /// <summary>
         /// implementation of Dispose pattern callable by consumers.
         /// </summary>
-        public override void Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.Collect();
@@ -390,6 +419,15 @@ namespace Furcadia.Net.DirectConnection
         public bool IsConnectedCharacter(IFurre Fur)
         {
             return ConnectedFurre == (Furre)Fur;
+        }
+
+        /// <summary>
+        /// Called when [throat tired trigger].
+        /// </summary>
+        /// <param name="stat">if set to <c>true</c> [stat].</param>
+        public void OnThroatTiredTrigger(bool stat)
+        {
+            TroatTiredEventHandler?.Invoke(stat);
         }
 
         /// <summary>
@@ -1163,6 +1201,23 @@ namespace Furcadia.Net.DirectConnection
         }
 
         /// <summary>
+        /// send errors to the error handler
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="o"></param>
+        public virtual void SendError(Exception e, object o)
+        {
+            if (Error != null)
+            {
+                Error?.Invoke(e, o);
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        /// <summary>
         /// Format basic furcadia commands and send to server
         /// <para>
         /// We also mirror the client to server banish system.
@@ -1202,7 +1257,7 @@ namespace Furcadia.Net.DirectConnection
         /// <param name="message">
         /// Client to server Instruction
         /// </param>
-        public override void SendToServer(string message)
+        public void SendToServer(string message)
         {
             Logger.Debug<NetConnection>(message);
             if (serverconnectphase != ConnectionPhase.Disconnected)
@@ -1267,7 +1322,7 @@ namespace Furcadia.Net.DirectConnection
 
             if (disposing)
             {
-                base.Dispose();
+                Client.Dispose();
                 ServerBalancer.Dispose();
             }
 
@@ -1285,6 +1340,7 @@ namespace Furcadia.Net.DirectConnection
             Logger.Disable<NetConnection>();
 #endif
             clientOptions = new ClientOptions();
+            Client = new ClientBase(clientOptions);
             SpeciesTag = new Queue<string>();
             BadgeTag = new Queue<string>();
 
@@ -1293,18 +1349,27 @@ namespace Furcadia.Net.DirectConnection
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
             ServerBalancer.TroatTiredEventHandler += e => OnThroatTiredTrigger(e);
-            base.ServerData2 += e => OnServerDataReceived(e);
-            ServerConnected += () => OnServerConnected();
-            ServerDisconnected += () => OnServerDisonnected();
+
+            Client.ServerData2 += e => OnServerDataReceived(e);
+            Client.ServerConnected += () => OnServerConnected();
+            Client.ServerDisconnected += () => OnServerDisonnected();
+
+            Client.Error += (e, o) => OnError(e, o);
 
             player = new Furre();
             Dream = new Dream();
+            furres = new FurreList(100);
 
             //BadgeTag = new Queue<string>(50);
             LookQue = new Queue<string>(50);
 
             //          SpeciesTag = new Queue<string>(50);
             //          BanishString = new List<string>(50);
+        }
+
+        private void OnError(Exception e, object v)
+        {
+            SendError(e, v);
         }
 
         private void OnServerConnected()
@@ -1335,7 +1400,7 @@ namespace Furcadia.Net.DirectConnection
 
         private void OnServerQueSent(object sender, EventArgs e)
         {
-            base.SendToServer(sender.ToString());
+            Client.SendToServer(sender.ToString());
         }
 
         #endregion Private Methods
