@@ -39,13 +39,6 @@ namespace Furcadia.Net.DreamInfo
     {
         #region Private Fields
 
-        private int _Lines;
-
-        private string dreamTitle, _Rating, dreamOwner;
-
-        private string fileName;
-
-        private bool isPermament;
         private string mode;
 
         /// <summary>
@@ -75,7 +68,7 @@ namespace Furcadia.Net.DreamInfo
         /// <param name="DreamOwner">The dream owner.</param>
         public Dream(string DreamOwner) : this()
         {
-            this.dreamOwner = DreamOwner;
+            this.DreamOwner = DreamOwner;
             JustArrived = true;
         }
 
@@ -96,20 +89,16 @@ namespace Furcadia.Net.DreamInfo
                 if (string.IsNullOrWhiteSpace(value.DreamOwner))
                     throw new ArgumentNullException(value.DreamOwner);
                 //Modern should be set bu this point
-                dreamTitle = value.Title;
-                if (string.IsNullOrEmpty(dreamOwner))
-                    dreamOwner = value.DreamOwner;
+                Title = value.Title;
+                if (string.IsNullOrEmpty(DreamOwner))
+                    DreamOwner = value.DreamOwner;
             }
         }
 
         /// <summary>
         /// Dreams uploader character
         /// </summary>
-        public string DreamOwner
-        {
-            get => dreamOwner;
-            set => dreamOwner = value;
-        }
+        public string DreamOwner { get; set; }
 
         /// <summary>
         /// Dreams full Furcadia Drean URL
@@ -121,15 +110,15 @@ namespace Furcadia.Net.DreamInfo
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
+                if (string.IsNullOrWhiteSpace(DreamOwner) && string.IsNullOrWhiteSpace(Title))
                     return null;
                 var sb = new StringBuilder($"furc://");
-                if (!string.IsNullOrWhiteSpace(dreamOwner))
-                    sb.Append($"{ dreamOwner.ToFurcadiaShortName()}");
-                if (!string.IsNullOrWhiteSpace(dreamOwner) && !string.IsNullOrWhiteSpace(dreamTitle))
+                if (!string.IsNullOrWhiteSpace(DreamOwner))
+                    sb.Append($"{ DreamOwner.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(DreamOwner) && !string.IsNullOrWhiteSpace(Title))
                     sb.Append(":");
-                if (!string.IsNullOrWhiteSpace(dreamTitle))
-                    sb.Append($"{dreamTitle.ToFurcadiaShortName()}");
+                if (!string.IsNullOrWhiteSpace(Title))
+                    sb.Append($"{Title.ToFurcadiaShortName()}");
                 sb.Append("/");
                 Logger.Debug<Dream>(sb);
                 return sb.ToString();
@@ -142,11 +131,7 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         /// The name of the file.
         /// </value>
-        public string FileName
-        {
-            get => fileName;
-            set => fileName = value;
-        }
+        public string FileName { get; set; }
 
         /// <summary>
         /// Is this dream Modern Mode?
@@ -159,16 +144,12 @@ namespace Furcadia.Net.DreamInfo
         /// <value>
         ///   <c>true</c> if this dream is permament; otherwise, <c>false</c>.
         /// </value>
-        public bool IsPermanent => isPermament;
+        public bool IsPermanent { get; private set; }
 
         /// <summary>
         /// Number of DS Lines
         /// </summary>
-        public int Lines
-        {
-            get => _Lines;
-            set => _Lines = value;
-        }
+        public int Lines { get; set; }
 
         /// <summary>
         /// Name of the dream
@@ -177,12 +158,12 @@ namespace Furcadia.Net.DreamInfo
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(dreamOwner) && string.IsNullOrWhiteSpace(dreamTitle))
+                if (string.IsNullOrWhiteSpace(DreamOwner) && string.IsNullOrWhiteSpace(Title))
                     return null;
                 var sb = new StringBuilder();
-                sb.Append($"{dreamOwner}");
-                if (!string.IsNullOrWhiteSpace(dreamTitle))
-                    sb.Append($":{dreamTitle}");
+                sb.Append($"{DreamOwner}");
+                if (!string.IsNullOrWhiteSpace(Title))
+                    sb.Append($":{Title}");
                 Logger.Debug<Dream>(sb);
                 return sb.ToString();
             }
@@ -191,20 +172,12 @@ namespace Furcadia.Net.DreamInfo
         /// <summary>
         /// Furcadia Dream rating
         /// </summary>
-        public string Rating
-        {
-            get => _Rating;
-            set => _Rating = value;
-        }
+        public string Rating { get; set; }
 
         /// <summary>
         /// Dream title
         /// </summary>
-        public string Title
-        {
-            get => dreamTitle;
-            set => dreamTitle = value;
-        }
+        public string Title { get; set; }
 
         #endregion Public Properties
 
@@ -218,13 +191,13 @@ namespace Furcadia.Net.DreamInfo
         /// <returns>
         /// The result of the operator.
         /// </returns>
-        public static bool operator !=(Dream dreamA, IDream dreamB)
+        public static bool operator !=(Dream dreamA, IDream DreamB)
         {
             if (dreamA is null)
             {
-                return dreamB is null;
+                return DreamB is null;
             }
-            return !dreamA.Equals(dreamB);
+            return !dreamA.Equals(DreamB);
         }
 
         /// <summary>
@@ -269,7 +242,7 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public override int GetHashCode()
         {
-            return Name.GetHashCode() ^ dreamOwner.GetHashCode(); ;
+            return Name.GetHashCode() ^ DreamOwner.GetHashCode();
         }
 
         /// <summary>
@@ -281,10 +254,10 @@ namespace Furcadia.Net.DreamInfo
             if (DreamInfo.IsModern)
                 mode = "modern";
 
-            fileName = DreamInfo.CacheFileName;
+            FileName = DreamInfo.CacheFileName;
             if (FileName.Length > 2)
-                dreamTitle = fileName.Substring(2);
-            isPermament = DreamInfo.IsPermanent;
+                Title = FileName.Substring(2);
+            IsPermanent = DreamInfo.IsPermanent;
         }
 
         /// <summary>
@@ -296,6 +269,16 @@ namespace Furcadia.Net.DreamInfo
         public override string ToString()
         {
             return Name;
+        }
+
+        internal void Clear()
+        {
+            DreamOwner = string.Empty;
+            FileName = string.Empty;
+            IsPermanent = false;
+            Lines = 0;
+            Rating = string.Empty;
+            Title = string.Empty;
         }
 
         #endregion Public Methods

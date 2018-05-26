@@ -60,20 +60,10 @@ namespace Furcadia.Net.Proxy
         ///// </summary>
         private Queue<string> BadgeTag;
 
-        private string banishName = "";
-
-        private List<string> banishString = new List<string>();
-
         private object ChannelLock = new object();
 
         private RegexOptions ChannelOptions = RegexOptions.Compiled | RegexOptions.CultureInvariant;
-
-        private ConnectionPhase clientconnectionphase;
-
         private bool disposed = false;
-
-        private bool hasShare;
-
         private bool Look;
 
         private Queue<string> LookQue;
@@ -86,8 +76,6 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         private Utils.ServerQue ServerBalancer;
 
-        private ConnectionPhase serverconnectphase;
-
         private Queue<string> SpeciesTag;
 
         #endregion Private Fields
@@ -96,7 +84,7 @@ namespace Furcadia.Net.Proxy
 
         /// <summary>
         /// </summary>
-        public ProxySession() : this(new Options.ProxyOptions())
+        public ProxySession() : this(new ProxyOptions())
         {
         }
 
@@ -251,11 +239,7 @@ namespace Furcadia.Net.Proxy
         /// <value>
         /// The banish list.
         /// </value>
-        public List<string> BanishList
-        {
-            get => banishString;
-            private set => banishString = value;
-        }
+        public List<string> BanishList { get; private set; } = new List<string>();
 
         /// <summary>
         /// Current Name for Banish Operations
@@ -263,19 +247,12 @@ namespace Furcadia.Net.Proxy
         /// We mirror Furcadia's Banish system for efficiency
         /// </para>
         /// </summary>
-        public string BanishName
-        {
-            get => banishName;
-            private set => banishName = value;
-        }
+        public string BanishName { get; private set; } = "";
 
         /// <summary>
         /// Current Connection Phase
         /// </summary>
-        public ConnectionPhase ClientConnectPhase
-        {
-            get => clientconnectionphase;
-        }
+        public ConnectionPhase ClientConnectPhase { get; private set; }
 
         /// <summary>
         /// Client Connection status
@@ -285,7 +262,7 @@ namespace Furcadia.Net.Proxy
         /// </returns>
         public ConnectionPhase ClientStatus
         {
-            get => clientconnectionphase;
+            get => ClientConnectPhase;
         }
 
         /// <summary>
@@ -344,10 +321,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// We have Dream Share or We are Dream owner
         /// </summary>
-        public bool HasShare
-        {
-            get => hasShare;
-        }
+        public bool HasShare { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -406,10 +380,7 @@ namespace Furcadia.Net.Proxy
         /// <summary>
         /// Current server connection phase
         /// </summary>
-        public ConnectionPhase ServerConnectPhase
-        {
-            get => serverconnectphase;
-        }
+        public ConnectionPhase ServerConnectPhase { get; private set; }
 
         /// <summary>
         /// Server Connection status
@@ -419,7 +390,7 @@ namespace Furcadia.Net.Proxy
         /// </returns>
         public ConnectionPhase ServerStatus
         {
-            get => serverconnectphase;
+            get => ServerConnectPhase;
         }
 
         /// <summary>
@@ -469,8 +440,10 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public void Connect()
         {
-            serverconnectphase = ConnectionPhase.Connecting;
-            clientconnectionphase = ConnectionPhase.Connecting;
+            ServerConnectPhase = ConnectionPhase.Connecting;
+            ClientConnectPhase = ConnectionPhase.Connecting;
+            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(ServerConnectPhase));
+            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(ClientConnectPhase));
             Proxy.Connect();
         }
 
@@ -479,6 +452,8 @@ namespace Furcadia.Net.Proxy
         /// </summary>
         public void Disconnect()
         {
+            Furres.Clear();
+            Dream.Clear();
             Proxy.DisconnectServerAndClientStreams();
         }
 
@@ -744,15 +719,15 @@ namespace Furcadia.Net.Proxy
                 }
                 else if (chanObject.ChannelText == "Control of this Dream is now being shared with you.")
                 {
-                    hasShare = true;
+                    HasShare = true;
                 }
                 else if (chanObject.ChannelText.EndsWith("is now sharing control of this Dream with you."))
                 {
-                    hasShare = true;
+                    HasShare = true;
                 }
                 else if (chanObject.ChannelText.EndsWith("has stopped sharing control of this Dream with you."))
                 {
-                    hasShare = false;
+                    HasShare = false;
                 }
                 else if (chanObject.ChannelText.StartsWith("The endurance limits of player "))
                 {
@@ -1021,7 +996,7 @@ namespace Furcadia.Net.Proxy
             Logger.Debug<ProxySession>(data);
             try
             {
-                switch (serverconnectphase)
+                switch (ServerConnectPhase)
                 {
                     case ConnectionPhase.MOTD:
                         // SSL/TLS `starttls
@@ -1033,15 +1008,15 @@ namespace Furcadia.Net.Proxy
                         if (data == "Dragonroar")
                         {
                             // Login Sucessful
-                            serverconnectphase = ConnectionPhase.Auth;
-                            ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                            ServerConnectPhase = ConnectionPhase.Auth;
+                            ServerStatusChanged?.Invoke(data, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.Unknown));
                             // Standalone / account
                             // SendToServer($"connect {sUsername} {sPassword}");
 
                             if (Proxy.IsClientSocketConnected)
                             {
-                                clientconnectionphase = ConnectionPhase.Auth;
-                                ClientStatusChanged?.Invoke(data, new NetClientEventArgs(clientconnectionphase));
+                                ClientConnectPhase = ConnectionPhase.Auth;
+                                ClientStatusChanged?.Invoke(data, new NetClientEventArgs(ClientConnectPhase));
                             }
                         }
                         break;
@@ -1054,13 +1029,13 @@ namespace Furcadia.Net.Proxy
                         else if (data == "&&&&&&&&&&&&&")
                         {
                             //We've connected to Furcadia
-                            serverconnectphase = ConnectionPhase.Connected;
+                            ServerConnectPhase = ConnectionPhase.Connected;
 
-                            ServerStatusChanged?.Invoke(data, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+                            ServerStatusChanged?.Invoke(data, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.Unknown));
                             if (Proxy.IsClientSocketConnected)
                             {
-                                clientconnectionphase = ConnectionPhase.Connected;
-                                ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+                                ClientConnectPhase = ConnectionPhase.Connected;
+                                ClientStatusChanged?.Invoke(this, new NetClientEventArgs(ClientConnectPhase));
                             }
                         }
                         break;
@@ -1089,7 +1064,7 @@ namespace Furcadia.Net.Proxy
                             ProcessServerInstruction?.Invoke
                             (
                                 instruction,
-                                new ParseServerArgs(ServerInstructionType.EnterDream, serverconnectphase)
+                                new ParseServerArgs(ServerInstructionType.EnterDream, ServerConnectPhase)
                             );
 
                             if (Options.Standalone)
@@ -1119,7 +1094,7 @@ namespace Furcadia.Net.Proxy
                                 ProcessServerInstruction?.Invoke
                                 (
                                     Instruction,
-                                    new ParseServerArgs(ServerInstructionType.LookResponse, serverconnectphase)
+                                    new ParseServerArgs(ServerInstructionType.LookResponse, ServerConnectPhase)
                                 );
                             };
                         }
@@ -1138,7 +1113,7 @@ namespace Furcadia.Net.Proxy
                                 Furres.Add(player);
                                 ProcessServerInstruction?.Invoke(
                                     FurreSpawn,
-                                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, serverconnectphase));
+                                    new ParseServerArgs(ServerInstructionType.SpawnAvatar, ServerConnectPhase));
                             }
                             if (!Furres.Contains(player))
                                 Furres.Add(player);
@@ -1160,7 +1135,7 @@ namespace Furcadia.Net.Proxy
                                 ProcessServerInstruction?.Invoke
                                 (
                                     RemoveFurre,
-                                    new ParseServerArgs(ServerInstructionType.RemoveAvatar, serverconnectphase)
+                                    new ParseServerArgs(ServerInstructionType.RemoveAvatar, ServerConnectPhase)
                                 );
                             }
                             return;
@@ -1205,7 +1180,7 @@ namespace Furcadia.Net.Proxy
 
                             Logger.Debug<ProxySession>(FurreMoved);
                             ProcessServerInstruction?.Invoke(FurreMoved,
-                                  new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, serverconnectphase));
+                                  new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, ServerConnectPhase));
 
                             return;
                         }
@@ -1247,7 +1222,7 @@ namespace Furcadia.Net.Proxy
                             };
                             Logger.Debug<ProxySession>(FurreMoved);
                             ProcessServerInstruction?.Invoke(FurreMoved,
-                                  new ParseServerArgs(ServerInstructionType.MoveAvatar, serverconnectphase));
+                                  new ParseServerArgs(ServerInstructionType.MoveAvatar, ServerConnectPhase));
                             return;
                         }
                         //Update ColorString
@@ -1260,7 +1235,7 @@ namespace Furcadia.Net.Proxy
                             if (InDream)
                             {
                                 ProcessServerInstruction?.Invoke(ColorStringUpdate,
-                                new ParseServerArgs(ServerInstructionType.UpdateColorString, serverconnectphase));
+                                new ParseServerArgs(ServerInstructionType.UpdateColorString, ServerConnectPhase));
                             }
                         }
                         //Hide Avatar
@@ -1323,14 +1298,14 @@ namespace Furcadia.Net.Proxy
                         else if (data.StartsWith("]q"))
                         {
                             //Set defaults (should move to some where else?
-                            hasShare = false;
+                            HasShare = false;
                             NoEndurance = false;
                             LoadDream loadDream = new LoadDream(data);
                             Dream.Load(loadDream);
                             Logger.Debug<ProxySession>($"Load Dream {loadDream}");
 
                             ProcessServerInstruction?.Invoke(loadDream,
-                               new ParseServerArgs(ServerInstructionType.LoadDreamEvent, serverconnectphase));
+                               new ParseServerArgs(ServerInstructionType.LoadDreamEvent, ServerConnectPhase));
 
                             // Set Proxy to Stand-Alone Operation
 
@@ -1348,7 +1323,7 @@ namespace Furcadia.Net.Proxy
                         else if (data.StartsWith("]z"))
                         {
                             ProcessServerInstruction?.Invoke(new BaseServerInstruction(data),
-                                new ParseServerArgs(ServerInstructionType.UniqueUserId, serverconnectphase));
+                                new ParseServerArgs(ServerInstructionType.UniqueUserId, ServerConnectPhase));
                         }
                         // ]BUserID[*]
                         // Set Own ID
@@ -1364,7 +1339,7 @@ namespace Furcadia.Net.Proxy
                             ProcessServerInstruction?.Invoke
                             (
                                 new BaseServerInstruction(data),
-                                new ParseServerArgs(ServerInstructionType.SetOwnId, serverconnectphase)
+                                new ParseServerArgs(ServerInstructionType.SetOwnId, ServerConnectPhase)
                             );
                         }
                         else if (data.StartsWith("]c"))
@@ -1390,7 +1365,7 @@ namespace Furcadia.Net.Proxy
                                 ProcessServerInstruction?.Invoke
                                     (
                                         bookmark,
-                                        new ParseServerArgs(ServerInstructionType.BookmarkDream, serverconnectphase)
+                                        new ParseServerArgs(ServerInstructionType.BookmarkDream, ServerConnectPhase)
                                     );
                                 return;
                             }
@@ -1422,7 +1397,7 @@ namespace Furcadia.Net.Proxy
                     case ConnectionPhase.Disconnected:
                         {
                             ServerStatusChanged?.Invoke(null,
-                                        new NetServerEventArgs(serverconnectphase, ServerInstructionType.None));
+                                        new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.None));
                             break;
                         }
                     // Do nothing - we're disconnected...
@@ -1505,7 +1480,7 @@ namespace Furcadia.Net.Proxy
         {
             if (string.IsNullOrWhiteSpace(data)) return;
             Logger.Debug<ProxySession>(data);
-            if (Proxy.IsClientSocketConnected && clientconnectionphase != ConnectionPhase.Disconnected)
+            if (Proxy.IsClientSocketConnected && ClientConnectPhase != ConnectionPhase.Disconnected)
                 Proxy.SendToClient(data);
         }
 
@@ -1519,7 +1494,7 @@ namespace Furcadia.Net.Proxy
         {
             if (string.IsNullOrWhiteSpace(message)) return;
             Logger.Debug<ProxySession>(message);
-            if (serverconnectphase != ConnectionPhase.Disconnected)
+            if (ServerConnectPhase != ConnectionPhase.Disconnected)
                 ServerBalancer.SendToServer(message);
         }
 
@@ -1560,8 +1535,8 @@ namespace Furcadia.Net.Proxy
             SpeciesTag = new Queue<string>();
             BadgeTag = new Queue<string>();
 
-            serverconnectphase = ConnectionPhase.Init;
-            clientconnectionphase = ConnectionPhase.Init;
+            ServerConnectPhase = ConnectionPhase.Init;
+            ClientConnectPhase = ConnectionPhase.Init;
 
             ServerBalancer = new Utils.ServerQue();
             ServerBalancer.OnServerSendMessage += (o, e) => OnServerQueSent(o, e);
@@ -1595,15 +1570,15 @@ namespace Furcadia.Net.Proxy
 
         private void OnClientConnected()
         {
-            clientconnectionphase = ConnectionPhase.MOTD;
-            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+            ClientConnectPhase = ConnectionPhase.MOTD;
+            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(ClientConnectPhase));
         }
 
         private void OnClientDisconnected()
         {
-            clientconnectionphase = ConnectionPhase.Disconnected;
+            ClientConnectPhase = ConnectionPhase.Disconnected;
             ClientDisconnected?.Invoke();
-            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+            ClientStatusChanged?.Invoke(this, new NetClientEventArgs(ClientConnectPhase));
         }
 
         private void OnError(Exception e, object v)
@@ -1613,8 +1588,8 @@ namespace Furcadia.Net.Proxy
 
         private void OnServerConnected()
         {
-            serverconnectphase = ConnectionPhase.MOTD;
-            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+            ServerConnectPhase = ConnectionPhase.MOTD;
+            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.Unknown));
         }
 
         /// <summary>
@@ -1633,9 +1608,9 @@ namespace Furcadia.Net.Proxy
 
         private void OnServerDisonnected()
         {
-            serverconnectphase = ConnectionPhase.Disconnected;
+            ServerConnectPhase = ConnectionPhase.Disconnected;
             ServerDisconnected?.Invoke();
-            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(serverconnectphase, ServerInstructionType.Unknown));
+            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.Unknown));
         }
 
         private void OnServerQueSent(object o, EventArgs e)
@@ -1653,7 +1628,7 @@ namespace Furcadia.Net.Proxy
         {
             Logger.Debug<ProxySession>(data);
 
-            switch (clientconnectionphase)
+            switch (ClientConnectPhase)
             {
                 case ConnectionPhase.Auth:
                     var ConnectString = data.Split(new char[] { ' ' }, 5);
@@ -1682,8 +1657,8 @@ namespace Furcadia.Net.Proxy
                     // handle the connection properly
                     if (data == "quit")
                     {
-                        clientconnectionphase = ConnectionPhase.Disconnected;
-                        ClientStatusChanged?.Invoke(this, new NetClientEventArgs(clientconnectionphase));
+                        ClientConnectPhase = ConnectionPhase.Disconnected;
+                        ClientStatusChanged?.Invoke(this, new NetClientEventArgs(ClientConnectPhase));
                         if (Options.Standalone)
                         {
                             Proxy.DisconnectClientStream();
