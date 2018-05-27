@@ -85,7 +85,7 @@ namespace Furcadia.Text
 
         /// <summary>
         /// </summary>
-        public const string NameFilter = "<name shortname=('[a-z0-9]{2,64}'|\"[a-z0-9]{2,64}\") ?>(.{2,64})</name>";
+        public const string NameFilter = "<name shortname=('(.*?)'|\"(.*?)\") ?>(.*?)</name>";
 
         /// <summary>
         /// Whispers Name

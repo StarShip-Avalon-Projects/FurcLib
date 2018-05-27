@@ -37,9 +37,7 @@ namespace Furcadia.Net.DreamInfo
 
         #region Private Fields
 
-        private object RemoveLockId = new object();
-        private object RemoveLock = new object();
-        private object AddLock = new object();
+        private object ListLock = new object();
 
         #endregion Private Fields
 
@@ -71,11 +69,17 @@ namespace Furcadia.Net.DreamInfo
         {
             get
             {
-                return this[this.IndexOf(fur)];
+                lock (ListLock)
+                {
+                    return this[this.IndexOf(fur)];
+                }
             }
             set
             {
-                this[this.IndexOf(fur)] = value;
+                lock (ListLock)
+                {
+                    this[this.IndexOf(fur)] = value;
+                }
             }
         }
 
@@ -83,23 +87,25 @@ namespace Furcadia.Net.DreamInfo
 
         #region Public Methods
 
-        ///// <summary>
-        ///// Adds the specified furre.
-        ///// </summary>
-        ///// <param name="Furre">The furre.</param>
-        //public void AddOrUpdate(Furre Furre)
-        //{
-        //    lock (AddLock)
-        //    {
-        //        if (!Contains(Furre))
-        //            Add(Furre);
-        //        else
-        //        {
-        //            var idx = IndexOf(Furre);
-        //            this[idx] = Furre;
-        //        }
-        //    }
-        //}
+        /// <summary>
+        /// Updates the specified furre in the list.
+        /// </summary>
+        /// <param name="Furre">The furre.</param>
+        /// <returns>True is the specified furre is in the list.</returns>
+        public bool Update(Furre Furre)
+        {
+            bool found = false;
+            lock (ListLock)
+            {
+                if (Contains(Furre))
+                {
+                    int idx = IndexOf(Furre);
+                    this[idx] = Furre;
+                    found = true;
+                }
+            }
+            return found;
+        }
 
         /// <summary>
         /// Determines whether [contains] [the specified furre name].
@@ -110,12 +116,19 @@ namespace Furcadia.Net.DreamInfo
         /// </returns>
         public bool Contains(string FurreName)
         {
-            foreach (Furre fur in this)
+            bool found = false;
+            lock (ListLock)
             {
-                if (fur.ShortName == FurreName.ToFurcadiaShortName())
-                    return true;
+                foreach (Furre fur in this)
+                {
+                    if (fur.ShortName == FurreName.ToFurcadiaShortName())
+                    {
+                        found = true;
+                        break;
+                    }
+                }
             }
-            return false;
+            return found;
         }
 
         /// <summary>
@@ -128,12 +141,15 @@ namespace Furcadia.Net.DreamInfo
         public bool Contains(Base220 FurreId)
         {
             var found = false;
-            foreach (Furre fur in this)
+            lock (ListLock)
             {
-                if (fur.FurreID == FurreId)
+                foreach (Furre fur in this)
                 {
-                    found = true;
-                    break;
+                    if (fur.FurreID == FurreId)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
             }
             return found;
@@ -161,10 +177,13 @@ namespace Furcadia.Net.DreamInfo
         public Furre GetFurreByID(Base220 FurreID)
         {
             var fur = new Furre(FurreID);
-            foreach (Furre Furre in this)
+            lock (ListLock)
             {
-                if (Furre.FurreID == FurreID)
-                    fur = Furre;
+                foreach (Furre Furre in this)
+                {
+                    if (Furre.FurreID == FurreID)
+                        fur = Furre;
+                }
             }
             return fur;
         }
@@ -179,14 +198,18 @@ namespace Furcadia.Net.DreamInfo
         {
             if (string.IsNullOrEmpty(FurreName))
                 throw new ArgumentNullException(FurreName);
-            foreach (Furre Furre in this)
+            var FoundFurre = new Furre(0, FurreName);
+            lock (ListLock)
             {
-                if (Furre.ShortName == FurreName.ToFurcadiaShortName())
+                foreach (Furre Furre in this)
                 {
-                    return Furre;
+                    if (Furre.ShortName == FurreName.ToFurcadiaShortName())
+                    {
+                        FoundFurre = Furre;
+                    }
                 }
             }
-            return new Furre(0, FurreName);
+            return FoundFurre;
         }
 
         /// <summary>
@@ -196,7 +219,7 @@ namespace Furcadia.Net.DreamInfo
         /// </param>
         public bool Remove(Base220 FurreID)
         {
-            lock (RemoveLockId)
+            lock (ListLock)
             {
                 Furre fur = null;
                 foreach (Furre Fur in this)

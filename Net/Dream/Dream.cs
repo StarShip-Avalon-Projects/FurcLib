@@ -273,12 +273,12 @@ namespace Furcadia.Net.DreamInfo
 
         internal void Clear()
         {
-            DreamOwner = string.Empty;
-            FileName = string.Empty;
-            IsPermanent = false;
-            Lines = 0;
-            Rating = string.Empty;
-            Title = string.Empty;
+            //DreamOwner = string.Empty;
+            //FileName = string.Empty;
+            //IsPermanent = false;
+            //Lines = 0;
+            //Rating = string.Empty;
+            //Title = string.Empty;
         }
 
         #endregion Public Methods

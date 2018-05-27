@@ -296,19 +296,11 @@ namespace Furcadia.Net.Proxy
                         var Furc = Process.GetProcessById(furcProcess.Id, furcProcess.MachineName);
                         Furc.CloseMainWindow();
                     }
+                    furcID = -1;
                 }
                 catch (Exception e)
                 {
                     e.Log();
-                }
-                finally
-                {
-                    if (furcProcess != null)
-                    {
-                        furcProcess.Dispose();
-                        furcProcess = null;
-                        furcID = -1;
-                    }
                 }
             }
         }

@@ -582,56 +582,21 @@ namespace Furcadia.Net.Proxy
             Regex FontColorRegex = new Regex(FontChannelFilter, RegexOptions.Compiled | RegexOptions.CultureInvariant);
             Match FontColorRegexMatch = FontColorRegex.Match(data);
             Match DescTagRegexMatch = DescTagRegex.Match(data);
-            Furre ActivePlayer = new Furre("Furcadia game server");
 
-            if (NameRegex.Match(data).Success)
-                ActivePlayer = Furres.GetFurreByName(NameRegex.Match(data).Groups[2].Value);
-
-            if (DescTagRegexMatch.Success)
-            {
-                if (DescTagRegexMatch.Groups[1].Value == "fsh://system.fsh:86")
-                {
-                    string LineCountRegex = "<img src='fsh://system.fsh:86' /> Lines of DragonSpeak: ([0-9]+)";
-                    Regex LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
-                    if (LineCount.Match(data).Success)
-                    {
-                        Dream.Lines = int.Parse(LineCount.Match(data).Groups[1].Value);
-                        Logger.Debug<ProxySession>($"DS Lines set to {Dream.Lines}");
-                    }
-                    LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
-                    LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
-                    if (LineCount.Match(data).Success)
-                    {
-                        Dream.Rating = LineCount.Match(data).Groups[1].Value;
-                        Logger.Debug<ProxySession>($"Dream Rating set to {Dream.Rating}");
-                    }
-                    ActivePlayer.Message = DescTagRegexMatch.Groups[6].Value;
-                    //LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
-                    //LineCount = new Regex(LineCountRegex);
-                    //if (LineCount.Match(data).Success)
-                    //    Dream.Title = LineCount.Match(data).Groups[1].Value;
-                    player = ActivePlayer;
-                    chanObject.player = player;
-                    args.Channel = "@emit";
-
-                    ProcessServerChannelData?.Invoke(chanObject, args);
-                    return;
-                }
-            }
             string Color = FontColorRegexMatch.Groups[1].Value;
 
             Regex DescRegex = new Regex(DescFilter, ChannelOptions);
             if (DescRegex.Match(data).Success)
             {
-                ActivePlayer = Furres.GetFurreByName(DescRegex.Match(data).Groups[1].Value);
-                ActivePlayer.FurreDescription = DescRegex.Match(data).Groups[2].Value;
+                player = Furres.GetFurreByName(DescRegex.Match(data).Groups[1].Value);
+                player.FurreDescription = DescRegex.Match(data).Groups[2].Value;
 
                 if (LookQue.Count > 0)
                 {
-                    (ActivePlayer).FurreColors = new ColorString(LookQue.Dequeue());
+                    player.FurreColors = new ColorString(LookQue.Dequeue());
                 }
-                player = ActivePlayer;
-                chanObject.player = ActivePlayer;
+
+                chanObject.player = player;
                 args.Channel = "desc";
 
                 ProcessServerChannelData?.Invoke(chanObject, args);
@@ -663,8 +628,8 @@ namespace Furcadia.Net.Proxy
 
                 player = Furres.GetFurreByName(ShoutMatch.Groups[5].Value);
                 player.Message = ShoutMatch.Groups[9].Value;
-                if (Furres.Contains(player))
-                    Furres[player] = player;
+
+                Furres.Update(player);
 
                 chanObject.player = player;
 
@@ -680,8 +645,9 @@ namespace Furcadia.Net.Proxy
                 player = ConnectedFurre;
 
                 player.Message = ShoutMatch.Groups[4].Value;
-                if (Furres.Contains(ConnectedFurre))
-                    Furres[ConnectedFurre] = player;
+
+                Furres.Update(player);
+
                 chanObject.player = player;
 
                 ProcessServerChannelData?.Invoke(chanObject, args);
@@ -741,10 +707,13 @@ namespace Furcadia.Net.Proxy
             }
             else if (Color == "myspeech")
             {
+                player = ConnectedFurre;
+
                 //TODO: Test Active Player
                 Regex t = new Regex(YouSayFilter);
-                ActivePlayer.Message = t.Match(data).Groups[2].Value;
-                chanObject.player = ActivePlayer;
+
+                player.Message = t.Match(data).Groups[2].Value;
+                chanObject.player = player;
                 args.Channel = Color;
 
                 ProcessServerChannelData?.Invoke(chanObject, args);
@@ -777,8 +746,8 @@ namespace Furcadia.Net.Proxy
                         // Process everything as raw text
                         args.Channel = "text";
 
-                        ActivePlayer.Message = data;
-                        chanObject.player = ActivePlayer;
+                        player.Message = data;
+                        chanObject.player = player;
 
                         ProcessServerChannelData?.Invoke(chanObject, args);
                         return;
@@ -786,13 +755,13 @@ namespace Furcadia.Net.Proxy
                 }
                 else // You see [FURRE]
                 {
-                    ActivePlayer.Message = null;
-                    player = ActivePlayer;
+                    var nameMatch = NameRegex.Match(data);
+                    player = Furres.GetFurreByName(nameMatch.Groups[2].Value);
 
                     if (Furres.Contains(player))
                         Furres[player] = player;
 
-                    chanObject.player = ActivePlayer;
+                    chanObject.player = player;
                     // args.Channel = ??
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
@@ -812,7 +781,7 @@ namespace Furcadia.Net.Proxy
                     if (Furres.Contains(player))
                         Furres[player] = player;
 
-                    chanObject.player = ActivePlayer;
+                    chanObject.player = player;
                     args.Channel = WhisperMatches.Groups[2].Value;
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
@@ -827,19 +796,12 @@ namespace Furcadia.Net.Proxy
                     if (Furres.Contains(ConnectedFurre))
                         Furres[ConnectedFurre] = player;
 
-                    chanObject = new ChannelObject(data, ConnectedFurre);
+                    chanObject = new ChannelObject(data, player);
                     args.Channel = WhisperMatches.Groups[2].Value;
 
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
                 }
-            }
-            else if (Color == "trade")
-            {
-                //TODO: Verify Trade System is correct
-
-                ActivePlayer.Message = FontColorRegex.Match(data).Groups[4].Value;
-                player = ActivePlayer;
             }
             else if (Color == "emote")
             {
@@ -871,6 +833,8 @@ namespace Furcadia.Net.Proxy
                         if (!string.IsNullOrWhiteSpace(t))
                             BanishList.Add(t);
                     }
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (chanObject.ChannelText.Contains("There are no Furres around right now with a name starting with "))
                 {
@@ -879,6 +843,8 @@ namespace Furcadia.Net.Proxy
 
                     Regex t = new Regex("There are no Furres around right now with a name starting with (.*?) .", RegexOptions.Compiled);
                     NameStr = t.Match(data).Groups[1].Value;
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (chanObject.ChannelText == "Sorry, this player has not been banished from your Dreams.")
                 {
@@ -886,6 +852,8 @@ namespace Furcadia.Net.Proxy
                     //Error:>> Sorry, this player has not been banished from your Dreams.
 
                     NameStr = BanishName;
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (chanObject.ChannelText == "You have not banished anyone.")
                 {
@@ -893,6 +861,8 @@ namespace Furcadia.Net.Proxy
                     //Error:>> You have not banished anyone.
 
                     BanishList.Clear();
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
                 else if (chanObject.ChannelText.StartsWith("The banishment of player "))
                 {
@@ -902,7 +872,6 @@ namespace Furcadia.Net.Proxy
                     Regex t = new Regex("The banishment of player (.*?) has ended.", RegexOptions.Compiled);
                     NameStr = t.Match(data).Groups[1].Value;
                     player = new Furre(0, NameStr);
-                    player = ActivePlayer;
                     bool found = false;
                     int I;
                     for (I = 0; I <= BanishList.Count - 1; I++)
@@ -915,58 +884,64 @@ namespace Furcadia.Net.Proxy
                     }
                     if (found)
                         BanishList.RemoveAt(I);
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
-                ProcessServerChannelData?.Invoke(chanObject, args);
-                return;
             }
             else if (data.StartsWith("Communication"))
             {
                 Disconnect();
             }
-            else if (Color == "@cookie")
+            else if (DescTagRegexMatch.Success)
             {
-                // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Cookie <a href='http://www.furcadia.com/cookies/Cookie%20Economy.html'>bank</a> has currently collected: 0</font>
-                // <font color='emit'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> All-time Cookie total: 0</font>
-                // <font color='success'><img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> Your cookies are ready.  http://furcadia.com/cookies/ for more info!</font>
-                //<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.
-
-                Regex EatCookie = new Regex("<img src='fsh://system.fsh:90' alt='@cookie' /><channel name='@cookie' /> You eat a cookie.(.*?)", ChannelOptions);
-                if (EatCookie.Match(data).Success)
+                // These are part of joining a dream. They are Game Server settings
+                if (DescTagRegexMatch.Groups[1].Value == "fsh://system.fsh:86")
                 {
-                    player = ConnectedFurre;
-                    player.Message = "You eat a cookie." + EatCookie.Replace(data, "");
+                    player = new Furre("Furcadia game server")
+                        ;
+                    string LineCountRegex = "<img src='fsh://system.fsh:86' /> Lines of DragonSpeak: ([0-9]+)";
+                    Regex LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
+                    if (LineCount.Match(data).Success)
+                    {
+                        Dream.Lines = int.Parse(LineCount.Match(data).Groups[1].Value);
+                        Logger.Debug<ProxySession>($"DS Lines set to {Dream.Lines}");
+                    }
+                    LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
+                    LineCount = new Regex(LineCountRegex, RegexOptions.Compiled);
+                    if (LineCount.Match(data).Success)
+                    {
+                        Dream.Rating = LineCount.Match(data).Groups[1].Value;
+                        Logger.Debug<ProxySession>($"Dream Rating set to {Dream.Rating}");
+                    }
+                    player.Message = DescTagRegexMatch.Groups[6].Value;
+                    //LineCountRegex = "<img src='fsh://system.fsh:86' /> Dream Standard: <a href='http://www.furcadia.com/standards/'>(.*)</a>";
+                    //LineCount = new Regex(LineCountRegex);
+                    //if (LineCount.Match(data).Success)
+                    //    Dream.Title = LineCount.Match(data).Groups[1].Value;
+                    chanObject.player = player;
+                    args.Channel = "@emit";
 
-                    if (Furres.Contains(ConnectedFurre))
-                        Furres[ConnectedFurre] = player;
+                    ProcessServerChannelData?.Invoke(chanObject, args);
+                    return;
                 }
-
-                chanObject.player = player;
-                ProcessServerChannelData?.Invoke(chanObject, args);
-
-                return;
             }
             else //Dynamic Channels
             {
-                args.Channel = FontColorRegexMatch.Groups[8].Value;
+                args.Channel = FontColorRegexMatch.Groups[9].Value;
                 if (NameRegex.Match(data).Success)
                 {
-                    var name = NameRegex.Match(data).Groups[2].Value;
-                    player = Furres.GetFurreByName(name);
-
                     if (Furres.Contains(player))
                         Furres[player] = player;
                 }
+                else
+                {
+                    player = new Furre("Furcadia game server");
+                }
+
+                player.Message = FontColorRegexMatch.Groups[10].Value;
+                ProcessServerChannelData?.Invoke(chanObject, args);
+                return;
             }
-
-            if (string.IsNullOrWhiteSpace(ActivePlayer.Message))
-                ActivePlayer.Message = FontColorRegexMatch.Groups[10].Value.Substring(1);
-
-            player = ActivePlayer;
-
-            chanObject.player = ActivePlayer;
-            args.Channel = FontColorRegexMatch.Groups[9].Value;
-
-            ProcessServerChannelData?.Invoke(chanObject, args);
         }
 
         /// <summary>
