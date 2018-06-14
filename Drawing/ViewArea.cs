@@ -12,16 +12,144 @@ namespace Furcadia.Drawing
     //tilesHigh = tilesHigh * 2 ' * 2 as zig-zaggy vertical cols can fit twice as many tiles to a column
 
     /// <summary>
-    /// Visible are a Furre can see
+    /// Furcadia Furre View area (Isometric Map View)
     /// </summary>
     public class ViewArea
     {
+        #region Private Fields
+
+        private FurrePosition furreLocation;
+
+        #endregion Private Fields
+
+        #region Public Constructors
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewArea"/> class.
         /// </summary>
         public ViewArea()
         {
             FurreLocation = new FurrePosition();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewArea"/> class.
+        /// </summary>
+        /// <param name="location">The location.</param>
+        public ViewArea(FurrePosition location)
+        {
+            SetPosition(location.X, location.Y);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public ViewArea(Base220 x, Base220 y)
+        {
+            SetPosition(x, y);
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        /// <summary>
+        /// Lower right corner where the map drawing of the rectangle ends
+        /// </summary>
+        public FurrePosition EndLocation { get; private set; } = new FurrePosition();
+
+        /// <summary>
+        /// Gets or sets the furre location in the center of the View rectangle.
+        /// </summary>
+        /// <value>
+        /// The furre location.
+        /// </value>
+        public FurrePosition FurreLocation
+        {
+            get { return furreLocation; }
+
+            set
+            {
+                SetPosition(value.X, value.Y);
+                furreLocation = value;
+            }
+        }
+
+        /// <summary>
+        /// Upper Left corner where map drawing begins.
+        /// </summary>
+        /// <value>
+        /// The start location.
+        /// </value>
+        public FurrePosition StartLocation { get; private set; } = new FurrePosition();
+
+        #endregion Public Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="obj1">The obj1.</param>
+        /// <param name="obj2">The obj2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(ViewArea obj1, ViewArea obj2)
+        {
+            return !obj1.Equals(obj2);
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="obj1">The obj1.</param>
+        /// <param name="obj2">The obj2.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(ViewArea obj1, ViewArea obj2)
+        {
+            return obj1.Equals(obj2);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+                return false;
+            if (obj is ViewArea view)
+                return view.EndLocation == EndLocation && view.StartLocation == StartLocation;
+
+            return base.Equals(obj);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return StartLocation.GetHashCode() ^ EndLocation.GetHashCode();
+        }
+
+        /// <summary>
+        /// Target location is in our viewable rectangle?
+        /// </summary>
+        /// <param name="TargetLocation">The location.</param>
+        /// <returns></returns>
+        public bool InRange(FurrePosition TargetLocation)
+        {
+            return StartLocation.X <= TargetLocation.X
+                    && StartLocation.Y <= TargetLocation.Y
+                    && EndLocation.Y >= TargetLocation.Y
+                    && EndLocation.X >= TargetLocation.X;
         }
 
         /// <summary>
@@ -53,80 +181,14 @@ namespace Furcadia.Drawing
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ViewArea"/> class.
-        /// </summary>
-        /// <param name="location">The location.</param>
-        public ViewArea(FurrePosition location)
-        {
-            SetPosition(location.X, location.Y);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public ViewArea(Base220 x, Base220 y)
-        {
-            SetPosition(x, y);
-        }
-
-        #region Public Fields
-
-        /// <summary>
-        /// Gets or sets the furre location in the center of the View rectangle.
-        /// </summary>
-        /// <value>
-        /// The furre location.
-        /// </value>
-        public FurrePosition FurreLocation
-        {
-            get { return furreLocation; }
-
-            set
-            {
-                SetPosition(value.X, value.Y);
-                furreLocation = value;
-            }
-        }
-
-        private FurrePosition furreLocation;
-
-        /// <summary>
-        /// Upper Left corner where map drawing begins.
-        /// </summary>
-        /// <value>
-        /// The start location.
-        /// </value>
-        public FurrePosition StartLocation { get; private set; } = new FurrePosition();
-
-        /// <summary>
-        /// Lower right corner where the map drawing of the rectangle ends
-        /// </summary>
-        public FurrePosition EndLocation { get; private set; } = new FurrePosition();
-
-        /// <summary>
-        /// Target location is in our viewable rectangle?
-        /// </summary>
-        /// <param name="TargetLocation">The location.</param>
-        /// <returns></returns>
-        public bool InRange(FurrePosition TargetLocation)
-        {
-            return StartLocation.X <= TargetLocation.X
-                    && StartLocation.Y <= TargetLocation.Y
-                    && EndLocation.Y >= TargetLocation.Y
-                    && EndLocation.X >= TargetLocation.X;
-        }
-
-        /// <summary>
         ///
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return $"({StartLocation} - {EndLocation})";
+            return $"(Top Left: {StartLocation} - Bottom Right: {EndLocation})";
         }
 
-        #endregion Public Fields
+        #endregion Public Methods
     }
 }

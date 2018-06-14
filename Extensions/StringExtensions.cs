@@ -179,4 +179,30 @@ public static class StringExtensions
     {
         return Encoding.UTF8.GetString(Convert.FromBase64String(str));
     }
+
+    /// <summary>
+    /// To the short name of the furcadia.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <returns></returns>
+    public static string ToFurcadiaShortName(this string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return null;
+        return Regex.Replace(name.ToLower(), "[^a-z0-9\0x0020_.;&\\\v]+", string.Empty, RegexOptions.CultureInvariant | RegexOptions.Compiled);
+    }
+
+    /// <summary>
+    /// To the stripped furcadia markup string.
+    /// </summary>
+    /// <param name="Text">The text.</param>
+    /// <returns></returns>
+    public static string ToStrippedFurcadiaMarkupString(this string Text)
+    {
+        if (string.IsNullOrWhiteSpace(Text))
+            return null;
+        Regex r = new Regex("<(.*?)>", RegexOptions.Compiled);
+        Text = r.Replace(Text, string.Empty);
+        return Text.Replace("|", " ");
+    }
 }
