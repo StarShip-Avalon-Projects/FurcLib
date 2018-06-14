@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="Extentions\ArrayExtensions.cs" />
     <Compile Include="Extentions\ExceptionExtensions.cs" />
+    <Compile Include="Extentions\MathExtentions.cs" />
     <Compile Include="Extentions\ObjectExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="Logging\ConcurrentList.cs" />

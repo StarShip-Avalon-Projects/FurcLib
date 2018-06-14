@@ -112,10 +112,7 @@ namespace Furcadia.Drawing
         /// </returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            sb.Append($"{X}");
-            sb.Append($"{Y}");
-            return sb.ToString();
+            return $"({(int)X}, {(int)Y})";
         }
 
         #endregion Public Methods

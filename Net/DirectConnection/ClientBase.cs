@@ -6,6 +6,7 @@
  * (Mar 12,2014,0.2.12) Gerolkae, Adapted Paths to work with a Supplied path
  */
 
+using Extentions;
 using Furcadia.Logging;
 using Furcadia.Net.Options;
 using Furcadia.Net.Utils.ServerObjects;
@@ -354,7 +355,7 @@ namespace Furcadia.Net.DirectConnection
         {
             LightBringer = (TcpClient)ar.AsyncState;
 
-            if (LightBringer.Client.Connected)
+            if (LightBringer.Connected)
             {
                 try
                 {
@@ -409,7 +410,7 @@ namespace Furcadia.Net.DirectConnection
                         ServerLeftOversSize = read - currStart;
                     }
 
-                    if (IsServerSocketConnected)
+                    if (LightBringer.Client.Connected)
                         LightBringer.GetStream().BeginRead(serverBuffer, 0, BufferCapacity, new AsyncCallback(GetServerData), LightBringer);
                 }
                 catch (Exception ex) //Catch any unknown exception and close the connection gracefully
@@ -449,7 +450,7 @@ namespace Furcadia.Net.DirectConnection
             }
             else
             {
-                throw e;
+                e.Log();
             }
         }
 

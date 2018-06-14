@@ -221,7 +221,7 @@ namespace Furcadia.Net.Proxy
         {
             get
             {
-                if (furcID == -1 || furcProcess == null)
+                if (furcProcess == null || furcID == -1 || furcProcess.HasExited)
                     return false;
                 try
                 {
@@ -420,6 +420,11 @@ namespace Furcadia.Net.Proxy
             ServerDisconnected?.Invoke();
         }
 
+        private void OnServerDisconnected()
+        {
+            ServerDisconnected?.Invoke();
+        }
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -596,6 +601,13 @@ namespace Furcadia.Net.Proxy
                 }
                 settings.RestoreFurcadiaSettings();
             };
+            base.ServerDisconnected += OnServerDisconnected;
+            base.ServerConnected += OnSererConnected;
+        }
+
+        private void OnSererConnected()
+        {
+            ServerConnected?.Invoke();
         }
 
         private int LaunchFurcadiaClient()

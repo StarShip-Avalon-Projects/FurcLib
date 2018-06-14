@@ -610,8 +610,7 @@ namespace Furcadia.Net.Proxy
                 chanObject = new QueryChannelObject(data);
                 player = Furres.GetFurreByName(chanObject.Player.ShortName);
 
-                if (Furres.Contains(player))
-                    Furres[Player] = player;
+                Furres.Update(player);
 
                 chanObject.player = player;
                 args.Channel = QueryMatch.Groups[1].Value;
@@ -733,8 +732,7 @@ namespace Furcadia.Net.Proxy
                         player = Furres.GetFurreByName(SayMatch.Groups[2].Value);
                         player.Message = SayMatch.Groups[3].Value;
 
-                        if (Furres.Contains(player))
-                            Furres[player] = player;
+                        Furres.Update(player);
 
                         chanObject.player = player;
 
@@ -758,8 +756,7 @@ namespace Furcadia.Net.Proxy
                     var nameMatch = NameRegex.Match(data);
                     player = Furres.GetFurreByName(nameMatch.Groups[2].Value);
 
-                    if (Furres.Contains(player))
-                        Furres[player] = player;
+                    Furres.Update(player);
 
                     chanObject.player = player;
                     // args.Channel = ??
@@ -778,8 +775,7 @@ namespace Furcadia.Net.Proxy
                     player = Furres.GetFurreByName(WhisperMatches.Groups[4].Value);
                     player.Message = WhisperMatches.Groups[7].Value;
 
-                    if (Furres.Contains(player))
-                        Furres[player] = player;
+                    Furres.Update(player);
 
                     chanObject.player = player;
                     args.Channel = WhisperMatches.Groups[2].Value;
@@ -793,8 +789,8 @@ namespace Furcadia.Net.Proxy
                 {
                     player = ConnectedFurre;
                     player.Message = WhisperMatches.Groups[4].Value;
-                    if (Furres.Contains(ConnectedFurre))
-                        Furres[ConnectedFurre] = player;
+
+                    Furres.Update(player);
 
                     chanObject = new ChannelObject(data, player);
                     args.Channel = WhisperMatches.Groups[2].Value;
@@ -811,9 +807,11 @@ namespace Furcadia.Net.Proxy
                 args.Channel = EmoteMatch.Groups[1].Value;
 
                 player = Furres.GetFurreByName(EmoteMatch.Groups[3].Value);
-                player.Message = EmoteMatch.Groups[6].Value;
 
+                player.Message = EmoteMatch.Groups[6].Value;
                 chanObject.player = player;
+
+                Furres.Update(player);
 
                 ProcessServerChannelData?.Invoke(chanObject, args);
                 return;
@@ -921,6 +919,8 @@ namespace Furcadia.Net.Proxy
                     chanObject.player = player;
                     args.Channel = "@emit";
 
+                    Furres.Update(player);
+
                     ProcessServerChannelData?.Invoke(chanObject, args);
                     return;
                 }
@@ -939,6 +939,9 @@ namespace Furcadia.Net.Proxy
                 }
 
                 player.Message = FontColorRegexMatch.Groups[10].Value;
+
+                Furres.Update(player);
+
                 ProcessServerChannelData?.Invoke(chanObject, args);
                 return;
             }
@@ -1115,91 +1118,32 @@ namespace Furcadia.Net.Proxy
                             }
                             return;
                         }
-                        //Animated Move
-                        else if (data[0] == '/')
+                        //Animated Move or Move Furre
+                        else if (data[0] == '/' || data[0] == 'A')
                         {
                             player = Furres.GetFurreByID(data.Substring(1, 4));
 
                             if (player.FurreID < 1 || player.ShortName == "unknown")
                                 throw new ArgumentOutOfRangeException("Player", player, "Player not found in dream.");
 
-                            player.Location = new FurrePosition(data.Substring(5, 4));
-
-                            if (Furres.Contains(player))
-                                Furres[player] = player;
+                            var FurreMoved = new MoveFurre(data, ref player);
 
                             if (ConnectedFurre.FurreID < 1)
                                 throw new ArgumentOutOfRangeException("ConnectedFurre", ConnectedFurre, "ConnectedFurre not found in dream.");
 
-                            ViewArea VisableRectangle = new ViewArea(ConnectedFurre.Location);
+                            ViewArea ConnectedFurreVisibleRectabgle = new ViewArea(ConnectedFurre.Location);
 
-                            // TODO: Re-factor tis mess some how... -Gero
-                            if (
-                                VisableRectangle.FurreLocation.X <= player.Location.X
-                                && VisableRectangle.FurreLocation.Y <= player.Location.Y
-                                && VisableRectangle.Height >= player.Location.Y
-                                && VisableRectangle.Length >= player.Location.X
-                                )
-                            {
-                                player.InRange = true;
-                            }
-                            else
-                            {
-                                player.InRange = false;
-                            }
+                            player.InRange = ConnectedFurreVisibleRectabgle.InRange(player.Location);
 
-                            var FurreMoved = new MoveFurre(data)
-                            {
-                                Player = player
-                            };
+                            Furres.Update(player);
 
                             Logger.Debug<ProxySession>(FurreMoved);
                             ProcessServerInstruction?.Invoke(FurreMoved,
-                                  new ParseServerArgs(ServerInstructionType.AnimatedMoveAvatar, ServerConnectPhase));
+                                  new ParseServerArgs(FurreMoved.InstructionType, ServerConnectPhase));
 
                             return;
                         }
-                        // Move Avatar
-                        else if (data[0] == 'A')
-                        {
-                            player = Furres.GetFurreByID(data.Substring(1, 4));
 
-                            if (player.FurreID < 1 || player.ShortName == "unknown")
-                                throw new ArgumentOutOfRangeException("Player", player, "Player not found in dream.");
-
-                            player.Location = new FurrePosition(data.Substring(5, 4));
-
-                            if (Furres.Contains(player))
-                                Furres[player] = player;
-
-                            if (ConnectedFurre.FurreID < 1)
-                                throw new ArgumentOutOfRangeException("ConnectedFurre", ConnectedFurre, "ConnectedFurre not found in dream.");
-
-                            //connectedFurre = Furres[connectedFurre];
-                            ViewArea VisableRectangle = new ViewArea(ConnectedFurre.Location);
-
-                            // TODO: Refactor this mess some how... -Gero
-                            if (VisableRectangle.FurreLocation.X <= player.Location.X
-                                && VisableRectangle.FurreLocation.Y <= player.Location.Y
-                                && VisableRectangle.Height >= player.Location.Y
-                                && VisableRectangle.Length >= player.Location.X
-                                )
-                            {
-                                player.InRange = true;
-                            }
-                            else
-                            {
-                                player.InRange = false;
-                            }
-                            MoveFurre FurreMoved = new MoveFurre(data)
-                            {
-                                Player = player
-                            };
-                            Logger.Debug<ProxySession>(FurreMoved);
-                            ProcessServerInstruction?.Invoke(FurreMoved,
-                                  new ParseServerArgs(ServerInstructionType.MoveAvatar, ServerConnectPhase));
-                            return;
-                        }
                         //Update ColorString
                         else if (data[0] == 'B')
                         {
@@ -1209,6 +1153,8 @@ namespace Furcadia.Net.Proxy
 
                             if (InDream)
                             {
+                                Furres.Update(player);
+
                                 ProcessServerInstruction?.Invoke(ColorStringUpdate,
                                 new ParseServerArgs(ServerInstructionType.UpdateColorString, ServerConnectPhase));
                             }
@@ -1217,9 +1163,11 @@ namespace Furcadia.Net.Proxy
                         else if (data[0] == 'C')
                         {
                             player = Furres.GetFurreByID(data.Substring(1, 4));
+
                             player.Location = new FurrePosition(data.Substring(5, 4));
                             player.Visible = false;
-                            // player.InRange = false;
+
+                            Furres.Update(player);
                         }
                         //Species Tags
                         else if (data.StartsWith("]-"))
@@ -1563,8 +1511,11 @@ namespace Furcadia.Net.Proxy
 
         private void OnServerConnected()
         {
+            if (ServerConnectPhase == ConnectionPhase.MOTD)
+                return; //Do nothing, Signal was already sent
             ServerConnectPhase = ConnectionPhase.MOTD;
-            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.Unknown));
+            ServerDisconnected?.Invoke();
+            ServerStatusChanged?.Invoke(this, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.None));
         }
 
         /// <summary>
@@ -1583,6 +1534,8 @@ namespace Furcadia.Net.Proxy
 
         private void OnServerDisonnected()
         {
+            if (ServerConnectPhase == ConnectionPhase.Disconnected)
+                return; //Do nothing, Signal was already sent
             ServerConnectPhase = ConnectionPhase.Disconnected;
             ServerDisconnected?.Invoke();
             ServerStatusChanged?.Invoke(this, new NetServerEventArgs(ServerConnectPhase, ServerInstructionType.Unknown));
