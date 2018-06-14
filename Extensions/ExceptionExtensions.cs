@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 #endregion Usings
 
-namespace Extentions
+namespace Extensions
 {
     /// <summary>
     ///

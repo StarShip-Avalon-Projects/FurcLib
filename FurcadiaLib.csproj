@@ -109,11 +109,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Extentions\ArrayExtensions.cs" />
-    <Compile Include="Extentions\ExceptionExtensions.cs" />
-    <Compile Include="Extentions\MathExtentions.cs" />
-    <Compile Include="Extentions\ObjectExtensions.cs" />
-    <Compile Include="Extentions\StringExtensions.cs" />
+    <Compile Include="Extensions\ArrayExtensions.cs" />
+    <Compile Include="Extensions\ExceptionExtensions.cs" />
+    <Compile Include="Extensions\MathExtentions.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Logging\ConcurrentList.cs" />
     <Compile Include="Logging\ConsoleLogOutput.cs" />
     <Compile Include="Logging\FileLogOutput.cs" />
